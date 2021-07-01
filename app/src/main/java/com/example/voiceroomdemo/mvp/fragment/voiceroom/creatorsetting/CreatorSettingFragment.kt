@@ -5,6 +5,8 @@
 package com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 
 import com.example.voiceroomdemo.R
+import com.example.voiceroomdemo.common.AccountStore
+import com.example.voiceroomdemo.common.loadPortrait
 import com.example.voiceroomdemo.common.ui
 import com.example.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
@@ -29,6 +31,8 @@ class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: Voice
             presenter.muteMic()
         }
         tv_member_name.text = roomInfoBean.createUser?.userName
+
+        iv_member_portrait.loadPortrait(AccountStore.getUserPortrait())
     }
 
     override fun fragmentDismiss() {
