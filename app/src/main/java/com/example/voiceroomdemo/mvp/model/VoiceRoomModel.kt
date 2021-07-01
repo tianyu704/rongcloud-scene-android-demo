@@ -115,7 +115,11 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     val currentUIRoomInfo = UiRoomModel(roomInfoSubject)
 
     var recordingStatus = true
+        get() {
+            return field
+        }
         private set(value) {
+            field = value
             recordingStatusSubject.onNext(value)
         }
 
@@ -841,10 +845,20 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
             override fun onSuccess(data: List<String>) {
                 doOnDataScheduler {
-                    roomMemberInfoList.forEach {
-                        it.isRequestSeat = data.contains(it.userId)
+                    var allUserInList = true
+                    data.forEach { userId ->
+                        if (roomMemberInfoMap[userId] == null) {
+                            allUserInList = false
+                        }
                     }
-                    memberListChangeSubject.onNext(roomMemberInfoList)
+                    if (allUserInList) {
+                        roomMemberInfoList.forEach {
+                            it.isRequestSeat = data.contains(it.userId)
+                        }
+                        memberListChangeSubject.onNext(roomMemberInfoList)
+                    } else {
+                        refreshAllMemberInfoList()
+                    }
                 }
             }
         })
@@ -1045,6 +1059,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     fun setRecordingEnable(enable: Boolean): Completable {
         return Completable.create { emitter ->
             RCVoiceRoomEngine.getInstance().disableAudioRecording(!enable)
+            recordingStatus = enable
             emitter.onComplete()
         }
     }

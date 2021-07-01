@@ -42,7 +42,7 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
     }
 
     fun muteSelf() {
-        if (seatInfo.userId == AccountStore.getUserId()) {
+        if (seatInfo.userId != null) {
             addDisposable(
                 roomModel
                     .setRecordingEnable(!roomModel.recordingStatus)
