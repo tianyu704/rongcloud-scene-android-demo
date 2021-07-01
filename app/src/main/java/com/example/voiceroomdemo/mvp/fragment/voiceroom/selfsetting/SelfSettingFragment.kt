@@ -44,7 +44,7 @@ class SelfSettingFragment(view: ISelfSettingView,var seatInfo:UiSeatModel,val ro
     }
 
     override fun onRecordStatusChange(isRecording:Boolean) {
-        if(isRecording){
+        if(!isRecording){
             btn_mute_self.text = "打开麦克风"
         }else{
             btn_mute_self.text = "关闭麦克风"

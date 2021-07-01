@@ -46,6 +46,11 @@ android {
                     output->outputFileName = new File(variant.name,"RTC_RC_"+releaseTime()+".apk")
                 }
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 static def releaseTime() {
