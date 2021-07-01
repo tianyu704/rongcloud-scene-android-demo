@@ -569,7 +569,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                                 ).show(this@VoiceRoomActivity.supportFragmentManager)
                             }
                         } else {
-                            presenter.enterSeat(0)
+                            presenter.roomOwnerEnterSeat()
                         }
                     }
                 }
