@@ -1437,23 +1437,17 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     }
                     muteSelfIfNeed();
                 } else {
-                    List<RCRTCInputStream> list = new ArrayList<>();
-                    for (RCRTCRemoteUser remoteUser : data.getRemoteUsers()) {
-                        list.addAll(remoteUser.getStreams());
-                    }
-                    if (list.size() > 0) {
-                        data.getLocalUser().subscribeStreams(data.getLiveStreams(), new IRCRTCResultCallback() {
-                            @Override
-                            public void onSuccess() {
-                                Log.d(TAG, "subscribeStreams:onSuccess: ");
-                            }
+                    data.getLocalUser().subscribeStreams(data.getLiveStreams(), new IRCRTCResultCallback() {
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "subscribeStreams:onSuccess: ");
+                        }
 
-                            @Override
-                            public void onFailed(RTCErrorCode errorCode) {
-                                Log.d(TAG, "subscribeStreams:onFailed : " + "errorCode = " + errorCode.getValue());
-                            }
-                        });
-                    }
+                        @Override
+                        public void onFailed(RTCErrorCode errorCode) {
+                            Log.d(TAG, "subscribeStreams:onFailed : " + "errorCode = " + errorCode.getValue());
+                        }
+                    });
                     enableSpeaker(true);
                 }
                 onSuccessWithCheck(callback);
