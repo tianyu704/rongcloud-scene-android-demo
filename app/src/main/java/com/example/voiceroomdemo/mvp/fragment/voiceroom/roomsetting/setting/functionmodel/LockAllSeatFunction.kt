@@ -26,7 +26,7 @@ class LockAllSeatFunction(roomId: String, val view: IRoomSettingView) :
                         }))
                     }
                 } else {
-                    onDataChange(R.drawable.ic_room_setting_unlock_all, "全麦锁座") {
+                    onDataChange(R.drawable.ic_room_setting_lock_all, "全麦锁座") {
                         addDisposable(roomModel.setAllSeatLock(true).subscribe({
                             view.showMessage("设置成功")
                         }, {
