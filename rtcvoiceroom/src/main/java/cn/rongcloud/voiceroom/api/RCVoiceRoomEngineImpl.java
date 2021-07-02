@@ -598,7 +598,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
-    public void muteOtherSeats(boolean isMute) {
+    public void muteOtherSeats(final boolean isMute) {
         mRoomInfo.setMuteAll(isMute);
         final List<RCVoiceSeatInfo> list = new ArrayList<>();
         for (int i = 0; i < mRCVoiceSeatInfoList.size(); i++) {
@@ -630,6 +630,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setMute(seatInfoClone.isMute());
                     if (requestingCount.decrementAndGet() == 0) {
+                        mRoomInfo.setMuteAll(isMute);
+                        updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
                             listener.onSeatInfoUpdate(mRCVoiceSeatInfoList);
@@ -661,7 +663,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
-    public void lockOtherSeats(boolean isLock) {
+    public void lockOtherSeats(final boolean isLock) {
         mRoomInfo.setLockAll(isLock);
         List<RCVoiceSeatInfo> list = new ArrayList<>();
         for (int i = 0; i < mRCVoiceSeatInfoList.size(); i++) {
@@ -690,6 +692,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setStatus(seatInfoClone.getStatus());
                     if (atomicInteger.decrementAndGet() == 0) {
+                        mRoomInfo.setLockAll(isLock);
+                        updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
                             listener.onSeatInfoUpdate(mRCVoiceSeatInfoList);
@@ -1378,7 +1382,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    Log.d(TAG, "switchRole: role = "+role.getType());
+                    Log.d(TAG, "switchRole: role = " + role.getType());
                     joinRTCRoom(mRoomId, role, callback);
                 }
 
@@ -1402,7 +1406,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             public void onSuccess(RCRTCRoom data) {
                 mRoom = data;
                 data.registerRoomListener(mVREventListener);
-                Log.d(TAG, "joinRTCRoom: role = "+role.getType());
+                Log.d(TAG, "joinRTCRoom: role = " + role.getType());
                 if (RCRTCLiveRole.BROADCASTER.equals(role)) {
                     data.getLocalUser().publishDefaultStreams(new IRCRTCResultCallback() {
                         @Override
