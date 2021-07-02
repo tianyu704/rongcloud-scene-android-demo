@@ -59,6 +59,7 @@ android {
 
 dependencies {
     api 'cn.rongcloud.sdk:im_lib:5.1.2'
+    compileOnly 'cn.rongcloud.sdk:im_kit:5.1.2'
     api 'cn.rongcloud.sdk:rtc_lib:5.1.2'
 }
 
