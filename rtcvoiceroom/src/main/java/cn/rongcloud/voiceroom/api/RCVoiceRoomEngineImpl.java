@@ -630,7 +630,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setMute(seatInfoClone.isMute());
                     if (requestingCount.decrementAndGet() == 0) {
-                        mRoomInfo.setMuteAll(isMute);
                         updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
@@ -692,7 +691,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setStatus(seatInfoClone.getStatus());
                     if (atomicInteger.decrementAndGet() == 0) {
-                        mRoomInfo.setLockAll(isLock);
                         updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
