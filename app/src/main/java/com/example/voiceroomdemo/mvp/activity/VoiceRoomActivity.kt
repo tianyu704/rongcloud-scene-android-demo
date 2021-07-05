@@ -308,7 +308,9 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             ConfirmDialog(
                 this,
                 "您被${if (isCreateReceive) "房主" else "管理员"}邀请上麦，是否同意?",
-                true,
+                false,
+                "同意",
+                "拒绝",
                 cancelBlock = {
                     presenter.refuseInvite(userId)
                 }) {
@@ -647,7 +649,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
                     }, closeRoomBlock = {
                         exitRoomPopupWindow?.dismiss()
-                        ConfirmDialog(context, "确定结束本次直播吗？", true) {
+                        ConfirmDialog(context, "确定结束本次直播吗？",true) {
                             presenter.closeRoom()
                         }.show()
                     })

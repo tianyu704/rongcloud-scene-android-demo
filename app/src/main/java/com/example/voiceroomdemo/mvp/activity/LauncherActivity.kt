@@ -6,39 +6,41 @@ package com.example.voiceroomdemo.mvp.activity
 
 import android.app.Application
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import android.os.PersistableBundle
+import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import com.example.voiceroomdemo.MyApp
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.setAndroidNativeLightStatusBar
+import com.example.voiceroomdemo.common.showToast
 import kotlinx.android.synthetic.main.activity_launcher.*
-import pub.devrel.easypermissions.AfterPermissionGranted
-import pub.devrel.easypermissions.EasyPermissions
+import java.util.*
 
-private const val PERMISSION_STORAGE_CODE = 1001;
-private val PERMISSIONS = arrayOf(
-    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-    android.Manifest.permission.RECORD_AUDIO
-)
 
-class LauncherActivity : AppCompatActivity(), EasyPermissions.PermissionCallbacks {
+class LauncherActivity : PermissionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setAndroidNativeLightStatusBar(true)
         setContentView(R.layout.activity_launcher)
-        if (EasyPermissions.hasPermissions(this, *PERMISSIONS)) {
-            iv_logo.postDelayed({
-                turnToActivity()
-            }, 1000L)
+    }
+
+    override fun onSetPermissions(): Array<String> {
+        return PERMISSIONS;
+    }
+
+    override fun onAccept(accept: Boolean) {
+        Log.e("LauncherActivity","accept = "+accept)
+        if (accept) {
+            turnToActivity()
         } else {
-            EasyPermissions.requestPermissions(this, "", PERMISSION_STORAGE_CODE, *PERMISSIONS)
+            showToast("请赋予必要权限！")
+            finish()
         }
     }
 
-    @AfterPermissionGranted(PERMISSION_STORAGE_CODE)
     private fun turnToActivity() {
         if (AccountStore.getImToken().isNullOrBlank()) {
             LoginActivity.startActivity(this)
@@ -61,24 +63,4 @@ class LauncherActivity : AppCompatActivity(), EasyPermissions.PermissionCallback
                 })
         }
     }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-
-    }
-
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-
-    }
-
-
 }

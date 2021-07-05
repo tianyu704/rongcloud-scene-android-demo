@@ -47,7 +47,7 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
                 roomModel
                     .setRecordingEnable(!roomModel.recordingStatus)
                     .subscribe({
-
+                        view.showMessage("修改成功")
                     }, {
                         view.showError(it.message)
                     })
@@ -64,6 +64,7 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
                 .leaveSeat(AccountStore.getUserId()!!)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    view.showMessage("您已断开连接")
                     view.fragmentDismiss()
                 }, {
                     view.showError(it.message)

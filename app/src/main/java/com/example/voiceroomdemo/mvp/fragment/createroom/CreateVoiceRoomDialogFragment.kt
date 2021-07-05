@@ -20,6 +20,7 @@ import com.example.voiceroomdemo.common.loadImageView
 import com.example.voiceroomdemo.common.showToast
 import com.example.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import com.example.voiceroomdemo.ui.dialog.InputPasswordDialog
+import com.example.voiceroomdemo.utils.ImageLoaderUtil
 import com.example.voiceroomdemo.utils.MaxLengthWithEmojiFilter
 import kotlinx.android.synthetic.main.layout_create_room.*
 
@@ -169,6 +170,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
                 val picturePath: String = cursor.getString(columnIndex)
                 cursor.close()
                 roomCover = picturePath
+                Log.e("CreateVoiceRoom","path = "+picturePath);
                 iv_room_cover.loadImageView(picturePath)
             }
         }

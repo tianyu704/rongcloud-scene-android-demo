@@ -241,6 +241,9 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 if (eventInfo.second[1] == AccountStore.getUserId()) {
                     view.showMessage("你已被踢出房间")
                     leaveRoom()
+                }else{
+                    // TODO: 2021/7/2 显示被踢消息 
+                    sendSystemMessage("显示别人被踢消息")
                 }
             }
             EVENT_REQUEST_SEAT_REFUSE -> {
@@ -317,6 +320,11 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 //        }, false)
     }
 
+    private fun sendSystemMessage(msg: String) {
+        RCChatRoomMessageManager.sendLocationMessage(
+            roomId, msg
+        )
+    }
     fun leaveRoom() {
         val index = roomModel.isInSeat(AccountStore.getUserId()!!)
         if (index > -1) {

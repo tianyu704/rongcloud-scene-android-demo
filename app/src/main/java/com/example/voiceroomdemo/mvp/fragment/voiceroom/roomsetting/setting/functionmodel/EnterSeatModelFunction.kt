@@ -19,7 +19,7 @@ class EnterSeatModelFunction(roomId: String, val view: IRoomSettingView) :
             .obRoomInfoChange()
             .subscribe { info ->
                 if (info.isFreeEnterSeat) {
-                    onDataChange(R.drawable.ic_room_setting_request_seat_model, "申请上麦模式") {
+                    onDataChange(R.drawable.ic_room_setting_request_seat_model, "申请上麦") {
                         addDisposable(
                             roomModel
                                 .setSeatMode(false)
@@ -36,7 +36,7 @@ class EnterSeatModelFunction(roomId: String, val view: IRoomSettingView) :
                         )
                     }
                 } else {
-                    onDataChange(R.drawable.ic_room_setting_free_enter_model, "自由上麦模式") {
+                    onDataChange(R.drawable.ic_room_setting_free_enter_model, "自由上麦") {
                         addDisposable(
                             roomModel
                                 .setSeatMode(true)

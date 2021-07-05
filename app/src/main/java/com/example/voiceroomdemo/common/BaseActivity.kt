@@ -7,6 +7,7 @@ package com.example.voiceroomdemo.common
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.mvp.activity.LoginActivity
+import com.example.voiceroomdemo.mvp.activity.PermissionActivity
 import kotlinx.android.synthetic.main.layout_custom_action_bar.*
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -28,7 +30,7 @@ private const val DEFAULT_EMPTY_VIEW = R.layout.layout_empty
 private const val DEFAULT_ERROR_VIEW = R.layout.layout_error
 private const val DEFAULT_LOADING_VIEW = R.layout.layout_loading
 
-abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : AppCompatActivity(),
+abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : PermissionActivity(),
     IBaseView, EasyPermissions.PermissionCallbacks {
 
     lateinit var presenter: P
@@ -43,16 +45,39 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : AppC
         setAndroidNativeLightStatusBar(isLightThemeActivity())
         setScreenPortrait()
         beforeInitView()
-        setContentView(LayoutInflater.from(this).inflate(getContentView(), null, false).apply {
-            mRootView = this
-        })
-        presenter = initPresenter()
-        afterInitPresenter()
-        supportActionBar?.let {
-            initActionBar(it)
+        // initView initData 移动赋予权限onAccept()后,避免因权限导致的一些异常
+        // setContentView(LayoutInflater.from(this).inflate(getContentView(), null, false).apply {
+        //     mRootView = this
+        // })
+        // presenter = initPresenter()
+        // afterInitPresenter()
+        //  supportActionBar?.let {
+        //   initActionBar(it)
+        // }
+        // initView()
+        //initData()
+    }
+
+    override fun onSetPermissions(): Array<String> {
+        return PERMISSIONS;
+    }
+
+    override fun onAccept(accept: Boolean) {
+        if (accept) {
+            setContentView(LayoutInflater.from(this).inflate(getContentView(), null, false).apply {
+                mRootView = this
+            })
+            presenter = initPresenter()
+            afterInitPresenter()
+            supportActionBar?.let {
+                initActionBar(it)
+            }
+            initView()
+            initData()
+        } else {
+            showToast("请赋予必要权限！")
+            finish()
         }
-        initView()
-        initData()
     }
 
     private fun setScreenPortrait() {
@@ -120,11 +145,12 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : AppC
     override fun showWaitingDialog() {
         ui {
             if (waitingDialog == null) {
-                waitingDialog = AlertDialog.Builder(this, R.style.TransparentDialog).create().apply {
-                    window?.setBackgroundDrawable(ColorDrawable())
-                    setCancelable(false)
-                    setCanceledOnTouchOutside(false)
-                }
+                waitingDialog =
+                    AlertDialog.Builder(this, R.style.TransparentDialog).create().apply {
+                        window?.setBackgroundDrawable(ColorDrawable())
+                        setCancelable(false)
+                        setCanceledOnTouchOutside(false)
+                    }
             }
             waitingDialog?.show()
             waitingDialog?.setContentView(R.layout.layout_waiting_dialog)
@@ -221,7 +247,7 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : AppC
         showError(-1, message)
     }
 
-    override fun showMessage(message:String?) {
+    override fun showMessage(message: String?) {
         ui {
             message?.let {
                 showToast(it)

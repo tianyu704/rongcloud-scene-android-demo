@@ -16,6 +16,8 @@ class ConfirmDialog(
     context: Context,
     val message: String,
     private val needDismiss: Boolean = false,
+    val confirm: String = "确定",
+    val cancel: String = "取消",
     val cancelBlock: (() -> Unit)? = null,
     val confirmBlock: () -> Unit
 ) :
@@ -34,5 +36,7 @@ class ConfirmDialog(
 
     override fun initView() {
         tv_message.text = message
+        btn_cancel.text = cancel;
+        btn_confirm.text = confirm;
     }
 }

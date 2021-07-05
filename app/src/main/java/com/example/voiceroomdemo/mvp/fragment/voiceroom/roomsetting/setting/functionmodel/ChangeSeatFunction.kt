@@ -20,12 +20,12 @@ class ChangeSeatFunction(roomId: String, val view: IRoomSettingView) :
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { list ->
                 if (list.size == 9) {
-                    onDataChange(R.drawable.ic_room_setting_4_seat,"设置 4 个座位"){
+                    onDataChange(R.drawable.ic_room_setting_4_seat,"设置 4 个\n座位"){
                         roomModel.setSeatCount(5)
                         view.hideSettingView()
                     }
                 } else {
-                    onDataChange(R.drawable.ic_room_setting_8_seat,"设置 8 个座位"){
+                    onDataChange(R.drawable.ic_room_setting_8_seat,"设置 8 个\n座位"){
                         roomModel.setSeatCount(9)
                         view.hideSettingView()
                     }
