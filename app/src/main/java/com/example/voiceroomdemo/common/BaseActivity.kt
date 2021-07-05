@@ -41,10 +41,10 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
     private var waitingDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         setAndroidNativeLightStatusBar(isLightThemeActivity())
         setScreenPortrait()
         beforeInitView()
+        super.onCreate(savedInstanceState)
         // initView initData 移动赋予权限onAccept()后,避免因权限导致的一些异常
         // setContentView(LayoutInflater.from(this).inflate(getContentView(), null, false).apply {
         //     mRootView = this
@@ -240,6 +240,7 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
     }
 
     override fun showError(errorCode: Int, message: String?) {
+        Log.e(this::class.java.name, "showError: $message")
         showToast(message)
     }
 
