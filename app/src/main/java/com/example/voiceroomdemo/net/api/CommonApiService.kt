@@ -99,8 +99,11 @@ interface CommonApiService {
     fun setAdmin(@Body settingAdminRequest: SettingAdminRequest): Single<SimpleRespondBean>
 
     @PUT("/mic/room/name")
-    fun setRoomName(@Body roomNameRequest: RoomNameRequest):Single<SimpleRespondBean>
+    fun setRoomName(@Body roomNameRequest: RoomNameRequest): Single<SimpleRespondBean>
 
     @PUT("/mic/room/setting")
-    fun setRoomSetting(@Body roomSettingRequest: RoomSettingRequest):Single<SimpleRespondBean>
+    fun setRoomSetting(@Body roomSettingRequest: RoomSettingRequest): Single<SimpleRespondBean>
+
+    @POST("/user/batch")
+    fun getUserInfoList(@Body userIdList: UserIdList): Single<VoiceRoomMemberListBean>
 }

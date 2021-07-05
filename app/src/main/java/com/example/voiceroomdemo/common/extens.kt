@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import com.example.voiceroomdemo.MyApp
 import com.example.voiceroomdemo.R
+import com.example.voiceroomdemo.net.api.ApiConstant
 import com.example.voiceroomdemo.utils.ImageLoaderUtil
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -142,4 +143,13 @@ fun View.setAvoidFastClickListener(
             }
         }
     }.throttleFirst(windowDuration, unit).subscribe { listener(it) }
+}
+
+fun String.getCompletePortraitUrl(): String? {
+    if (this.isNotNullOrEmpty()) {
+        if (!this.startsWith("http") && !this.startsWith("file", true)) {
+            return "${ApiConstant.FILE_URL}$this"
+        }
+    }
+    return null
 }

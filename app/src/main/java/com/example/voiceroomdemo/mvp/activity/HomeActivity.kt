@@ -17,19 +17,16 @@ import com.example.voiceroomdemo.common.*
 import com.example.voiceroomdemo.mvp.activity.iview.IHomeView
 import com.example.voiceroomdemo.mvp.presenter.HomePresenter
 import com.example.voiceroomdemo.ui.dialog.UserInfoDialog
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.example.voiceroomdemo.utils.LocalUserInfoManager
 import de.hdodenhof.circleimageview.CircleImageView
+import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_portrait.*
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
 
 private const val TAG = "HomeActivity"
-
-
 
 
 class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
@@ -40,8 +37,6 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
             context.startActivity(intent)
         }
     }
-
-
 
 
     private var userInfoDialog: UserInfoDialog? = null
@@ -64,7 +59,6 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
             showToast("暂未实现")
         }
     }
-
 
     override fun getActionTitle(): CharSequence? {
         return null
@@ -104,12 +98,17 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
             .inflate(R.layout.layout_right_title_icon, null) as AppCompatImageView
         imageView.setImageResource(R.drawable.ic_message)
         imageView.setOnClickListener {
-            MessageListActivity.startActivity(this)
+            RouteUtils.routeToSubConversationListActivity(
+                this,
+                Conversation.ConversationType.PRIVATE,
+                "消息"
+            )
         }
         return imageView
     }
 
     override fun initData() {
+        LocalUserInfoManager.getUserInfoByUserId("");
     }
 
     override fun modifyInfoSuccess() {

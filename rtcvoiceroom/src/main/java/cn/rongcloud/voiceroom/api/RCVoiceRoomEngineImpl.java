@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -98,11 +97,23 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     private final Map<String, RCVoiceSeatInfo> mUserOnSeatMap;
     private final List<RCVoiceSeatInfo> mRCVoiceSeatInfoList;
 
+    private RCVoiceRoomClientDelegate clientDelegate;
+
     private RCVoiceRoomEngineImpl() {
         mMessageReceiveListenerList = new CopyOnWriteArrayList<>();
         mUserOnSeatMap = new ConcurrentHashMap<>();
         mRCVoiceSeatInfoList = new CopyOnWriteArrayList<>();
         mVREventListener = new IRCRTCVoiceRoomEventsListener();
+
+        try {
+            if (null != Class.forName("io.rong.imkit.RongIM")) {
+                Log.d(TAG, "RCVoiceRoomEngineImpl: init RCIMKitReceiver");
+                clientDelegate = new RCIMKitReceiver();
+            }
+        } catch (ClassNotFoundException e) {
+            Log.d(TAG, "RCVoiceRoomEngineImpl: init RCIMLibReceiver");
+            clientDelegate = new RCIMLibReceiver();
+        }
     }
 
     public static RCVoiceRoomEngine getInstance() {
@@ -136,9 +147,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     @Override
     public void initWithAppKey(Application context, String appKey) {
         RongCoreClient.setServerInfo("http://navqa.cn.ronghub.com", "upload.qiniup.com");
-        RongCoreClient.init(context, appKey);
-        RongCoreClient.registerMessageType(Arrays.asList(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class));
-        RongCoreClient.setOnReceiveMessageListener(this);
+        clientDelegate.initWithAppKey(context, appKey);
+        clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
+        clientDelegate.setReceiveMessageDelegate(this);
         RongChatRoomClient.getInstance().setKVStatusListener(this);
     }
 
@@ -154,7 +165,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void connectWithToken(final Application context, String appToken, final RCVoiceRoomCallback callback) {
-        RongCoreClient.connect(appToken, new IRongCoreCallback.ConnectCallback() {
+        clientDelegate.connectWithToken(appToken, new RCVoiceRoomClientDelegate.ConnectCallback() {
             @Override
             public void onSuccess(String userId) {
                 Log.d(TAG, "onSuccess: userId = " + userId);
@@ -164,17 +175,16 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
 
             @Override
-            public void onError(IRongCoreEnum.ConnectionErrorCode e) {
-                Log.d(TAG, "onError: error code = " + e.getValue());
-                onErrorWithCheck(callback, e.getValue(), "Init token failed");
+            public void onError(int code) {
+                Log.d(TAG, "onError: error code = " + code);
+                onErrorWithCheck(callback, code, "Init token failed");
             }
 
             @Override
-            public void onDatabaseOpened(IRongCoreEnum.DatabaseOpenStatus code) {
+            public void onDatabaseOpened(int code) {
                 Log.d(TAG, "onDatabaseOpened: ");
             }
         });
-
     }
 
     @Override
@@ -448,8 +458,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         inviteMessage.setContent(RC_PICKER_USER_SEAT_CONTENT);
         inviteMessage.setInvitationId(uuid);
         inviteMessage.setTargetId(userId);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mRoomId, inviteMessage, null, null, new IRongCoreCallback.ISendMessageCallback() {
-
+        clientDelegate.sendMessage(mRoomId, inviteMessage, new RCVoiceRoomClientDelegate.SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
 
@@ -461,10 +470,12 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
 
             @Override
-            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+            public void onError(Message message, int code, String reason) {
+                onErrorWithCheck(callback, code, reason);
             }
         });
+
+
     }
 
     @Override
@@ -512,8 +523,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         message.setInvitationId(uuid);
         message.setTargetId(userId);
         message.setContent(RC_KICK_USER_OUT_ROOM_CONTENT);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mRoomId, message, null, null, new IRongCoreCallback.ISendMessageCallback() {
-
+        clientDelegate.sendMessage(mRoomId, message, new RCVoiceRoomClientDelegate.SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
 
@@ -529,8 +539,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
 
             @Override
-            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+            public void onError(Message message, int code, String reason) {
+                onErrorWithCheck(callback, code, reason);
             }
         });
 
@@ -716,7 +726,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void sendMessage(MessageContent message, final RCVoiceRoomCallback callback) {
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mRoomId, message, null, null, new IRongCoreCallback.ISendMessageCallback() {
+
+        clientDelegate.sendMessage(mRoomId, message, new RCVoiceRoomClientDelegate.SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
 
@@ -728,8 +739,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
 
             @Override
-            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+            public void onError(Message message, int code, String reason) {
+                onErrorWithCheck(callback, code, reason);
             }
         });
     }
@@ -933,7 +944,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         inviteMessage.setSendUserId(mCurrentUserId);
         inviteMessage.setType(RCVoiceRoomInviteMessage.RCInviteCmdType.RCInviteCmdTypeRequest);
         inviteMessage.setContent(content);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mRoomId, inviteMessage, null, null, new IRongCoreCallback.ISendMessageCallback() {
+
+        clientDelegate.sendMessage(mRoomId, inviteMessage, new RCVoiceRoomClientDelegate.SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
 
@@ -945,8 +957,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
 
             @Override
-            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+            public void onError(Message message, int code, String reason) {
+                onErrorWithCheck(callback, code, reason);
             }
         });
     }
@@ -957,12 +969,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         inviteMessage.setInvitationId(invitationId);
         inviteMessage.setSendUserId(mCurrentUserId);
         inviteMessage.setType(RCVoiceRoomInviteMessage.RCInviteCmdType.RCInviteCmdTypeReject);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM,
+        clientDelegate.sendMessage(
                 mRoomId,
                 inviteMessage,
-                null,
-                null,
-                new IRongCoreCallback.ISendMessageCallback() {
+                new RCVoiceRoomClientDelegate.SendMessageCallback() {
                     @Override
                     public void onAttached(Message message) {
 
@@ -974,10 +984,12 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     }
 
                     @Override
-                    public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                        onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+                    public void onError(Message message, int code, String reason) {
+                        onErrorWithCheck(callback, code, reason);
                     }
-                });
+                }
+        );
+
     }
 
     @Override
@@ -986,12 +998,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         inviteMessage.setInvitationId(invitationId);
         inviteMessage.setSendUserId(mCurrentUserId);
         inviteMessage.setType(RCVoiceRoomInviteMessage.RCInviteCmdType.RCInviteCmdTypeAccept);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM,
+        clientDelegate.sendMessage(
                 mRoomId,
                 inviteMessage,
-                null,
-                null,
-                new IRongCoreCallback.ISendMessageCallback() {
+                new RCVoiceRoomClientDelegate.SendMessageCallback() {
                     @Override
                     public void onAttached(Message message) {
 
@@ -1003,10 +1013,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     }
 
                     @Override
-                    public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                        onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+                    public void onError(Message message, int code, String reason) {
+                        onErrorWithCheck(callback, code, reason);
                     }
-                });
+                }
+        );
     }
 
     @Override
@@ -1015,12 +1026,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         inviteMessage.setInvitationId(invitationId);
         inviteMessage.setSendUserId(mCurrentUserId);
         inviteMessage.setType(RCVoiceRoomInviteMessage.RCInviteCmdType.RCInviteCmdTypeCancel);
-        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM,
+        clientDelegate.sendMessage(
                 mRoomId,
                 inviteMessage,
-                null,
-                null,
-                new IRongCoreCallback.ISendMessageCallback() {
+                new RCVoiceRoomClientDelegate.SendMessageCallback() {
                     @Override
                     public void onAttached(Message message) {
 
@@ -1032,8 +1041,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     }
 
                     @Override
-                    public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                        onErrorWithCheck(callback, coreErrorCode.getValue(), coreErrorCode.getMessage());
+                    public void onError(Message message, int code, String reason) {
+                        onErrorWithCheck(callback, code, reason);
                     }
                 });
     }
@@ -1058,7 +1067,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void disConnect() {
-        RongCoreClient.getInstance().disconnect(true);
+        clientDelegate.disconnect(true);
     }
 
     private RCVoiceRoomEventListener getCurrentRoomEventListener() {

@@ -20,6 +20,7 @@ import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
+import com.example.voiceroomdemo.utils.LocalUserInfoManager
 import com.example.voiceroomdemo.utils.RCChatRoomMessageManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
@@ -330,6 +331,12 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             return null
         }
         return roomMemberInfoList.find { member -> member.userId == userId }
+            ?: LocalUserInfoManager.getUserInfoByUserId(userId)?.run {
+                UiMemberModel(memberInfoChangeSubject).apply {
+                    this.member = member
+                    roomMemberInfoList.add(this)
+                }
+            }
     }
 
 
@@ -775,6 +782,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                                 roomMemberInfoList.add(this)
                             }
                     }
+                    LocalUserInfoManager.addUserInfoToCache(member)
                 }
                 // 移除过期数据
                 membersBean.data?.let { members ->
