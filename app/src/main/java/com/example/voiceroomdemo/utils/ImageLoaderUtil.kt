@@ -9,8 +9,7 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
 import com.example.voiceroomdemo.R
-import com.example.voiceroomdemo.common.isNotNullOrEmpty
-import com.example.voiceroomdemo.net.api.ApiConstant
+import com.example.voiceroomdemo.common.getCompletePortraitUrl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
@@ -34,12 +33,7 @@ object ImageLoaderUtil {
     }
 
     fun loadPortrait(context: Context, imageView: ImageView, url: String) {
-        var realUrl = url
-        if (url.isNotNullOrEmpty()) {
-            if (!realUrl.startsWith("http") && !realUrl.startsWith("file", true)) {
-                realUrl = "${ApiConstant.FILE_URL}$realUrl"
-            }
-        }
+        val realUrl = url.getCompletePortraitUrl() ?: ""
         Glide.with(context).load(realUrl).error(R.drawable.default_portrait)
             .placeholder(R.drawable.default_portrait).centerCrop().into(imageView)
     }

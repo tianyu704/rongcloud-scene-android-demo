@@ -86,6 +86,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences-rxjava3:1.0.0-beta01")
 
     implementation project(path: ':rtcvoiceroom')
+    implementation 'cn.rongcloud.sdk:im_kit:5.1.2'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 

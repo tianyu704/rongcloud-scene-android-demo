@@ -9,6 +9,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.voiceroomdemo.R
+import io.rong.imkit.RongIM
 
 private const val TAG = "MessageListActivity"
 

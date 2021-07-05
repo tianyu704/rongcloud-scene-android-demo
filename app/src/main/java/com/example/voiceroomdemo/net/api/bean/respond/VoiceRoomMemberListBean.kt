@@ -30,4 +30,9 @@ data class Member(
     var userId: String,
     @SerializedName("userName")
     var userName: String? = null
-):Parcelable
+) : Parcelable
+
+data class UserIdList(
+    @SerializedName("userIds")
+    val userIds: List<String> = arrayListOf()
+)

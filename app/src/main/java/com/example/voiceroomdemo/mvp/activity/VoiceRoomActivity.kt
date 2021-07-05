@@ -48,6 +48,8 @@ import com.example.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
 import com.vanniktech.emoji.EmojiPopup
+import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_voice_room.*
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
@@ -167,6 +169,14 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             roomInfo.roomBean?.let {
                 SeatOrderOperationFragment(this, it).show(supportFragmentManager)
             }
+        }
+
+        iv_send_message.setOnClickListener {
+            RouteUtils.routeToSubConversationListActivity(
+                this,
+                Conversation.ConversationType.PRIVATE,
+                "消息"
+            )
         }
 
 
