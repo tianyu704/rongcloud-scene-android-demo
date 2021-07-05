@@ -30,6 +30,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.ChatRoomInfo
+import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 
 /**
@@ -110,6 +111,8 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     private val recordingStatusSubject = BehaviorSubject.create<Boolean>()
 
+    private val privateMessageSubject = BehaviorSubject.create<Int>()
+
     private val roomEventSubject: BehaviorSubject<Pair<String, ArrayList<String>>> =
         BehaviorSubject.create()
 
@@ -184,6 +187,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     fun obRecordingStatusChange(): Observable<Boolean> {
         return recordingStatusSubject.observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun obUnreadMessageNumberChange(): Observable<Int> {
+        return privateMessageSubject.observeOn(AndroidSchedulers.mainThread())
     }
 
 
@@ -540,9 +547,26 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     override fun onMessageReceived(message: Message) {
         doOnDataScheduler {
-            //        Log.d(TAG, "onMessageReceived: ${message.toString()}")
+            if (message.conversationType == Conversation.ConversationType.PRIVATE) {
+                noticeRefreshUnreadMessageCount()
+            }
         }
+    }
 
+    fun noticeRefreshUnreadMessageCount() {
+        RongIMClient.getInstance().getUnreadCount(
+            object :
+                RongIMClient.ResultCallback<Int>() {
+                override fun onSuccess(p0: Int) {
+                    privateMessageSubject.onNext(p0)
+                }
+
+                override fun onError(p0: RongIMClient.ErrorCode) {
+
+                }
+            },
+            Conversation.ConversationType.PRIVATE
+        )
     }
 
     fun obSeatInfoByIndex(index: Int): Observable<UiSeatModel> {

@@ -254,6 +254,20 @@
                 app:layout_constraintEnd_toStartOf="@+id/iv_room_setting"
                 app:srcCompat="@drawable/ic_send_message" />
 
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_unread_message_number"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:background="@drawable/bg_seat_order_subscript"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textColor="@color/whiteTextColor"
+                android:textSize="10sp"
+                app:layout_constraintEnd_toEndOf="@+id/iv_send_message"
+                app:layout_constraintTop_toTopOf="@+id/iv_send_message"
+                tools:text="11" />
+
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_send_gift"
                 android:layout_width="0dp"

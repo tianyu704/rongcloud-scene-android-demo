@@ -12,6 +12,8 @@ import com.example.voiceroomdemo.common.ui
 import com.example.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
+import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.layout_member_setting.*
 
 /**
@@ -66,7 +68,7 @@ class MemberSettingFragment(
             view.showError("暂未开放")
         }
         btn_send_message.setOnClickListener {
-            view.showError("暂未开放")
+            RouteUtils.routeToConversationActivity(requireContext(),Conversation.ConversationType.PRIVATE,member.userId)
         }
 
 

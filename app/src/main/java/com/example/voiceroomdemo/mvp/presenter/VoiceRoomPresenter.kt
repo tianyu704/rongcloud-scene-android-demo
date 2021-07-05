@@ -190,6 +190,14 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 }
         )
 
+        addDisposable(
+            roomModel
+                .obUnreadMessageNumberChange()
+                .subscribe {
+                    view.showUnreadMessage(it)
+                }
+        )
+
         addDisposable(roomModel
             .obRequestSeatListChange()
             .map {
@@ -478,5 +486,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         } else {
             view.showError("当前没有空余的麦位")
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        roomModel.noticeRefreshUnreadMessageCount()
     }
 }

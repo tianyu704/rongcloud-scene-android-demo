@@ -347,6 +347,15 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         currentRole.showUnReadRequestNumber(number)
     }
 
+    override fun showUnreadMessage(count: Int) {
+        tv_unread_message_number.isVisible = count > 0
+        tv_unread_message_number.text = if (count < 99) {
+            "$count"
+        } else {
+            "99+"
+        }
+    }
+
 
     override fun initData() {
 

@@ -11,7 +11,8 @@ import android.database.Cursor
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.view.isVisible
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.*
 import com.example.voiceroomdemo.mvp.activity.iview.IHomeView
@@ -20,8 +21,12 @@ import com.example.voiceroomdemo.ui.dialog.UserInfoDialog
 import com.example.voiceroomdemo.utils.LocalUserInfoManager
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.IRongCoreListener
+import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
@@ -29,7 +34,8 @@ private const val PICTURE_SELECTED_RESULT_CODE = 10001
 private const val TAG = "HomeActivity"
 
 
-class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
+class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
+    IRongCoreListener.OnReceiveMessageListener {
 
     companion object {
         fun startActivity(context: Context) {
@@ -91,24 +97,47 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
                 it.dismiss()
             }
         }
+        RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
     }
 
     override fun getRightActionButton(): View? {
-        val imageView = LayoutInflater.from(this)
-            .inflate(R.layout.layout_right_title_icon, null) as AppCompatImageView
-        imageView.setImageResource(R.drawable.ic_message)
-        imageView.setOnClickListener {
-            RouteUtils.routeToSubConversationListActivity(
-                this,
-                Conversation.ConversationType.PRIVATE,
-                "消息"
-            )
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.layout_action_right_button_message, null)
+        with(view) {
+            iv_right_btn.setImageResource(R.drawable.ic_message)
+            setOnClickListener {
+                RouteUtils.routeToSubConversationListActivity(
+                    this@HomeActivity,
+                    Conversation.ConversationType.PRIVATE,
+                    "消息"
+                )
+            }
         }
-        return imageView
+        return view
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshUnreadMessageCount()
+    }
+
+    private fun refreshUnreadMessageCount() {
+        RongIMClient.getInstance().getUnreadCount(object : RongIMClient.ResultCallback<Int>() {
+            override fun onSuccess(number: Int) {
+                ui {
+                    findViewById<View>(R.id.tv_seat_order_operation_number)?.isVisible = number > 0
+                }
+            }
+
+            override fun onError(p0: RongIMClient.ErrorCode?) {
+            }
+
+        }, Conversation.ConversationType.PRIVATE)
     }
 
     override fun initData() {
         LocalUserInfoManager.getUserInfoByUserId("");
+        RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this)
     }
 
     override fun modifyInfoSuccess() {
@@ -151,5 +180,11 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView {
             }
         }
     }
+
+    override fun onReceived(message: Message?, p1: Int): Boolean {
+        refreshUnreadMessageCount()
+        return true
+    }
+
 
 }

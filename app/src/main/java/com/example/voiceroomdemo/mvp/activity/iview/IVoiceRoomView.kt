@@ -43,5 +43,6 @@ interface IVoiceRoomView:IBaseView {
     fun switchToAdminRole(isAdmin: Boolean)
     fun changeStatus(status: Int)
     fun showUnReadRequestNumber(number: Int)
+    fun showUnreadMessage(count: Int)
 
 }
