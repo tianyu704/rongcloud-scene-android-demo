@@ -31,4 +31,11 @@
     <string name="close_room">关闭房间</string>
     <string name="send_gift">送礼物</string>
     <string name="send_message">发私信</string>
+
+    <string name="voice_room">语聊房</string>
+    <string name="voice_room_des">超大聊天室，支持麦位、麦序 管理，\n涵盖 KTV 等多种玩法</string>
+    <string name="video_call">视频</string>
+    <string name="video_call_des">低延迟，高清晰度视频通话</string>
+    <string name="voice_call">语言</string>
+    <string name="voice_call_des">拥有智能降噪的无差别电话体验</string>
 </resources>
