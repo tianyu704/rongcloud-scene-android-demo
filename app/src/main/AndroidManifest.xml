@@ -37,11 +37,14 @@
         <activity
             android:name=".mvp.activity.VoiceRoomActivity"
             android:theme="@style/Theme.VoiceRoomActivityTheme"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="behind"/>
 
-        <activity android:name=".mvp.activity.MessageListActivity" />
+        <activity android:name=".mvp.activity.MessageListActivity"
+            android:screenOrientation="behind"/>
 
-        <activity android:name=".mvp.activity.VoiceRoomListActivity" />
+        <activity android:name=".mvp.activity.VoiceRoomListActivity"
+            android:screenOrientation="behind"/>
 
         <activity
             android:name=".mvp.activity.LauncherActivity"
@@ -53,10 +56,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".mvp.activity.HomeActivity" />
+        <activity android:name=".mvp.activity.HomeActivity"
+            android:screenOrientation="behind"/>
         <activity
             android:name=".mvp.activity.LoginActivity"
-            android:theme="@style/Theme.LoginStyle" />
+            android:theme="@style/Theme.LoginStyle"
+            android:screenOrientation="behind"/>
     </application>
 
 </manifest>

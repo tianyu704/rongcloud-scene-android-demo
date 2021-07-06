@@ -36,7 +36,6 @@
     </style>
 
     <style name="Theme.AppTheme.LauncherActivity" parent="Theme.AppTheme.NoAction">
-<!--        <item name="android:windowIsTranslucent">true</item>-->
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowNoTitle">true</item>

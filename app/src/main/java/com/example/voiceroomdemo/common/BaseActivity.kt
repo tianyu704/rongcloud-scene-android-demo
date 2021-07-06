@@ -42,7 +42,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setAndroidNativeLightStatusBar(isLightThemeActivity())
-        setScreenPortrait()
         beforeInitView()
         super.onCreate(savedInstanceState)
         // initView initData 移动赋予权限onAccept()后,避免因权限导致的一些异常
@@ -80,11 +79,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
         }
     }
 
-    private fun setScreenPortrait() {
-        if (requestedOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        }
-    }
 
     open fun isLightThemeActivity(): Boolean {
         return true

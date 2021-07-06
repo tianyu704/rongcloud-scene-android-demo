@@ -28,6 +28,7 @@ class RoomSettingPresenter(view: IRoomSettingView, private val roomInfoBean: Voi
             add(LockAllSeatFunction(roomInfoBean.roomId, view))
             add(MuteAllRemoteFunction(roomInfoBean.roomId,view))
             add(ChangeSeatFunction(roomInfoBean.roomId,view))
+//            add(MusicFunction(roomInfoBean.roomId,view))
         }
     }
 
