@@ -17,6 +17,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel, roomId: String) :
     BaseLifeCyclePresenter<ISelfSettingView>(view) {
 
+    private var isLeaveSeating = false
     private val roomModel by lazy {
         getVoiceRoomModelByRoomId(roomId)
     }
@@ -27,6 +28,9 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
             .obSeatInfoByIndex(seatInfo.index)
             .subscribe {
                 if (seatInfo.userId != AccountStore.getUserId()) {
+                    if(isLeaveSeating){
+                        view.showMessage("您已断开连接")
+                    }
                     view.fragmentDismiss()
                 } else {
                     seatInfo = it
@@ -59,10 +63,14 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
     }
 
     fun leaveSeat() {
+        isLeaveSeating = true
         addDisposable(
             roomModel
                 .leaveSeat(AccountStore.getUserId()!!)
                 .observeOn(AndroidSchedulers.mainThread())
+                .doFinally {
+                    isLeaveSeating = false
+                }
                 .subscribe({
                     view.showMessage("您已断开连接")
                     view.fragmentDismiss()
