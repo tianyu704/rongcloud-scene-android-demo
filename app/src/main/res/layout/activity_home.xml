@@ -22,6 +22,7 @@
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:paddingLeft="20dp"
+            android:paddingBottom="10dp"
             app:layout_constraintDimensionRatio="w,173:335"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +38,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/voice_room_des"
                 android:textColor="@color/app_color_white"
                 android:textSize="12sp" />
@@ -50,7 +51,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/ic_video_call"
             android:orientation="vertical"
-            android:padding="20dp"
+            android:padding="15dp"
             app:layout_constraintDimensionRatio="w,225:160"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_voice_room"
@@ -67,7 +68,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/video_call_des"
                 android:textColor="@color/app_color_white"
                 android:textSize="12sp" />
@@ -78,7 +79,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
-            android:padding="20dp"
+            android:padding="15dp"
             android:background="@drawable/ic_audio_call"
             android:orientation="vertical"
             app:layout_constraintDimensionRatio="w,225:160"
@@ -96,7 +97,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
                 android:text="@string/voice_call_des"
                 android:textColor="@color/app_color_white"
                 android:textSize="12sp" />
