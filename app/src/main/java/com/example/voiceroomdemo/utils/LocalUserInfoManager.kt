@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicReference
 object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
 
     private val cache: LruCache<String, Member> by lazy {
-        LruCache(1000)
+        LruCache(2000)
     }
 
     private val memberIdInfoSubject = PublishSubject.create<MutableList<String>>()
@@ -41,8 +41,13 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
     init {
         RongUserInfoManager.getInstance()
             .setUserInfoProvider({ userId ->
-                refreshUserInfo(userId)
-                return@setUserInfoProvider null
+                val member = getMemberByUserId(userId)
+                if (member != null) {
+                    return@setUserInfoProvider memberToUserInfo(member)
+                } else {
+                    refreshUserInfo(userId)
+                    return@setUserInfoProvider null
+                }
             }, true)
 
         memberIdInfoSubject
@@ -61,7 +66,7 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
             }
     }
 
-    public fun getUserInfoByUserId(userId: String?): Member? {
+    public fun getMemberByUserId(userId: String?): Member? {
         if (userId.isNullOrEmpty()) {
             return null
         }
@@ -74,15 +79,17 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
 
     private fun refreshIMUserInfo(member: Member) {
         RongUserInfoManager.getInstance().refreshUserInfoCache(
-            UserInfo(
-                member.userId,
-                member.userName,
-                Uri.parse(
-                    member.portrait?.getCompletePortraitUrl() ?: ApiConstant.DEFAULT_PORTRAIT_ULR
-                )
-            )
+            memberToUserInfo(member)
         )
     }
+
+    private fun memberToUserInfo(member: Member): UserInfo = UserInfo(
+        member.userId,
+        member.userName,
+        Uri.parse(
+            member.portrait?.getCompletePortraitUrl() ?: ApiConstant.DEFAULT_PORTRAIT_ULR
+        )
+    )
 
     private fun refreshUserInfo(userId: String) {
         cache[userId]?.let {

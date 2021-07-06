@@ -338,7 +338,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             return null
         }
         return roomMemberInfoList.find { member -> member.userId == userId }
-            ?: LocalUserInfoManager.getUserInfoByUserId(userId)?.run {
+            ?: LocalUserInfoManager.getMemberByUserId(userId)?.run {
                 UiMemberModel(memberInfoChangeSubject).apply {
                     this.member = member
                     roomMemberInfoList.add(this)
@@ -1075,16 +1075,22 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     fun acceptRequest(userId: String): Completable {
         return Completable.create {
-            RCVoiceRoomEngine.getInstance().acceptRequestSeat(userId, object : RCVoiceRoomCallback {
-                override fun onError(code: Int, message: String?) {
-                    Log.d(TAG, "onError: code = $code,message = $message")
-                    it.onError(Throwable(message))
-                }
+            var availableIndex = getAvailableIndex()
+            if (availableIndex < 0) {
+                it.onError(Throwable("房间麦位已满"))
+            } else {
+                RCVoiceRoomEngine.getInstance()
+                    .acceptRequestSeat(userId, object : RCVoiceRoomCallback {
+                        override fun onError(code: Int, message: String?) {
+                            Log.d(TAG, "onError: code = $code,message = $message")
+                            it.onError(Throwable(message))
+                        }
 
-                override fun onSuccess() {
-                    it.onComplete()
-                }
-            })
+                        override fun onSuccess() {
+                            it.onComplete()
+                        }
+                    })
+            }
         }
     }
 
