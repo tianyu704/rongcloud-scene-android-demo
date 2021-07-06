@@ -29,6 +29,8 @@ import com.example.voiceroomdemo.mvp.fragment.voiceroom.memberlist.IMemberListVi
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.memberlist.MemberListFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
+import com.example.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.IMusicSettingView
+import com.example.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.MusicSettingFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.IRevokeSeatView
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.RevokeSeatRequestFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroundSettingFragment
@@ -61,7 +63,7 @@ private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
 class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
-    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView {
+    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, IMusicSettingView {
 
     companion object {
         fun startActivity(context: Context, roomId: String, createUserId: String) {
@@ -406,7 +408,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            
+            MusicSettingFragment(this).show(supportFragmentManager)
         }
     }
 
@@ -657,7 +659,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
                     }, closeRoomBlock = {
                         exitRoomPopupWindow?.dismiss()
-                        ConfirmDialog(context, "确定结束本次直播吗？",true) {
+                        ConfirmDialog(context, "确定结束本次直播吗？", true) {
                             presenter.closeRoom()
                         }.show()
                     })
