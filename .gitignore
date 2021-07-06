@@ -10,3 +10,4 @@ local.properties
 /.idea/
 gradlew
 gradlew.bat
+/rtcvoiceroom/build
