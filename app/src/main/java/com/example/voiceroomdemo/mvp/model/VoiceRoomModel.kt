@@ -11,6 +11,7 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
+import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomAdmin
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomSeats
@@ -39,13 +40,13 @@ import io.rong.imlib.model.Message
  */
 
 private val map = HashMap<String, VoiceRoomModel>()
-public fun getVoiceRoomModelByRoomId(roomId: String): VoiceRoomModel {
+fun getVoiceRoomModelByRoomId(roomId: String): VoiceRoomModel {
     return map[roomId] ?: VoiceRoomModel(roomId).apply {
         map[roomId] = this
     }
 }
 
-public val EMPTY_ROOM_INFO: VoiceRoomBean = VoiceRoomBean(roomId = "")
+val EMPTY_ROOM_INFO: VoiceRoomBean = VoiceRoomBean(roomId = "")
 
 private const val TAG = "VoiceRoomModel"
 
@@ -81,6 +82,20 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     private val dataModifyScheduler by lazy {
         Schedulers.computation()
+    }
+    val presents by lazy {
+        return@lazy ArrayList<Present>(16).apply {
+            add(Present(0, R.drawable.ic_present_0, "礼物0", 99))
+            add(Present(1, R.drawable.ic_present_1, "礼物0", 99))
+            add(Present(2, R.drawable.ic_present_2, "礼物0", 99))
+            add(Present(3, R.drawable.ic_present_3, "礼物0", 99))
+            add(Present(4, R.drawable.ic_present_4, "礼物0", 99))
+            add(Present(5, R.drawable.ic_present_5, "礼物0", 99))
+            add(Present(6, R.drawable.ic_present_6, "礼物0", 99))
+            add(Present(7, R.drawable.ic_present_7, "礼物0", 99))
+            add(Present(8, R.drawable.ic_present_8, "礼物0", 99))
+            add(Present(9, R.drawable.ic_present_9, "礼物0", 99))
+        }
     }
 
     private var dataModifyWorker: Scheduler.Worker = dataModifyScheduler.createWorker()
@@ -346,6 +361,9 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }
     }
 
+    fun getPersents(): ArrayList<Present> {
+        return presents;
+    }
 
     fun addDisposable(vararg disposable: Disposable) {
         compositeDisposable.addAll(*disposable)

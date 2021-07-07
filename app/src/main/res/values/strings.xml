@@ -38,4 +38,7 @@
     <string name="video_call_des">低延迟，高清晰度视频通话</string>
     <string name="voice_call">语言</string>
     <string name="voice_call_des">拥有智能降噪的无差别电话体验</string>
+    <string name="send">送给</string>
+    <string name="select_all">全选</string>
+    <string name="send_t">赠送</string>
 </resources>

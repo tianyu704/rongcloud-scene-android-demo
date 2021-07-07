@@ -4,6 +4,7 @@
 
 package com.example.voiceroomdemo.mvp.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Rect
@@ -21,6 +22,8 @@ import com.example.voiceroomdemo.common.*
 import com.example.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import com.example.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import com.example.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
+import com.example.voiceroomdemo.mvp.fragment.present.ISendPresentView
+import com.example.voiceroomdemo.mvp.fragment.present.SendPresentFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.EmptySeatFragment
@@ -63,7 +66,7 @@ private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
 class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
-    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, IMusicSettingView {
+    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView ,ISendPresentView, IMusicSettingView {
 
     companion object {
         fun startActivity(context: Context, roomId: String, createUserId: String) {
@@ -122,7 +125,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 showSoftKeyBoard()
             }
         }
-
         currentRole = if (creatorId == AccountStore.getUserId()) {
             RoomOwner(mRootView)
         } else {
@@ -180,7 +182,11 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 "消息"
             )
         }
-
+        iv_send_gift.setOnClickListener {
+            roomInfo.roomBean?.let {
+                SendPresentFragment(this, it.roomId).show(supportFragmentManager)
+            }
+        }
 
     }
 
@@ -206,6 +212,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         currentRole.setOnlineUsersNumber(onlineUsersNumber)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun refreshRoomInfo(roomInfo: UiRoomModel) {
         Log.d(TAG, "refreshRoomInfo: $roomInfo")
         currentRole.refreshRoomInfo(roomInfo)
@@ -477,6 +484,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             sendTextMessage(et_message.text.toString())
         }
 
+        @SuppressLint("SetTextI18n")
         open fun setOnlineUsersNumber(number: Int) {
             with(view) {
                 tv_room_members_count.text = "在线 $number"
