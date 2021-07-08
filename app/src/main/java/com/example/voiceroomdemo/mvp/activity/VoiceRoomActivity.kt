@@ -7,12 +7,10 @@ package com.example.voiceroomdemo.mvp.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Point
 import android.graphics.Rect
 import android.util.Log
-import android.view.Gravity
-import android.view.KeyEvent
-import android.view.MotionEvent
-import android.view.View
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
@@ -24,6 +22,7 @@ import com.example.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import com.example.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
 import com.example.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import com.example.voiceroomdemo.mvp.fragment.present.SendPresentFragment
+import com.example.voiceroomdemo.mvp.fragment.present.like.FavAnimation
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.EmptySeatFragment
@@ -59,6 +58,7 @@ import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_voice_room.*
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
 
+
 private const val TAG = "VoiceRoomActivity"
 
 private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
@@ -66,7 +66,9 @@ private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
 class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
-    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView ,ISendPresentView, IMusicSettingView {
+    IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, ISendPresentView,
+    IMusicSettingView {
+
 
     companion object {
         fun startActivity(context: Context, roomId: String, createUserId: String) {
@@ -110,10 +112,55 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         return false
     }
 
+    val favAnimation: FavAnimation by lazy {
+        return@lazy FavAnimation(this).apply {
+            this.addLikeImages(
+                R.drawable.heart0,
+                R.drawable.heart1,
+                R.drawable.heart2,
+                R.drawable.heart3,
+                R.drawable.heart4
+            )
+        }
+    }
+
+    private val simpleGestureListener: GestureDetector.SimpleOnGestureListener by lazy {
+        return@lazy object : GestureDetector.SimpleOnGestureListener() {
+            override fun onDoubleTap(e: MotionEvent?): Boolean {
+                var touch = Point().apply {
+                    x = e?.rawX?.toInt() ?: 0
+                    y = e?.rawY?.toInt() ?: 0
+                }
+                showFov(touch)
+                return true
+            }
+        }
+    }
+
+    /**
+     * 显示爱心动画
+     */
+    fun showFov(from: Point?) {
+        if (from != null) {
+            favAnimation.addFavor(container, 300, 1500, from, null)
+        } else {
+            var sp = Point()
+            windowManager.defaultDisplay.getRealSize(sp)
+            var from = Point(sp.x - 200, sp.y - 100)
+            var to = Point(sp.x - 100, sp.y - 200)
+            favAnimation.addFavor(container, 300, 1500, from, to)
+        }
+    }
+
+    private var detector: GestureDetector? = null
 
     override fun getContentView(): Int = R.layout.activity_voice_room
 
     override fun initView() {
+        detector = GestureDetector(this, simpleGestureListener).apply {
+            this.setIsLongpressEnabled(false)
+            this.setOnDoubleTapListener(simpleGestureListener)
+        }
         // 初始化角色无关的数据
         btn_open_send_message.setOnClickListener {
             cl_input_bar.isVisible = true
@@ -154,7 +201,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     override fun initRoleView(roomInfo: UiRoomModel) {
         // 初始化角色相关的视图
-
         currentRole.initView(roomInfo)
         refreshRoomInfo(roomInfo)
 
@@ -187,7 +233,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 SendPresentFragment(this, it.roomId).show(supportFragmentManager)
             }
         }
-
     }
 
     private fun sendTextMessage(message: String?) {
@@ -376,11 +421,12 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         super.onResume()
     }
 
-
     override fun onDestroy() {
         super.onDestroy()
+        favAnimation?.let {
+            it.release()
+        }
     }
-
 
     override fun onJoinRoomSuccess() {
         currentRole.onJoinRoomSuccess()
@@ -390,13 +436,18 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         currentRole.onTopRightButtonPress()
     }
 
-
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        Log.e(TAG, "dispatchTouchEvent")
         if (ev?.action == KeyEvent.ACTION_DOWN && cl_input_bar.isVisible) {
             val rect = Rect()
             cl_input_bar.getGlobalVisibleRect(rect)
             if (!rect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
                 cl_input_bar.isVisible = false
+                return true
+            }
+        }
+        detector?.let {
+            if (it.onTouchEvent(ev)) {
                 return true
             }
         }
@@ -733,7 +784,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             }
         }
     }
-
 
 }
 

@@ -14,6 +14,8 @@ import com.example.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.functions.Action
+import java.util.function.Consumer
 
 /**
  * @author gusd
@@ -39,6 +41,7 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
             }.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 view.onMemberModify(it)
+                allCount = it.size;
             })
     }
 
@@ -85,6 +88,7 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
         }
     }
 
+    var allCount: Int = 0;
     fun selectAll(members: List<UiMemberModel>?) {
         selects.let {
             selects.clear();
@@ -106,6 +110,17 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
 
     fun sendPresent() {
         view.showMessage("赠送礼物：数量: $presentNum 人数:${selects.size} 礼物索引:${currentPresent?.index ?: 0}")
+        currentPresent?.let {
+            addDisposable(
+                roomModel
+                    .sendGift(selects, it, presentNum)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { it ->
+                        roomModel.sendGiftMsg(it)
+                    }
+            )
+        }
+
     }
 
     override fun onResume() {

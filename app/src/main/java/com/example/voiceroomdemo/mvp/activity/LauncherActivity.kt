@@ -32,7 +32,6 @@ class LauncherActivity : PermissionActivity() {
     }
 
     override fun onAccept(accept: Boolean) {
-        Log.e("LauncherActivity","accept = "+accept)
         if (accept) {
             turnToActivity()
         } else {

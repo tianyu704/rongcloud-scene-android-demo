@@ -52,7 +52,7 @@ public class CustomerPopupWindow extends PopupWindow {
         super.showAsDropDown(anchor);
     }
 
-    private int[] getLocation(View view) {
+    public static int[] getLocation(View view) {
         int[] location = new int[2];
         if (Build.VERSION.SDK_INT >= 24) {
             Rect rect = new Rect();

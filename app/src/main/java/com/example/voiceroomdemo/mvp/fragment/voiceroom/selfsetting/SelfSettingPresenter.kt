@@ -28,7 +28,7 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
             .obSeatInfoByIndex(seatInfo.index)
             .subscribe {
                 if (seatInfo.userId != AccountStore.getUserId()) {
-                    if(isLeaveSeating){
+                    if (isLeaveSeating) {
                         view.showMessage("您已断开连接")
                     }
                     view.fragmentDismiss()

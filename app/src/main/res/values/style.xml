@@ -128,4 +128,11 @@
         <attr name="right_bottom_radius" />
         <attr name="left_bottom_radius" />
     </declare-styleable>
+
+    <declare-styleable name="KsgLikeView">
+        <!-- 进入动画 时长-->
+        <attr name="ksg_enter_duration" format="integer"/>
+        <!--路径动画 时长-->
+        <attr name="ksg_curve_duration" format="integer"/>
+    </declare-styleable>
 </resources>

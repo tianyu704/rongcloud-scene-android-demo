@@ -18,7 +18,7 @@ abstract class BaseLifeCyclePresenter<T : IBaseView>(
     private var view: T,
 ) : BasePresenter<T>(), LifecycleObserver {
 
-    private val compositeDisposable:CompositeDisposable = CompositeDisposable()
+    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     override fun onCreate() {
