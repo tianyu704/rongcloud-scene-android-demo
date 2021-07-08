@@ -42,6 +42,18 @@ object RCChatRoomMessageManager {
         messageSubject.onNext(MessageWrapperModel(roomId, messageContent))
     }
 
+    fun sendChatMessages(
+        roomId: String,
+        messageContents: List<MessageContent>,
+        showLocation: Boolean = true,
+        onSuccess: ((messageId: Int) -> Unit)? = null,
+        onError: ((errorCode: IRongCoreEnum.CoreErrorCode?, messageId: Int) -> Unit)? = null
+    ) {
+        messageContents.forEach {
+            sendChatMessage(roomId, it, showLocation, onSuccess, onError)
+        }
+    }
+
     fun sendChatMessage(
         roomId: String,
         messageContent: MessageContent,

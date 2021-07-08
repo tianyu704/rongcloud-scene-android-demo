@@ -4,18 +4,13 @@
 
 package com.example.voiceroomdemo.mvp.fragment.present
 
-import android.util.Log
-import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
 import com.example.voiceroomdemo.mvp.model.Present
 import com.example.voiceroomdemo.mvp.model.VoiceRoomModel
 import com.example.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
-import com.google.gson.annotations.SerializedName
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.functions.Action
-import java.util.function.Consumer
 
 /**
  * @author gusd
@@ -34,9 +29,9 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
         addDisposable(roomModel
             .obMemberListChange()
             .map {
-//                return@map it.filter {
-//                    it.userId != AccountStore.getUserId()
-//                }
+                return@map it.filter {
+                    it.userId != AccountStore.getUserId() && it.seatIndex >= 0
+                }
                 return@map it
             }.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
@@ -109,14 +104,14 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
     }
 
     fun sendPresent() {
-        view.showMessage("赠送礼物：数量: $presentNum 人数:${selects.size} 礼物索引:${currentPresent?.index ?: 0}")
-        currentPresent?.let {
+        view.showMessage("赠送礼物：数量: $presentNum 人数:${selects.size} 礼物索引:${currentPresent?.index ?: 0} 价值：${currentPresent?.price}")
+        currentPresent?.let { present ->
             addDisposable(
                 roomModel
-                    .sendGift(selects, it, presentNum)
+                    .sendGift(selects, present, presentNum)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { it ->
-                        roomModel.sendGiftMsg(it)
+                    .subscribe { members ->
+                        roomModel.sendGiftMsg(members, present, presentNum)
                     }
             )
         }

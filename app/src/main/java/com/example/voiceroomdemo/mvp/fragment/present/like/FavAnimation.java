@@ -33,6 +33,7 @@ import java.util.Random;
 public class FavAnimation {
     private final static String TAG = "FavAnimation";
     private final static int MAX_IN = 200;
+    private final static int MAX_SIZE = 250;
     private final List<Integer> mLikeRes = new ArrayList<>();
     protected final Random mRandom = new Random();
     private Context context;
@@ -75,7 +76,8 @@ public class FavAnimation {
         // 只读取图片，不加载到内存中
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(context.getResources(), resId, options);
-        return new int[]{options.outWidth, options.outHeight};
+
+        return new int[]{Math.min(options.outWidth, MAX_SIZE), Math.min(options.outHeight, MAX_SIZE)};
     }
 
     public void addFavor(ViewGroup parent, int enterDuration, int curDuration, @NonNull Point from, @Nullable Point to) {

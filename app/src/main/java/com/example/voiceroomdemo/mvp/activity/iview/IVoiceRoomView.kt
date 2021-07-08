@@ -4,6 +4,7 @@
 
 package com.example.voiceroomdemo.mvp.activity.iview
 
+import android.graphics.Point
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import com.example.voiceroomdemo.common.IBaseView
 import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
@@ -44,5 +45,6 @@ interface IVoiceRoomView:IBaseView {
     fun changeStatus(status: Int)
     fun showUnReadRequestNumber(number: Int)
     fun showUnreadMessage(count: Int)
+    fun showFov(from: Point?)
 
 }

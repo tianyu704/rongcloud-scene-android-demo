@@ -115,11 +115,16 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     val favAnimation: FavAnimation by lazy {
         return@lazy FavAnimation(this).apply {
             this.addLikeImages(
-                R.drawable.heart0,
-                R.drawable.heart1,
-                R.drawable.heart2,
-                R.drawable.heart3,
-                R.drawable.heart4
+                R.drawable.ic_present_0,
+                R.drawable.ic_present_1,
+                R.drawable.ic_present_2,
+                R.drawable.ic_present_3,
+                R.drawable.ic_present_4,
+                R.drawable.ic_present_5,
+                R.drawable.ic_present_6,
+                R.drawable.ic_present_7,
+                R.drawable.ic_present_8,
+                R.drawable.ic_present_9,
             )
         }
     }
@@ -132,6 +137,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                     y = e?.rawY?.toInt() ?: 0
                 }
                 showFov(touch)
+                presenter.sendFovMessage()
                 return true
             }
         }
@@ -140,14 +146,14 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     /**
      * 显示爱心动画
      */
-    fun showFov(from: Point?) {
+    override fun showFov(from: Point?) {
         if (from != null) {
             favAnimation.addFavor(container, 300, 1500, from, null)
         } else {
             var sp = Point()
             windowManager.defaultDisplay.getRealSize(sp)
-            var from = Point(sp.x - 200, sp.y - 100)
-            var to = Point(sp.x - 100, sp.y - 200)
+            var from = Point(sp.x - 300, sp.y - 100)
+            var to = Point(sp.x - 200, sp.y - 200)
             favAnimation.addFavor(container, 300, 1500, from, to)
         }
     }

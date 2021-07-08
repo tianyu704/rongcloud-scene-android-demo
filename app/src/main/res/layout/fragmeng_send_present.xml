@@ -7,11 +7,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <View
+    <com.example.voiceroomdemo.ui.widget.RealtimeBlurView
+        android:id="@+id/bg_top"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:realtimeBlurRadius="14pt"
+        app:realtimeOverlayColor="#29FFFFFF" />
+
+    <com.example.voiceroomdemo.ui.widget.RealtimeBlurView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bg_top"
+        app:realtimeBlurRadius="14pt"
+        app:realtimeOverlayColor="#1AFFFFFF" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/send"
@@ -94,13 +104,13 @@
         android:layout_marginBottom="20dp"
         android:background="@drawable/selector_select_present_num_bg"
         android:drawableEnd="@drawable/ic_up"
+        android:drawablePadding="1dp"
         android:enabled="false"
         android:gravity="center"
         android:paddingEnd="10dp"
-        android:drawablePadding="1dp"
         android:text=""
-        android:textSize="12sp"
         android:textColor="@color/selector_send_text_color"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_send"
         app:layout_constraintTop_toBottomOf="@+id/index" />
@@ -116,8 +126,8 @@
         android:background="@drawable/selector_send_present_bg"
         android:enabled="false"
         android:text="@string/send_t"
-        android:textSize="14sp"
         android:textColor="@color/selector_send_text_color"
+        android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/index" />

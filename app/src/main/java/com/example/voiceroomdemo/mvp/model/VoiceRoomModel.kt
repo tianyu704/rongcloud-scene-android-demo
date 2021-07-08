@@ -14,6 +14,8 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomAdmin
+import com.example.voiceroomdemo.mvp.model.message.RCChatroomGift
+import com.example.voiceroomdemo.mvp.model.message.RCChatroomGiftAll
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomSeats
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.net.api.bean.request.*
@@ -33,8 +35,8 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.ChatRoomInfo
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
+import io.rong.imlib.model.MessageContent
 import org.reactivestreams.Publisher
-import java.util.concurrent.Flow
 
 /**
  * @author gusd
@@ -87,16 +89,16 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     }
     val presents by lazy {
         return@lazy ArrayList<Present>(16).apply {
-            add(Present(0, R.drawable.ic_present_0, "礼物0", 99))
-            add(Present(1, R.drawable.ic_present_1, "礼物0", 99))
-            add(Present(2, R.drawable.ic_present_2, "礼物0", 99))
-            add(Present(3, R.drawable.ic_present_3, "礼物0", 99))
-            add(Present(4, R.drawable.ic_present_4, "礼物0", 99))
-            add(Present(5, R.drawable.ic_present_5, "礼物0", 99))
-            add(Present(6, R.drawable.ic_present_6, "礼物0", 99))
-            add(Present(7, R.drawable.ic_present_7, "礼物0", 99))
-            add(Present(8, R.drawable.ic_present_8, "礼物0", 99))
-            add(Present(9, R.drawable.ic_present_9, "礼物0", 99))
+            add(Present(1, R.drawable.ic_present_0, "小心心", 1))
+            add(Present(2, R.drawable.ic_present_1, "话筒", 2))
+            add(Present(3, R.drawable.ic_present_2, "麦克风", 5))
+            add(Present(4, R.drawable.ic_present_3, "萌小鸡", 10))
+            add(Present(5, R.drawable.ic_present_4, "手柄", 20))
+            add(Present(6, R.drawable.ic_present_5, "奖杯", 50))
+            add(Present(7, R.drawable.ic_present_6, "火箭", 100))
+            add(Present(8, R.drawable.ic_present_7, "礼花", 200))
+            add(Present(9, R.drawable.ic_present_8, "玫瑰花", 10))
+            add(Present(10, R.drawable.ic_present_9, "吉他", 20))
         }
     }
 
@@ -363,9 +365,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }
     }
 
-    fun getPersents(): ArrayList<Present> {
-        return presents;
-    }
 
     fun addDisposable(vararg disposable: Disposable) {
         compositeDisposable.addAll(*disposable)
@@ -1125,7 +1124,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }
         }.toTypedArray()
         return Single.create<List<UiMemberModel>> { emitter ->
-            val result = arrayListOf<UiMemberModel>();
+            val result = arrayListOf<UiMemberModel>()
             addDisposable(Flowable.concatArray(*flowableArrs).map {
                 RetrofitManager.commonService.sendGifts(
                     SendGiftsRequest(present.index, num, roomId, it.userId)
@@ -1135,16 +1134,57 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                     }
                 }
                 return@map it
-            }.doFinally {
+            }.subscribe({
                 emitter.onSuccess(result)
-            }.subscribe())
+            }, {
+                emitter.onError(it)
+            }))
         }.subscribeOn(Schedulers.io())
     }
 
     fun sendGiftMsg(
-        members: List<UiMemberModel>
+        members: List<UiMemberModel>, present: Present, nums: Int
     ) {
+        if (isToAll(members)) {
+            RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomGiftAll().apply {
+                userId = AccountStore.getUserId()
+                userName = AccountStore.getUserName()
+                giftId = "${present.index}"
+                giftName = present.name
+                number = nums
+                price = present.price
+            })
+        } else {
+            RCChatRoomMessageManager.sendChatMessages(roomId,
+                members.map { member ->
+                    return@map RCChatroomGift().apply {
+                        userId = AccountStore.getUserId()
+                        userName = AccountStore.getUserName()
+                        targetId = member.userId
+                        targetName = member.userName
+                        giftId = "${present.index}"
+                        giftName = present.name
+                        number = "$nums"
+                        price = present.price
+                    }
+                })
+        }
 
+    }
+
+    fun isToAll(members: List<UiMemberModel>): Boolean {
+        var flag = false;
+        if (members.size == roomMemberInfoList.size - 1) {
+            var currIds = members.map {
+                return@map it.userId
+            }
+            var allIds = roomMemberInfoList.map {
+                return@map it.userId
+            }
+            var dx = currIds - allIds
+            return dx.size == 0
+        }
+        return flag;
     }
 
     fun setRecordingEnable(enable: Boolean): Completable {

@@ -9,16 +9,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bcq.adapter.recycle.RcyHolder
 import com.bcq.adapter.recycle.RcySAdapter
 import com.example.voiceroomdemo.R
+import com.example.voiceroomdemo.common.loadPortrait
 import com.example.voiceroomdemo.common.ui
 import com.example.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import com.example.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager
 import com.example.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager.HORIZONTAL
 import com.example.voiceroomdemo.mvp.fragment.present.page.PagerSnapHelper
 import com.example.voiceroomdemo.mvp.model.Present
+import com.example.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.utils.UiUtils
 import kotlinx.android.synthetic.main.fragmeng_send_present.*
 import kotlinx.android.synthetic.main.layout_present_item.view.*
+import kotlinx.android.synthetic.main.layout_present_member_item.view.*
 
 /**
  * @author baicq
@@ -31,6 +34,9 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
         return SendPresentPresenter(this, roomId)
     }
 
+    val roomModel by lazy {
+        getVoiceRoomModelByRoomId(roomId);
+    }
     var members: List<UiMemberModel> = ArrayList()
 
     override fun initListener() {
@@ -90,11 +96,16 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
             R.layout.layout_present_member_item
         ) {
             override fun convert(holder: RcyHolder, t: UiMemberModel, position: Int) {
-                holder.rootView().isSelected = presenter.isSelected(t)
-                holder.rootView().setOnClickListener({
-                    presenter.updateSelected(t)
-                    notifyDataSetChanged()
-                })
+                with(holder.itemView) {
+                    this.isSelected = presenter.isSelected(t)
+                    this.setOnClickListener({
+                        presenter.updateSelected(t)
+                        notifyDataSetChanged()
+                    })
+                    this.iv_member_head.loadPortrait(t.portrait)
+                    this.tv_member_name.text =
+                        if (t.userId == roomModel.currentUIRoomInfo.roomBean?.createUser?.userId) "房主" else "${t.seatIndex}"
+                }
             }
         }
         vp_present.setHasFixedSize(true)
@@ -155,7 +166,10 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
     override fun onMemberModify(members: List<UiMemberModel>) {
         ui {
             this.members = members
-            (rcy_member.adapter as RcySAdapter<UiMemberModel, RcyHolder>).setData(this.members, true);
+            (rcy_member.adapter as RcySAdapter<UiMemberModel, RcyHolder>).setData(
+                this.members,
+                true
+            );
         }
     }
 

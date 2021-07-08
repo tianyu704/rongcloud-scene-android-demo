@@ -9,11 +9,11 @@
     android:layout_height="50dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/iv_member_portrait"
+        android:id="@+id/iv_member_head"
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="3dp"
         android:src="@drawable/default_portrait"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

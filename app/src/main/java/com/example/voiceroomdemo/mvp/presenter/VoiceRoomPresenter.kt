@@ -4,6 +4,7 @@
 
 package com.example.voiceroomdemo.mvp.presenter
 
+import android.graphics.Point
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
@@ -12,7 +13,7 @@ import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
 import com.example.voiceroomdemo.common.isNotNullOrEmpty
 import com.example.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import com.example.voiceroomdemo.mvp.model.*
-import com.example.voiceroomdemo.mvp.model.message.RCChatroomBarrage
+import com.example.voiceroomdemo.mvp.model.message.*
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
@@ -176,6 +177,11 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     view.showChatRoomMessage(it)
+                    if (it is RCChatroomGiftAll || it is RCChatroomGift) {
+                        roomModel.refreshGift()
+                    } else if (it is RCChatroomLike) {
+                        view.showFov(null)
+                    }
                 })
 
         // 监听上麦邀请
@@ -241,7 +247,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 if (eventInfo.second[1] == AccountStore.getUserId()) {
                     view.showMessage("你已被踢出房间")
                     leaveRoom()
-                }else{
+                } else {
                     // TODO: 2021/7/2 显示被踢消息 
                     sendSystemMessage("显示别人被踢消息")
                 }
@@ -325,6 +331,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             roomId, msg
         )
     }
+
     fun leaveRoom() {
         val index = roomModel.isInSeat(AccountStore.getUserId()!!)
         if (index > -1) {
@@ -440,6 +447,16 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 
             }
         }
+    }
+
+    fun sendFovMessage() {
+        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomLike().apply {
+        },
+            true,
+            {
+            }, { code, _ ->
+                view.showError("发送失败：${code?.code}")
+            })
     }
 
     fun sendMessage(message: String) {
