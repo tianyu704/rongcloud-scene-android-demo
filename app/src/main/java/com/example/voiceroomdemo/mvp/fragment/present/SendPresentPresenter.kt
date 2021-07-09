@@ -36,9 +36,7 @@ class SendPresentPresenter(
             .obMemberListChange()
             .map {
                 return@map it.filter {
-                    (it.userId != AccountStore.getUserId() && it.seatIndex >= 0) || selectedIds.contains(
-                        it.userId
-                    )
+                    (it.seatIndex >= 0) || selectedIds.contains(it.userId)
                 }
                 return@map it
             }.observeOn(AndroidSchedulers.mainThread())
@@ -134,6 +132,12 @@ class SendPresentPresenter(
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { members ->
                         roomModel.sendGiftMsg(members, present, presentNum, isAll)
+                        if (members.size == selects.size) {
+                            view.showMessage("赠送成功")
+                        } else {
+                            view.showMessage("赠送异常")
+                        }
+                        view.fragmentDismiss()
                     }
             )
         }
