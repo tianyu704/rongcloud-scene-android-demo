@@ -30,7 +30,7 @@ import kotlinx.android.synthetic.main.layout_present_member_item.view.*
 class SendPresentFragment(
     view: ISendPresentView,
     private val roomId: String,
-    private val selectedIds: ArrayList<String>
+    private val selectedIds: List<String> = emptyList()
 ) :
     BaseBottomSheetDialogFragment<SendPresentPresenter, ISendPresentView>(R.layout.fragmeng_send_present),
     ISendPresentView by view {

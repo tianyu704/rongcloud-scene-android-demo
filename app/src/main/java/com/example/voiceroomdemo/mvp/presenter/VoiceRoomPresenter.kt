@@ -4,7 +4,6 @@
 
 package com.example.voiceroomdemo.mvp.presenter
 
-import android.graphics.Point
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
@@ -176,11 +175,16 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 .obMessageReceiveByRoomId(roomId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    view.showChatRoomMessage(it)
-                    if (it is RCChatroomGiftAll || it is RCChatroomGift) {
-                        roomModel.refreshGift()
-                    } else if (it is RCChatroomLike) {
-                        view.showFov(null)
+                    when (it) {
+                        is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
+                            view.showChatRoomMessage(it)
+                            if (it is RCChatroomGiftAll || it is RCChatroomGift) {
+                                roomModel.refreshGift()
+                            }
+                        }
+                        is RCChatroomLike -> {
+                            view.showFov(null)
+                        }
                     }
                 })
 

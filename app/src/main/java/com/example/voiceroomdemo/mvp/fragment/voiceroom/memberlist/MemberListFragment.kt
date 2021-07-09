@@ -22,10 +22,11 @@ private const val TAG = "MemberListFragment"
 
 class MemberListFragment(
     view: IMemberListView,
+    private val memberSettingView: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean
 ) :
     BaseBottomSheetDialogFragment<MemberListPresenter, IMemberListView>(R.layout.layout_member_list),
-    IMemberListView by view, IMemberSettingView{
+    IMemberListView by view{
 
 
     override fun initPresenter(): MemberListPresenter {
@@ -39,7 +40,7 @@ class MemberListFragment(
 
     override fun initListener() {
         iv_close.setOnClickListener {
-           dismiss()
+            dismiss()
         }
     }
 
@@ -54,7 +55,7 @@ class MemberListFragment(
                 // 点击自己不做任何反应
                 return@MemberListAdapter
             }
-            MemberSettingFragment(this,roomInfoBean,it).show(childFragmentManager)
+            MemberSettingFragment(memberSettingView, roomInfoBean, it).show(childFragmentManager)
 
         }
 

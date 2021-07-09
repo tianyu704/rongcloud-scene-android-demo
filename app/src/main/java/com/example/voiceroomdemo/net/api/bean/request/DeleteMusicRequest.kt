@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName
  */
 data class DeleteMusicRequest(
     @SerializedName("id")
-    val id: String? = null,
+    val id: Int = 0,
     @SerializedName("roomId")
     val roomId: String? = null
 )

@@ -5,13 +5,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="490dp"
     android:background="@color/transparent">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/cl_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/cl_view">
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -35,7 +35,7 @@
                 app:realtimeOverlayColor="#29FFFFFF" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_add_music"
+                android:id="@+id/iv_music_list"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="23dp"
@@ -46,14 +46,14 @@
                 app:srcCompat="@drawable/ic_add_music_selector" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/iv_music_list"
+                android:id="@+id/iv_add_music"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="7dp"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toEndOf="@+id/iv_add_music"
+                app:layout_constraintStart_toEndOf="@+id/iv_music_list"
                 app:srcCompat="@drawable/ic_music_list_selector" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -64,7 +64,7 @@
                 android:layout_marginTop="7dp"
                 android:layout_marginBottom="7dp"
                 app:layout_constraintDimensionRatio="1:1"
-                app:layout_constraintStart_toEndOf="@+id/iv_music_list"
+                app:layout_constraintStart_toEndOf="@+id/iv_add_music"
                 app:srcCompat="@drawable/ic_control_music_selector" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -92,6 +92,7 @@
             android:id="@+id/vp_page"
             android:layout_width="match_parent"
             android:layout_height="410dp"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/cl_buttons" />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -46,6 +46,12 @@
         <attr name="left_bottom_radius" />
     </declare-styleable>
 
+    <declare-styleable name="MusicPlayView">
+        <attr name="line_color" format="color"/>
+        <attr name="line_number" format="integer"/>
+        <attr name="refresh_duration" format="integer"/>
+    </declare-styleable>
+
     <declare-styleable name="verify_EditText">
         <!-- 验证码的个数 -->
         <attr name="verify_count" format="integer" />

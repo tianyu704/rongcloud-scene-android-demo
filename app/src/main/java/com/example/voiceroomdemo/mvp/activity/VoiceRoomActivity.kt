@@ -90,6 +90,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     private var emptySeatFragment: EmptySeatFragment? = null
 
+    private var memberListFragment: MemberListFragment? = null
+
     private val emojiPopup by lazy {
         EmojiPopup
             .Builder
@@ -213,7 +215,9 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
         cl_member_list.setOnClickListener {
             roomInfo.roomBean?.let {
-                MemberListFragment(this, it).show(supportFragmentManager)
+                memberListFragment = MemberListFragment(this,this, it).apply {
+                    show(supportFragmentManager)
+                }
             }
         }
         iv_room_setting.setOnClickListener {
@@ -473,7 +477,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            MusicSettingFragment(this).show(supportFragmentManager)
+            MusicSettingFragment(it.roomId, this).show(supportFragmentManager)
         }
     }
 
@@ -484,6 +488,12 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     override fun fragmentDismiss() {
         memberSettingFragment?.dismiss()
+    }
+
+    override fun sendGift(userId: String) {
+        memberSettingFragment?.dismiss()
+        memberListFragment?.dismiss()
+        SendPresentFragment(this, roomId, arrayListOf<String>(userId)).show(supportFragmentManager)
     }
 
 

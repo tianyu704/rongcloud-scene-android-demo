@@ -20,15 +20,14 @@ import com.example.voiceroomdemo.mvp.model.message.RCChatroomSeats
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.net.api.bean.request.*
 import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
-import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
-import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
+import com.example.voiceroomdemo.ui.uimodel.*
 import com.example.voiceroomdemo.utils.LocalUserInfoManager
 import com.example.voiceroomdemo.utils.RCChatRoomMessageManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
+import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.rong.imlib.RongIMClient
@@ -77,6 +76,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     private val roomMemberInfoList = arrayListOf<UiMemberModel>()
 
     private val roomMemberInfoMap = HashMap<String, UiMemberModel>()
+
+    private val userMusicList = arrayListOf<UiMusicModel>()
+
+    private val systemMusicList = arrayListOf<UiMusicModel>()
 
     private var isInitRoomSetting = false
 
@@ -131,6 +134,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     private val recordingStatusSubject = BehaviorSubject.create<Boolean>()
 
     private val privateMessageSubject = BehaviorSubject.create<Int>()
+
+    private val userMusicListSubject = BehaviorSubject.create<List<UiMusicModel>>()
+
+    private val systemMusicListSubject = BehaviorSubject.create<List<UiMusicModel>>()
 
     private val roomEventSubject: BehaviorSubject<Pair<String, ArrayList<String>>> =
         BehaviorSubject.create()
@@ -210,6 +217,14 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     fun obUnreadMessageNumberChange(): Observable<Int> {
         return privateMessageSubject.observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun obUserMusicListChange(): Observable<List<UiMusicModel>> {
+        return userMusicListSubject.observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun obSystemMusicListChange(): Observable<List<UiMusicModel>> {
+        return systemMusicListSubject.observeOn(AndroidSchedulers.mainThread())
     }
 
 
@@ -1201,5 +1216,79 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     fun noticeMemberListUpdate() {
         memberListChangeSubject.onNext(roomMemberInfoList)
     }
+
+    private fun querySystemMusicList(): Single<List<UiMusicModel>> {
+        return queryMusicListByType(MUSIC_TYPE_SYSTEM)
+    }
+
+    private fun queryCustomizeMusicList(): Single<List<UiMusicModel>> {
+        return queryMusicListByType(MUSIC_FROM_TYPE_LOCAL)
+    }
+
+    private fun queryMusicListByType(type: Int): Single<List<UiMusicModel>> {
+        return RetrofitManager
+            .commonService
+            .getMusicList(MusicListRequest(roomId, type))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map {
+                return@map it.data?.map { bean -> UiMusicModel.create(bean) } ?: emptyList()
+            }
+    }
+
+
+    fun refreshMusicList() {
+        addDisposable(
+            Observable.combineLatest(
+                querySystemMusicList().toObservable(),
+                queryCustomizeMusicList().toObservable(),
+                BiFunction { systemList, customList ->
+                    systemList.forEach { sysModel ->
+                        sysModel.addAlready = customList.firstOrNull {
+                            sysModel.url == it.url
+                        } != null
+                    }
+                    userMusicListSubject.onNext(customList)
+                    systemMusicListSubject.onNext(systemList)
+                    return@BiFunction emptyList<UiMusicModel>()
+                }).subscribe()
+        )
+    }
+
+    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String) {
+        return addDisposable(
+            RetrofitManager.commonService.addMusic(
+                AddMusicRequest(
+                    name = name,
+                    author = author,
+                    roomId = roomId,
+                    type = type,
+                    url = url
+                )
+            ).subscribe { result ->
+                if (result.code == 10000) {
+                    refreshMusicList()
+                }
+            }
+        )
+    }
+
+    fun deleteMusic(id: Int): Completable {
+        return Completable.create { emitter ->
+            RetrofitManager
+                .commonService
+                .musicDelete(DeleteMusicRequest(id, roomId))
+                .subscribe({
+                    if (it.code == 10000) {
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(Throwable(it.msg))
+                    }
+                }, {
+                    emitter.onError(it)
+                })
+        }
+    }
+
 
 }

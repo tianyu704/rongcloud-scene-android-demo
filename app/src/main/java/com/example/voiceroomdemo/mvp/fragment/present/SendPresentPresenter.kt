@@ -56,6 +56,7 @@ class SendPresentPresenter(
                     }
                 }
                 view.onMemberModify(it)
+                checkEnableSend()
             })
     }
 

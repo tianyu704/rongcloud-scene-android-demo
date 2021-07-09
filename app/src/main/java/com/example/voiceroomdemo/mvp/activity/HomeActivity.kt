@@ -18,6 +18,7 @@ import com.example.voiceroomdemo.common.*
 import com.example.voiceroomdemo.mvp.activity.iview.IHomeView
 import com.example.voiceroomdemo.mvp.presenter.HomePresenter
 import com.example.voiceroomdemo.ui.dialog.UserInfoDialog
+import com.example.voiceroomdemo.utils.AudioEffectManager
 import com.example.voiceroomdemo.utils.LocalUserInfoManager
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.imkit.utils.RouteUtils
@@ -138,13 +139,13 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     override fun initData() {
         LocalUserInfoManager.getMemberByUserId("")
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this)
+        AudioEffectManager.init()
     }
 
     override fun modifyInfoSuccess() {
         ui {
             userInfoDialog?.dismiss()
             iv_portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
-
         }
     }
 

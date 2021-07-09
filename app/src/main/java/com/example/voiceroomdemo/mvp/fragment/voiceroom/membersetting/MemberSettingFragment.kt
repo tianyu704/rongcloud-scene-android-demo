@@ -65,7 +65,7 @@ class MemberSettingFragment(
     override fun initListener() {
         super.initListener()
         btn_send_gift.setOnClickListener {
-            view.showError("暂未开放")
+            view.sendGift(member.userId)
         }
         btn_send_message.setOnClickListener {
             RouteUtils.routeToConversationActivity(requireContext(),Conversation.ConversationType.PRIVATE,member.userId)

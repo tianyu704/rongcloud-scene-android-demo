@@ -16,4 +16,5 @@ interface IMemberSettingView:IBaseView {
     fun thisUserIsAdmin(isAdmin: Boolean){}
     fun thisUserIsMute(isMute:Boolean){}
     fun fragmentDismiss() {}
+    fun sendGift(userId: String){}
 }
