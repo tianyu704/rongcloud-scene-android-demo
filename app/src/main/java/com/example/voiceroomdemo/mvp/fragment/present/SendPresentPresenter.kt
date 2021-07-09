@@ -18,7 +18,11 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
  * @Date 2021/06/28
  */
 
-class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
+class SendPresentPresenter(
+    val view: ISendPresentView,
+    roomId: String,
+    private val selectedIds: List<String>
+) :
     BaseLifeCyclePresenter<ISendPresentView>(view) {
 
     private val roomModel: VoiceRoomModel by lazy {
@@ -32,7 +36,9 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
             .obMemberListChange()
             .map {
                 return@map it.filter {
-                    it.userId != AccountStore.getUserId() && it.seatIndex >= 0
+                    (it.userId != AccountStore.getUserId() && it.seatIndex >= 0) || selectedIds.contains(
+                        it.userId
+                    )
                 }
                 return@map it
             }.observeOn(AndroidSchedulers.mainThread())
@@ -43,9 +49,13 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
                 }
                 selects.clear()
                 selects.addAll(filts)
-
+                // 处理默认选中
+                it.forEach {
+                    if (selectedIds.contains(it.userId)) {
+                        selects.add(it)
+                    }
+                }
                 view.onMemberModify(it)
-                allCount = it.size;
             })
     }
 
@@ -92,7 +102,6 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
         }
     }
 
-    var allCount: Int = 0;
     fun selectAll(members: List<UiMemberModel>?) {
         selects.let {
             selects.clear();

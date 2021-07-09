@@ -27,11 +27,15 @@ import kotlinx.android.synthetic.main.layout_present_member_item.view.*
  * @author baicq
  * @Date 2021/07/05
  */
-class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
+class SendPresentFragment(
+    view: ISendPresentView,
+    private val roomId: String,
+    private val selectedIds: ArrayList<String>
+) :
     BaseBottomSheetDialogFragment<SendPresentPresenter, ISendPresentView>(R.layout.fragmeng_send_present),
     ISendPresentView by view {
     override fun initPresenter(): SendPresentPresenter {
-        return SendPresentPresenter(this, roomId)
+        return SendPresentPresenter(this, roomId, selectedIds)
     }
 
     val roomModel by lazy {
@@ -104,7 +108,7 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
                     }
                     this.iv_member_head.loadPortrait(t.portrait)
                     this.tv_member_name.text =
-                        if (t.userId == roomModel.currentUIRoomInfo.roomBean?.createUser?.userId) "房主" else "${t.seatIndex}"
+                        if (t.userId == roomModel.currentUIRoomInfo.roomBean?.createUser?.userId) "房主" else if (t.seatIndex < 0) "观众" else "${t.seatIndex}"
                 }
             }
         }
