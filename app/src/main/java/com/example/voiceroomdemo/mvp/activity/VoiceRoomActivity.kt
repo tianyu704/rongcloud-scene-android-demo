@@ -23,6 +23,7 @@ import com.example.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
 import com.example.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import com.example.voiceroomdemo.mvp.fragment.present.SendPresentFragment
 import com.example.voiceroomdemo.mvp.fragment.present.like.FavAnimation
+import com.example.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
 import com.example.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.EmptySeatFragment
@@ -150,11 +151,11 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         if (from != null) {
             favAnimation.addFavor(container, 300, 1500, from, null)
         } else {
-            var sp = Point()
-            windowManager.defaultDisplay.getRealSize(sp)
-            var from = Point(sp.x - 300, sp.y - 100)
-            var to = Point(sp.x - 200, sp.y - 200)
-            favAnimation.addFavor(container, 300, 1500, from, to)
+            var location = CustomerPopupWindow.getLocation(iv_send_gift)
+            var from =
+                Point(location[0] + iv_send_gift.width / 2, location[1] - iv_send_gift.height / 2)
+            var to = Point(from.x + 200, from.y - 200)
+            favAnimation.addFavor(container, 300, 1200, from, to)
         }
     }
 

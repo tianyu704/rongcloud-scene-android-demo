@@ -65,9 +65,9 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/vp_present"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_height="200dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         app:layout_constraintBottom_toTopOf="@+id/index"
         app:layout_constraintTop_toBottomOf="@+id/send" />
 

@@ -40,7 +40,7 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
     var members: List<UiMemberModel> = ArrayList()
 
     override fun initListener() {
-        btn_selectall.setOnClickListener({
+        btn_selectall.setOnClickListener {
             members.let {
                 if (btn_selectall.isSelected) {//全选
                     presenter.selectAll(members)
@@ -53,11 +53,11 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
                 }
                 rcy_member.adapter?.notifyDataSetChanged()
             }
-        })
-        btn_send.setOnClickListener({
-            presenter.sendPresent()
-        })
-        btn_num.setOnClickListener({
+        }
+        btn_send.setOnClickListener {
+            presenter.sendPresent(presenter.selects?.size == members?.size)
+        }
+        btn_num.setOnClickListener {
             NumPopupWindow(
                 requireContext(), {
                     presenter.presentNum = it
@@ -68,7 +68,7 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
             ).show(btn_num)
             // show pop
             updateBtnNum(true)
-        })
+        }
     }
 
 
@@ -98,10 +98,10 @@ class SendPresentFragment(view: ISendPresentView, private val roomId: String) :
             override fun convert(holder: RcyHolder, t: UiMemberModel, position: Int) {
                 with(holder.itemView) {
                     this.isSelected = presenter.isSelected(t)
-                    this.setOnClickListener({
+                    this.setOnClickListener {
                         presenter.updateSelected(t)
                         notifyDataSetChanged()
-                    })
+                    }
                     this.iv_member_head.loadPortrait(t.portrait)
                     this.tv_member_name.text =
                         if (t.userId == roomModel.currentUIRoomInfo.roomBean?.createUser?.userId) "房主" else "${t.seatIndex}"

@@ -1143,9 +1143,12 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     }
 
     fun sendGiftMsg(
-        members: List<UiMemberModel>, present: Present, nums: Int
+        members: List<UiMemberModel>,
+        present: Present,
+        nums: Int,
+        isAll: Boolean
     ) {
-        if (isToAll(members)) {
+        if (isAll) {
             RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomGiftAll().apply {
                 userId = AccountStore.getUserId()
                 userName = AccountStore.getUserName()

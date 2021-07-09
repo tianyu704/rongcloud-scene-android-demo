@@ -33,7 +33,7 @@ import java.util.Random;
 public class FavAnimation {
     private final static String TAG = "FavAnimation";
     private final static int MAX_IN = 200;
-    private final static int MAX_SIZE = 250;
+    private final static int MAX_SIZE = 150;
     private final List<Integer> mLikeRes = new ArrayList<>();
     protected final Random mRandom = new Random();
     private Context context;

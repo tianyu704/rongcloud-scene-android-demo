@@ -4,6 +4,7 @@
 
 package com.example.voiceroomdemo.mvp.fragment.present
 
+import android.util.Log
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
 import com.example.voiceroomdemo.mvp.model.Present
@@ -26,6 +27,7 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
 
     fun initeialObserve() {
         view.onPresentInited(roomModel.presents)
+        currentPresent = roomModel.presents.first()
         addDisposable(roomModel
             .obMemberListChange()
             .map {
@@ -35,13 +37,20 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
                 return@map it
             }.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
+                //移出已下麦
+                var filts = selects.filter { mem ->
+                    !it.contains(mem)
+                }
+                selects.clear()
+                selects.addAll(filts)
+
                 view.onMemberModify(it)
                 allCount = it.size;
             })
     }
 
     // 存储选中发生对象
-    private val selects: ArrayList<UiMemberModel> by lazy {
+    val selects: ArrayList<UiMemberModel> by lazy {
         return@lazy ArrayList<UiMemberModel>(16)
     }
 
@@ -103,15 +112,18 @@ class SendPresentPresenter(val view: ISendPresentView, roomId: String) :
         view.onEnableSend(enable)
     }
 
-    fun sendPresent() {
-        view.showMessage("赠送礼物：数量: $presentNum 人数:${selects.size} 礼物索引:${currentPresent?.index ?: 0} 价值：${currentPresent?.price}")
+    fun sendPresent(isAll: Boolean) {
+        Log.e(
+            "sendPresent",
+            "赠送礼物：数量: $presentNum 人数:${selects.size} 礼物索引:${currentPresent?.index ?: 0} 价值：${currentPresent?.price} isAll = $isAll"
+        )
         currentPresent?.let { present ->
             addDisposable(
                 roomModel
                     .sendGift(selects, present, presentNum)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { members ->
-                        roomModel.sendGiftMsg(members, present, presentNum)
+                        roomModel.sendGiftMsg(members, present, presentNum, isAll)
                     }
             )
         }

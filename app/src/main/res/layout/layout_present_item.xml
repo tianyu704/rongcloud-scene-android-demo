@@ -2,30 +2,25 @@
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@drawable/selector_present_select_bg"
-    android:orientation="vertical">
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="3dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/iv_present"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:src="@drawable/default_portrait"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/default_portrait" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_present_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
         android:lines="1"
         android:text=""
         android:textColor="@color/whiteTextColor"
@@ -35,7 +30,6 @@
         android:id="@+id/tv_present_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="5dp"
         android:drawableLeft="@drawable/ic_diamond"
         android:drawablePadding="5dp"

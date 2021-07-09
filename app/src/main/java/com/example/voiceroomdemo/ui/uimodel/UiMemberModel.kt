@@ -95,6 +95,7 @@ class UiMemberModel(
             }
         }
 
+    var selected: Boolean = false
 
     override fun toString(): String {
         return "UiMemberModel(portrait=$portrait, userId='$userId', userName=$userName, isAdmin=$isAdmin, giftCount=$giftCount, isRequestSeat=$isRequestSeat, isInvitedInfoSeat=$isInvitedInfoSeat, seatIndex=$seatIndex)"
