@@ -53,7 +53,10 @@ class RequestSeatListFragment(view: IRequestSeatListView, val roomId: String) :
                 tv_member_name.text = uiMemberModel.userName
                 tv_operation.text = "接受"
                 setOnClickListener {
-                    presenter.acceptRequest(uiMemberModel)
+                    isEnabled = false
+                    presenter.acceptRequest(uiMemberModel) {
+                        isEnabled = true
+                    }
                 }
             }
         }
