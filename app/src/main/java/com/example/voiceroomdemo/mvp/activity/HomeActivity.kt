@@ -7,6 +7,7 @@ package com.example.voiceroomdemo.mvp.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
@@ -59,10 +60,13 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         iv_video_call.setOnClickListener {
             showToast("暂未实现")
         }
-
         iv_audio_call.setOnClickListener {
             showToast("暂未实现")
         }
+        bg2.setColorFilter(Color.GRAY)
+        bg2.alpha = 0.65f
+        bg3.setColorFilter(Color.GRAY)
+        bg3.alpha = 0.65f
     }
 
     override fun getActionTitle(): CharSequence? {
