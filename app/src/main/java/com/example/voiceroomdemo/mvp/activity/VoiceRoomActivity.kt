@@ -294,7 +294,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 wv_creator_background.stopImmediately()
                 iv_room_creator_portrait.loadPortrait(R.drawable.ic_room_creator_not_in_seat)
                 iv_room_creator_portrait.background = null
-                iv_is_mute.isVisible = true
+                iv_is_mute.isVisible = uiSeatModel.isMute
                 tv_room_creator_name.text = uiSeatModel.userName
             } else {
                 iv_room_creator_portrait.loadPortrait(uiSeatModel.portrait)
