@@ -36,8 +36,6 @@ class MemberSettingFragment(
             rl_setting_admin.isVisible = true
             cl_member_setting.isVisible = true
         }
-
-
         iv_member_portrait.loadPortrait(member.portrait)
         tv_member_name.text = member.userName
 
@@ -68,10 +66,12 @@ class MemberSettingFragment(
             view.sendGift(member.userId)
         }
         btn_send_message.setOnClickListener {
-            RouteUtils.routeToConversationActivity(requireContext(),Conversation.ConversationType.PRIVATE,member.userId)
+            RouteUtils.routeToConversationActivity(
+                requireContext(),
+                Conversation.ConversationType.PRIVATE,
+                member.userId
+            )
         }
-
-
     }
 
 
@@ -84,7 +84,11 @@ class MemberSettingFragment(
                 }
                 isAdmin -> {
                     rl_setting_admin.isVisible = false
-                    cl_member_setting.isVisible = true
+                    if (member.isAdmin) {
+                        cl_member_setting.isVisible = false//对方是管理员 不能操作
+                    } else {
+                        cl_member_setting.isVisible = true
+                    }
                 }
                 else -> {
                     rl_setting_admin.isVisible = false
