@@ -417,6 +417,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 }
             })
         } else {
+            if ( currentStatus == STATUS_WAIT_FOR_SEAT){
+                view.showRevokeSeatRequest()
+                return
+            }
             // 自由上麦模式
             if (roomModel.currentUIRoomInfo.isFreeEnterSeat) {
                 var index = seatIndex

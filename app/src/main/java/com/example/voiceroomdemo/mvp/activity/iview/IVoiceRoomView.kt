@@ -17,7 +17,7 @@ import java.util.ArrayList
  * @author gusd
  * @Date 2021/06/10
  */
-interface IVoiceRoomView:IBaseView {
+interface IVoiceRoomView : IBaseView {
     fun onJoinRoomSuccess()
     fun initRoleView(roomInfo: UiRoomModel)
 
@@ -38,13 +38,14 @@ interface IVoiceRoomView:IBaseView {
      */
     fun onSeatInfoChange(index: Int, uiSeatModel: UiSeatModel)
     fun onSeatListChange(uiSeatModelList: List<UiSeatModel>)
-    fun sendTextMessageSuccess(message:String)
+    fun sendTextMessageSuccess(message: String)
     fun showChatRoomMessage(messageContent: MessageContent)
-    fun showPickReceived(isCreateReceive: Boolean,userId:String)
+    fun showPickReceived(isCreateReceive: Boolean, userId: String)
     fun switchToAdminRole(isAdmin: Boolean)
     fun changeStatus(status: Int)
     fun showUnReadRequestNumber(number: Int)
     fun showUnreadMessage(count: Int)
     fun showFov(from: Point?)
+    fun showRevokeSeatRequest()
 
 }

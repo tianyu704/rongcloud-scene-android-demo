@@ -508,6 +508,21 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     }
 
 
+    override fun showRevokeSeatRequest() {
+        when (presenter.currentStatus) {
+            STATUS_ON_SEAT -> {
+
+            }
+            STATUS_WAIT_FOR_SEAT -> {
+                RevokeSeatRequestFragment(this@VoiceRoomActivity, roomId).show(
+                    supportFragmentManager
+                )
+            }
+            STATUS_NOT_ON_SEAT -> {
+                presenter.enterSeat(-1)
+            }
+        }
+    }
     ///////////////////////////////////////////////////////////////////////////
     // 以下为不同角色的状态类
     ///////////////////////////////////////////////////////////////////////////
@@ -527,19 +542,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                     onTopRightButtonPress()
                 }
                 iv_request_enter_seat.setOnClickListener {
-                    when (presenter.currentStatus) {
-                        STATUS_ON_SEAT -> {
-
-                        }
-                        STATUS_WAIT_FOR_SEAT -> {
-                            RevokeSeatRequestFragment(this@VoiceRoomActivity, roomId).show(
-                                supportFragmentManager
-                            )
-                        }
-                        STATUS_NOT_ON_SEAT -> {
-                            presenter.enterSeat(-1)
-                        }
-                    }
+                    showRevokeSeatRequest()
                 }
 
                 btn_emoji_keyboard.setOnClickListener {
@@ -619,7 +622,10 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
-            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
+            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock) {
+                // 点击锁定座位
+                showMessage("该座位已锁定")
+            } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
                 // 点击空座位
                 presenter.enterSeat(position)
             } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed) {
