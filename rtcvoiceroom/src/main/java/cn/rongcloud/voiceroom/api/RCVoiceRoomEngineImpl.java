@@ -339,13 +339,14 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
         final RCVoiceSeatInfo info = mRCVoiceSeatInfoList.get(seatIndex);
         if (info != null) {
+            final String userId = info.getUserId();
             final RCVoiceSeatInfo seatClone = info.clone();
             seatClone.setUserId(null);
             seatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
             updateKvSeatInfo(seatClone, seatIndex, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    userLeaveSeat(seatClone.getUserId(), info);
+                    userLeaveSeat(userId, info);
                     RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                     if (currentRoomEventListener != null) {
                         currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
@@ -386,6 +387,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             onErrorWithCheck(callback, VoiceRoomErrorCode.SEAT_IS_NOT_IDLE);
             return;
         }
+        final String userId = preSeatInfo.getUserId();
         final RCVoiceSeatInfo preSeatClone = preSeatInfo.clone();
         preSeatClone.setUserId(null);
         preSeatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
@@ -393,7 +395,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         updateKvSeatInfo(preSeatClone, preIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
-                userLeaveSeat(preSeatClone.getUserId(), preSeatInfo);
+                userLeaveSeat(userId, preSeatInfo);
                 RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                 if (currentRoomEventListener != null) {
                     currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
@@ -497,7 +499,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             updateKvSeatInfo(seatInfoClone, index, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    userLeaveSeat(seatInfoClone.getUserId(), seatInfo);
+                    userLeaveSeat(userId, seatInfo);
                     RCVoiceRoomEventListener roomEventListener = getCurrentRoomEventListener();
                     if (roomEventListener != null) {
                         roomEventListener.onUserLeaveSeat(index, userId);
