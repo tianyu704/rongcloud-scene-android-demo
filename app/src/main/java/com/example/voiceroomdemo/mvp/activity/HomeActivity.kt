@@ -89,6 +89,11 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         return portrait
     }
 
+    override fun onLogout() {
+        RCVoiceRoomEngine.getInstance().disConnect()
+        super.onLogout()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         userInfoDialog?.let {

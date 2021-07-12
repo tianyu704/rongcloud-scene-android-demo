@@ -10,6 +10,8 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import com.example.voiceroomdemo.common.AccountStore
+import com.example.voiceroomdemo.common.showToast
 import com.example.voiceroomdemo.utils.CrashCollectHandler
 import com.example.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.umeng.analytics.MobclickAgent
@@ -19,6 +21,7 @@ import com.vanniktech.emoji.EmojiProvider
 import com.vanniktech.emoji.emoji.EmojiCategory
 import com.vanniktech.emoji.ios.category.*
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
+import io.rong.imlib.RongIMClient
 import kotlin.properties.Delegates
 
 /**
@@ -84,6 +87,13 @@ class MyApp : Application() {
                 activityList.remove(activity)
             }
         })
+
+        RongIMClient.setConnectionStatusListener { status ->
+            if (status == RongIMClient.ConnectionStatusListener.ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT) {
+                showToast("当前账号已在其他设备登录，请重新登录")
+                AccountStore.logout()
+            }
+        }
 
     }
 

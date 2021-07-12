@@ -67,7 +67,6 @@ class HomePresenter(val view: IHomeView, val context: Context) :
     }
 
     fun logout() {
-        RCVoiceRoomEngine.getInstance().disConnect()
         AccountStore.logout()
     }
 }
