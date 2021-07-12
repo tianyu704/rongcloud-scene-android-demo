@@ -37,15 +37,17 @@ class RequestSeatListPresenter(val view: IRequestSeatListView, roomId: String) :
         )
     }
 
-    fun acceptRequest(uiMemberModel: UiMemberModel, onComplete: () -> Unit) {
+    fun acceptRequest(uiMemberModel: UiMemberModel, complete: () -> Unit) {
         addDisposable(
             roomModel
                 .acceptRequest(uiMemberModel.userId)
                 .subscribe({
-                    onComplete()
+                    complete()
+                    uiMemberModel.isRequestSeat = false
+                    roomModel.noticeMemberListUpdate()
                 }, {
                     view.showError(it.message)
-                    onComplete()
+                    complete()
                 })
         )
     }
