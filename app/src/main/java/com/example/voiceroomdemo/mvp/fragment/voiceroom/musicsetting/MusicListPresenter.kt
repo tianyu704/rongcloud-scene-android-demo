@@ -50,8 +50,8 @@ class MusicListPresenter(val view: IMusicListView, roomId: String) :
 
     }
 
-    fun playOrPauseMusic(url: String) {
-        roomModel.playOrPauseMusic(url)
+    fun playOrPauseMusic(model: UiMusicModel) {
+        roomModel.playOrPauseMusic(model)
     }
 
     fun moveMusicTop(model: UiMusicModel) {

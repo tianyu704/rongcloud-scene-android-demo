@@ -4,6 +4,9 @@
 
 package com.example.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +26,7 @@ import kotlinx.android.synthetic.main.layout_add_music_item.view.*
  * @Date 2021/07/06
  */
 private const val TAG = "MusicAddFragment"
+private const val MUSIC_PICK_REQUEST_CODE = 10000
 
 class MusicAddFragment(view: IMusicAddView, val roomId: String) :
     BaseFragment<MusicAddPresenter, IMusicAddView>(R.layout.fragment_music_add),
@@ -73,6 +77,18 @@ class MusicAddFragment(view: IMusicAddView, val roomId: String) :
 
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == MUSIC_PICK_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            val uri = data?.data
+            uri?.let {
+                Log.d(TAG, "onActivityResult: ${uri.path}")
+                presenter.addMusicFromLocal(requireContext(),uri)
+            }
+        }
+    }
+
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(model: UiMusicModel) {
             with(itemView) {
@@ -105,7 +121,11 @@ class MusicAddFragment(view: IMusicAddView, val roomId: String) :
                     this.iv_music_icon.setImageResource(R.drawable.ic_add_music_from_local)
                     this.iv_music_status.setImageResource(R.drawable.ic_add_music_not_add)
                     this.iv_music_status.setOnClickListener {
-
+                        val intent = Intent(Intent.ACTION_GET_CONTENT)
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, presenter.getSupportFileTypeMime())
+                        intent.type = "*/*"
+                        intent.addCategory(Intent.CATEGORY_OPENABLE)
+                        startActivityForResult(intent, MUSIC_PICK_REQUEST_CODE)
                     }
                 }
             }

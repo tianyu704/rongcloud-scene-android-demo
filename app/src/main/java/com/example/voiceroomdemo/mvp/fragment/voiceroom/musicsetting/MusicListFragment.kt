@@ -93,7 +93,7 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
                 }
 
                 iv_music_play_icon.setOnClickListener {
-                    presenter.playOrPauseMusic(model.url!!)
+                    presenter.playOrPauseMusic(model)
                 }
 
                 iv_music_delete.setOnClickListener {

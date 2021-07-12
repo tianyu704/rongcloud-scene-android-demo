@@ -337,6 +337,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     }
 
     fun leaveRoom() {
+        roomModel.onLeaveRoom()
         val index = roomModel.isInSeat(AccountStore.getUserId()!!)
         if (index > -1) {
             RCVoiceRoomEngine.getInstance().leaveSeat(object : RCVoiceRoomCallback {

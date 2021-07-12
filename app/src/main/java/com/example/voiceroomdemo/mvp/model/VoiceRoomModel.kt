@@ -13,8 +13,10 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
+import com.example.voiceroomdemo.MyApp
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
+import com.example.voiceroomdemo.common.showToast
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomAdmin
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomGift
 import com.example.voiceroomdemo.mvp.model.message.RCChatroomGiftAll
@@ -1283,7 +1285,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     }
 
 
-    fun refreshMusicList() {
+    fun refreshMusicList(onComplete: (() -> Unit)? = null) {
         addDisposable(
             Observable.combineLatest(
                 querySystemMusicList().toObservable(),
@@ -1307,11 +1309,14 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                     userMusicListSubject.onNext(customList)
                     systemMusicListSubject.onNext(systemList)
                     return@BiFunction emptyList<UiMusicModel>()
-                }).subscribe()
+                }).subscribe {
+                onComplete?.invoke()
+            }
         )
     }
 
-    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String): Completable {
+    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String,size:Long? = null): Completable {
+        Log.d(TAG, "addMusic: name = $name,author = $author,type = $type,url = $url")
         return Completable.create { emitter ->
             addDisposable(
                 RetrofitManager
@@ -1322,11 +1327,18 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                             author = author,
                             roomId = roomId,
                             type = type,
-                            url = url
+                            url = url,
+                            size = size
                         )
                     ).subscribe({ result ->
                         if (result.code == 10000) {
-                            refreshMusicList()
+                            refreshMusicList {
+                                if (userMusicList.size == 1) {
+                                    userMusicList.elementAtOrNull(0)?.url?.let {
+                                        playMusic(name, it)
+                                    }
+                                }
+                            }
                             emitter.onComplete()
                         } else {
                             emitter.onError(Throwable(result.msg))
@@ -1369,7 +1381,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     private var currentMusicState = RCRTCAudioMixer.MixingState.STOPPED
 
 
-    fun playOrPauseMusic(url: String) {
+    fun playOrPauseMusic(model: UiMusicModel) {
         playNextMusicJob?.let {
             if (it.isActive) {
                 it.cancel()
@@ -1378,15 +1390,15 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
         if (currentPlayMusic.isNullOrEmpty()) {
             // 当前没在播放，直接播放
-            playMusic(url)
-        } else if (currentPlayMusic != url) {
+            model.url?.let { playMusic(model.name, it) }
+        } else if (currentPlayMusic != model.url) {
             // 当前在播放的和选择的不同,停止播放旧的，直接播放新的
             try {
                 RCRTCAudioMixer.getInstance().stop()
             } catch (e: Exception) {
                 Log.e(TAG, "playOrPauseMusic: ", e)
             }
-            playMusic(url)
+            model.url?.let { playMusic(model.name, it) }
         } else {
             // 暂停
             if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
@@ -1397,11 +1409,11 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         }
     }
 
-    private fun playMusic(url: String) {
+    private fun playMusic(name: String? = "", url: String) {
         addDisposable(
             FileModel
-                .checkOrDownLoadMusic(url)
-                .subscribe {
+                .checkOrDownLoadMusic(name ?: "", url)
+                .subscribe({
                     currentPlayMusic = url
                     RCRTCAudioMixer.getInstance()
                         .startMix(
@@ -1409,7 +1421,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                                 FileModel.getNameFromUrl(url) ?: ""
                             ), RCRTCAudioMixer.Mode.MIX, true, 1
                         )
+                }, {
+                    MyApp.context.showToast(it.message)
                 })
+        )
     }
 
     fun moveMusicToTop(model: UiMusicModel): Completable {
@@ -1418,7 +1433,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             if (currentPlayMusic.isNullOrEmpty() || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
                 model.url?.let {
                     RCRTCAudioMixer.getInstance().stop()
-                    playMusic(it)
+                    playMusic(model.name, it)
                     emitter.onComplete()
                 }
             } else {
@@ -1452,19 +1467,26 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             Log.d(TAG, "playNextMusic: index = $index")
             currentPlayMusic = null
             userMusicList
-                .elementAtOrNull((index + 1) % userMusicList.size)?.url?.let {
+                .elementAtOrNull((index + 1) % userMusicList.size)?.let {
                     Log.d(TAG, "playNextMusic: $it")
                     delay(1000)
-                    playMusic(it)
+
+                    it.url?.let { it1 -> playMusic(it.name, it1) }
                 } ?: run {
                 Log.d(TAG, "playNextMusic: not find next music,try play first index music")
                 if (userMusicList.size > 0) {
-                    userMusicList[0].url?.let {
+                    userMusicList[0].let {
                         delay(1000)
-                        playMusic(it)
+                        it.url?.let { it1 -> playMusic(it.name, it1) }
                     }
                 }
             }
+        }
+    }
+
+    fun onLeaveRoom() {
+        if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED || currentMusicState == RCRTCAudioMixer.MixingState.PLAY) {
+            RCRTCAudioMixer.getInstance().stop()
         }
     }
 

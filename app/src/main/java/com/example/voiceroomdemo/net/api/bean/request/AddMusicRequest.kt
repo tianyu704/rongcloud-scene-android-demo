@@ -3,6 +3,7 @@
  */
 
 package com.example.voiceroomdemo.net.api.bean.request
+
 import com.google.gson.annotations.SerializedName
 
 
@@ -23,5 +24,7 @@ data class AddMusicRequest(
     @SerializedName("type")
     val type: Int? = null,
     @SerializedName("url")
-    val url: String? = null
+    val url: String? = null,
+    @SerializedName("size")
+    val size: Long? = 0
 )
