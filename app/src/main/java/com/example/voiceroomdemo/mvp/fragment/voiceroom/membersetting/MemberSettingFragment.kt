@@ -81,6 +81,9 @@ class MemberSettingFragment(
                 isCreatorUser -> {
                     rl_setting_admin.isVisible = true
                     cl_member_setting.isVisible = true
+                    //处理管理员可能因此
+                    ll_mute_seat.isVisible = true
+                    ll_close_seat.isVisible = true
                 }
                 isAdmin -> {
                     rl_setting_admin.isVisible = false
@@ -88,6 +91,9 @@ class MemberSettingFragment(
                         cl_member_setting.isVisible = false//对方是管理员 不能操作
                     } else {
                         cl_member_setting.isVisible = true
+                        // 管理员没有权限处理座位相关权限
+                        ll_mute_seat.isVisible = false
+                        ll_close_seat.isVisible = false
                     }
                 }
                 else -> {
@@ -98,13 +104,19 @@ class MemberSettingFragment(
         }
     }
 
-
-    override fun thisUserIsOnSeat(seatIndex: Int) {
+    override fun thisUserIsOnSeat(seatIndex: Int, isAdmin: Boolean) {
         ui {
             if (seatIndex > -1) {
                 ll_kick_seat.isVisible = true
-                ll_close_seat.isVisible = true
-                ll_mute_seat.isVisible = true
+                // 修改麦位和权限的冲突
+                if (roomInfoBean.createUser?.userId == AccountStore.getUserId()) {
+                    ll_mute_seat.isVisible = true
+                    ll_close_seat.isVisible = true
+                } else if (isAdmin && !member.isAdmin) {
+                    // 管理员没有权限处理座位相关权限
+                    ll_mute_seat.isVisible = false
+                    ll_close_seat.isVisible = false
+                }
                 ll_kick_room.isVisible = true
                 ll_invited_seat.isVisible = false
                 tv_seat_position.isVisible = true
