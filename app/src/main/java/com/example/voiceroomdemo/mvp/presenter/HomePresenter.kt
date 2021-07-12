@@ -5,13 +5,15 @@
 package com.example.voiceroomdemo.mvp.presenter
 
 import android.content.Context
+import android.net.Uri
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
 import com.example.voiceroomdemo.mvp.activity.iview.IHomeView
-import com.example.voiceroomdemo.mvp.model.FileUploadModel
+import com.example.voiceroomdemo.mvp.model.FileModel
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
+import com.example.voiceroomdemo.utils.RealPathFromUriUtils
 
 /**
  * @author gusd
@@ -25,10 +27,10 @@ class HomePresenter(val view: IHomeView, val context: Context) :
     override fun onDestroy() {
     }
 
-    fun modifyUserInfo(userName: String, selectedPicPath: String?) {
+    fun modifyUserInfo(userName: String, selectedPicPath: Uri?) {
         view.showWaitingDialog()
-        if (!selectedPicPath.isNullOrEmpty()) {
-            addDisposable(FileUploadModel.imageUpload(selectedPicPath, context).flatMap { url ->
+        if (selectedPicPath!=null) {
+            addDisposable(FileModel.imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,selectedPicPath), context).flatMap { url ->
                 return@flatMap RetrofitManager.commonService.updateUserInfo(
                     UpdateUserInfoRequestBean(
                         userName,

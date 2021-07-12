@@ -6,9 +6,8 @@ package com.example.voiceroomdemo.mvp.fragment.createroom
 
 import android.app.Activity
 import android.content.Intent
-import android.database.Cursor
+import android.net.Uri
 import android.provider.MediaStore
-import android.text.InputFilter
 import android.util.Log
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatRadioButton
@@ -20,7 +19,6 @@ import com.example.voiceroomdemo.common.loadImageView
 import com.example.voiceroomdemo.common.showToast
 import com.example.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import com.example.voiceroomdemo.ui.dialog.InputPasswordDialog
-import com.example.voiceroomdemo.utils.ImageLoaderUtil
 import com.example.voiceroomdemo.utils.MaxLengthWithEmojiFilter
 import kotlinx.android.synthetic.main.layout_create_room.*
 
@@ -40,7 +38,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     private lateinit var radioButtons: List<AppCompatRadioButton>
     private lateinit var gifMarks: List<AppCompatTextView>
 
-    private var roomCover: String? = null
+    private var roomCover: Uri? = null
     private var roomBackground: String? = null
     private var roomPassword: String? = null
     private var inputPasswordDialog: InputPasswordDialog? = null
@@ -80,7 +78,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
             R.drawable.test_background
         )
 
-        et_room_name.filters = arrayOf(MaxLengthWithEmojiFilter(10,et_room_name))
+        et_room_name.filters = arrayOf(MaxLengthWithEmojiFilter(10, et_room_name))
     }
 
     override fun initListener() {
@@ -129,7 +127,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
             }
 
             presenter.createVoiceRoom(
-                roomCover ?: "",
+                roomCover,
                 et_room_name.text.toString(),
                 roomBackground ?: "",
                 rb_private.isChecked,
@@ -157,21 +155,25 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICTURE_SELECTED_RESULT_CODE && resultCode == Activity.RESULT_OK) {
             val selectImageUrl = data?.data;
-            val filePathColumn = arrayOf<String>(MediaStore.Images.Media.DATA)
+//            val filePathColumn = arrayOf<String>(MediaStore.Images.Media.DATA)
             // 查询我们需要的数据
-            selectImageUrl?.let {
-                val cursor: Cursor? = activity?.contentResolver?.query(
-                    selectImageUrl,
-                    filePathColumn, null, null, null
-                )
-                cursor?.moveToFirst()
+//            selectImageUrl?.let {
+//                val cursor: Cursor? = activity?.contentResolver?.query(
+//                    selectImageUrl,
+//                    filePathColumn, null, null, null
+//                )
+//                cursor?.moveToFirst()
+//
+//                val columnIndex: Int = cursor?.getColumnIndex(filePathColumn[0])!!
+//                val picturePath: String = cursor.getString(columnIndex)
+//                cursor.close()
+//                roomCover = picturePath
+//                iv_room_cover.loadImageView(picturePath)
+//            }
 
-                val columnIndex: Int = cursor?.getColumnIndex(filePathColumn[0])!!
-                val picturePath: String = cursor.getString(columnIndex)
-                cursor.close()
-                roomCover = picturePath
-                Log.e("CreateVoiceRoom","path = "+picturePath);
-                iv_room_cover.loadImageView(picturePath)
+            selectImageUrl?.let {
+                iv_room_cover.loadImageView(it)
+                roomCover = it
             }
         }
     }

@@ -5,6 +5,7 @@
 package com.example.voiceroomdemo.ui.dialog
 
 import android.content.Context
+import android.net.Uri
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.*
 import kotlinx.android.synthetic.main.layout_user_info_popup_window.*
@@ -16,14 +17,14 @@ import kotlinx.android.synthetic.main.layout_user_info_popup_window.*
 class UserInfoDialog(
     context: Context,
     private val logoutBlock: (() -> Unit)? = null,
-    private val saveBlock: ((userName: String, portrait: String?) -> Unit)? = null,
+    private val saveBlock: ((userName: String, portrait: Uri?) -> Unit)? = null,
     private val showPictureSelectBlock: (() -> Unit)? = null
 ) : BaseDialog(
     context, R.layout.layout_user_info_popup_window,
     false
 ) {
 
-    private var selectedPicPath: String? = null
+    private var selectedPicPath: Uri? = null
 
     override fun initListener() {
 
@@ -56,7 +57,7 @@ class UserInfoDialog(
 
     }
 
-    fun setUserPortrait(picturePath: String) {
+    fun setUserPortrait(picturePath: Uri) {
         selectedPicPath = picturePath
         iv_portrait.loadLocalPortrait(picturePath)
     }

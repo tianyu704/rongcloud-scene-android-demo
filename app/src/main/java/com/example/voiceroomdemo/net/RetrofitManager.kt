@@ -4,9 +4,10 @@
 
 package com.example.voiceroomdemo.net
 
+import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.net.api.ApiConstant
 import com.example.voiceroomdemo.net.api.CommonApiService
-import com.example.voiceroomdemo.common.AccountStore
+import com.example.voiceroomdemo.net.api.DownloadFileApiService
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -24,6 +25,15 @@ private const val TAG = "RetrofitManager"
 object RetrofitManager {
     val commonService: CommonApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         getRetrofit().create(CommonApiService::class.java)
+    }
+
+    val downloadService: DownloadFileApiService by lazy {
+        getDownloadRetrofit().create(DownloadFileApiService::class.java)
+    }
+
+    private fun getDownloadRetrofit(): Retrofit {
+        return Retrofit.Builder().baseUrl("http://127.0.0.1").client(getOkHttpClient())
+            .addCallAdapterFactory(RxJava3CallAdapterFactory.create()).build()
     }
 
     private fun getRetrofit(): Retrofit {

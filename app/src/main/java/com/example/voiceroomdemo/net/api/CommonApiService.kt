@@ -64,9 +64,8 @@ interface CommonApiService {
     /**
      * 修改音乐顺序 operation: up 上移，down 下移
      */
-    @POST("/mic/room/music/{operation}")
+    @POST("/mic/room/music/move")
     fun modifyMusicOrder(
-        @Path("operation") operation: String,
         @Body musicOrderRequest: MusicOrderRequest
     ): Single<SimpleRespondBean>
 

@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.example.voiceroomdemo"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "${releaseTime()}"
 

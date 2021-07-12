@@ -39,14 +39,26 @@ class MusicListPresenter(val view: IMusicListView, roomId: String) :
     fun deleteMusic(model: UiMusicModel) {
         model.id?.let {
             addDisposable(
-                roomModel.deleteMusic(it)
+                roomModel.deleteMusic(model.url ?: "", it)
                     .subscribe({
-                        roomModel.refreshMusicList()
+
                     }, {
                         view.showError(it.message)
                     })
             )
         }
 
+    }
+
+    fun playOrPauseMusic(url: String) {
+        roomModel.playOrPauseMusic(url)
+    }
+
+    fun moveMusicTop(model: UiMusicModel) {
+        addDisposable(roomModel.moveMusicToTop(model).subscribe({
+
+        }, {
+            view.showError(it.message)
+        }))
     }
 }

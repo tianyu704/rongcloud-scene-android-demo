@@ -52,7 +52,7 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
             )
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-            holder.bind(data[position])
+            holder.bind(position, data[position])
         }
 
         override fun getItemCount(): Int {
@@ -69,7 +69,7 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
 
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(model: UiMusicModel) {
+        fun bind(position: Int, model: UiMusicModel) {
             with(itemView) {
                 this.iv_music_play_icon.setImageResource(
                     if (model.isPlaying) R.drawable.ic_music_pause else R.drawable.ic_music_play
@@ -77,6 +77,10 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
                 this.tv_music_name.text = model.name
                 this.tv_music_author.text = model.author
                 this.tv_music_size.text = "${model.size}M"
+
+                this.tv_music_name.isSelected = model.isPlaying
+                this.tv_music_author.isSelected = model.isPlaying
+                this.tv_music_size.isSelected = model.isPlaying
 
                 if (model.isPlaying) {
                     iv_music_top.isVisible = false
@@ -89,7 +93,7 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
                 }
 
                 iv_music_play_icon.setOnClickListener {
-
+                    presenter.playOrPauseMusic(model.url!!)
                 }
 
                 iv_music_delete.setOnClickListener {
@@ -97,7 +101,7 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
                 }
 
                 iv_music_top.setOnClickListener {
-
+                    presenter.moveMusicTop(model)
                 }
             }
         }

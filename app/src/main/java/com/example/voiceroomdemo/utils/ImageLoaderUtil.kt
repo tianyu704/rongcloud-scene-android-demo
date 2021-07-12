@@ -5,6 +5,7 @@
 package com.example.voiceroomdemo.utils
 
 import android.content.Context
+import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
@@ -43,7 +44,15 @@ object ImageLoaderUtil {
     }
 
     fun loadLocalImage(context: Context, imageView: ImageView, localPath: String) {
-        Glide.with(context).load(localPath).into(imageView)
+        Glide.with(context).load(localPath).centerCrop().into(imageView)
+    }
+
+    fun loadLocalImage(context: Context, imageView: ImageView, uri: Uri) {
+        Glide.with(context).load(uri).centerCrop().into(imageView)
+    }
+
+    fun loadImage(context: Context, imageView: ImageView, uri: Uri, resId: Int) {
+        Glide.with(context).load(uri).placeholder(resId).error(resId).centerCrop().into(imageView)
     }
 
 

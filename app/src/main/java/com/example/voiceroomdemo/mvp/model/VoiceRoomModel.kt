@@ -5,6 +5,8 @@
 package com.example.voiceroomdemo.mvp.model
 
 import android.util.Log
+import cn.rongcloud.rtc.api.RCRTCAudioMixer
+import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener
@@ -34,7 +36,7 @@ import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.ChatRoomInfo
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
-import io.rong.imlib.model.MessageContent
+import kotlinx.coroutines.*
 import org.reactivestreams.Publisher
 
 /**
@@ -268,6 +270,41 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                     }
                 }
             })
+
+        RCRTCAudioMixer.getInstance().setAudioMixingStateChangeListener(object :
+            RCRTCAudioMixingStateChangeListener() {
+            override fun onMixEnd() {
+                Log.d(TAG, "onMixEnd: ")
+                playNextMusic()
+            }
+
+            override fun onStateChanged(p0: RCRTCAudioMixer.MixingState) {
+                Log.d(TAG, "onStateChanged: $p0")
+                currentMusicState = p0
+                when (p0) {
+                    RCRTCAudioMixer.MixingState.PLAY -> {
+                        userMusicList.forEach {
+                            it.isPlaying = currentPlayMusic == it.url
+                        }
+                    }
+                    RCRTCAudioMixer.MixingState.PAUSED -> {
+                        userMusicList.forEach {
+                            it.isPlaying = false
+                        }
+                    }
+                    RCRTCAudioMixer.MixingState.STOPPED -> {
+                        currentPlayMusic = null
+                        userMusicList.forEach {
+                            it.isPlaying = false
+                        }
+                    }
+                }
+
+                userMusicListSubject.onNext(userMusicList)
+
+            }
+
+        })
     }
 
 
@@ -1248,6 +1285,16 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                             sysModel.url == it.url
                         } != null
                     }
+                    userMusicList.clear()
+                    userMusicList.addAll(customList)
+                    if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY) {
+                        userMusicList.forEach {
+                            it.isPlaying = currentPlayMusic == it.url
+                        }
+                    }
+
+                    systemMusicList.clear()
+                    systemMusicList.addAll(systemList)
                     userMusicListSubject.onNext(customList)
                     systemMusicListSubject.onNext(systemList)
                     return@BiFunction emptyList<UiMusicModel>()
@@ -1255,31 +1302,50 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         )
     }
 
-    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String) {
-        return addDisposable(
-            RetrofitManager.commonService.addMusic(
-                AddMusicRequest(
-                    name = name,
-                    author = author,
-                    roomId = roomId,
-                    type = type,
-                    url = url
-                )
-            ).subscribe { result ->
-                if (result.code == 10000) {
-                    refreshMusicList()
-                }
-            }
-        )
+    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String): Completable {
+        return Completable.create { emitter ->
+            addDisposable(
+                RetrofitManager
+                    .commonService
+                    .addMusic(
+                        AddMusicRequest(
+                            name = name,
+                            author = author,
+                            roomId = roomId,
+                            type = type,
+                            url = url
+                        )
+                    ).subscribe({ result ->
+                        if (result.code == 10000) {
+                            refreshMusicList()
+                            emitter.onComplete()
+                        } else {
+                            emitter.onError(Throwable(result.msg))
+                        }
+                    }, {
+                        emitter.onError(it)
+                    })
+            )
+        }
+
     }
 
-    fun deleteMusic(id: Int): Completable {
+    fun deleteMusic(url: String, id: Int): Completable {
         return Completable.create { emitter ->
             RetrofitManager
                 .commonService
                 .musicDelete(DeleteMusicRequest(id, roomId))
                 .subscribe({
                     if (it.code == 10000) {
+                        if (url == currentPlayMusic) {
+
+                            try {
+                                RCRTCAudioMixer.getInstance().stop()
+                            } catch (e: Exception) {
+                                Log.e(TAG, "deleteMusic: ", e)
+                            }
+                        }
+                        refreshMusicList()
                         emitter.onComplete()
                     } else {
                         emitter.onError(Throwable(it.msg))
@@ -1290,5 +1356,107 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         }
     }
 
+    private var currentPlayMusic: String? = null
+    private var currentMusicState = RCRTCAudioMixer.MixingState.STOPPED
+
+
+    fun playOrPauseMusic(url: String) {
+        playNextMusicJob?.let {
+            if (it.isActive) {
+                it.cancel()
+            }
+        }
+
+        if (currentPlayMusic.isNullOrEmpty()) {
+            // 当前没在播放，直接播放
+            playMusic(url)
+        } else if (currentPlayMusic != url) {
+            // 当前在播放的和选择的不同,停止播放旧的，直接播放新的
+            try {
+                RCRTCAudioMixer.getInstance().stop()
+            } catch (e: Exception) {
+                Log.e(TAG, "playOrPauseMusic: ", e)
+            }
+            playMusic(url)
+        } else {
+            // 暂停
+            if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
+                RCRTCAudioMixer.getInstance().resume()
+            } else if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY) {
+                RCRTCAudioMixer.getInstance().pause()
+            }
+        }
+    }
+
+    private fun playMusic(url: String) {
+        addDisposable(
+            FileModel
+                .checkOrDownLoadMusic(url)
+                .subscribe {
+                    currentPlayMusic = url
+                    RCRTCAudioMixer.getInstance()
+                        .startMix(
+                            FileModel.getCompleteMusicPathByName(
+                                FileModel.getNameFromUrl(url) ?: ""
+                            ), RCRTCAudioMixer.Mode.MIX, true, 1
+                        )
+                })
+    }
+
+    fun moveMusicToTop(model: UiMusicModel): Completable {
+        return Completable.create { emitter ->
+
+            if (currentPlayMusic.isNullOrEmpty() || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
+                model.url?.let {
+                    RCRTCAudioMixer.getInstance().stop()
+                    playMusic(it)
+                    emitter.onComplete()
+                }
+            } else {
+                val currentMusic = userMusicList.lastOrNull {
+                    it.url == currentPlayMusic
+                }
+                RetrofitManager.commonService.modifyMusicOrder(
+                    MusicOrderRequest(roomId, model.id, currentMusic?.id ?: 0)
+                ).subscribe({
+                    if (it.code == 10000) {
+                        refreshMusicList()
+                        emitter.onComplete()
+                    } else {
+                        emitter.onError(Throwable(it.msg))
+                    }
+                }, {
+                    emitter.onError(it)
+                })
+            }
+        }
+    }
+
+    private var playNextMusicJob: Job? = null
+    private fun playNextMusic() {
+        Log.d(TAG, "playNextMusic: ")
+        playNextMusicJob = GlobalScope.launch(Dispatchers.IO) {
+            // FIXME: 2021/7/12 sdk 混音存在问题，添加延迟临时处理
+            val index = userMusicList.indexOfLast {
+                it.url == currentPlayMusic
+            }
+            Log.d(TAG, "playNextMusic: index = $index")
+            currentPlayMusic = null
+            userMusicList
+                .elementAtOrNull((index + 1) % userMusicList.size)?.url?.let {
+                    Log.d(TAG, "playNextMusic: $it")
+                    delay(1000)
+                    playMusic(it)
+                } ?: run {
+                Log.d(TAG, "playNextMusic: not find next music,try play first index music")
+                if (userMusicList.size > 0) {
+                    userMusicList[0].url?.let {
+                        delay(1000)
+                        playMusic(it)
+                    }
+                }
+            }
+        }
+    }
 
 }

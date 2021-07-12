@@ -5,13 +5,15 @@
 package com.example.voiceroomdemo.mvp.fragment.createroom
 
 import android.content.Context
+import android.net.Uri
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
-import com.example.voiceroomdemo.mvp.model.FileUploadModel
+import com.example.voiceroomdemo.mvp.model.FileModel
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.net.api.ApiConstant
 import com.example.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
 import com.example.voiceroomdemo.net.api.bean.request.Kv
+import com.example.voiceroomdemo.utils.RealPathFromUriUtils
 
 /**
  * @author gusd
@@ -21,7 +23,7 @@ class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Cont
     BaseLifeCyclePresenter<ICreateVoiceRoomView>(view) {
 
     fun createVoiceRoom(
-        roomCover: String,
+        roomCover: Uri? = null,
         roomName: String,
         roomBackground: String,
         isPrivate: Boolean,
@@ -38,9 +40,9 @@ class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Cont
         val kvList = ArrayList<Kv>().apply {
             add(Kv("RCRoomInfoKey", rcRoomInfo.toJson()))
         }
-        if (!roomCover.isNullOrEmpty()) {
-            addDisposable(FileUploadModel
-                .imageUpload(roomCover, context)
+        if (roomCover != null) {
+            addDisposable(FileModel
+                .imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,roomCover), context)
                 .flatMap {
                     return@flatMap RetrofitManager
                         .commonService
@@ -50,7 +52,7 @@ class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Cont
                                 kvList,
                                 roomName,
                                 password,
-                                "${ApiConstant.BASE_URL}$it",
+                                "${ApiConstant.FILE_URL}$it",
                                 roomBackground
                             )
                         )

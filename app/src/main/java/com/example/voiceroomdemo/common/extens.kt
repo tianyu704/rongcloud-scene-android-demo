@@ -6,6 +6,7 @@ package com.example.voiceroomdemo.common
 
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -58,6 +59,10 @@ fun ImageView.loadImageView(url: String, @DrawableRes defaultImage: Int = 0) {
     ImageLoaderUtil.loadImage(context, this, url, defaultImage)
 }
 
+fun ImageView.loadImageView(uri: Uri, @DrawableRes defaultImage: Int = 0) {
+    ImageLoaderUtil.loadImage(context, this, uri, defaultImage)
+}
+
 fun ImageView.loadPortrait(url: String?) {
     if (url.isNullOrEmpty()) {
         this.setImageResource(R.drawable.default_portrait)
@@ -71,6 +76,14 @@ fun ImageView.loadLocalPortrait(url: String?) {
         this.setImageResource(R.drawable.default_portrait)
     } else {
         ImageLoaderUtil.loadLocalImage(context, this, url)
+    }
+}
+
+fun ImageView.loadLocalPortrait(uri: Uri?) {
+    if (uri == null) {
+        this.setImageResource(R.drawable.default_portrait)
+    } else {
+        ImageLoaderUtil.loadLocalImage(context, this, uri)
     }
 }
 

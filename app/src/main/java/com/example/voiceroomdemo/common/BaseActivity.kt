@@ -4,7 +4,6 @@
 
 package com.example.voiceroomdemo.common
 
-import android.content.pm.ActivityInfo
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.mvp.activity.LoginActivity
 import com.example.voiceroomdemo.mvp.activity.PermissionActivity
@@ -81,7 +79,7 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
 
 
     open fun isLightThemeActivity(): Boolean {
-        return true
+        return this.applicationContext.resources.configuration.uiMode == 0x11
     }
 
     open fun initActionBar(actionBar: ActionBar) {

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 
@@ -18,4 +17,10 @@
     <color name="color_speaking_bg">#FF69FD</color>
 
     <color name="whiteTextColor">#FFFFFFFF</color>
+
+    <color name="windowsBackground">#F6F8F9</color>
+
+    <color name="defaultTextColor">#333333</color>
+
+    <color name="ActionbarColor">@color/colorPrimary</color>
 </resources>

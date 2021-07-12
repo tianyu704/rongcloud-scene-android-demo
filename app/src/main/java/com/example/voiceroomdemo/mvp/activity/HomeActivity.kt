@@ -7,8 +7,6 @@ package com.example.voiceroomdemo.mvp.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
@@ -164,20 +162,9 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICTURE_SELECTED_RESULT_CODE && resultCode == Activity.RESULT_OK) {
-            val selectImageUrl = data?.data;
-            val filePathColumn = arrayOf<String>(MediaStore.Images.Media.DATA)
-            // 查询我们需要的数据
+            val selectImageUrl = data?.data
             selectImageUrl?.let {
-                val cursor: Cursor? = contentResolver.query(
-                    selectImageUrl,
-                    filePathColumn, null, null, null
-                )
-                cursor?.moveToFirst()
-
-                val columnIndex: Int = cursor?.getColumnIndex(filePathColumn[0])!!
-                val picturePath: String = cursor.getString(columnIndex)
-                cursor.close()
-                userInfoDialog?.setUserPortrait(picturePath)
+                userInfoDialog?.setUserPortrait(it)
             }
         }
     }

@@ -11,10 +11,10 @@ import com.google.gson.annotations.SerializedName
  * @Date 2021/06/17
  */
 data class MusicOrderRequest(
-    @SerializedName("id")
-    val id: String? = null,
     @SerializedName("roomId")
     val roomId: String? = null,
-    @SerializedName("type")
-    val type: Int? = null
+    @SerializedName("fromId")
+    val fromId: Int? = null,
+    @SerializedName("toId")
+    val toId: Int? = null
 )
