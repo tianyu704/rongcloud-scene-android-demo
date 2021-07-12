@@ -339,13 +339,13 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
         final RCVoiceSeatInfo info = mRCVoiceSeatInfoList.get(seatIndex);
         if (info != null) {
-            RCVoiceSeatInfo seatClone = info.clone();
+            final RCVoiceSeatInfo seatClone = info.clone();
             seatClone.setUserId(null);
             seatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
             updateKvSeatInfo(seatClone, seatIndex, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    userLeaveSeat(info);
+                    userLeaveSeat(seatClone.getUserId(), info);
                     RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                     if (currentRoomEventListener != null) {
                         currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
@@ -386,14 +386,14 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             onErrorWithCheck(callback, VoiceRoomErrorCode.SEAT_IS_NOT_IDLE);
             return;
         }
-        RCVoiceSeatInfo preSeatClone = preSeatInfo.clone();
+        final RCVoiceSeatInfo preSeatClone = preSeatInfo.clone();
         preSeatClone.setUserId(null);
         preSeatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
 
         updateKvSeatInfo(preSeatClone, preIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
-                userLeaveSeat(preSeatInfo);
+                userLeaveSeat(preSeatClone.getUserId(), preSeatInfo);
                 RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                 if (currentRoomEventListener != null) {
                     currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
@@ -491,13 +491,13 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
         final int index = seatIndexWithUserSit(seatInfo.getUserId());
         if (index >= 0) {
-            RCVoiceSeatInfo seatInfoClone = seatInfo.clone();
+            final RCVoiceSeatInfo seatInfoClone = seatInfo.clone();
             seatInfoClone.setUserId(null);
             seatInfoClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
             updateKvSeatInfo(seatInfoClone, index, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    userLeaveSeat(seatInfo);
+                    userLeaveSeat(seatInfoClone.getUserId(), seatInfo);
                     RCVoiceRoomEventListener roomEventListener = getCurrentRoomEventListener();
                     if (roomEventListener != null) {
                         roomEventListener.onUserLeaveSeat(index, userId);
@@ -1294,12 +1294,14 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     }
                 }
             }
-            mRCVoiceSeatInfoList.clear();
-            mRCVoiceSeatInfoList.addAll(latestInfoList);
-            mUserOnSeatMap.clear();
-            for (RCVoiceSeatInfo seatInfo : mRCVoiceSeatInfoList) {
-                if (!TextUtils.isEmpty(seatInfo.getUserId())) {
-                    mUserOnSeatMap.put(seatInfo.getUserId(), seatInfo);
+            synchronized (TAG) {
+                mRCVoiceSeatInfoList.clear();
+                mRCVoiceSeatInfoList.addAll(latestInfoList);
+                mUserOnSeatMap.clear();
+                for (RCVoiceSeatInfo seatInfo : mRCVoiceSeatInfoList) {
+                    if (!TextUtils.isEmpty(seatInfo.getUserId())) {
+                        mUserOnSeatMap.put(seatInfo.getUserId(), seatInfo);
+                    }
                 }
             }
             muteSelfIfNeed();
@@ -1564,15 +1566,20 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     private void userEnterSeat(RCVoiceSeatInfo seatInfo, String userId) {
         synchronized (TAG) {
-            seatInfo.setUserId(userId);
-            seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed);
-            mUserOnSeatMap.put(userId, seatInfo);
+            if (!TextUtils.isEmpty(userId)) {
+                seatInfo.setUserId(userId);
+                seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed);
+                mUserOnSeatMap.put(userId, seatInfo);
+            }
         }
     }
 
-    private void userLeaveSeat(RCVoiceSeatInfo seatInfo) {
+    private void userLeaveSeat(String userId, RCVoiceSeatInfo seatInfo) {
         synchronized (TAG) {
-            mUserOnSeatMap.remove(seatInfo.getUserId());
+            if (!TextUtils.isEmpty(userId)) {
+                // 避免因为上层对 model 的修改导致的空指针异常
+                mUserOnSeatMap.remove(userId);
+            }
             seatInfo.setUserId(null);
             seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
         }
