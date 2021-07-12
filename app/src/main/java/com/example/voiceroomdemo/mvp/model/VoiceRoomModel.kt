@@ -37,7 +37,6 @@ import io.rong.imlib.model.ChatRoomInfo
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.coroutines.*
-import org.reactivestreams.Publisher
 
 /**
  * @author gusd
@@ -1169,29 +1168,39 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         members: List<UiMemberModel>,
         present: Present,
         num: Int
-    ): Single<List<UiMemberModel>> {
-        val flowableArrs = members.map { member ->
-            return@map Publisher<UiMemberModel> { sub ->
-                sub.onNext(member)
-            }
-        }.toTypedArray()
-        return Single.create<List<UiMemberModel>> { emitter ->
-            val result = arrayListOf<UiMemberModel>()
-            addDisposable(Flowable.concatArray(*flowableArrs).map {
-                RetrofitManager.commonService.sendGifts(
-                    SendGiftsRequest(present.index, num, roomId, it.userId)
-                ).toFlowable().blockingFirst().apply {
-                    if (this.code == 10000) {
-                        result.add(it)
-                    }
+    ): Observable<List<UiMemberModel>> {
+
+        val result = arrayListOf<UiMemberModel>()
+
+        val publisherList = members.map { model ->
+            RetrofitManager.commonService.sendGifts(
+                SendGiftsRequest(
+                    present.index,
+                    num,
+                    roomId,
+                    model.userId
+                )
+            ).doOnSuccess {
+                if (it.code == 10000) {
+                    result.add(model)
                 }
-                return@map it
-            }.subscribe({
-                emitter.onSuccess(result)
-            }, {
-                emitter.onError(it)
-            }))
+            }.toFlowable()
+        }.toTypedArray()
+
+
+        return Observable.create<List<UiMemberModel>> { emitter ->
+            addDisposable(
+                Flowable
+                    .concatArray(*publisherList)
+                    .subscribe({
+                    }, {
+                        emitter.onError(it)
+                    }, {
+                        emitter.onNext(result)
+                    })
+            )
         }.subscribeOn(Schedulers.io())
+
     }
 
     fun sendGiftMsg(
