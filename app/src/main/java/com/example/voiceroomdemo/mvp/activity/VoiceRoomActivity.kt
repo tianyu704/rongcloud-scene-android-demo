@@ -622,7 +622,10 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
-            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
+            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock) {
+                // 点击锁定座位
+                showMessage("该座位已锁定")
+            } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
                 // 点击空座位
                 presenter.enterSeat(position)
             } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed) {
