@@ -47,6 +47,10 @@ class SelfSettingPresenter(val view: ISelfSettingView, var seatInfo: UiSeatModel
 
     fun muteSelf() {
         if (seatInfo.userId != null) {
+            if (seatInfo.isMute) {
+                view.showMessage("此座位已被管理员禁麦")
+                return
+            }
             addDisposable(
                 roomModel
                     .setRecordingEnable(!roomModel.recordingStatus)

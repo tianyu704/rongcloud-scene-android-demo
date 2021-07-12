@@ -53,7 +53,7 @@ class MemberSettingPresenter(
             roomInfoBean.createUser?.userId == AccountStore.getUserId(),
             roomModel.isAdmin(AccountStore.getUserId()!!)
         )
-        view.thisUserIsOnSeat(member.seatIndex)
+        view.thisUserIsOnSeat(member.seatIndex,roomModel.isAdmin(AccountStore.getUserId()!!))
         view.thisUserIsAdmin(member.isAdmin)
         view.thisUserIsMute(roomModel.getSeatInfoByUserId(member.userId)?.isMute ?: false)
     }

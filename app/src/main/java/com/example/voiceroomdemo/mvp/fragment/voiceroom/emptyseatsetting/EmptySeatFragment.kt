@@ -57,24 +57,25 @@ class EmptySeatFragment(
             }
             if (it.isMute) {
                 iv_mute_seat.setImageResource(R.drawable.ic_room_setting_unmute_all)
-                tv_mute_seat.text = "座位开麦"
+                tv_mute_seat.text = "取消禁麦"
                 iv_is_mute.isVisible = true
             } else {
                 iv_mute_seat.setImageResource(R.drawable.ic_member_setting_mute_seat)
-                tv_mute_seat.text = "座位闭麦"
+                tv_mute_seat.text = "座位禁麦"
                 iv_is_mute.isVisible = false
             }
 
             if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock) {
                 iv_seat_status.setImageResource(R.drawable.ic_seat_status_locked)
                 iv_user_portrait.setImageResource(R.drawable.bg_seat_status)
-                iv_close_seat.setImageResource(R.drawable.ic_room_setting_lock_all)
+                iv_close_seat.setImageResource(R.drawable.ic_room_setting_unlock_all)
                 tv_close_seat.text = "开启座位"
 
             } else if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
                 iv_seat_status.setImageResource(R.drawable.ic_seat_status_enter)
                 iv_user_portrait.setImageResource(R.drawable.bg_seat_status)
-                iv_close_seat.setImageResource(R.drawable.ic_room_setting_unlock_all)
+
+                iv_close_seat.setImageResource(R.drawable.ic_room_setting_lock_all)
                 tv_close_seat.text = "关闭座位"
             }
             tv_member_name.text = "${it.index} 号麦位"

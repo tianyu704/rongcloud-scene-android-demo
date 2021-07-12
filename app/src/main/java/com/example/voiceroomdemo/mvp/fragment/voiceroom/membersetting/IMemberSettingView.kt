@@ -12,7 +12,7 @@ import com.example.voiceroomdemo.common.IBaseView
  */
 interface IMemberSettingView:IBaseView {
     fun loginUserIsCreator(isCreatorUser: Boolean, isAdmin: Boolean){}
-    fun thisUserIsOnSeat(seatIndex: Int){}
+    fun thisUserIsOnSeat(seatIndex: Int,isAdmin:Boolean){}
     fun thisUserIsAdmin(isAdmin: Boolean){}
     fun thisUserIsMute(isMute:Boolean){}
     fun fragmentDismiss() {}

@@ -215,7 +215,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
         cl_member_list.setOnClickListener {
             roomInfo.roomBean?.let {
-                memberListFragment = MemberListFragment(this,this, it).apply {
+                memberListFragment = MemberListFragment(this, this, it).apply {
                     show(supportFragmentManager)
                 }
             }
@@ -368,19 +368,30 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
     }
 
+    var confirmDialog: ConfirmDialog? = null
+
     override fun showPickReceived(isCreateReceive: Boolean, userId: String) {
         ui {
+            var current: ConfirmDialog? = null
             ConfirmDialog(
                 this,
                 "您被${if (isCreateReceive) "房主" else "管理员"}邀请上麦，是否同意?",
-                false,
+                true,
                 "同意",
                 "拒绝",
                 cancelBlock = {
                     presenter.refuseInvite(userId)
                 }) {
                 presenter.enterSeatIfAvailable()
-            }.show()
+            }.apply {
+                current = this;
+                show()
+            }
+            // 处理重复显示 在消失
+            mRootView.postDelayed({
+                confirmDialog?.dismiss()
+                confirmDialog = current
+            }, 500)
         }
     }
 
