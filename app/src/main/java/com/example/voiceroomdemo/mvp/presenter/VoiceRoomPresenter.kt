@@ -254,7 +254,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                     leaveRoom()
                 } else {
                     // TODO: 2021/7/2 显示被踢消息 
-                    sendSystemMessage("显示别人被踢消息")
+//                    sendSystemMessage("显示别人被踢消息")
                 }
             }
             EVENT_REQUEST_SEAT_REFUSE -> {
@@ -302,6 +302,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     fun getMemberInfoByUserId(userId: String): UiMemberModel? {
         return roomModel?.getMemberInfoByUserIdOnlyLocal(userId)
     }
+
     fun joinRoom() {
         Log.d(TAG, "joinRoom: ${roomId}")
         RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {
@@ -327,17 +328,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             roomId,
             "感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。"
         )
-
-//        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomEnter().apply {
-//            this.userId = AccountStore.getUserId()
-//            this.userName = AccountStore.getUserName()
-//        }, false)
-    }
-
-    private fun sendSystemMessage(msg: String) {
-        RCChatRoomMessageManager.sendLocationMessage(
-            roomId, msg
-        )
+        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomEnter().apply {
+            this.userId = AccountStore.getUserId()
+            this.userName = AccountStore.getUserName()
+        }, false)
     }
 
     fun leaveRoom() {

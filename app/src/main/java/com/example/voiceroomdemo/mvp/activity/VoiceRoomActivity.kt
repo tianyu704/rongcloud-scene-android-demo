@@ -5,6 +5,7 @@
 package com.example.voiceroomdemo.mvp.activity
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Point
@@ -13,6 +14,9 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.example.voiceroomdemo.R
@@ -53,6 +57,7 @@ import com.example.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
+import com.google.android.material.snackbar.Snackbar
 import com.vanniktech.emoji.EmojiPopup
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
@@ -62,6 +67,7 @@ import kotlinx.android.synthetic.main.activity_voice_room.view.*
 
 
 private const val TAG = "VoiceRoomActivity"
+private const val NOTICATION_ID = 10020
 
 private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
 private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
@@ -166,6 +172,38 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     override fun getContentView(): Int = R.layout.activity_voice_room
 
+    val notificationManager: NotificationManager by lazy {
+        return@lazy getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
+
+    fun bindNotification() {
+        var mNotificationManagerCompat = NotificationManagerCompat.from(applicationContext)
+        val areNotificationsEnabled: Boolean = mNotificationManagerCompat.areNotificationsEnabled()
+        if (!areNotificationsEnabled) {
+            val snackbar = Snackbar
+                .make(
+                    mRootView,
+                    "You need to enable notifications for this app",
+                    Snackbar.LENGTH_LONG
+                )
+                .setAction("设置") {
+                    val intent = Intent()
+                    intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
+                    intent.putExtra("app_package", packageName)
+                    intent.putExtra("app_uid", applicationInfo.uid)
+                    startActivity(intent)
+                }
+            snackbar.show()
+            return
+        }
+        var mBuilder = NotificationCompat.Builder(this, TAG).apply {
+            setSmallIcon(R.mipmap.app_icon)
+            setContentTitle("语聊房")
+            setContentText("正在语聊房中...")
+        }
+        notificationManager.notify(NOTICATION_ID, mBuilder.build())
+    }
+
     override fun initView() {
         detector = GestureDetector(this, simpleGestureListener).apply {
             this.setIsLongpressEnabled(false)
@@ -199,6 +237,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             }
             showMemberSetting(member)
         }
+        bindNotification()
     }
 
     private fun showSoftKeyBoard() {
@@ -459,6 +498,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         favAnimation?.let {
             it.release()
         }
+        notificationManager.cancel(NOTICATION_ID)
     }
 
     override fun onJoinRoomSuccess() {

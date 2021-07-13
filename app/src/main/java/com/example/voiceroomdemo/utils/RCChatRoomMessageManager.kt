@@ -101,6 +101,13 @@ object RCChatRoomMessageManager {
         }))
     }
 
+    fun sendLocationMessage(
+        roomId: String,
+        messageContent: MessageContent,
+    ) {
+        messageSubject.onNext(MessageWrapperModel(roomId, messageContent))
+    }
+
     fun obMessageReceiveByRoomId(roomId: String): Observable<MessageContent> {
         return messageSubject.observeOn(AndroidSchedulers.mainThread()).filter {
             it.roomId == roomId
