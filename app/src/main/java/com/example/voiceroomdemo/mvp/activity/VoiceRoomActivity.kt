@@ -5,18 +5,19 @@
 package com.example.voiceroomdemo.mvp.activity
 
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.graphics.Rect
+import android.os.Build
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.isVisible
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.example.voiceroomdemo.R
@@ -57,7 +58,6 @@ import com.example.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
-import com.google.android.material.snackbar.Snackbar
 import com.vanniktech.emoji.EmojiPopup
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
@@ -178,35 +178,21 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     override fun getContentView(): Int = R.layout.activity_voice_room
 
     val notificationManager: NotificationManager by lazy {
-        return@lazy getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        var manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            var channel = NotificationChannel(TAG, TAG, NotificationManager.IMPORTANCE_DEFAULT)
+            manager.createNotificationChannel(channel)
+        }
+        return@lazy manager
     }
 
     fun bindNotification() {
-        var mNotificationManagerCompat = NotificationManagerCompat.from(applicationContext)
-        val areNotificationsEnabled: Boolean = mNotificationManagerCompat.areNotificationsEnabled()
-        if (!areNotificationsEnabled) {
-            val snackbar = Snackbar
-                .make(
-                    mRootView,
-                    "You need to enable notifications for this app",
-                    Snackbar.LENGTH_LONG
-                )
-                .setAction("设置") {
-                    val intent = Intent()
-                    intent.action = "android.settings.APP_NOTIFICATION_SETTINGS"
-                    intent.putExtra("app_package", packageName)
-                    intent.putExtra("app_uid", applicationInfo.uid)
-                    startActivity(intent)
-                }
-            snackbar.show()
-            return
-        }
-        var mBuilder = NotificationCompat.Builder(this, TAG).apply {
-            setSmallIcon(R.mipmap.app_icon)
-            setContentTitle("语聊房")
-            setContentText("正在语聊房中...")
-        }
-        notificationManager.notify(NOTICATION_ID, mBuilder.build())
+        var mBuilder = NotificationCompat.Builder(this, TAG)
+            .setSmallIcon(R.mipmap.app_icon)
+            .setContentTitle("语聊房")
+            .setContentText("正在语聊中...")
+        val notification: Notification = mBuilder.build()
+        notificationManager.notify(NOTICATION_ID, notification)
     }
 
     override fun initView() {

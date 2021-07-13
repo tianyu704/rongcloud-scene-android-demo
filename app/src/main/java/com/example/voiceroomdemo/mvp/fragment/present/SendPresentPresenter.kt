@@ -5,7 +5,6 @@
 package com.example.voiceroomdemo.mvp.fragment.present
 
 import android.util.Log
-import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.BaseLifeCyclePresenter
 import com.example.voiceroomdemo.mvp.model.Present
 import com.example.voiceroomdemo.mvp.model.VoiceRoomModel
