@@ -108,13 +108,13 @@ public class RCVoiceSeatInfo extends BaseInfo implements Parcelable,Cloneable {
          * 麦位占用中
          */
         @SerializedName("1")
-        RCSeatStatusUsed,
+        RCSeatStatusUsing,
 
         /**
          * 麦位被锁
          */
         @SerializedName("2")
-        RCSeatStatusLock
+        RCSeatStatusLocking
     }
 
     @Override
