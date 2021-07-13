@@ -161,6 +161,18 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             }
             .subscribe {
                 if (it) {
+                    if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+                        RCVoiceRoomEngine.getInstance()
+                            .cancelRequestSeat(object : RCVoiceRoomCallback {
+                                override fun onError(code: Int, message: String?) {
+
+                                }
+
+                                override fun onSuccess() {
+                                }
+
+                            })
+                    }
                     currentStatus = STATUS_ON_SEAT
                     view.changeStatus(STATUS_ON_SEAT)
                 } else {
@@ -302,6 +314,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 
     fun getMemberInfoByUserId(userId: String): UiMemberModel? {
         return roomModel.getMemberInfoByUserIdOnlyLocal(userId)
+    }
+
+    fun getMemberInfo(userId: String, result: (UiMemberModel) -> Unit) {
+//        addDisposable(roomModel.)
     }
 
     fun joinRoom() {
