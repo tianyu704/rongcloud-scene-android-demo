@@ -132,6 +132,15 @@ class MusicSettingFragment(val roomId: String, view: IMusicSettingView) :
 
     }
 
+    override fun gotoAddMusicView() {
+        super.gotoAddMusicView()
+        fragmentList.indexOfLast { it is MusicAddFragment }.let { index ->
+            if (index > -1) {
+                vp_page.setCurrentItem(index, true)
+            }
+        }
+    }
+
     override fun showMusicList(list: List<UiMusicModel>) {
 
     }

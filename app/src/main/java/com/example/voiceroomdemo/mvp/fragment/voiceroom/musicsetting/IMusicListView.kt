@@ -15,4 +15,8 @@ interface IMusicListView : IBaseView {
     fun showMusicList(musicList: List<UiMusicModel>) {
 
     }
+
+    fun gotoAddMusicView() {
+
+    }
 }

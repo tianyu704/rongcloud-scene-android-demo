@@ -19,7 +19,7 @@ import kotlinx.android.synthetic.main.layout_music_play_item.view.*
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicListFragment(view: IMusicListView, val roomId: String) :
+class MusicListFragment(val view: IMusicListView, val roomId: String) :
     BaseFragment<MusicListPresenter, IMusicListView>(
         R.layout.fragment_music_list
     ), IMusicListView by view {
@@ -29,6 +29,12 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
 
     override fun initView() {
         rv_list.adapter = MyAdapter()
+        group_add_music.isVisible = true
+        rv_list.isVisible = false
+
+        btn_add_music.setOnClickListener {
+            view.gotoAddMusicView()
+        }
     }
 
     override fun initData() {
@@ -37,7 +43,15 @@ class MusicListFragment(view: IMusicListView, val roomId: String) :
 
     override fun showMusicList(musicList: List<UiMusicModel>) {
         super.showMusicList(musicList)
-        (rv_list.adapter as MyAdapter).refreshData(musicList)
+        if (musicList.isEmpty()) {
+            group_add_music.isVisible = true
+            rv_list.isVisible = false
+        } else {
+            group_add_music.isVisible = false
+            rv_list.isVisible = true
+            (rv_list.adapter as MyAdapter).refreshData(musicList)
+        }
+
     }
 
 
