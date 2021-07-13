@@ -11,6 +11,7 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.fragmeng_send_present.*
 import kotlinx.android.synthetic.main.layout_system_message_item.view.*
+import java.util.logging.Logger
 
 /**
  * @author gusd
@@ -159,6 +161,10 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                     }
                     is RCChatroomSeats -> {
                         list.add(MsgInfo("房间更换为 ${message.count} 座模式，请重新上麦"))
+                    }
+                    is RCChatroomLocationMessage -> {
+                        list.add(MsgInfo(message.content, "", false))
+                        Log.e("LocationMessage","RCChatroomLocationMessage")
                     }
                 }
                 tv_message_content.text = styleBuilder(list, listener)

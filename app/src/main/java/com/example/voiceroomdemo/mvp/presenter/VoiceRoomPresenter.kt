@@ -190,7 +190,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     when (it) {
-                        is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
+                        is RCChatroomLocationMessage, is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
                             view.showChatRoomMessage(it)
                             if (it is RCChatroomGiftAll || it is RCChatroomGift) {
                                 roomModel.refreshGift()
