@@ -36,6 +36,7 @@
         <activity
             android:name=".mvp.activity.VoiceRoomActivity"
             android:screenOrientation="behind"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.VoiceRoomActivityTheme"
             android:windowSoftInputMode="adjustResize" />
 

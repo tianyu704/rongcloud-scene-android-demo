@@ -88,6 +88,11 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        super.onCreate(intent?.extras)
+    }
+
     private lateinit var currentRole: Role
 
     private lateinit var roomId: String
