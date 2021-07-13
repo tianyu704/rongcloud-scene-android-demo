@@ -54,6 +54,7 @@ import com.example.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import com.example.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import com.example.voiceroomdemo.mvp.presenter.VoiceRoomPresenter
 import com.example.voiceroomdemo.ui.dialog.ConfirmDialog
+import com.example.voiceroomdemo.ui.dialog.TipDialog
 import com.example.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
@@ -217,7 +218,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             Audience(mRootView)
         }
 
-        rv_message_list.adapter = VoiceRoomMessageAdapter { userId ->
+        rv_message_list.adapter = VoiceRoomMessageAdapter(roomId) { userId ->
             if (userId == AccountStore.getUserId()) {
                 return@VoiceRoomMessageAdapter
             }
@@ -434,6 +435,19 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 confirmDialog?.dismiss()
                 confirmDialog = current
             }, 500)
+        }
+    }
+
+    override fun showRoomClose() {
+        ui {
+            TipDialog(
+                this,
+                "当前直播已结束",
+                listener = {
+                    presenter.leaveRoom()
+                }).apply {
+                show()
+            }
         }
     }
 

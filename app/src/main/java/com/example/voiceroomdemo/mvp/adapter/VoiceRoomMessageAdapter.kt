@@ -16,7 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.voiceroomdemo.R
+import com.example.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.example.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import com.example.voiceroomdemo.mvp.model.message.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 
@@ -28,12 +31,14 @@ import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 private const val MESSAGE_TYPE_SYSTEM = 0
 private const val MESSAGE_TYPE_NORMAL = 1
 
-class VoiceRoomMessageAdapter(val listener: (String) -> Unit) :
+class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val data = arrayListOf<MessageContent>()
 
-
+    private val roomModel: VoiceRoomModel by lazy {
+        getVoiceRoomModelByRoomId(roomId)
+    }
     override fun getItemViewType(position: Int): Int {
         return if (data[position] is RCChatroomLocationMessage) MESSAGE_TYPE_SYSTEM else MESSAGE_TYPE_NORMAL
     }

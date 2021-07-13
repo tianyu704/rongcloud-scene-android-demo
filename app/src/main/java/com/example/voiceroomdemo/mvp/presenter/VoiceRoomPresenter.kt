@@ -225,8 +225,9 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     private fun handleRoomEvent(eventInfo: Pair<String, ArrayList<String>>) {
         when (eventInfo.first) {
             EVENT_ROOM_CLOSE -> {
-                view.showMessage("房间已关闭")
-                leaveRoom()
+//                view.showMessage("房间已关闭")
+//                leaveRoom()
+                view.showRoomClose()
             }
             EVENT_BACKGROUND_CHANGE -> {
                 roomModel.refreshRoomInfo()
