@@ -187,7 +187,9 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             Audience(mRootView)
         }
 
-        rv_message_list.adapter = VoiceRoomMessageAdapter()
+        rv_message_list.adapter = VoiceRoomMessageAdapter { userId ->
+            showMemberSetting(userId)
+        }
     }
 
     private fun showSoftKeyBoard() {
@@ -563,7 +565,12 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
         fun sendMessage() {
-            sendTextMessage(et_message.text.toString())
+            var msg = et_message.text.toString().trim()
+            if (msg.isNullOrEmpty()) {
+                showMessage("消息不能为空")
+                return
+            }
+            sendTextMessage(msg)
         }
 
         @SuppressLint("SetTextI18n")
@@ -654,6 +661,10 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
 
+    }
+
+    fun showMemberSetting(userId: String) {
+        showMessage("点击id：$userId")
     }
 
     /**

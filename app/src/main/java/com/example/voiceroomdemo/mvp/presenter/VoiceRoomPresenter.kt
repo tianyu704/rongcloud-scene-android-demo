@@ -14,6 +14,7 @@ import com.example.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import com.example.voiceroomdemo.mvp.model.*
 import com.example.voiceroomdemo.mvp.model.message.*
 import com.example.voiceroomdemo.net.RetrofitManager
+import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
 import com.example.voiceroomdemo.utils.RCChatRoomMessageManager
@@ -401,7 +402,6 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         })
     }
 
-
     fun enterSeat(seatIndex: Int) {
         Log.d(TAG, "enterSeat: seatIndex = $seatIndex")
         // 当前在座位上
@@ -418,7 +418,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 }
             })
         } else {
-            if ( currentStatus == STATUS_WAIT_FOR_SEAT){
+            if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                 view.showRevokeSeatRequest()
                 return
             }
