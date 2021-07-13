@@ -1672,7 +1672,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         mRCVoiceSeatInfoList.clear();
         mRoom = null;
         mRoomEventListener.clear();
-        currentKvMap.clear();
         mRoomEventListener = null;
     }
 
