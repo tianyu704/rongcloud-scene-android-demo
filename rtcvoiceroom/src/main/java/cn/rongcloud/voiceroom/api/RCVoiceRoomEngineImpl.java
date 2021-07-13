@@ -759,7 +759,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             @Override
             public void onSuccess() {
                 mRoomInfo = roomInfo;
-                resetListExceptOwnerSeat(roomInfo.getSeatCount());
+                if (mRoomInfo.getSeatCount() != mSeatInfoList.size()) {
+                    resetListExceptOwnerSeat(roomInfo.getSeatCount());
+                }
                 onSuccessWithCheck(callback);
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                 if (listener != null) {
@@ -796,40 +798,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
                     mSeatInfoList.add(seatInfo);
                 }
-            }
-        }
-    }
-
-    private void resetSeatCount(final int seatCount, final CompletionListener completionListener) {
-        synchronized (TAG) {
-            final List<RCVoiceSeatInfo> list = new ArrayList<>();
-            int maxCount = Math.max(mRoomInfo.getSeatCount(), seatCount);
-            for (int i = 0; i < maxCount; i++) {
-                if (i == seatIndexWithUserSit(mCurrentUserId)) {
-                    list.add(getSeatInfoByIndex(i));
-                    continue;
-                }
-                RCVoiceSeatInfo info = new RCVoiceSeatInfo();
-                list.add(info);
-            }
-
-            final AtomicInteger seatCountTemp = new AtomicInteger(list.size());
-            for (int i = 0; i < list.size(); i++) {
-                updateKvSeatInfo(list.get(i), i, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        if (seatCountTemp.decrementAndGet() == 0) {
-                            handleSeatCountChange(list, seatCount, completionListener);
-                        }
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        if (seatCountTemp.decrementAndGet() == 0) {
-                            handleSeatCountChange(list, seatCount, completionListener);
-                        }
-                    }
-                });
             }
         }
     }
@@ -1244,9 +1212,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             if (listener != null) {
                 listener.onSeatInfoUpdate(latestInfoList);
             }
-            int minCount = Math.min(oldInfoList.size(), latestInfoList.size());
-            for (int i = 0; i < minCount; i++) {
-                RCVoiceSeatInfo newInfo = latestInfoList.get(i);
+            int maxCount = Math.max(oldInfoList.size(), latestInfoList.size());
+            for (int i = 0; i < maxCount; i++) {
+                RCVoiceSeatInfo newInfo = getSeatInfoByIndex(latestInfoList, i);
                 RCVoiceSeatInfo oldInfo = getSeatInfoByIndex(oldInfoList, i);
                 if (oldInfo.getStatus() != newInfo.getStatus()) {
                     switch (newInfo.getStatus()) {
