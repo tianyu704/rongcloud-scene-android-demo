@@ -1241,7 +1241,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             for (int i = 0; i < mRoomInfo.getSeatCount(); i++) {
                 RCVoiceSeatInfo newInfo = latestInfoList.get(i);
                 RCVoiceSeatInfo oldInfo = getSeatInfoByIndex(oldInfoList, i);
-                Log.d(TAG, "updateSeatInfoFromEntry: new seat status = " + newInfo.getStatus() + " ,old seat status = " + oldInfo.getStatus() + " ,index = " + i);
                 if (oldInfo.getStatus() != newInfo.getStatus()) {
                     switch (newInfo.getStatus()) {
                         case RCSeatStatusEmpty:
@@ -1314,10 +1313,18 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     private void resetSeatInfoWithCount(int seatCount) {
         if (seatCount != mRCVoiceSeatInfoList.size()) {
             synchronized (TAG) {
-                mUserOnSeatMap.clear();
-                mRCVoiceSeatInfoList.clear();
+                int startIndex = 0;
                 if (seatCount > 0) {
-                    for (int i = 1; i < seatCount; i++) {
+                    if (mRCVoiceSeatInfoList.size() > 0) {
+                        RCVoiceSeatInfo firstInfo = mRCVoiceSeatInfoList.get(0);
+                        boolean isOnSeat = mUserOnSeatMap.containsKey(firstInfo.getUserId());
+                        mUserOnSeatMap.clear();
+                        if (isOnSeat) {
+                            mUserOnSeatMap.put(firstInfo.getUserId(), firstInfo);
+                        }
+                        startIndex = 1;
+                    }
+                    for (int i = startIndex; i < seatCount; i++) {
                         RCVoiceSeatInfo seatInfo = new RCVoiceSeatInfo();
                         seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
                         mRCVoiceSeatInfoList.add(seatInfo);
