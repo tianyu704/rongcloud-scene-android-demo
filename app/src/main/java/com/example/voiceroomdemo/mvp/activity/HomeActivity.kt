@@ -51,7 +51,6 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
 
     override fun getContentView(): Int = R.layout.activity_home
 
-
     override fun initView() {
         iv_voice_room.setOnClickListener {
             VoiceRoomListActivity.startActivity(this)
@@ -64,9 +63,9 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
             showToast("暂未实现")
         }
         bg2.setColorFilter(Color.GRAY)
-        bg2.alpha = 0.65f
+        bg2.alpha = 0.5f
         bg3.setColorFilter(Color.GRAY)
-        bg3.alpha = 0.65f
+        bg3.alpha = 0.5f
     }
 
     override fun getActionTitle(): CharSequence? {

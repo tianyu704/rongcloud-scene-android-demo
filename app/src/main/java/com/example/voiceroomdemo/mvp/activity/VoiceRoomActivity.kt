@@ -177,23 +177,23 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     override fun getContentView(): Int = R.layout.activity_voice_room
 
-    val notificationManager: NotificationManager by lazy {
-        var manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            var channel = NotificationChannel(TAG, TAG, NotificationManager.IMPORTANCE_DEFAULT)
-            manager.createNotificationChannel(channel)
-        }
-        return@lazy manager
-    }
-
-    fun bindNotification() {
-        var mBuilder = NotificationCompat.Builder(this, TAG)
-            .setSmallIcon(R.mipmap.app_icon)
-            .setContentTitle("语聊房")
-            .setContentText("正在语聊中...")
-        val notification: Notification = mBuilder.build()
-        notificationManager.notify(NOTICATION_ID, notification)
-    }
+//    val notificationManager: NotificationManager by lazy {
+//        var manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            var channel = NotificationChannel(TAG, TAG, NotificationManager.IMPORTANCE_DEFAULT)
+//            manager.createNotificationChannel(channel)
+//        }
+//        return@lazy manager
+//    }
+//
+//    fun bindNotification() {
+//        var mBuilder = NotificationCompat.Builder(this, TAG)
+//            .setSmallIcon(R.mipmap.app_icon)
+//            .setContentTitle("语聊房")
+//            .setContentText("正在语聊中...")
+//        val notification: Notification = mBuilder.build()
+//        notificationManager.notify(NOTICATION_ID, notification)
+//    }
 
     override fun initView() {
         detector = GestureDetector(this, simpleGestureListener).apply {
@@ -228,7 +228,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             }
             showMemberSetting(member)
         }
-        bindNotification()
+        //开启前台服务
+        startService(Intent(this, RTCNotificationService::class.java))
     }
 
     private fun showSoftKeyBoard() {
@@ -489,7 +490,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         favAnimation?.let {
             it.release()
         }
-        notificationManager.cancel(NOTICATION_ID)
+        stopService(Intent(this, RTCNotificationService::class.java))
     }
 
     override fun onJoinRoomSuccess() {
