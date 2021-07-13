@@ -114,7 +114,7 @@ class VoiceRoomMessageAdapter(val listener: (String) -> Unit) :
                         )
                     }
                     is RCChatroomSeats -> {
-                        tv_message_content.text = "房间更换为 ${message.count} 座模式，请重新上麦"
+                        list.add(MsgInfo("房间更换为 ${message.count} 座模式，请重新上麦"))
                     }
                 }
                 tv_message_content.text = styleBuilder(list, listener)

@@ -66,14 +66,9 @@ class VoiceRoomSeatsAdapter(
         fun bind(
             mode: UiSeatModel,
             position: Int,
-            payload: Bundle? = null,
             listener: (seatModel: UiSeatModel, position: Int) -> Unit
         ) {
             with(itemView) {
-                // TODO: 2021/6/25 简单处理下频繁刷新的问题
-                if (itemView.tag == mode.toString()) {
-                    return
-                }
                 when (mode.seatStatus) {
                     RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed -> {
                         wv_seat_background.isVisible = true

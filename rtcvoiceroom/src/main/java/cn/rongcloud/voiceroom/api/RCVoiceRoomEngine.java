@@ -36,6 +36,7 @@ public abstract class RCVoiceRoomEngine {
     public static final String RC_AUDIENCE_JOIN_ROOM = "RCAudienceJoinRoom";
     public static final String RC_AUDIENCE_LEAVE_ROOM = "RCAudienceLeaveRoom";
     public static final String RC_USER_ON_SEAT_SPEAKING_KEY = "RCUserOnSeatSpeakingKey";
+    public static final String RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY = "RCOnUserLeaveSeatHappenedPrefixKey";
 
     public static RCVoiceRoomEngine getInstance() {
         return RCVoiceRoomEngineImpl.getInstance();

@@ -39,6 +39,7 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
     private var waitingDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(javaClass.name, "onCreate: ")
         setAndroidNativeLightStatusBar(isLightThemeActivity())
         beforeInitView()
         super.onCreate(savedInstanceState)
@@ -169,12 +170,24 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
 
     override fun onResume() {
         super.onResume()
+        Log.d(javaClass.name, "onResume: ")
         isFront = true
     }
 
     override fun onPause() {
         super.onPause()
+        Log.d(javaClass.name, "onPause: ")
         isFront = false
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d(javaClass.name, "onStart: ")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(javaClass.name, "onStop: ")
     }
 
     override fun onDestroy() {

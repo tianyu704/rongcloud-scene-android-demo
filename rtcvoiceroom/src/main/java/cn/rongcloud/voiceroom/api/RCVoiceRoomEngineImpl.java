@@ -1174,15 +1174,20 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void onChatRoomKVUpdate(String roomId, Map<String, String> chatRoomKvMap) {
-        Log.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + "," + "chatRoomKvMap = " + chatRoomKvMap);
+        updateRoomInfoFromEntry(chatRoomKvMap);
+
+        if (mRoomInfo.getSeatCount() != mRCVoiceSeatInfoList.size()) {
+            currentKvMap.clear();
+        }
+
         for (String key : chatRoomKvMap.keySet()) {
             if (key.contains(RC_ROOM_INFO_KEY) || key.contains(RC_MIC_SEAT_INFO_PREFIX_KEY)) {
                 currentKvMap.put(key, chatRoomKvMap.get(key));
             }
         }
-        updateRoomInfoFromEntry(currentKvMap);
+        List<RCVoiceSeatInfo> oldList = new ArrayList<>(mRCVoiceSeatInfoList);
         resetSeatInfoWithCount(mRoomInfo.getSeatCount());
-        updateSeatInfoFromEntry(currentKvMap);
+        updateSeatInfoFromEntry(oldList, currentKvMap);
         handleRequestSeatKvUpdated(chatRoomKvMap);
     }
 
@@ -1237,11 +1242,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         });
     }
 
-    private void updateSeatInfoFromEntry(Map<String, String> chatRoomKvMap) {
+    private void updateSeatInfoFromEntry(List<RCVoiceSeatInfo> oldInfoList, Map<String, String> chatRoomKvMap) {
         synchronized (TAG) {
-            List<RCVoiceSeatInfo> oldInfoList = new ArrayList<>(mRCVoiceSeatInfoList);
             List<RCVoiceSeatInfo> latestInfoList = latestMicInfoListFromEntry(chatRoomKvMap);
-
             RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
             if (listener != null) {
                 listener.onSeatInfoUpdate(latestInfoList);
@@ -1249,7 +1252,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
             for (int i = 0; i < mRoomInfo.getSeatCount(); i++) {
                 RCVoiceSeatInfo newInfo = latestInfoList.get(i);
-                RCVoiceSeatInfo oldInfo = oldInfoList.get(i);
+                RCVoiceSeatInfo oldInfo = getSeatInfoByIndex(oldInfoList, i);
+                Log.d(TAG, "updateSeatInfoFromEntry: new seat status = " + newInfo.getStatus() + " ,old seat status = " + oldInfo.getStatus() + " ,index = " + i);
                 if (oldInfo.getStatus() != newInfo.getStatus()) {
                     switch (newInfo.getStatus()) {
                         case RCSeatStatusEmpty:
@@ -1310,6 +1314,15 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
     }
 
+    private RCVoiceSeatInfo getSeatInfoByIndex(List<RCVoiceSeatInfo> oldInfoList, int index) {
+        if (index >= 0 && index < oldInfoList.size()) {
+            return oldInfoList.get(index);
+        }
+        RCVoiceSeatInfo seatInfo = new RCVoiceSeatInfo();
+        seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+        return seatInfo;
+    }
+
     private void resetSeatInfoWithCount(int seatCount) {
         if (seatCount != mRCVoiceSeatInfoList.size()) {
             synchronized (TAG) {
@@ -1347,6 +1360,27 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                 if (listener != null) {
                     listener.onRequestSeatListChanged();
+                }
+            }
+
+            if (key.startsWith(RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY)) {
+                Log.d(TAG, "handleRequestSeatCancelled: key = " + key);
+                String[] info = key.split("_");
+                String userId = info[info.length - 1];
+                if (!TextUtils.isEmpty(userId)) {
+                    if (isUserOnSeat(userId)) {
+                        kickSeatFromSeat(userId, new RCVoiceRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError(int code, String message) {
+
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -1501,10 +1535,43 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 onErrorWithCheck(callback, coreErrorCode.code, coreErrorCode.msg);
             }
         });
+
+        if (!TextUtils.isEmpty(info.getUserId())) {
+            updateSeatBeUsedByUser(info.getUserId(), seatIndex, new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onError(int code, String message) {
+
+                }
+            });
+        }
+    }
+
+    private void updateSeatBeUsedByUser(String userId, int seatIndex, final RCVoiceRoomCallback callback) {
+        Log.d(TAG, "updateSeatBeUsedByUser: userId = " + userId);
+        RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatBeUserdKvKey(userId), userId, false, true, "", new IRongCoreCallback.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                onSuccessWithCheck(callback);
+            }
+
+            @Override
+            public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                onErrorWithCheck(callback, coreErrorCode.code, coreErrorCode.getMessage());
+            }
+        });
     }
 
     private String seatInfoKvKey(int index) {
         return String.format(Locale.getDefault(), "%s_%d", RC_MIC_SEAT_INFO_PREFIX_KEY, index);
+    }
+
+    private String seatBeUserdKvKey(String userId) {
+        return String.format(Locale.getDefault(), "%s_%s", RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY, userId);
     }
 
     private String speakingKey(int index) {

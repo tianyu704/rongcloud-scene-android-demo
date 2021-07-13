@@ -80,7 +80,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             .subscribe { list ->
                 view.onSeatListChange(list)
                 list.forEach {
-                    if (it.userId.isNotNullOrEmpty() && it.member == null) {
+                    if (it.userId.isNotNullOrEmpty() && (it.member == null || it.member!!.member == null)) {
                         val memberInfo =
                             roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
                         if (memberInfo == null) {
@@ -97,7 +97,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         addDisposable(roomModel
             .obSeatInfoChange()
             .subscribe { info ->
-                if (info.member == null && !info.userId.isNullOrEmpty()) {
+                if ((info.member == null || info.member!!.member == null) && !info.userId.isNullOrEmpty()) {
                     val memberInfo =
                         roomModel.getMemberInfoByUserIdOnlyLocal(info.userId)
                     if (memberInfo == null) {
@@ -300,7 +300,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     }
 
     fun getMemberInfoByUserId(userId: String): UiMemberModel? {
-        return roomModel?.getMemberInfoByUserIdOnlyLocal(userId)
+        return roomModel.getMemberInfoByUserIdOnlyLocal(userId)
     }
 
     fun joinRoom() {

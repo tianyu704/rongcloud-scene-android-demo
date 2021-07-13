@@ -970,6 +970,11 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     fun invitedIntoSeat(userId: String): Completable {
         return Completable.create {
+            if (getAvailableIndex() < 0) {
+                it.onError(Throwable("麦位已满"))
+                return@create
+            }
+
             RCVoiceRoomEngine.getInstance().pickUserToSeat(userId, object : RCVoiceRoomCallback {
                 override fun onError(code: Int, message: String?) {
                     Log.e(TAG, "invitedIntoSeat:onError: code = $code,message = $message")
@@ -1315,7 +1320,13 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         )
     }
 
-    fun addMusic(name: String, author: String? = "", type: Int = 0, url: String,size:Long? = null): Completable {
+    fun addMusic(
+        name: String,
+        author: String? = "",
+        type: Int = 0,
+        url: String,
+        size: Long? = null
+    ): Completable {
         Log.d(TAG, "addMusic: name = $name,author = $author,type = $type,url = $url")
         return Completable.create { emitter ->
             addDisposable(
