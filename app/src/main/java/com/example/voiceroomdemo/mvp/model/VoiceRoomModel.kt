@@ -300,9 +300,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                         }
                     }
                 }
-
                 userMusicListSubject.onNext(userMusicList)
-
             }
 
         })
@@ -589,7 +587,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             Log.d(TAG, "onSeatLock: index = $index , isLock = $isLock")
             currentUISeatInfoList.elementAtOrNull(index)?.let {
                 it.seatStatus =
-                    if (isLock) RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock else RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
+                    if (isLock) RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking else RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
             }
         }
     }
@@ -1345,6 +1343,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                         if (result.code == 10000) {
                             refreshMusicList {
                                 if (userMusicList.size == 1) {
+                                    Log.d(TAG, "addMusic: list only one music,start play")
                                     userMusicList.elementAtOrNull(0)?.url?.let {
                                         playMusic(name, it)
                                     }
@@ -1426,12 +1425,12 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                 .checkOrDownLoadMusic(name ?: "", url)
                 .subscribe({
                     currentPlayMusic = url
+                    val path = FileModel.getCompleteMusicPathByName(
+                        FileModel.getNameFromUrl(url) ?: ""
+                    )
+                    Log.d(TAG, "playMusic: path = $path")
                     RCRTCAudioMixer.getInstance()
-                        .startMix(
-                            FileModel.getCompleteMusicPathByName(
-                                FileModel.getNameFromUrl(url) ?: ""
-                            ), RCRTCAudioMixer.Mode.MIX, true, 1
-                        )
+                        .startMix(path, RCRTCAudioMixer.Mode.MIX, true, 1)
                 }, {
                     MyApp.context.showToast(it.message)
                 })
@@ -1477,6 +1476,8 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }
             Log.d(TAG, "playNextMusic: index = $index")
             currentPlayMusic = null
+            // 及时通知上层音乐播放完成
+            userMusicListSubject.onNext(userMusicList)
             userMusicList
                 .elementAtOrNull((index + 1) % userMusicList.size)?.let {
                     Log.d(TAG, "playNextMusic: $it")

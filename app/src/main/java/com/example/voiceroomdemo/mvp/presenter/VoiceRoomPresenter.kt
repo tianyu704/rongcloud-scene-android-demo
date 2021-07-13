@@ -80,10 +80,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             .subscribe { list ->
                 view.onSeatListChange(list)
                 list.forEach {
-                    if (it.userId.isNotNullOrEmpty() && (it.member == null || it.member!!.member == null)) {
+                    if (it.userId.isNotNullOrEmpty() && (it.member?.member == null)) {
                         val memberInfo =
                             roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
-                        if (memberInfo == null) {
+                        if (memberInfo?.member == null) {
                             Log.d(TAG, "obSeatListChange: member is null")
                             roomModel.refreshAllMemberInfoList()
                         } else {
@@ -97,10 +97,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         addDisposable(roomModel
             .obSeatInfoChange()
             .subscribe { info ->
-                if ((info.member == null || info.member!!.member == null) && !info.userId.isNullOrEmpty()) {
+                if ((info.member?.member == null) && !info.userId.isNullOrEmpty()) {
                     val memberInfo =
                         roomModel.getMemberInfoByUserIdOnlyLocal(info.userId)
-                    if (memberInfo == null) {
+                    if (memberInfo?.member == null) {
                         roomModel.refreshAllMemberInfoList()
                     } else {
                         info.member = memberInfo
@@ -433,7 +433,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 }
             })
         } else {
-            if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+            if (currentStatus == STATUS_WAIT_FOR_SEAT && !roomModel.currentUIRoomInfo.isFreeEnterSeat) {
                 view.showRevokeSeatRequest()
                 return
             }

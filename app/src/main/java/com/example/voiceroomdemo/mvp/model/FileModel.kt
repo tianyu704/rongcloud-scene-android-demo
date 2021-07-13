@@ -6,6 +6,7 @@ package com.example.voiceroomdemo.mvp.model
 
 import android.content.Context
 import android.os.Environment
+import android.util.Log
 import com.example.voiceroomdemo.MyApp
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.showToast
@@ -115,6 +116,7 @@ object FileModel {
                     block
                 )
                     .subscribe({
+                        Log.d(TAG, "checkOrDownLoadMusic: onComplete")
                         emitter.onComplete()
                     }, {
                         emitter.onError(it)

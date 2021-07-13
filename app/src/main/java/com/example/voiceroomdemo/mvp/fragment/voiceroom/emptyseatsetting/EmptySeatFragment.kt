@@ -51,7 +51,7 @@ class EmptySeatFragment(
         super.refreshView(it)
         seatInfo = it
         ui {
-            if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed) {
+            if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 dismiss()
                 return@ui
             }
@@ -65,7 +65,7 @@ class EmptySeatFragment(
                 iv_is_mute.isVisible = false
             }
 
-            if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock) {
+            if (it.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
                 iv_seat_status.setImageResource(R.drawable.ic_seat_status_locked)
                 iv_user_portrait.setImageResource(R.drawable.bg_seat_status)
                 iv_close_seat.setImageResource(R.drawable.ic_room_setting_unlock_all)

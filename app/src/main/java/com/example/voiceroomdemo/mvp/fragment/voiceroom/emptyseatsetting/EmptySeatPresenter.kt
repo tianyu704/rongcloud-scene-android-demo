@@ -51,7 +51,7 @@ class EmptySeatPresenter(
         addDisposable(
             roomModel.setSeatLock(
                 uiSeatModel.index,
-                uiSeatModel.seatStatus != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock
+                uiSeatModel.seatStatus != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking
             )
                 .subscribe({
 

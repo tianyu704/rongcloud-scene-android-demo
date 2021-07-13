@@ -52,21 +52,16 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
 
     fun addMusic(name: String?, author: String? = "", type: Int = 0, url: String) {
         view.showWaitingDialog()
-        addDisposable(roomModel
-            .addMusic(name ?: "", author, type, url)
-            .subscribe {
-                addDisposable(fileModel
-                    .checkOrDownLoadMusic(name ?: "", url)
-                    { total, progress ->
-                        Log.d(TAG, "addMusic:total = $total,progress = $progress ")
-                    }.subscribe({
-                        Log.d(TAG, "addMusic: onComplete")
-                        view.hideWaitingDialog()
-                    }, {
-                        view.hideWaitingDialog()
-                    })
-                )
-            })
+        addDisposable(
+            roomModel
+                .addMusic(name ?: "", author, type, url)
+                .subscribe({
+                    view.hideWaitingDialog()
+                }, {
+                    view.showError(it.message)
+                    view.hideWaitingDialog()
+                })
+        )
     }
 
     fun getSupportFileTypeMime(): Array<String> {

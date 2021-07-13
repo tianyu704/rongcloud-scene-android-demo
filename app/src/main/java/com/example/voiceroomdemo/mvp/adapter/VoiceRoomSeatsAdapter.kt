@@ -4,7 +4,6 @@
 
 package com.example.voiceroomdemo.mvp.adapter
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,7 +69,7 @@ class VoiceRoomSeatsAdapter(
         ) {
             with(itemView) {
                 when (mode.seatStatus) {
-                    RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed -> {
+                    RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                         wv_seat_background.isVisible = true
                         iv_user_portrait.isVisible = true
                         tv_member_name.isVisible = true
@@ -117,7 +116,7 @@ class VoiceRoomSeatsAdapter(
                         iv_user_portrait.background = null
 
                     }
-                    RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock -> {
+                    RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
                         iv_user_portrait.isVisible = true
                         tv_member_name.isVisible = true
                         iv_seat_status.isVisible = true

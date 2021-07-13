@@ -5,19 +5,14 @@
 package com.example.voiceroomdemo.mvp.activity
 
 import android.annotation.SuppressLint
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Point
 import android.graphics.Rect
-import android.os.Build
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.core.app.NotificationCompat
 import androidx.core.view.isVisible
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.example.voiceroomdemo.R
@@ -689,13 +684,13 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
-            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock) {
+            if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
                 // 点击锁定座位
                 showMessage("该座位已锁定")
             } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
                 // 点击空座位
                 presenter.enterSeat(position)
-            } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed) {
+            } else if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 if (seatModel.userId == AccountStore.getUserId()) {
                     // 点击自己头像
                     SelfSettingFragment(this@VoiceRoomActivity, seatModel, roomId).show(
@@ -795,7 +790,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
                     roomInfo.roomBean?.let { roomBean ->
                         emptySeatFragment = EmptySeatFragment(
                             this@VoiceRoomActivity,
@@ -806,7 +801,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                         }
                     }
                 }
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                     roomInfo.roomBean?.let { roomBean ->
                         seatModel.member?.let { member ->
                             memberSettingFragment = MemberSettingFragment(
@@ -864,7 +859,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         Audience(view) {
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLock -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
                     roomInfo.roomBean?.let { roomBean ->
                         emptySeatFragment = EmptySeatFragment(
                             this@VoiceRoomActivity,
@@ -875,7 +870,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                         }
                     }
                 }
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsed -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                     if (seatModel.userId == AccountStore.getUserId()) {
                         SelfSettingFragment(this@VoiceRoomActivity, seatModel, roomId).show(
                             supportFragmentManager
