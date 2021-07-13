@@ -14,13 +14,17 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.annotation.DrawableRes
 import androidx.recyclerview.widget.RecyclerView
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.mvp.model.VoiceRoomModel
 import com.example.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import com.example.voiceroomdemo.mvp.model.message.*
+import com.example.voiceroomdemo.utils.UiUtils
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.model.MessageContent
+import kotlinx.android.synthetic.main.fragmeng_send_present.*
 import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 
 /**
@@ -31,7 +35,7 @@ import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 private const val MESSAGE_TYPE_SYSTEM = 0
 private const val MESSAGE_TYPE_NORMAL = 1
 
-class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
+class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val data = arrayListOf<MessageContent>()
@@ -39,6 +43,7 @@ class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
     private val roomModel: VoiceRoomModel by lazy {
         getVoiceRoomModelByRoomId(roomId)
     }
+
     override fun getItemViewType(position: Int): Int {
         return if (data[position] is RCChatroomLocationMessage) MESSAGE_TYPE_SYSTEM else MESSAGE_TYPE_NORMAL
     }
@@ -58,7 +63,7 @@ class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
         if (getItemViewType(position) == MESSAGE_TYPE_SYSTEM) {
             (holder as SystemMessageViewHolder).bind(data[position] as RCChatroomLocationMessage)
         } else {
-            (holder as NormalMessageViewHolder).bind(data[position], listener)
+            (holder as NormalMessageViewHolder).bind(data[position], roomModel, listener)
         }
     }
 
@@ -81,17 +86,48 @@ class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
     }
 
     class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(message: MessageContent, listener: (String) -> Unit) {
+        fun updateRole(userId: String, view: TextView, roomModel: VoiceRoomModel) {
+            if (roomModel.currentUIRoomInfo?.roomBean?.createUser?.userId == userId) {
+                view.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_creator,
+                    0,
+                    0,
+                    0
+                )
+                view.compoundDrawablePadding = 2
+            } else if (roomModel.getMemberInfoByUserIdOnlyLocal(userId)?.isAdmin
+                    ?: false
+            ) {
+                view.setCompoundDrawablesWithIntrinsicBounds(
+                    R.drawable.ic_is_admin,
+                    0,
+                    0,
+                    0
+                )
+                view.compoundDrawablePadding = 2
+            }
+        }
+
+        fun bind(message: MessageContent, roomModel: VoiceRoomModel, listener: (String) -> Unit) {
             with(itemView) {
                 var list = ArrayList<MsgInfo>(4)
+                tv_message_content.setCompoundDrawablesWithIntrinsicBounds(
+                    0,
+                    0,
+                    0,
+                    0
+                )
+                tv_message_content.compoundDrawablePadding = 0
                 when (message) {
                     is RCChatroomBarrage -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
                         list.add(MsgInfo("${message.content}", "", false))
+                        updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomEnter -> {
                         list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo("进来了", "", false))
+                        updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomKickOut -> {
                         list.add(MsgInfo("${message.targetName} 被", "", false))
@@ -101,12 +137,14 @@ class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
                     is RCChatroomGiftAll -> {
                         list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo("全麦打赏 ${message.giftName} x${message.number}", "", false))
+                        updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomGift -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
                         list.add(MsgInfo(" 送给 ", "", false))
                         list.add(MsgInfo("${message.targetName} ", message.targetId, true))
                         list.add(MsgInfo(" ${message.giftName} x${message.number}", "", false))
+                        updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomAdmin -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
@@ -117,6 +155,7 @@ class VoiceRoomMessageAdapter(roomId:String,val listener: (String) -> Unit) :
                                 false
                             )
                         )
+                        updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomSeats -> {
                         list.add(MsgInfo("房间更换为 ${message.count} 座模式，请重新上麦"))

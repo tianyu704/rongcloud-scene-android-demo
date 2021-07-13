@@ -140,6 +140,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             .obMemberInfoChange()
             .subscribe {
                 Log.d(TAG, "onCreate: obMemberInfoChange")
+                view.onMemberInfoChange()
                 roomModel.getSeatInfoByUserId(it.userId)?.member = it
                 if (it.userId == AccountStore.getUserId()) {
                     // 监听当前用户是否为管理员

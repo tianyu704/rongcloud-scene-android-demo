@@ -233,6 +233,11 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         startService(Intent(this, RTCNotificationService::class.java))
     }
 
+    override fun onMemberInfoChange() {
+        // 刷新角色变化
+        rv_message_list?.adapter?.notifyDataSetChanged()
+    }
+
     private fun showSoftKeyBoard() {
         et_message.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

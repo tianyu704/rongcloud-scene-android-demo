@@ -48,5 +48,6 @@ interface IVoiceRoomView : IBaseView {
     fun showFov(from: Point?)
     fun showRevokeSeatRequest()
     fun showRoomClose()
+    fun onMemberInfoChange()
 
 }
