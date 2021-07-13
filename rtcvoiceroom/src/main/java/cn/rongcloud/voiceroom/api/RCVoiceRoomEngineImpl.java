@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -88,8 +87,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     private IRCRTCVoiceRoomEventsListener mVREventListener;
 
     private VoiceStatusReportListener mVoiceStatusReportListener = new VoiceStatusReportListener();
-
-    private Map<String, String> currentKvMap = new HashMap<>();
 
     /**
      * 采用 map 和 list 双集合保存，map 用于记录在座位上的人，用于快速查询，list 用于记录位置信息
@@ -1176,18 +1173,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     public void onChatRoomKVUpdate(String roomId, Map<String, String> chatRoomKvMap) {
         updateRoomInfoFromEntry(chatRoomKvMap);
 
-        if (mRoomInfo.getSeatCount() != mRCVoiceSeatInfoList.size()) {
-            currentKvMap.clear();
-        }
-
-        for (String key : chatRoomKvMap.keySet()) {
-            if (key.contains(RC_ROOM_INFO_KEY) || key.contains(RC_MIC_SEAT_INFO_PREFIX_KEY)) {
-                currentKvMap.put(key, chatRoomKvMap.get(key));
-            }
-        }
         List<RCVoiceSeatInfo> oldList = new ArrayList<>(mRCVoiceSeatInfoList);
         resetSeatInfoWithCount(mRoomInfo.getSeatCount());
-        updateSeatInfoFromEntry(oldList, currentKvMap);
+        updateSeatInfoFromEntry(oldList, chatRoomKvMap);
         handleRequestSeatKvUpdated(chatRoomKvMap);
     }
 
@@ -1328,10 +1316,12 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             synchronized (TAG) {
                 mUserOnSeatMap.clear();
                 mRCVoiceSeatInfoList.clear();
-                for (int i = 0; i < seatCount; i++) {
-                    RCVoiceSeatInfo seatInfo = new RCVoiceSeatInfo();
-                    seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
-                    mRCVoiceSeatInfoList.add(seatInfo);
+                if (seatCount > 0) {
+                    for (int i = 1; i < seatCount; i++) {
+                        RCVoiceSeatInfo seatInfo = new RCVoiceSeatInfo();
+                        seatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+                        mRCVoiceSeatInfoList.add(seatInfo);
+                    }
                 }
             }
         }
