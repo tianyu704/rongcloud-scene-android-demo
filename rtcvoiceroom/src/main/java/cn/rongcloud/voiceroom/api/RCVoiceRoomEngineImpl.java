@@ -214,7 +214,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     private void changeUserRoleIfNeeded() {
-        int index = seatIndexWithUserSit(mCurrentUserId);
+        int index = getSeatIndexByUserId(mCurrentUserId);
         if (index > 0 && mCurrentRole != RCRTCLiveRole.BROADCASTER) {
             switchRole(RCRTCLiveRole.BROADCASTER, new RCVoiceRoomCallback() {
                 @Override
@@ -236,7 +236,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void leaveRoom(final RCVoiceRoomCallback callback) {
-        int index = seatIndexWithUserSit(mCurrentUserId);
+        int index = getSeatIndexByUserId(mCurrentUserId);
         if (index >= 0) {
             leaveSeat(new RCVoiceRoomCallback() {
                 @Override
@@ -333,7 +333,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void leaveSeat(final RCVoiceRoomCallback callback) {
-        final int seatIndex = seatIndexWithUserSit(mCurrentUserId);
+        final int seatIndex = getSeatIndexByUserId(mCurrentUserId);
         if (seatIndex < 0) {
             callback.onError(-1, "current user not in seat");
             return;
@@ -492,7 +492,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             onErrorWithCheck(callback, VoiceRoomErrorCode.USER_CAN_NOT_KICK_SELF);
             return;
         }
-        final int index = seatIndexWithUserSit(seatInfo.getUserId());
+        final int index = getSeatIndexByUserId(seatInfo.getUserId());
         if (index >= 0) {
             final RCVoiceSeatInfo seatInfoClone = seatInfo.clone();
             seatInfoClone.setUserId(null);
@@ -799,25 +799,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     mSeatInfoList.add(seatInfo);
                 }
             }
-        }
-    }
-
-    private void handleSeatCountChange(List<RCVoiceSeatInfo> list, int seatCount, CompletionListener completionListener) {
-        synchronized (TAG) {
-            List<RCVoiceSeatInfo> seatInfoList = list.subList(0, seatCount);
-            mSeatInfoList.clear();
-            mSeatInfoList.addAll(seatInfoList);
-            mUserOnSeatMap.clear();
-            for (RCVoiceSeatInfo seatInfo : seatInfoList) {
-                if (!TextUtils.isEmpty(seatInfo.getUserId())) {
-                    mUserOnSeatMap.put(seatInfo.getUserId(), seatInfo);
-                }
-            }
-            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-            if (listener != null) {
-                listener.onSeatInfoUpdate(mSeatInfoList);
-            }
-            completionListener.onComplete();
         }
     }
 
@@ -1541,7 +1522,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         return String.format(Locale.getDefault(), "%s_%s", RC_REQUEST_SEAT_PREFIX_KEY, content);
     }
 
-    private int seatIndexWithUserSit(String userId) {
+    private int getSeatIndexByUserId(String userId) {
         RCVoiceSeatInfo rcVoiceSeatInfo = mUserOnSeatMap.get(userId);
         if (rcVoiceSeatInfo == null) {
             return -1;
@@ -1696,8 +1677,24 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
 
         @Override
-        public void onUserOffline(RCRTCRemoteUser remoteUser) {
+        public void onUserOffline(final RCRTCRemoteUser remoteUser) {
+            final int index = getSeatIndexByUserId(remoteUser.getUserId());
+            if (index > -1) {
+                kickSeatFromSeat(remoteUser.getUserId(), new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
+                        if (currentRoomEventListener != null) {
+                            currentRoomEventListener.onUserLeaveSeat(index, remoteUser.getUserId());
+                        }
+                    }
 
+                    @Override
+                    public void onError(int code, String message) {
+
+                    }
+                });
+            }
         }
 
         @Override
