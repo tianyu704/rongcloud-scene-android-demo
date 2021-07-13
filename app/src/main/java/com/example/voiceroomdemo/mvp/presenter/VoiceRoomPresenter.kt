@@ -299,6 +299,9 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         return roomModel.currentUISeatInfoList
     }
 
+    fun getMemberInfoByUserId(userId: String): UiMemberModel? {
+        return roomModel?.getMemberInfoByUserIdOnlyLocal(userId)
+    }
     fun joinRoom() {
         Log.d(TAG, "joinRoom: ${roomId}")
         RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {

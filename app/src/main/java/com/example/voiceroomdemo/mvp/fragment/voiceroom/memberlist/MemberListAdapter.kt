@@ -4,14 +4,12 @@
 
 package com.example.voiceroomdemo.mvp.fragment.voiceroom.memberlist
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.loadPortrait
-import com.example.voiceroomdemo.net.api.bean.respond.Member
 import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import kotlinx.android.synthetic.main.layout_member_list_item.view.*
 import java.util.*

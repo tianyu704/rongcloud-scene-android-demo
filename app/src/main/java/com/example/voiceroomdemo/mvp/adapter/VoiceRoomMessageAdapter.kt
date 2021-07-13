@@ -11,16 +11,13 @@ import android.text.TextPaint
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.mvp.model.message.*
-import com.jiaxun.nim.main.widget.CustomLinkMovementMethod
 import io.rong.imlib.model.MessageContent
-import kotlinx.android.synthetic.main.layout_confirm_dialog.view.*
 import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 
 /**

@@ -50,6 +50,7 @@ import com.example.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import com.example.voiceroomdemo.mvp.presenter.VoiceRoomPresenter
 import com.example.voiceroomdemo.ui.dialog.ConfirmDialog
 import com.example.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
+import com.example.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.example.voiceroomdemo.ui.uimodel.UiRoomModel
 import com.example.voiceroomdemo.ui.uimodel.UiSeatModel
 import com.vanniktech.emoji.EmojiPopup
@@ -188,7 +189,15 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
 
         rv_message_list.adapter = VoiceRoomMessageAdapter { userId ->
-            showMemberSetting(userId)
+            if (userId == AccountStore.getUserId()) {
+                return@VoiceRoomMessageAdapter
+            }
+            var member = presenter.getMemberInfoByUserId(userId)
+            if (null == member) {
+                showMessage("用户已离开房间")
+                return@VoiceRoomMessageAdapter
+            }
+            showMemberSetting(member)
         }
     }
 
@@ -663,8 +672,16 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     }
 
-    fun showMemberSetting(userId: String) {
-        showMessage("点击id：$userId")
+    fun showMemberSetting(member: UiMemberModel) {
+        presenter.getCurrentRoomInfo().roomBean?.let { roomBean ->
+            memberSettingFragment = MemberSettingFragment(
+                this@VoiceRoomActivity,
+                roomBean,
+                member
+            ).apply {
+                show(supportFragmentManager)
+            }
+        }
     }
 
     /**
