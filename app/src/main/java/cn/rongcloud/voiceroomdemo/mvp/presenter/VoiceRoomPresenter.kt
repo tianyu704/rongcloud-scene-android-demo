@@ -190,20 +190,23 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     when (it) {
-                        is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomBarrage, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomEnter, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomKickOut, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGiftAll, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGift, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomAdmin, is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomSeats -> {
+                        is RCChatroomLocationMessage, is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
                             view.showChatRoomMessage(it)
-                            if (it is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGiftAll || it is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGift) {
+                            if (it is RCChatroomGiftAll || it is RCChatroomGift) {
                                 roomModel.refreshGift()
                             }
-                            if(it is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomEnter) {
+                            if(it is RCChatroomEnter) {
                                 val member =
                                     roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
                                 if(member == null){
                                     roomModel.refreshAllMemberInfoList()
                                 }
                             }
+                            if(it is RCChatroomAdmin){
+                                roomModel.noticeMemberListUpdate()
+                            }
                         }
-                        is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLike -> {
+                        is RCChatroomLike -> {
                             view.showFov(null)
                         }
                     }
@@ -355,7 +358,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             roomId,
             "感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。"
         )
-        RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomEnter()
+        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomEnter()
             .apply {
             this.userId = AccountStore.getUserId()
             this.userName = AccountStore.getUserName()
@@ -484,7 +487,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     }
 
     fun sendFovMessage() {
-        RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLike()
+        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomLike()
             .apply {
         },
             true,
@@ -495,7 +498,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     }
 
     fun sendMessage(message: String) {
-        RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomBarrage()
+        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomBarrage()
             .apply {
             userId = AccountStore.getUserId()
             userName = AccountStore.getUserName()
