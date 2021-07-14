@@ -132,8 +132,8 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
                     is RCChatroomKickOut -> {
-                        list.add(MsgInfo("${message.targetName} 被", "", false))
-                        list.add(MsgInfo("${message.userName}: ", message.userId, true))
+                        list.add(MsgInfo("${message.targetName} 被 ", "", false))
+                        list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo(" 踢出去了", "", false))
                     }
                     is RCChatroomGiftAll -> {

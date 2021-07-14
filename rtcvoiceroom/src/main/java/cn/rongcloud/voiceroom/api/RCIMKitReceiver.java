@@ -81,7 +81,6 @@ final class RCIMKitReceiver implements RCVoiceRoomClientDelegate {
                         , new IRongCallback.ISendMessageCallback() {
                             @Override
                             public void onAttached(Message message) {
-                                callback.onSuccess(message);
                             }
 
                             @Override

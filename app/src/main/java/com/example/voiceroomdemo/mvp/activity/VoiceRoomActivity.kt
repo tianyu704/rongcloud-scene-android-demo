@@ -217,12 +217,13 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             if (userId == AccountStore.getUserId()) {
                 return@VoiceRoomMessageAdapter
             }
-            var member = presenter.getMemberInfoByUserId(userId)
-            if (null == member) {
-                showMessage("用户已离开房间")
-                return@VoiceRoomMessageAdapter
+            presenter.getMemberInfoByUserId(userId) { member ->
+                if (null == member) {
+                    showMessage("用户已离开房间")
+                    return@getMemberInfoByUserId
+                }
+                showMemberSetting(member)
             }
-            showMemberSetting(member)
         }
         //开启前台服务
         startService(Intent(this, RTCNotificationService::class.java))

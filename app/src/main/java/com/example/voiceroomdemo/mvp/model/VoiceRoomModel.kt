@@ -17,10 +17,7 @@ import com.example.voiceroomdemo.MyApp
 import com.example.voiceroomdemo.R
 import com.example.voiceroomdemo.common.AccountStore
 import com.example.voiceroomdemo.common.showToast
-import com.example.voiceroomdemo.mvp.model.message.RCChatroomAdmin
-import com.example.voiceroomdemo.mvp.model.message.RCChatroomGift
-import com.example.voiceroomdemo.mvp.model.message.RCChatroomGiftAll
-import com.example.voiceroomdemo.mvp.model.message.RCChatroomSeats
+import com.example.voiceroomdemo.mvp.model.message.*
 import com.example.voiceroomdemo.net.RetrofitManager
 import com.example.voiceroomdemo.net.api.bean.request.*
 import com.example.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
@@ -34,11 +31,13 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import io.reactivex.rxjava3.subjects.PublishSubject
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.ChatRoomInfo
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 
 /**
  * @author gusd
@@ -144,6 +143,8 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     private val roomEventSubject: BehaviorSubject<Pair<String, ArrayList<String>>> =
         BehaviorSubject.create()
+
+    private val refreshAllMemberList = PublishSubject.create<Unit>()
 
     val currentUIRoomInfo = UiRoomModel(roomInfoSubject)
 
@@ -304,6 +305,13 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }
 
         })
+
+        addDisposable(refreshAllMemberList
+            .debounce(20L, TimeUnit.MILLISECONDS)
+            .subscribe {
+                queryAllUserInfo()
+            })
+
     }
 
 
@@ -847,15 +855,12 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         }
     }
 
-    // 临时方案，防止过快的调用该方法
-    private var refreshTime: Long = 0L
 
     fun refreshAllMemberInfoList() {
-        if (System.currentTimeMillis() - refreshTime < 1000) {
-            return
-        }
-        Log.d(TAG, "refreshAllMemberInfoList: ")
-        refreshTime = System.currentTimeMillis()
+        refreshAllMemberList.onNext(Unit)
+    }
+
+    fun queryAllUserInfo(onComplete: (() -> Unit)? = null) {
         addDisposable(RetrofitManager
             .commonService
             .getMembersList(roomId)
@@ -916,8 +921,24 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             }.doOnSuccess {
                 refreshRequestSeatUserList()
             }
-            .subscribe()
+            .subscribe({
+                onComplete?.invoke()
+            }, {
+                onComplete?.invoke()
+            })
         )
+    }
+
+    fun queryUserInfoFromLocalAndServer(userId: String, onComplete: ((UiMemberModel?) -> Unit)?) {
+        var memberModel = getMemberInfoByUserIdOnlyLocal(userId)
+        if (memberModel?.member == null) {
+            queryAllUserInfo {
+                memberModel = getMemberInfoByUserIdOnlyLocal(userId)
+                onComplete?.invoke(memberModel)
+            }
+        } else {
+            onComplete?.invoke(memberModel)
+        }
     }
 
     fun userInSeat(userId: String): Boolean {
@@ -993,6 +1014,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     }
 
     fun kickRoom(userId: String): Completable {
+        Log.d(TAG, "kickRoom: ")
         return Completable.create {
             RCVoiceRoomEngine.getInstance().kickUserFromRoom(userId, object : RCVoiceRoomCallback {
                 override fun onError(code: Int, message: String?) {
@@ -1001,12 +1023,27 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                 }
 
                 override fun onSuccess() {
+                    Log.d(TAG, "kickRoom:onSuccess: ")
                     doOnDataScheduler {
                         val uiMemberModel = roomMemberInfoMap[userId]
                         uiMemberModel?.let { model ->
                             roomMemberInfoMap.remove(model.userId)
                             roomMemberInfoList.remove(model)
                             memberListChangeSubject.onNext(roomMemberInfoList)
+                        }
+                        queryUserInfoFromLocalAndServer(userId) { member ->
+                            Log.d(TAG, "kickRoom:querySuccess:onSuccess: ")
+                            member?.let {
+                                RCChatRoomMessageManager.sendChatMessage(
+                                    roomId,
+                                    RCChatroomKickOut().apply {
+                                        this.userId = AccountStore.getUserId()
+                                        this.userName = AccountStore.getUserName()
+                                        this.targetId = it.userId
+                                        this.targetName = it.userName
+                                    }, true
+                                )
+                            }
                         }
                         it.onComplete()
                     }

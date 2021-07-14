@@ -313,8 +313,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         return roomModel.currentUISeatInfoList
     }
 
-    fun getMemberInfoByUserId(userId: String): UiMemberModel? {
-        return roomModel.getMemberInfoByUserIdOnlyLocal(userId)
+    fun getMemberInfoByUserId(userId: String, block: (UiMemberModel?) -> Unit) {
+        roomModel.queryUserInfoFromLocalAndServer(userId) {
+            block.invoke(it)
+        }
     }
 
     fun getMemberInfo(userId: String, result: (UiMemberModel) -> Unit) {

@@ -68,7 +68,6 @@ final class RCIMLibReceiver implements RCVoiceRoomClientDelegate {
         RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, targetId, content, "", "", new IRongCoreCallback.ISendMessageCallback() {
             @Override
             public void onAttached(Message message) {
-                callback.onAttached(message);
             }
 
             @Override

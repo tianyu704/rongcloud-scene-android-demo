@@ -4,6 +4,7 @@
 
 package com.example.voiceroomdemo.utils
 
+import android.util.Log
 import com.example.voiceroomdemo.mvp.model.message.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -19,6 +20,9 @@ import io.rong.imlib.model.MessageContent
  * @author gusd
  * @Date 2021/06/17
  */
+
+private const val TAG = "RCChatRoomMessageManage"
+
 object RCChatRoomMessageManager {
 
     private val messageSubject: PublishSubject<MessageWrapperModel> = PublishSubject.create()
