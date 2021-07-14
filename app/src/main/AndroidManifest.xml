@@ -3,7 +3,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.voiceroomdemo">
+    package="cn.rongcloud.voiceroomdemo">
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -24,7 +24,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:name=".MyApp"
+        android:name="cn.rongcloud.voiceroomdemo.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
@@ -34,22 +34,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppTheme">
         <activity
-            android:name=".mvp.activity.VoiceRoomActivity"
-            android:screenOrientation="behind"
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask"
             android:theme="@style/Theme.VoiceRoomActivityTheme"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".mvp.activity.MessageListActivity"
-            android:screenOrientation="behind" />
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.MessageListActivity"
+            android:screenOrientation="portrait" />
 
         <activity
-            android:name=".mvp.activity.VoiceRoomListActivity"
-            android:screenOrientation="behind" />
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomListActivity"
+            android:screenOrientation="portrait" />
 
         <activity
-            android:name=".mvp.activity.LauncherActivity"
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppTheme.LauncherActivity">
             <intent-filter>
@@ -59,11 +59,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".mvp.activity.HomeActivity"
-            android:screenOrientation="behind" />
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.HomeActivity"
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".mvp.activity.LoginActivity"
-            android:screenOrientation="behind"
+            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.LoginStyle" />
 
         <provider
@@ -74,7 +74,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_path" />
         </provider>
-        <service android:name=".mvp.activity.RTCNotificationService"
+        <service android:name="cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService"
             android:permission="true"/>
     </application>
 
