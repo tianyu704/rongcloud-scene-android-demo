@@ -307,7 +307,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         })
 
         addDisposable(refreshAllMemberList
-            .debounce(20L, TimeUnit.MILLISECONDS)
+            .debounce(30L, TimeUnit.MILLISECONDS)
             .subscribe {
                 queryAllUserInfo()
             })
@@ -773,24 +773,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             })
     }
 
-    /**
-     * 该接口暂时无用,房间状态依赖于 KV 处理
-     */
-    private fun refreshRoomSetting() {
-        addDisposable(RetrofitManager
-            .commonService
-            .getRoomSetting(roomId)
-            .subscribe { bean ->
-                bean.data?.run {
-                    currentUIRoomInfo.isMuteAll = this.applyAllLockMic ?: false
-                    currentUIRoomInfo.isLockAll = this.applyAllLockSeat ?: false
-                    currentUIRoomInfo.isMute = this.setMute ?: false
-                    currentUIRoomInfo.isFreeEnterSeat = !(applyOnMic ?: true)
-//                    currentUIRoomInfo.mSeatCount =
-                }
-            })
-    }
-
     private fun pushRoomSettingToServer(
         applyOnMic: Boolean? = null,
         applyAllLockMic: Boolean? = null,
@@ -1016,40 +998,41 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     fun kickRoom(userId: String): Completable {
         Log.d(TAG, "kickRoom: ")
         return Completable.create {
-            RCVoiceRoomEngine.getInstance().kickUserFromRoom(userId, object : RCVoiceRoomCallback {
-                override fun onError(code: Int, message: String?) {
-                    Log.e(TAG, "kickRoom:onError: code = $code,message = $message")
-                    it.onError(Throwable(message))
-                }
-
-                override fun onSuccess() {
-                    Log.d(TAG, "kickRoom:onSuccess: ")
-                    doOnDataScheduler {
-                        val uiMemberModel = roomMemberInfoMap[userId]
-                        uiMemberModel?.let { model ->
-                            roomMemberInfoMap.remove(model.userId)
-                            roomMemberInfoList.remove(model)
-                            memberListChangeSubject.onNext(roomMemberInfoList)
+            queryUserInfoFromLocalAndServer(userId) { member ->
+                RCVoiceRoomEngine.getInstance()
+                    .kickUserFromRoom(userId, object : RCVoiceRoomCallback {
+                        override fun onError(code: Int, message: String?) {
+                            it.onError(Throwable(message))
                         }
-                        queryUserInfoFromLocalAndServer(userId) { member ->
-                            Log.d(TAG, "kickRoom:querySuccess:onSuccess: ")
-                            member?.let {
-                                RCChatRoomMessageManager.sendChatMessage(
-                                    roomId,
-                                    RCChatroomKickOut().apply {
-                                        this.userId = AccountStore.getUserId()
-                                        this.userName = AccountStore.getUserName()
-                                        this.targetId = it.userId
-                                        this.targetName = it.userName
-                                    }, true
-                                )
+
+                        override fun onSuccess() {
+                            doOnDataScheduler {
+                                val uiMemberModel = roomMemberInfoMap[userId]
+                                uiMemberModel?.let { model ->
+                                    roomMemberInfoMap.remove(model.userId)
+                                    roomMemberInfoList.remove(model)
+                                    memberListChangeSubject.onNext(roomMemberInfoList)
+                                }
+
+                                member?.let {
+                                    RCChatRoomMessageManager.sendChatMessage(
+                                        roomId,
+                                        RCChatroomKickOut().apply {
+                                            this.userId = AccountStore.getUserId()
+                                            this.userName = AccountStore.getUserName()
+                                            this.targetId = it.userId
+                                            this.targetName = it.userName
+                                        }, true
+                                    )
+                                }
+
+                                it.onComplete()
                             }
                         }
-                        it.onComplete()
-                    }
-                }
-            })
+                    })
+            }
         }.subscribeOn(dataModifyScheduler)
+
     }
 
     fun setSeatLockByUserId(userId: String): Completable {
@@ -1278,20 +1261,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     }
 
-    fun isToAll(members: List<UiMemberModel>): Boolean {
-        var flag = false;
-        if (members.size == roomMemberInfoList.size - 1) {
-            var currIds = members.map {
-                return@map it.userId
-            }
-            var allIds = roomMemberInfoList.map {
-                return@map it.userId
-            }
-            var dx = currIds - allIds
-            return dx.size == 0
-        }
-        return flag;
-    }
 
     fun setRecordingEnable(enable: Boolean): Completable {
         return Completable.create { emitter ->

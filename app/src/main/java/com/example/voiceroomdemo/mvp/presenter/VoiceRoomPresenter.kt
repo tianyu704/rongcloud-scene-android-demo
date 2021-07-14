@@ -195,6 +195,13 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                             if (it is RCChatroomGiftAll || it is RCChatroomGift) {
                                 roomModel.refreshGift()
                             }
+                            if(it is RCChatroomEnter) {
+                                val member =
+                                    roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
+                                if(member == null){
+                                    roomModel.refreshAllMemberInfoList()
+                                }
+                            }
                         }
                         is RCChatroomLike -> {
                             view.showFov(null)

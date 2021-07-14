@@ -4,7 +4,7 @@
 
 rootProject.name = "VoiceRoomDemo"
 include ':app'
-include ':rtcvoiceroom'
+include ':RCVoiceRoomLib'
 
 
 
