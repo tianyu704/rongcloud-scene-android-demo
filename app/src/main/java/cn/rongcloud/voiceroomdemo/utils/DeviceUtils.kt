@@ -17,7 +17,7 @@ import java.util.*
  */
 object DeviceUtils {
 
-    public fun getDeviceId(): String {
+    fun getDeviceId(): String {
         var deviceId = MyApp.context.getValueSync(DEVICE_ID_KEY)
         if (deviceId.isNotBlank()) {
             return deviceId

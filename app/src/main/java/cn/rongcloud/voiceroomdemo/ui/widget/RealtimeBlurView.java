@@ -42,7 +42,7 @@ public class RealtimeBlurView extends View {
     private Bitmap mBitmapToBlur, mBlurredBitmap;
     private Canvas mBlurringCanvas;
     private boolean mIsRendering;
-    private Paint mPaint;
+    private final Paint mPaint;
     private final Rect mRectSrc = new Rect(), mRectDst = new Rect();
     // mDecorView should be the root view of the activity (even if you are on a different window like a dialog)
     private View mDecorView;
@@ -421,5 +421,5 @@ public class RealtimeBlurView extends View {
     private static class StopException extends RuntimeException {
     }
 
-    private static StopException STOP_EXCEPTION = new StopException();
+    private static final StopException STOP_EXCEPTION = new StopException();
 }

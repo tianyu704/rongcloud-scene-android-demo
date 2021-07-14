@@ -6,14 +6,12 @@ package cn.rongcloud.voiceroom.model.messagemodel;
 
 import android.os.Parcel;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import io.rong.common.RLog;
@@ -58,11 +56,7 @@ public class RCVoiceRoomInviteMessage extends MessageContent {
     public RCVoiceRoomInviteMessage(byte[] data) {
         super(data);
         String jsonStr = null;
-        try {
-            jsonStr = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            RLog.e(TAG, "UnsupportedEncodingException ", e);
-        }
+        jsonStr = new String(data, StandardCharsets.UTF_8);
 
         try {
             JSONObject jsonObj = new JSONObject(jsonStr);

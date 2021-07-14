@@ -57,7 +57,7 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : cn.r
     }
 
     override fun onSetPermissions(): Array<String> {
-        return PERMISSIONS;
+        return PERMISSIONS
     }
 
     override fun onAccept(accept: Boolean) {

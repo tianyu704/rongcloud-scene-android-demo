@@ -64,7 +64,7 @@ object VoiceRoomListModel {
             .subscribe({ bean ->
                 onRoomListChange(bean)
                 bean.data?.images?.let {
-                    LocalDataStore.saveBackGroundUrl(bean.data?.images ?: emptyList())
+                    LocalDataStore.saveBackGroundUrl(bean.data.images)
                 }
             }, { t ->
                 roomListErrorSubject.onNext(t)

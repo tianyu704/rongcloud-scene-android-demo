@@ -87,8 +87,8 @@ public enum VoiceRoomErrorCode {
          
     }
 
-    private int code;
-    private String message;
+    private final int code;
+    private final String message;
 
     VoiceRoomErrorCode(int code, String message) {
         this.code = code;

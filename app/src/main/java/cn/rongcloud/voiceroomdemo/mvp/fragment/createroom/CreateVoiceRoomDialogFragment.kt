@@ -154,7 +154,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICTURE_SELECTED_RESULT_CODE && resultCode == Activity.RESULT_OK) {
-            val selectImageUrl = data?.data;
+            val selectImageUrl = data?.data
 //            val filePathColumn = arrayOf<String>(MediaStore.Images.Media.DATA)
             // 查询我们需要的数据
 //            selectImageUrl?.let {

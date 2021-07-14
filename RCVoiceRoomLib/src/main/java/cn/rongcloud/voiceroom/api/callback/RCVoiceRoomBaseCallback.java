@@ -10,5 +10,5 @@ package cn.rongcloud.voiceroom.api.callback;
  * @Date 2021/06/02
  */
 public interface RCVoiceRoomBaseCallback {
-    public void onError(int code,String message);
+    void onError(int code, String message);
 }

@@ -102,7 +102,7 @@ class SendPresentPresenter(
 
     fun selectAll(members: List<UiMemberModel>?) {
         selects.let {
-            selects.clear();
+            selects.clear()
             members?.let {
                 selects.addAll(it)
             }
@@ -115,7 +115,7 @@ class SendPresentPresenter(
      * 检查赠送状态
      */
     fun checkEnableSend() {
-        val enable = null != currentPresent && selects.isNotEmpty();
+        val enable = null != currentPresent && selects.isNotEmpty()
         view.onEnableSend(enable)
     }
 

@@ -42,7 +42,7 @@ class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Cont
         }
         if (roomCover != null) {
             addDisposable(FileModel
-                .imageUpload(cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils.getRealPathFromUri(context,roomCover), context)
+                .imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,roomCover), context)
                 .flatMap {
                     return@flatMap RetrofitManager
                         .commonService

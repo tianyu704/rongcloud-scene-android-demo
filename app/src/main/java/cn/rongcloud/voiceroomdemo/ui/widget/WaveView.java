@@ -35,9 +35,9 @@ public class WaveView extends View {
 
     private boolean mIsRunning;
     private long mLastCreateTime;
-    private List<Circle> mCircleList = new ArrayList<>((int) (mDuration / mSpeed + 1));
+    private final List<Circle> mCircleList = new ArrayList<>((int) (mDuration / mSpeed + 1));
 
-    private Runnable mCreateCircle = new Runnable() {
+    private final Runnable mCreateCircle = new Runnable() {
         @Override
         public void run() {
             if (mIsRunning) {
@@ -184,7 +184,7 @@ public class WaveView extends View {
     }
 
     private class Circle {
-        private long mCreateTime;
+        private final long mCreateTime;
 
         Circle() {
             mCreateTime = System.currentTimeMillis();

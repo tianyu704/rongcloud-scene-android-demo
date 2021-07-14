@@ -47,7 +47,7 @@ class MyApp : Application() {
             null
         )
         MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.MANUAL)
-        UMConfigure.setLogEnabled(cn.rongcloud.voiceroomdemo.BuildConfig.DEBUG)
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
 
         RCVoiceRoomEngine.getInstance().initWithAppKey(this, APP_KEY)
         RCChatRoomMessageManager.registerMessageTypes()

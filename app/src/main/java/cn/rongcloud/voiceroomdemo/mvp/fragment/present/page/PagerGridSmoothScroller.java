@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * 摘要：用于用户手指抬起后页面对齐或者 Fling 事件。
  */
 public class PagerGridSmoothScroller extends LinearSmoothScroller {
-    private RecyclerView mRecyclerView;
+    private final RecyclerView mRecyclerView;
 
     public PagerGridSmoothScroller(@NonNull RecyclerView recyclerView) {
         super(recyclerView.getContext());

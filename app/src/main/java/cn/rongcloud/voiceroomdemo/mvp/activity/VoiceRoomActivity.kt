@@ -123,8 +123,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         return false
     }
 
-    val favAnimation: cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.FavAnimation by lazy {
-        return@lazy cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.FavAnimation(this).apply {
+    val favAnimation: FavAnimation by lazy {
+        return@lazy FavAnimation(this).apply {
             this.addLikeImages(
                 R.drawable.ic_present_0,
                 R.drawable.ic_present_1,
@@ -161,7 +161,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         if (from != null) {
             favAnimation.addFavor(container, 300, 1500, from, null)
         } else {
-            var location = cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow.getLocation(iv_send_gift)
+            var location = CustomerPopupWindow.getLocation(iv_send_gift)
             var from =
                 Point(location[0] + iv_send_gift.width / 2, location[1] - iv_send_gift.height / 2)
             var to = Point(from.x + 200, from.y - 200)
@@ -430,7 +430,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                 }) {
                 presenter.enterSeatIfAvailable()
             }.apply {
-                current = this;
+                current = this
                 show()
             }
             // 处理重复显示 在消失
@@ -498,13 +498,9 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     }
 
-    override fun onResume() {
-        super.onResume()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        favAnimation?.let {
+        favAnimation.let {
             it.release()
         }
         stopService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
@@ -682,10 +678,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             initListener()
         }
 
-        override fun onJoinRoomSuccess() {
-            super.onJoinRoomSuccess()
-        }
-
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             if (seatModel.seatStatus == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
                 // 点击锁定座位
@@ -753,10 +745,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             initListener()
         }
 
-        override fun onJoinRoomSuccess() {
-            super.onJoinRoomSuccess()
-        }
-
         override fun initListener() {
             super.initListener()
             with(view) {
@@ -775,11 +763,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                     }
                 }
             }
-        }
-
-        override fun refreshRoomInfo(roomInfo: UiRoomModel) {
-            super.refreshRoomInfo(roomInfo)
-
         }
 
         override fun onSeatListChange(uiSeatModelList: List<UiSeatModel>) {

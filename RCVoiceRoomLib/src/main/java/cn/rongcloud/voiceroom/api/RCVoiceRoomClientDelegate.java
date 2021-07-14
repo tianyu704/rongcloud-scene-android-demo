@@ -37,7 +37,7 @@ interface RCVoiceRoomClientDelegate {
         void onDatabaseOpened(int code);
     }
 
-    public interface SendMessageCallback {
+    interface SendMessageCallback {
         void onAttached(Message message);
 
         void onSuccess(Message message);

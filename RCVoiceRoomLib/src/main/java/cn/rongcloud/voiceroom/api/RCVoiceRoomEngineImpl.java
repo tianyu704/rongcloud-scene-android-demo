@@ -84,9 +84,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     private RCVoiceRoomInfo mRoomInfo;
 
-    private IRCRTCVoiceRoomEventsListener mVREventListener;
+    private final IRCRTCVoiceRoomEventsListener mVREventListener;
 
-    private VoiceStatusReportListener mVoiceStatusReportListener = new VoiceStatusReportListener();
+    private final VoiceStatusReportListener mVoiceStatusReportListener = new VoiceStatusReportListener();
 
     /**
      * 采用 map 和 list 双集合保存，map 用于记录在座位上的人，用于快速查询，list 用于记录位置信息

@@ -21,8 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.evaluator.CurveEvaluatorRecord;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;

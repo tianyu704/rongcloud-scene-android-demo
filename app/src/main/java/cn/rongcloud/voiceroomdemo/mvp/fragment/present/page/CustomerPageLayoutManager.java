@@ -40,11 +40,11 @@ public class CustomerPageLayoutManager extends RecyclerView.LayoutManager implem
     private int mOffsetX = 0;                       // 水平滚动距离(偏移量)
     private int mOffsetY = 0;                       // 垂直滚动距离(偏移量)
 
-    private int mRows;                              // 行数
-    private int mColumns;                           // 列数
-    private int mOnePageSize;                       // 一页的条目数量
+    private final int mRows;                              // 行数
+    private final int mColumns;                           // 列数
+    private final int mOnePageSize;                       // 一页的条目数量
 
-    private SparseArray<Rect> mItemFrames;          // 条目的显示区域
+    private final SparseArray<Rect> mItemFrames;          // 条目的显示区域
 
     private int mItemWidth  = 0;                     // 条目宽度
     private int mItemHeight = 0;                    // 条目高度

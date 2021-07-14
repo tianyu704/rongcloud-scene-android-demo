@@ -8,5 +8,4 @@ package cn.rongcloud.voiceroomdemo.throwable
  * @author gusd
  * @Date 2021/06/18
  */
-class NotFoundMemberException:Throwable("not find member in this room") {
-}
+class NotFoundMemberException:Throwable("not find member in this room")

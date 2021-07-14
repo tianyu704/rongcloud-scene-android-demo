@@ -14,8 +14,6 @@ import androidx.recyclerview.widget.SnapHelper;
 
 import org.jetbrains.annotations.NotNull;
 
-import static cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.PagerConfig.Loge;
-
 
 public class PagerSnapHelper extends SnapHelper {
     private RecyclerView mRecyclerView;                     // RecyclerView

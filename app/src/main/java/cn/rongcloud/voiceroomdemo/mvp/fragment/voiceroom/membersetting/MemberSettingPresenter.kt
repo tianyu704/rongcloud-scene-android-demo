@@ -53,7 +53,7 @@ class MemberSettingPresenter(
             roomInfoBean.createUser?.userId == AccountStore.getUserId(),
             roomModel.isAdmin(AccountStore.getUserId()!!)
         )
-        view.thisUserIsOnSeat(member.seatIndex,roomModel.isAdmin(AccountStore.getUserId()!!))
+        view.thisUserIsOnSeat(member.seatIndex, roomModel.isAdmin(AccountStore.getUserId()!!))
         view.thisUserIsAdmin(member.isAdmin)
         view.thisUserIsMute(roomModel.getSeatInfoByUserId(member.userId)?.isMute ?: false)
     }
@@ -131,6 +131,10 @@ class MemberSettingPresenter(
                 .setAdmin(member.userId, !member.isAdmin)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ isSuccess ->
+                    if (!isSuccess) {
+                        view.showError("设置失败")
+                        view.fragmentDismiss()
+                    }
                 }, { t ->
                     view.showError(t.message)
                 })

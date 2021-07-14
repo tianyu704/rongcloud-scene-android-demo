@@ -15,7 +15,7 @@ const val MUSIC_FROM_TYPE_LOCAL = 1
 const val MUSIC_FROM_TYPE_SYSTEM = 2
 const val MUSIC_FUNCTION_LOCAL_ADD = -1
 
-class UiMusicModel() {
+class UiMusicModel {
     var author: String? = null
     var createDt: Long? = null
     var id: Int? = null

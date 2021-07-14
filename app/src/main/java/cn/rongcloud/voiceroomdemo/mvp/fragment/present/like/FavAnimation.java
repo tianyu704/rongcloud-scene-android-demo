@@ -23,8 +23,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.evaluator.CurveEvaluatorRecord;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +40,7 @@ public class FavAnimation {
     private final static int MAX_SIZE = 150;
     private final List<Integer> mLikeRes = new ArrayList<>();
     protected final Random mRandom = new Random();
-    private Context context;
+    private final Context context;
     protected CurveEvaluatorRecord mEvaluatorRecord;
     protected List<AnimatorSet> mAnimatorSets = new ArrayList<>();
 

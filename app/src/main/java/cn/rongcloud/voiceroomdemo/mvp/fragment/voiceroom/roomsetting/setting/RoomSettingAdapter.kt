@@ -16,7 +16,7 @@ import kotlinx.android.synthetic.main.layout_room_setting_item.view.*
  * @author gusd
  * @Date 2021/06/22
  */
-class RoomSettingAdapter() :
+class RoomSettingAdapter :
     RecyclerView.Adapter<RoomSettingViewHolder>() {
     private val functionList: ArrayList<BaseFunctionModel> = arrayListOf()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomSettingViewHolder {

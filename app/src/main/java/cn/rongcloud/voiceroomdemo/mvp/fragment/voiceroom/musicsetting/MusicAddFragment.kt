@@ -41,10 +41,6 @@ class MusicAddFragment(view: IMusicAddView, val roomId: String) :
 
     }
 
-    override fun initData() {
-        super.initData()
-    }
-
     override fun showMusicList(list: List<UiMusicModel>) {
         ui {
             (rv_list.adapter as MyAdapter).refreshData(list)

@@ -32,29 +32,29 @@ object AccountStore {
     }
 
 
-    public fun saveAccountInfo(info: AccountInfo?) {
+    fun saveAccountInfo(info: AccountInfo?) {
         currentInfo = info ?: EMPTY_ACCOUNT
         MyApp.context.putValue(ACCOUNT_INFO, currentInfo.toJson())
     }
 
-    public fun getAccountInfo(): AccountInfo = currentInfo
+    fun getAccountInfo(): AccountInfo = currentInfo
 
 
-    public fun getImToken() = getAccountInfo().imToken
+    fun getImToken() = getAccountInfo().imToken
 
 
-    public fun getUserName() = getAccountInfo().userName
+    fun getUserName() = getAccountInfo().userName
 
 
-    public fun getAuthorization() = getAccountInfo().authorization
+    fun getAuthorization() = getAccountInfo().authorization
 
 
-    public fun getUserPortrait() = getAccountInfo().portrait
+    fun getUserPortrait() = getAccountInfo().portrait
 
-    public fun getUserId() = getAccountInfo().userId
+    fun getUserId() = getAccountInfo().userId
 
     // 登出监听
-    public fun obLogoutSubject(): Observable<Boolean> =
+    fun obLogoutSubject(): Observable<Boolean> =
         MyApp.context.obValue(ACCOUNT_INFO)
             .filter {
                 it.isNullOrEmpty() || it == ACCOUNT_INFO.defaultValue
@@ -63,13 +63,13 @@ object AccountStore {
             }.observeOn(AndroidSchedulers.mainThread())
 
     // 登出
-    public fun logout() {
+    fun logout() {
 
         saveAccountInfo(EMPTY_ACCOUNT)
     }
 
     // 监听账号信息发生变化
-    public fun obAccountInfoChange(): Observable<AccountInfo> =
+    fun obAccountInfoChange(): Observable<AccountInfo> =
         MyApp.context.obValue(ACCOUNT_INFO).map {
             return@map JsonUtils.fromJson(it, AccountInfo::class.java) ?: EMPTY_ACCOUNT
         }.observeOn(AndroidSchedulers.mainThread())

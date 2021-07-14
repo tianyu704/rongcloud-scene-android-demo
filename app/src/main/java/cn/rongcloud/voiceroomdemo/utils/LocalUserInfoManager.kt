@@ -66,14 +66,14 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
             }
     }
 
-    public fun getMemberByUserId(userId: String?): Member? {
+    fun getMemberByUserId(userId: String?): Member? {
         if (userId.isNullOrEmpty()) {
             return null
         }
         return cache.get(userId)
     }
 
-    public fun addUserInfoToCache(member: Member) {
+    fun addUserInfoToCache(member: Member) {
         cache.put(member.userId, member)
     }
 

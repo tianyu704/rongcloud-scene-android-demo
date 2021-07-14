@@ -9,6 +9,6 @@ package cn.rongcloud.voiceroomdemo.common
  * @Date 2021/06/07
  */
 object DataStoreKeys{
-    public val DEVICE_ID_KEY by myStringPreferencesKey("")
+    val DEVICE_ID_KEY by myStringPreferencesKey("")
 
 }

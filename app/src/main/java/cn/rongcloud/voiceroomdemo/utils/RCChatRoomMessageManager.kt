@@ -99,7 +99,7 @@ object RCChatRoomMessageManager {
         roomId: String,
         message: String
     ) {
-        messageSubject.onNext(MessageWrapperModel(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage()
+        messageSubject.onNext(MessageWrapperModel(roomId, RCChatroomLocationMessage()
             .apply {
             content = message
         }))

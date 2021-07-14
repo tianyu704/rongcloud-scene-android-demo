@@ -10,7 +10,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import io.rong.imlib.MessageTag;
@@ -30,11 +29,7 @@ public class RCChatroomSeats extends MessageContent {
     public RCChatroomSeats(byte[] data) {
         super(data);
         String jsonStr = null;
-        try {
-            jsonStr = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            Log.e(TAG, "UnsupportedEncodingException ", e);
-        }
+        jsonStr = new String(data, StandardCharsets.UTF_8);
 
         try {
             JSONObject jsonObj = new JSONObject(jsonStr);

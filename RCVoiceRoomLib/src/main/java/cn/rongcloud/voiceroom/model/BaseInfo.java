@@ -4,8 +4,6 @@
 
 package cn.rongcloud.voiceroom.model;
 
-import com.google.gson.Gson;
-
 import cn.rongcloud.voiceroom.utils.JsonUtils;
 
 /**

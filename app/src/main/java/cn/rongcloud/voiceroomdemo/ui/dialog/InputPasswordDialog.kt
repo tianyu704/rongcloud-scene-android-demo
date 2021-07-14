@@ -33,10 +33,6 @@ class InputPasswordDialog(
         }
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-    }
-
 
     override fun initView() {
         if (isSettingPassword == true) {

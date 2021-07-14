@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
  * @author gusd
  * @Date 2021/06/22
  */
-abstract class BaseFunctionModel() {
+abstract class BaseFunctionModel {
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private val dataChangeSubject = BehaviorSubject.create<FunctionDataModel>()

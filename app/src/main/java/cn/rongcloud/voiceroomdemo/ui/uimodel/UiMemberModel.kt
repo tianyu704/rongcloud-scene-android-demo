@@ -42,7 +42,6 @@ class UiMemberModel(
         }
 
     var isAdmin: Boolean = false
-        get() = field
         set(value) {
             if (value != field) {
                 field = value
@@ -50,7 +49,6 @@ class UiMemberModel(
             }
         }
     var giftCount: Int = 0
-        get() = field
         set(value) {
             if (value != field) {
                 field = value
@@ -62,7 +60,6 @@ class UiMemberModel(
      * 正在请求麦位
      */
     var isRequestSeat: Boolean = false
-        get() = field
         set(value) {
             if (value != field) {
                 field = value
@@ -74,7 +71,6 @@ class UiMemberModel(
      * 正在被邀请上麦
      */
     var isInvitedInfoSeat: Boolean = false
-        get() = field
         set(value) {
             if (value != field) {
                 field = value
@@ -83,7 +79,6 @@ class UiMemberModel(
         }
 
     var seatIndex: Int = -1
-        get() = field
         set(value) {
             if (value != field) {
                 if (value != -1) {

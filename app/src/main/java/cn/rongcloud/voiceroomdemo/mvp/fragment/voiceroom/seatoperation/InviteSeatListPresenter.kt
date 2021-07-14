@@ -21,10 +21,6 @@ class InviteSeatListPresenter(val view: IInviteSeatListView, roomId: String) :
         getVoiceRoomModelByRoomId(roomId)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onResume() {
         super.onResume()
         addDisposable(

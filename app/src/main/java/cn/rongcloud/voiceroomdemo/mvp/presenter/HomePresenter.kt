@@ -29,7 +29,7 @@ class HomePresenter(val view: IHomeView, val context: Context) :
     fun modifyUserInfo(userName: String, selectedPicPath: Uri?) {
         view.showWaitingDialog()
         if (selectedPicPath!=null) {
-            addDisposable(FileModel.imageUpload(cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils.getRealPathFromUri(context,selectedPicPath), context).flatMap { url ->
+            addDisposable(FileModel.imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,selectedPicPath), context).flatMap { url ->
                 return@flatMap RetrofitManager.commonService.updateUserInfo(
                     UpdateUserInfoRequestBean(
                         userName,

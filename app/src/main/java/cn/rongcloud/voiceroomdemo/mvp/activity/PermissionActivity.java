@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import cn.rongcloud.voiceroomdemo.utils.PermissionUtil;
-
 import org.jetbrains.annotations.NotNull;
 
 import cn.rongcloud.voiceroomdemo.utils.PermissionUtil;
@@ -56,7 +54,7 @@ public abstract class PermissionActivity extends AppCompatActivity {
         if (requestCode == AppSettingsDialog.DEFAULT_SETTINGS_REQ_CODE) {
             //从设置页面返回，判断权限是否申请。
             String[] ps = onSetPermissions();
-            if (ps == null){
+            if (ps == null) {
                 return;
             }
             boolean accept = PermissionUtil.hasPermissions(this, ps);

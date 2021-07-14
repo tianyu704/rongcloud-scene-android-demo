@@ -21,7 +21,7 @@ class BackgroundSettingAdapter(private val listener: (url: String) -> Unit) :
     RecyclerView.Adapter<BackgroundSettingViewHolder>() {
 
     private val data = arrayListOf<String>()
-    public var currentSelectedBackground: String? = null
+    var currentSelectedBackground: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BackgroundSettingViewHolder {
         return BackgroundSettingViewHolder(

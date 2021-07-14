@@ -24,7 +24,7 @@ import cn.rongcloud.voiceroomdemo.R;
 public class RTCNotificationService extends Service {
 
     private static final String CHANNEL_ID = "RTCNotificationService";
-    private int notifyId = 20200202;
+    private final int notifyId = 20200202;
     private NotificationManager manager;
 
     private void init() {

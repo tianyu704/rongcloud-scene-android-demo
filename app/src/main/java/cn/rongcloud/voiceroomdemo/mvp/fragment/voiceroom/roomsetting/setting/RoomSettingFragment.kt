@@ -43,7 +43,7 @@ class RoomSettingFragment(
         iv_close.setOnClickListener {
             dismiss()
         }
-        val itemDecoration = cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration(
+        val itemDecoration = GridSpacingItemDecoration(
             (rv_function_list.layoutManager as GridLayoutManager).spanCount,
             resources.getDimensionPixelSize(R.dimen.background_setting_decoration), true
         )

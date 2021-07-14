@@ -30,9 +30,9 @@ import java.util.concurrent.TimeUnit
  */
 private const val TAG = "VoiceRoomPresenter"
 
-public const val STATUS_ON_SEAT = 0
-public const val STATUS_NOT_ON_SEAT = 1
-public const val STATUS_WAIT_FOR_SEAT = 2
+const val STATUS_ON_SEAT = 0
+const val STATUS_NOT_ON_SEAT = 1
+const val STATUS_WAIT_FOR_SEAT = 2
 
 class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     BaseLifeCyclePresenter<IVoiceRoomView>(view), IRongCoreListener.OnReceiveMessageListener {
@@ -515,9 +515,6 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         return true
     }
 
-    fun setAdmin(userId: String, isAdmin: Boolean) {
-        roomModel.setAdmin(userId, isAdmin)
-    }
 
     fun refuseInvite(userId: String) {
         RCVoiceRoomEngine.getInstance()

@@ -36,7 +36,7 @@ class ConfirmDialog(
 
     override fun initView() {
         tv_message.text = message
-        btn_cancel.text = cancel;
-        btn_confirm.text = confirm;
+        btn_cancel.text = cancel
+        btn_confirm.text = confirm
     }
 }

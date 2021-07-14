@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import io.rong.common.RLog;
@@ -32,11 +31,7 @@ public class RCVoiceRoomRefreshMessage extends MessageContent {
     public RCVoiceRoomRefreshMessage(byte[] data) {
         super(data);
         String jsonStr = null;
-        try {
-            jsonStr = new String(data, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            RLog.e(TAG, "UnsupportedEncodingException ", e);
-        }
+        jsonStr = new String(data, StandardCharsets.UTF_8);
 
         try {
             JSONObject jsonObj = new JSONObject(jsonStr);

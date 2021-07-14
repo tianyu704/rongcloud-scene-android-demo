@@ -11,8 +11,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Objects;
 
-import cn.rongcloud.rtc.base.RCRTCParamsType;
-
 /**
  * @author gusd
  * @Date 2021/05/31

@@ -10,5 +10,4 @@ import cn.rongcloud.voiceroomdemo.common.IBaseView
  * @author gusd
  * @Date 2021/07/05
  */
-interface IMusicSettingView:IBaseView {
-}
+interface IMusicSettingView:IBaseView

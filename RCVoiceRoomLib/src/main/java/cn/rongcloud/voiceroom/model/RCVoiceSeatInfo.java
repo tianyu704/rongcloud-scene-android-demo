@@ -7,10 +7,7 @@ package cn.rongcloud.voiceroom.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-
-import java.util.Objects;
 
 /**
  * 麦位信息

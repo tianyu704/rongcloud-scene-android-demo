@@ -40,7 +40,7 @@ class SendPresentFragment(
     }
 
     val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId);
+        getVoiceRoomModelByRoomId(roomId)
     }
     var members: List<UiMemberModel> = ArrayList()
 
@@ -64,7 +64,7 @@ class SendPresentFragment(
             }
         }
         btn_send.setOnClickListener {
-            presenter.sendPresent(presenter.selects?.size == members?.size && presenter.selects.size != 1)
+            presenter.sendPresent(presenter.selects.size == members.size && presenter.selects.size != 1)
         }
         btn_num.setOnClickListener {
             NumPopupWindow(
@@ -91,7 +91,7 @@ class SendPresentFragment(
         var res = R.drawable.ic_up
         if (showPop) res = R.drawable.ic_down
         btn_num.setCompoundDrawablesWithIntrinsicBounds(0, 0, res, 0)
-        btn_num.compoundDrawablePadding = UiUtils.dp2Px(requireContext(), 1f);
+        btn_num.compoundDrawablePadding = UiUtils.dp2Px(requireContext(), 1f)
     }
 
     /**
@@ -99,7 +99,7 @@ class SendPresentFragment(
      * 非全选：文案 全选 isSelected = true
      */
     fun updateBtnAll() {
-        var isAll = presenter.selects?.size == members?.size
+        var isAll = presenter.selects.size == members.size
         btn_selectall.isSelected = !isAll
         btn_selectall.text = if (isAll) "取消" else "全选"
     }
@@ -130,13 +130,13 @@ class SendPresentFragment(
         }
         vp_present.setHasFixedSize(true)
         val pageLayoutManager =
-            cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager(
+            CustomerPageLayoutManager(
                 2,
                 4,
                 HORIZONTAL
             )
-        pageLayoutManager.setAllowContinuousScroll(false)
-        pageLayoutManager.setPageListener(object : cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager.PageListener {
+        pageLayoutManager.isAllowContinuousScroll = false
+        pageLayoutManager.setPageListener(object : CustomerPageLayoutManager.PageListener {
             override fun onPageSizeChanged(pageSize: Int) {}
             override fun onItemVisible(fromItem: Int, toItem: Int) {}
             override fun onPageSelect(pageIndex: Int) {
@@ -197,7 +197,7 @@ class SendPresentFragment(
 
     override fun onPresentInited(members: List<Present>) {
         ui {
-            (vp_present.adapter as RcySAdapter<Present, RcyHolder>).setData(members, true);
+            (vp_present.adapter as RcySAdapter<Present, RcyHolder>).setData(members, true)
         }
     }
 

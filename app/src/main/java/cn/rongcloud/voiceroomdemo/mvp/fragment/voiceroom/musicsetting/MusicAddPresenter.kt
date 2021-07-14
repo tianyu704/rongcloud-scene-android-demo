@@ -69,7 +69,7 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
     }
 
     fun addMusicFromLocal(context: Context, uri: Uri) {
-        val realPath = cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils.getRealPathFromUri(context, uri)
+        val realPath = RealPathFromUriUtils.getRealPathFromUri(context, uri)
         if (!realPath.endsWith("mp3", true)
             && !realPath.endsWith("aac")
             && !realPath.endsWith("m4a", true)

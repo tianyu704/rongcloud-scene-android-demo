@@ -42,7 +42,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (data[position] is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage) MESSAGE_TYPE_SYSTEM else MESSAGE_TYPE_NORMAL
+        return if (data[position] is RCChatroomLocationMessage) MESSAGE_TYPE_SYSTEM else MESSAGE_TYPE_NORMAL
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -58,7 +58,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == MESSAGE_TYPE_SYSTEM) {
-            (holder as SystemMessageViewHolder).bind(data[position] as cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage)
+            (holder as SystemMessageViewHolder).bind(data[position] as RCChatroomLocationMessage)
         } else {
             (holder as NormalMessageViewHolder).bind(data[position], roomModel, listener)
         }
@@ -75,7 +75,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
 
 
     class SystemMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(message: cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage) {
+        fun bind(message: RCChatroomLocationMessage) {
             with(itemView) {
                 tv_message_content.text = message.content
             }
@@ -84,7 +84,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
 
     class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun updateRole(userId: String, view: TextView, roomModel: VoiceRoomModel) {
-            if (roomModel.currentUIRoomInfo?.roomBean?.createUser?.userId == userId) {
+            if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId == userId) {
                 view.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.ic_creator,
                     0,
@@ -92,8 +92,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                     0
                 )
                 view.compoundDrawablePadding = 2
-            } else if (roomModel.getMemberInfoByUserIdOnlyLocal(userId)?.isAdmin
-                    ?: false
+            } else if (roomModel.getMemberInfoByUserIdOnlyLocal(userId)?.isAdmin == true
             ) {
                 view.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.ic_is_admin,
@@ -116,34 +115,34 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                 )
                 tv_message_content.compoundDrawablePadding = 0
                 when (message) {
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomBarrage -> {
+                    is RCChatroomBarrage -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
                         list.add(MsgInfo("${message.content}", "", false))
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomEnter -> {
+                    is RCChatroomEnter -> {
                         list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo("进来了", "", false))
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomKickOut -> {
+                    is RCChatroomKickOut -> {
                         list.add(MsgInfo("${message.targetName} 被 ", "", false))
                         list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo(" 踢出去了", "", false))
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGiftAll -> {
+                    is RCChatroomGiftAll -> {
                         list.add(MsgInfo("${message.userName} ", message.userId, true))
                         list.add(MsgInfo("全麦打赏 ${message.giftName} x${message.number}", "", false))
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGift -> {
+                    is RCChatroomGift -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
                         list.add(MsgInfo(" 送给 ", "", false))
                         list.add(MsgInfo("${message.targetName} ", message.targetId, true))
                         list.add(MsgInfo(" ${message.giftName} x${message.number}", "", false))
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomAdmin -> {
+                    is RCChatroomAdmin -> {
                         list.add(MsgInfo("${message.userName}: ", message.userId, true))
                         list.add(
                             MsgInfo(
@@ -154,16 +153,16 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                         )
                         updateRole(message.userId, tv_message_content, roomModel)
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomSeats -> {
+                    is RCChatroomSeats -> {
                         list.add(MsgInfo("房间更换为 ${message.count} 座模式，请重新上麦"))
                     }
-                    is cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLocationMessage -> {
+                    is RCChatroomLocationMessage -> {
                         list.add(MsgInfo(message.content, "", false))
                         Log.e("LocationMessage","RCChatroomLocationMessage")
                     }
                 }
                 tv_message_content.text = styleBuilder(list, listener)
-                tv_message_content.setMovementMethod(LinkMovementMethod.getInstance())
+                tv_message_content.movementMethod = LinkMovementMethod.getInstance()
             }
         }
 
@@ -185,7 +184,7 @@ class VoiceRoomMessageAdapter(roomId: String, val listener: (String) -> Unit) :
                         }
 
                         override fun updateDrawState(ds: TextPaint) {
-                            ds.setUnderlineText(false)
+                            ds.isUnderlineText = false
                         }
                     }, info.start, info.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                     style.setSpan(

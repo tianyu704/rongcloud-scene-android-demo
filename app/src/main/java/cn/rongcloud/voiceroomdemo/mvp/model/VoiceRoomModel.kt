@@ -55,20 +55,20 @@ val EMPTY_ROOM_INFO: VoiceRoomBean = VoiceRoomBean(roomId = "")
 
 private const val TAG = "VoiceRoomModel"
 
-public const val EVENT_ROOM_CLOSE = "VoiceRoomClosed"
-public const val EVENT_BACKGROUND_CHANGE = "VoiceRoomBackgroundChanged"
-public const val EVENT_MANAGER_LIST_CHANGE = "VoiceRoomNeedRefreshManagerList"
-public const val EVENT_REJECT_MANAGE_PICK = "VoiceRoomRejectManagePick" // 拒绝上麦
-public const val EVENT_AGREE_MANAGE_PICK = "VoiceRoomAgreeManagePick" // 同意上麦
+const val EVENT_ROOM_CLOSE = "VoiceRoomClosed"
+const val EVENT_BACKGROUND_CHANGE = "VoiceRoomBackgroundChanged"
+const val EVENT_MANAGER_LIST_CHANGE = "VoiceRoomNeedRefreshManagerList"
+const val EVENT_REJECT_MANAGE_PICK = "VoiceRoomRejectManagePick" // 拒绝上麦
+const val EVENT_AGREE_MANAGE_PICK = "VoiceRoomAgreeManagePick" // 同意上麦
 
-public const val EVENT_KICK_OUT_OF_SEAT = "EVENT_KICK_OUT_OF_SEAT"
-public const val EVENT_REQUEST_SEAT_REFUSE = "EVENT_REQUEST_SEAT_REFUSE"
-public const val EVENT_REQUEST_SEAT_AGREE = "EVENT_REQUEST_SEAT_AGREE"
+const val EVENT_KICK_OUT_OF_SEAT = "EVENT_KICK_OUT_OF_SEAT"
+const val EVENT_REQUEST_SEAT_REFUSE = "EVENT_REQUEST_SEAT_REFUSE"
+const val EVENT_REQUEST_SEAT_AGREE = "EVENT_REQUEST_SEAT_AGREE"
 
-public const val EVENT_REQUEST_SEAT_CANCEL = "EVENT_REQUEST_SEAT_CANCEL"
+const val EVENT_REQUEST_SEAT_CANCEL = "EVENT_REQUEST_SEAT_CANCEL"
 
 
-public const val EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM"
+const val EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM"
 
 
 class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
@@ -149,9 +149,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     val currentUIRoomInfo = UiRoomModel(roomInfoSubject)
 
     var recordingStatus = true
-        get() {
-            return field
-        }
         private set(value) {
             field = value
             recordingStatusSubject.onNext(value)
@@ -322,7 +319,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             .observeOn(dataModifyScheduler)
             .map {
                 if (it.code == 10000) {
-                    RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomAdmin()
+                    RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomAdmin()
                         .apply {
                         this.userId = userId
                         this.userName = getMemberInfoByUserIdOnlyLocal(userId)?.userName
@@ -515,7 +512,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
                 override fun onSuccess() {
                     pushRoomSettingToServer(setSeatNumber = count)
-                    RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomSeats()
+                    RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomSeats()
                         .apply {
                         this.count = count - 1
                     })
@@ -1020,7 +1017,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                                 member?.let {
                                     RCChatRoomMessageManager.sendChatMessage(
                                         roomId,
-                                        cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomKickOut()
+                                        RCChatroomKickOut()
                                             .apply {
                                             this.userId = AccountStore.getUserId()
                                             this.userName = AccountStore.getUserName()
@@ -1239,7 +1236,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         isAll: Boolean
     ) {
         if (isAll) {
-            RCChatRoomMessageManager.sendChatMessage(roomId, cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGiftAll()
+            RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomGiftAll()
                 .apply {
                 userId = AccountStore.getUserId()
                 userName = AccountStore.getUserName()
@@ -1251,7 +1248,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         } else {
             RCChatRoomMessageManager.sendChatMessages(roomId,
                 members.map { member ->
-                    return@map cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGift().apply {
+                    return@map RCChatroomGift().apply {
                         userId = AccountStore.getUserId()
                         userName = AccountStore.getUserName()
                         targetId = member.userId

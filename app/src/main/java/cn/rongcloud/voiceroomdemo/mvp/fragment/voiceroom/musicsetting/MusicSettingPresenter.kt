@@ -25,7 +25,7 @@ class MusicSettingPresenter(roomId: String, view: IMusicSettingView) :
     }
 
     fun getMusicAtmosphereIndexByName(name: String): Int {
-        return AudioEffectManager.getMusicAtmosphereIndexByName(name);
+        return AudioEffectManager.getMusicAtmosphereIndexByName(name)
     }
 
     override fun onCreate() {

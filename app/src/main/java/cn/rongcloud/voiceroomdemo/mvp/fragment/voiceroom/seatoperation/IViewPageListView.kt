@@ -10,5 +10,4 @@ import cn.rongcloud.voiceroomdemo.common.IBaseView
  * @author gusd
  * @Date 2021/06/24
  */
-interface IViewPageListView:IBaseView {
-}
+interface IViewPageListView:IBaseView

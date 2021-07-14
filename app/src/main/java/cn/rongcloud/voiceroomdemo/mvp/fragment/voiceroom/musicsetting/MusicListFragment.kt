@@ -37,10 +37,6 @@ class MusicListFragment(val view: IMusicListView, val roomId: String) :
         }
     }
 
-    override fun initData() {
-        super.initData()
-    }
-
     override fun showMusicList(musicList: List<UiMusicModel>) {
         super.showMusicList(musicList)
         if (musicList.isEmpty()) {

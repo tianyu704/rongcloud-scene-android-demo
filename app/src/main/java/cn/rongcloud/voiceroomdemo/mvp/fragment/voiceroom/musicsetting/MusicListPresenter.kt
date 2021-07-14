@@ -19,10 +19,6 @@ class MusicListPresenter(val view: IMusicListView, roomId: String) :
         getVoiceRoomModelByRoomId(roomId)
     }
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     override fun onStart() {
         super.onStart()
         addDisposable(

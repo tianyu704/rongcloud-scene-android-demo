@@ -26,7 +26,7 @@ class LauncherActivity : cn.rongcloud.voiceroomdemo.mvp.activity.PermissionActiv
     }
 
     override fun onSetPermissions(): Array<String> {
-        return PERMISSIONS;
+        return PERMISSIONS
     }
 
     override fun onAccept(accept: Boolean) {

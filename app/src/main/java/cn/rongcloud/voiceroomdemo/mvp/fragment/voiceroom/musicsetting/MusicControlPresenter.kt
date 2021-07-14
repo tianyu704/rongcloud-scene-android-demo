@@ -10,5 +10,4 @@ import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicControlPresenter(view:IMusicControlView):BaseLifeCyclePresenter<IMusicControlView>(view) {
-}
+class MusicControlPresenter(view:IMusicControlView):BaseLifeCyclePresenter<IMusicControlView>(view)

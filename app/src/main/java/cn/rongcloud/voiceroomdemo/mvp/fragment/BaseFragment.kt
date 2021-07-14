@@ -53,7 +53,7 @@ abstract class BaseFragment<P : BaseLifeCyclePresenter<V>, V : IBaseView>(@Layou
 
     abstract fun initView()
 
-    public open fun getTitle():String{
+    open fun getTitle():String{
         return ""
     }
 }

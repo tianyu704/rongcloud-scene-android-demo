@@ -39,7 +39,7 @@ class RequestSeatListFragment(view: IRequestSeatListView, val roomId: String) :
         (rv_list.adapter as? MyAdapter)?.refreshData(list)
     }
 
-    private inner class MyAdapter() : BaseListAdapter<MyViewHolder>() {
+    private inner class MyAdapter : BaseListAdapter<MyViewHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
             return MyViewHolder(parent)
         }

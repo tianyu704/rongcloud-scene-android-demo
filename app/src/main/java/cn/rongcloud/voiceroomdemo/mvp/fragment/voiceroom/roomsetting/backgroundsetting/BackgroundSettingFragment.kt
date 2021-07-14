@@ -31,7 +31,7 @@ class BackgroundSettingFragment(
     }
 
     override fun initView() {
-        val itemDecoration = cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration(
+        val itemDecoration = GridSpacingItemDecoration(
             (rv_background_list.layoutManager as GridLayoutManager).spanCount,
             resources.getDimensionPixelSize(R.dimen.background_setting_decoration), true
         )
