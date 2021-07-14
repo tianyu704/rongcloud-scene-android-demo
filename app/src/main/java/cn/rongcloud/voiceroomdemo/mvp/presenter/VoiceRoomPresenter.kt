@@ -133,6 +133,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 it.forEach { member ->
                     roomModel.getSeatInfoByUserId(member.userId)?.member = member
                 }
+                view.onMemberInfoChange()
             })
 
         // 监听房间成员信息变化
@@ -140,7 +141,6 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             .obMemberInfoChange()
             .subscribe {
                 Log.d(TAG, "onCreate: obMemberInfoChange")
-                view.onMemberInfoChange()
                 roomModel.getSeatInfoByUserId(it.userId)?.member = it
                 if (it.userId == AccountStore.getUserId()) {
                     // 监听当前用户是否为管理员
@@ -201,9 +201,6 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                                 if(member?.member == null){
                                     roomModel.refreshAllMemberInfoList()
                                 }
-                            }
-                            if(it is RCChatroomAdmin){
-                                roomModel.noticeMemberListUpdate()
                             }
                         }
                         is RCChatroomLike -> {
@@ -329,9 +326,6 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
         }
     }
 
-    fun getMemberInfo(userId: String, result: (UiMemberModel) -> Unit) {
-//        addDisposable(roomModel.)
-    }
 
     fun joinRoom() {
         Log.d(TAG, "joinRoom: ${roomId}")

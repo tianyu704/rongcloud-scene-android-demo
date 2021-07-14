@@ -230,8 +230,10 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     }
 
     override fun onMemberInfoChange() {
-        // 刷新角色变化
-        rv_message_list?.adapter?.notifyDataSetChanged()
+        ui {
+            // 刷新角色变化
+            rv_message_list?.adapter?.notifyDataSetChanged()
+        }
     }
 
     private fun showSoftKeyBoard() {

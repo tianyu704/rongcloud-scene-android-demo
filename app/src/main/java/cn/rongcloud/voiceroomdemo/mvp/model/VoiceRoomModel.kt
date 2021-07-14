@@ -810,6 +810,7 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                             adminList.firstOrNull { admin -> admin.userId == member.userId } != null
                     }
                 }
+                noticeMemberListUpdate()
             })
     }
 
