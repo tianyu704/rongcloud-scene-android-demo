@@ -198,7 +198,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                             if(it is RCChatroomEnter) {
                                 val member =
                                     roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
-                                if(member == null){
+                                if(member?.member == null){
                                     roomModel.refreshAllMemberInfoList()
                                 }
                             }
