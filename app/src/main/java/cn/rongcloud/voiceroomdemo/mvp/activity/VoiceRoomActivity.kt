@@ -236,6 +236,11 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
     }
 
+    override fun onLogout() {
+        presenter.leaveRoom()
+        super.onLogout()
+    }
+
     private fun showSoftKeyBoard() {
         et_message.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

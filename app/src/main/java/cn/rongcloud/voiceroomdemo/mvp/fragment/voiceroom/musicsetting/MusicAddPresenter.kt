@@ -65,7 +65,7 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
     }
 
     fun getSupportFileTypeMime(): Array<String> {
-        return arrayOf("audio/x-mpeg", "audio/aac", "audio/mp4a-latm", "audio/x-wav")
+        return arrayOf("audio/x-mpeg", "audio/aac", "audio/mp4a-latm", "audio/x-wav","audio/ogg","audio/3gpp")
     }
 
     fun addMusicFromLocal(context: Context, uri: Uri) {
@@ -74,6 +74,8 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
             && !realPath.endsWith("aac")
             && !realPath.endsWith("m4a", true)
             && !realPath.endsWith("wav", true)
+            && !realPath.endsWith("ogg", true)
+            && !realPath.endsWith("amr", true)
         ) {
             view.showError("仅支持 MP3、AAC、M4A、WAV 格式文件")
             return

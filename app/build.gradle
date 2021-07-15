@@ -135,4 +135,8 @@ dependencies {
 
     //adapter
     implementation 'com.github.lbasis:adapter:1.0.1'
+
+
+    implementation 'cn.rongcloud.sdk:im_lib:5.1.2'
+    implementation 'cn.rongcloud.sdk:rtc_lib:5.1.2'
 }

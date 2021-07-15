@@ -44,6 +44,8 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 
     var currentStatus = STATUS_NOT_ON_SEAT
 
+    private lateinit var currentUserId:String
+
 
     private var hasInit = false
 
@@ -61,6 +63,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                         initRoomEventListener()
                         joinRoom()
                         afterInitView()
+                        currentUserId = AccountStore.getUserId()?:""
                     } else {
                         view.refreshRoomInfo(roomInfo)
                     }
@@ -361,7 +364,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 
     fun leaveRoom() {
         roomModel.onLeaveRoom()
-        val index = roomModel.isInSeat(AccountStore.getUserId()!!)
+        val index = roomModel.isInSeat(currentUserId)
         if (index > -1) {
             RCVoiceRoomEngine.getInstance().leaveSeat(object : RCVoiceRoomCallback {
                 override fun onError(code: Int, message: String?) {

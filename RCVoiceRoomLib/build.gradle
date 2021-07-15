@@ -16,7 +16,7 @@ android {
         minSdkVersion ANDROID_BUILD_MIN_SDK_VERSION
         targetSdkVersion ANDROID_BUILD_TARGET_SDK_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionName "4.0.3.1"
+        versionName "0.0.1"
 
         //Android单元测试
         multiDexEnabled true
@@ -58,8 +58,8 @@ android {
 }
 
 dependencies {
-    api 'cn.rongcloud.sdk:im_lib:5.1.2'
+    compileOnly 'cn.rongcloud.sdk:im_lib:5.1.2'
+    compileOnly 'cn.rongcloud.sdk:rtc_lib:5.1.2'
     compileOnly 'cn.rongcloud.sdk:im_kit:5.1.2'
-    api 'cn.rongcloud.sdk:rtc_lib:5.1.2'
 }
 
