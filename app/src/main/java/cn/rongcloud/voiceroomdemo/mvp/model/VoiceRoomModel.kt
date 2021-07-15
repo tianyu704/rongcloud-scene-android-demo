@@ -612,6 +612,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         doOnDataScheduler {
             Log.d(TAG, "onAudienceExit: userId = $userId")
             getOnLineUsersCount()
+            roomMemberInfoMap[userId]?.let {
+                roomMemberInfoList.remove(it)
+                roomMemberInfoMap.remove(userId)
+            }
         }
     }
 

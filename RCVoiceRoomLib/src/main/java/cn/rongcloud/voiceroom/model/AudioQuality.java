@@ -15,23 +15,14 @@ public enum AudioQuality {
     /**
      * 人声音质，编码码率最大值为32Kbps
      */
-    SPEECH(32),
+    SPEECH,
     /**
      * 标清音乐音质，编码码率最大值为64Kbps
      */
-    MUSIC(64),
+    MUSIC,
     /**
      * 高清音乐音质，编码码率最大值为128Kbps
      */
-    MUSIC_HIGH(128);
+    MUSIC_HIGH;
 
-    int bitrate;
-
-    AudioQuality(int bitrate) {
-        this.bitrate = bitrate;
-    }
-
-    public int getBitrate() {
-        return bitrate;
-    }
 }

@@ -29,15 +29,20 @@ public class RCVoiceRoomInfo extends BaseInfo implements Parcelable, Cloneable {
     private int mSeatCount;
 
     /**
-     * 是否可以自由上麦
+     * 是否可以自由上麦，状态标记，直接修改不会自动触发锁麦操作
      */
     @SerializedName("isFreeEnterSeat")
     private boolean isFreeEnterSeat;
 
-
+    /**
+     * 房间麦位锁定状态，状态标记，直接修改不会自动触发锁麦操作
+     */
     @SerializedName("isLockAll")
     private boolean isLockAll;
 
+    /**
+     * 房间麦位静音状态，状态标记，直接修改不会自动触发静音麦位操作
+     */
     @SerializedName("isMuteAll")
     private boolean isMuteAll;
 
