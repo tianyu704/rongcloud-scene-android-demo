@@ -12,6 +12,8 @@ import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
+import cn.rongcloud.voiceroom.model.AudioQuality;
+import cn.rongcloud.voiceroom.model.AudioScenario;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.MessageContent;
@@ -210,8 +212,7 @@ public abstract class RCVoiceRoomEngine {
      * @param audioQuality 音频质量
      * @param scenario     音频场景
      */
-    // TODO: 2021/6/29 再封装，不暴露 RTC
-    public abstract void setAudioQuality(RCRTCParamsType.AudioQuality audioQuality, RCRTCParamsType.AudioScenario scenario);
+    public abstract void setAudioQuality(AudioQuality audioQuality, AudioScenario scenario);
 
     /**
      * 是否使用扬声器

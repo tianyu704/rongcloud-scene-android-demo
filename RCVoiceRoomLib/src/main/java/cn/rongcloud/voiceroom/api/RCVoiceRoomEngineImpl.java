@@ -39,6 +39,8 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomBaseCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
+import cn.rongcloud.voiceroom.model.AudioQuality;
+import cn.rongcloud.voiceroom.model.AudioScenario;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.model.VoiceRoomErrorCode;
@@ -289,7 +291,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void enterSeat(final int seatIndex, final RCVoiceRoomCallback callback) {
-        if (!seatIndexInRange(seatIndex)){
+        if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
         }
@@ -336,7 +338,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     @Override
     public void leaveSeat(final RCVoiceRoomCallback callback) {
         final int seatIndex = getSeatIndexByUserId(mCurrentUserId);
-        if (!seatIndexInRange(seatIndex)){
+        if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
         }
@@ -367,7 +369,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
     }
 
-    private boolean seatIndexInRange(int index){
+    private boolean seatIndexInRange(int index) {
         return index >= 0 && index < mSeatInfoList.size();
     }
 
@@ -384,11 +386,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             return;
         }
         int preIndex = getIndexBySeatInfo(preSeatInfo);
-        if (preIndex < 0){
+        if (preIndex < 0) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomUserNotOnSeat);
             return;
         }
-        if (seatIndex == preIndex){
+        if (seatIndex == preIndex) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomJumpIndexEqual);
             return;
         }
@@ -831,8 +833,34 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
-    public void setAudioQuality(RCRTCParamsType.AudioQuality audioQuality, RCRTCParamsType.AudioScenario scenario) {
-        RCRTCEngine.getInstance().getDefaultAudioStream().setAudioQuality(audioQuality, scenario);
+    public void setAudioQuality(AudioQuality audioQuality, AudioScenario audioScenario) {
+        RCRTCParamsType.AudioQuality quality = RCRTCParamsType.AudioQuality.SPEECH;
+        switch (audioQuality) {
+            case MUSIC:
+                quality = RCRTCParamsType.AudioQuality.MUSIC;
+                break;
+            case MUSIC_HIGH:
+                quality = RCRTCParamsType.AudioQuality.MUSIC_HIGH;
+                break;
+            case SPEECH:
+                quality = RCRTCParamsType.AudioQuality.SPEECH;
+                break;
+        }
+
+        RCRTCParamsType.AudioScenario scenario = RCRTCParamsType.AudioScenario.DEFAULT;
+        switch (audioScenario) {
+            case DEFAULT:
+                scenario = RCRTCParamsType.AudioScenario.DEFAULT;
+                break;
+            case MUSIC_CHATROOM:
+                scenario = RCRTCParamsType.AudioScenario.MUSIC_CHATROOM;
+                break;
+            case MUSIC_CLASSROOM:
+                scenario = RCRTCParamsType.AudioScenario.MUSIC_CLASSROOM;
+                break;
+        }
+
+        RCRTCEngine.getInstance().getDefaultAudioStream().setAudioQuality(quality, scenario);
     }
 
     @Override
