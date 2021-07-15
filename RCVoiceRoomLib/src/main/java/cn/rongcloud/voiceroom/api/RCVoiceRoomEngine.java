@@ -244,6 +244,14 @@ public abstract class RCVoiceRoomEngine {
     public abstract void acceptRequestSeat(String userId, RCVoiceRoomCallback callback);
 
     /**
+     * 拒绝用户排麦请求
+     *
+     * @param userId
+     * @param callback
+     */
+    public abstract void rejectRequestSeat(String userId,RCVoiceRoomCallback callback);
+
+    /**
      * 获取当前排麦的用户列表
      *
      * @param callback 结果回调

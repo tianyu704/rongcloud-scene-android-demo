@@ -919,6 +919,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
+    public void rejectRequestSeat(String userId, RCVoiceRoomCallback callback) {
+        updateRequestSeatKvWithUserId(userId, RC_REQUEST_SEAT_CONTENT_DENY, callback);
+    }
+
+    @Override
     public void getRequestSeatUserIds(final RCVoiceRoomResultCallback<List<String>> callback) {
         RongChatRoomClient.getInstance().getAllChatRoomEntries(mRoomId, new IRongCoreCallback.ResultCallback<Map<String, String>>() {
             @Override
