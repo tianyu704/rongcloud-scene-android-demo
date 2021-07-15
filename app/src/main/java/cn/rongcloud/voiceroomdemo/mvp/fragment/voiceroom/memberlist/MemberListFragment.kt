@@ -55,7 +55,7 @@ class MemberListFragment(
                 // 点击自己不做任何反应
                 return@MemberListAdapter
             }
-            MemberSettingFragment(memberSettingView, roomInfoBean, it).show(childFragmentManager)
+            MemberSettingFragment(memberSettingView, roomInfoBean, it,false).show(childFragmentManager)
 
         }
 

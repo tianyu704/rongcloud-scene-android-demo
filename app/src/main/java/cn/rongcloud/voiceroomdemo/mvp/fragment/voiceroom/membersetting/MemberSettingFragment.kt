@@ -23,7 +23,8 @@ import kotlinx.android.synthetic.main.layout_member_setting.*
 class MemberSettingFragment(
     val view: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean,
-    private val member: UiMemberModel
+    private val member: UiMemberModel,
+    private val isFromSeat: Boolean = false // 麦位上点击  管理员管理非管理员 可以闭麦和关闭座位  列表中点击不可以操作
 ) :
     BaseBottomSheetDialogFragment<MemberSettingPresenter, IMemberSettingView>(R.layout.layout_member_setting),
     IMemberSettingView by view {
@@ -92,8 +93,13 @@ class MemberSettingFragment(
                     } else {
                         cl_member_setting.isVisible = true
                         // 管理员没有权限处理座位相关权限
-                        ll_mute_seat.isVisible = false
-                        ll_close_seat.isVisible = false
+                        if(!isFromSeat) {
+                            ll_mute_seat.isVisible = false
+                            ll_close_seat.isVisible = false
+                        }else{
+                            ll_mute_seat.isVisible = true
+                            ll_close_seat.isVisible = true
+                        }
                     }
                 }
                 else -> {
@@ -114,8 +120,13 @@ class MemberSettingFragment(
                     ll_close_seat.isVisible = true
                 } else if (isAdmin && (!member.isAdmin && roomInfoBean.createUser?.userId != member.userId)) {
                     // 管理员没有权限处理座位相关权限
-                    ll_mute_seat.isVisible = false
-                    ll_close_seat.isVisible = false
+                    if(!isFromSeat) {
+                        ll_mute_seat.isVisible = false
+                        ll_close_seat.isVisible = false
+                    }else{
+                        ll_mute_seat.isVisible = true
+                        ll_close_seat.isVisible = true
+                    }
                 }
                 ll_kick_room.isVisible = true
                 ll_invited_seat.isVisible = false

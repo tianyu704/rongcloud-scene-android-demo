@@ -703,7 +703,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                             MemberSettingFragment(
                                 this@VoiceRoomActivity,
                                 roomInfo,
-                                memberInfo
+                                memberInfo,
+                                true
                             ).show(supportFragmentManager)
                         }
                     }
@@ -723,7 +724,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             memberSettingFragment = MemberSettingFragment(
                 this@VoiceRoomActivity,
                 roomBean,
-                member
+                member,
+                false
             ).apply {
                 show(supportFragmentManager)
             }
@@ -798,7 +800,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                             memberSettingFragment = MemberSettingFragment(
                                 this@VoiceRoomActivity,
                                 roomBean,
-                                member
+                                member,
+                                true
                             ).apply {
                                 show(supportFragmentManager)
                             }
@@ -872,7 +875,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                                 memberSettingFragment = MemberSettingFragment(
                                     this@VoiceRoomActivity,
                                     roomBean,
-                                    member
+                                    member,
+                                    true
                                 ).apply {
                                     show(supportFragmentManager)
                                 }
