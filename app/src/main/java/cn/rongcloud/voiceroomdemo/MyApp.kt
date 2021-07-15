@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroomdemo.common.AccountStore
+import cn.rongcloud.voiceroomdemo.common.IBaseView
 import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
@@ -103,7 +104,11 @@ class MyApp : Application() {
                     this.startActivity(Intent(this, LoginActivity::class.java))
                     activityList.forEach { activity ->
                         if (activity !is LoginActivity && !activity.isFinishing) {
-                            activity.finish()
+                            if (activity is IBaseView) {
+                                activity.onLogout()
+                            } else {
+                                activity.finish()
+                            }
                         }
                     }
                 }
