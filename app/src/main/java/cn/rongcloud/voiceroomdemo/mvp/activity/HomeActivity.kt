@@ -8,10 +8,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
@@ -93,6 +95,20 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     }
 
     override fun onLogout() {
+        RCVoiceRoomEngine.getInstance().leaveRoom(object : RCVoiceRoomCallback {
+            override fun onError(code: Int, message: String?) {
+                Log.e(TAG, "onError: $code $message")
+                logout()
+            }
+
+            override fun onSuccess() {
+                Log.e(TAG, "onSuccess:")
+                logout()
+            }
+        })
+    }
+
+    fun logout() {
         RCVoiceRoomEngine.getInstance().disConnect()
         super.onLogout()
     }
