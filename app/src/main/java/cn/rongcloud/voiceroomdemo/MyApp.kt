@@ -7,11 +7,13 @@ package cn.rongcloud.voiceroomdemo
 import android.app.Activity
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.showToast
+import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.umeng.analytics.MobclickAgent
@@ -92,6 +94,21 @@ class MyApp : Application() {
             if (status == RongIMClient.ConnectionStatusListener.ConnectionStatus.KICKED_OFFLINE_BY_OTHER_CLIENT) {
                 showToast("当前账号已在其他设备登录，请重新登录")
                 AccountStore.logout()
+            }
+        }
+
+        AccountStore.obLogoutSubject().subscribe {
+            try {
+                activityList.lastOrNull()?.run {
+                    this.startActivity(Intent(this, LoginActivity::class.java))
+                    activityList.forEach { activity ->
+                        if (activity !is LoginActivity && !activity.isFinishing) {
+                            activity.finish()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "obLogoutSubject: ", e)
             }
         }
 

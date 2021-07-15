@@ -22,9 +22,7 @@ abstract class BaseLifeCyclePresenter<T : IBaseView>(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
     override fun onCreate() {
-        addDisposable(AccountStore.obLogoutSubject().subscribe {
-            view.onLogout()
-        })
+
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
