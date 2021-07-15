@@ -46,8 +46,8 @@ public class RCChatroomKickOut extends MessageContent {
                 userName = jsonObj.getString("userName");
             }
 
-            if (jsonObj.has("targetId")) {
-                targetId = jsonObj.getString("targetId");
+            if (jsonObj.has("targetName")) {
+                targetName = jsonObj.getString("targetName");
             }
             if (jsonObj.has("targetId")) {
                 targetId = jsonObj.getString("targetId");
