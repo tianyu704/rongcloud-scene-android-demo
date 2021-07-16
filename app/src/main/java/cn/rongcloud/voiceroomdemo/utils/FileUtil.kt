@@ -47,22 +47,22 @@ object FileUtil {
         } else null
 
 
-    private fun isFileDownload():Boolean{
+    private fun isFileDownload(): Boolean {
 //        MyApp.context.getExternalFilesDir()
         return false
     }
 
 
-     fun writeFile(
-         inputStream: InputStream,
-         path: String,
-         onProgress: (done: Long) -> Unit
+    fun writeFile(
+        inputStream: InputStream,
+        path: String,
+        onProgress: (done: Long) -> Unit
     ): Boolean {
         lateinit var outputFile: File
         lateinit var outputStream: OutputStream
         try {
             outputFile = File("${path}.temp")
-            if(outputFile.exists()){
+            if (outputFile.exists()) {
                 outputFile.delete()
             }
             outputFile.parentFile.mkdirs()
@@ -95,6 +95,25 @@ object FileUtil {
         return false
     }
 
-     fun exists(path: String) = File(path).exists()
+    fun exists(path: String) = File(path).exists()
+
+    fun copyFile(srcFile: File, destFile: File) {
+
+        val fis = FileInputStream(srcFile);
+        val fos = FileOutputStream(destFile)
+        val bis = BufferedInputStream(fis)
+        val bos = BufferedOutputStream(fos)
+        val buf = ByteArray(1024)
+
+        var len = 0;
+        while (true) {
+            len = bis.read(buf)
+            if (len == -1) break;
+            bos.write(buf, 0, len)
+        }
+        fis.close()
+        fos.close()
+
+    }
 
 }

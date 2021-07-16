@@ -15,6 +15,7 @@ import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.IBaseView
 import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
+import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.umeng.analytics.MobclickAgent
@@ -105,6 +106,7 @@ class MyApp : Application() {
                     activityList.forEach { activity ->
                         if (activity !is LoginActivity && !activity.isFinishing) {
                             if (activity is IBaseView) {
+                                Log.d(TAG, "obLogoutSubject: ")
                                 activity.onLogout()
                             } else {
                                 activity.finish()
@@ -116,6 +118,8 @@ class MyApp : Application() {
                 Log.e(TAG, "obLogoutSubject: ", e)
             }
         }
+
+        AudioManagerUtil.init(this)
 
     }
 

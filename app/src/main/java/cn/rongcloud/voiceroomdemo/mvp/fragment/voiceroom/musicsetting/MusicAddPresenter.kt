@@ -16,6 +16,7 @@ import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FROM_TYPE_LOCAL
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
 
 /**
@@ -65,7 +66,14 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
     }
 
     fun getSupportFileTypeMime(): Array<String> {
-        return arrayOf("audio/x-mpeg", "audio/aac", "audio/mp4a-latm", "audio/x-wav","audio/ogg","audio/3gpp")
+        return arrayOf(
+            "audio/x-mpeg",
+            "audio/aac",
+            "audio/mp4a-latm",
+            "audio/x-wav",
+            "audio/ogg",
+            "audio/3gpp"
+        )
     }
 
     fun addMusicFromLocal(context: Context, uri: Uri) {
@@ -77,13 +85,18 @@ class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
             && !realPath.endsWith("ogg", true)
             && !realPath.endsWith("amr", true)
         ) {
-            view.showError("仅支持 MP3、AAC、M4A、WAV 格式文件")
+            view.showError("仅支持 MP3、AAC、M4A、WAV、OGG、AMR 格式文件")
             return
         }
         view.showWaitingDialog()
         addDisposable(
             FileModel
                 .musicUpload(context, realPath)
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .doOnSuccess {
+                    FileModel.moveMusicToCache(it, realPath)
+                }
                 .flatMapCompletable {
                     var author: String? = null
                     if (!it.isNullOrEmpty()) {

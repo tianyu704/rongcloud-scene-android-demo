@@ -168,4 +168,17 @@ object FileModel {
 
         } ?: ""
     }
+
+    fun moveMusicToCache(url: String, path: String) {
+        getNameFromUrl(url)?.let {
+            val destFilePath = getCompleteMusicPathByName(it)
+            val destFile = File(destFilePath)
+            if (destFile.exists()) {
+                return
+            }
+            val srcFile = File(path)
+            FileUtil.copyFile(srcFile, destFile)
+        }
+
+    }
 }

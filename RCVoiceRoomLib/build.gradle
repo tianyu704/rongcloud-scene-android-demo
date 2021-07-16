@@ -58,8 +58,8 @@ android {
 }
 
 dependencies {
-    compileOnly 'cn.rongcloud.sdk:im_lib:5.1.2'
-    compileOnly 'cn.rongcloud.sdk:rtc_lib:5.1.2'
-    compileOnly 'cn.rongcloud.sdk:im_kit:5.1.2'
+    compileOnly "cn.rongcloud.sdk:im_lib:$rongcloudSdkVersion"
+    compileOnly "cn.rongcloud.sdk:rtc_lib:$rongcloudSdkVersion"
+    compileOnly "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
 }
 

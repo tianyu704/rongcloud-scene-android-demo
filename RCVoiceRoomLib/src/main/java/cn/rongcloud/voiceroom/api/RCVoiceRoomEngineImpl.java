@@ -1498,6 +1498,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                         }
                     });
                     enableSpeaker(true);
+                    setAudioQuality(AudioQuality.MUSIC, AudioScenario.MUSIC_CHATROOM);
                 }
                 onSuccessWithCheck(callback);
             }

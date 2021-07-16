@@ -14,6 +14,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import cn.rongcloud.rtc.utils.AudioUtil
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
@@ -54,6 +55,7 @@ import cn.rongcloud.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import com.vanniktech.emoji.EmojiPopup
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
@@ -504,6 +506,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             it.release()
         }
         stopService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
+        AudioManagerUtil.dispose()
     }
 
     override fun onJoinRoomSuccess() {

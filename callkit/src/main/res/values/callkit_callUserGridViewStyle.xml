@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2021 RongCloud. All rights reserved.
+  -->
+
+<resources>
+    <declare-styleable name="CallUserGridView">
+        <attr name="CallGridViewOrientation" format="boolean"/>
+        <attr name="CallGridViewChildrenPerLine" format="integer"/>
+    </declare-styleable>
+</resources>
