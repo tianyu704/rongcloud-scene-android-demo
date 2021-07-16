@@ -38,7 +38,7 @@ interface IVoiceRoomView : IBaseView {
     fun sendTextMessageSuccess(message: String)
     fun showChatRoomMessage(messageContent: MessageContent)
     fun showPickReceived(isCreateReceive: Boolean, userId: String)
-    fun switchToAdminRole(isAdmin: Boolean)
+    fun switchToAdminRole(isAdmin: Boolean, roomInfo: UiRoomModel)
     fun changeStatus(status: Int)
     fun showUnReadRequestNumber(number: Int)
     fun showUnreadMessage(count: Int)

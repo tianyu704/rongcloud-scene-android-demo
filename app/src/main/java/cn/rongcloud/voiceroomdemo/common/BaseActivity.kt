@@ -224,9 +224,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : cn.r
     }
 
     override fun onLogout() {
-        if (isFront) {
-            LoginActivity.startActivity(this)
-        }
         finish()
     }
 

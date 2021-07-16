@@ -237,6 +237,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void leaveRoom(final RCVoiceRoomCallback callback) {
+        Log.d(TAG, "leaveRoom: ");
         int index = getSeatIndexByUserId(mCurrentUserId);
         if (index >= 0) {
             leaveSeat(new RCVoiceRoomCallback() {
@@ -266,6 +267,18 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             @Override
             public void onSuccess() {
                 Log.d(TAG, "onSuccess: ");
+                RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
+                    @Override
+                    public void onSuccess() {
+                        clearAll();
+                        onSuccessWithCheck(callback);
+                    }
+
+                    @Override
+                    public void onFailed(RTCErrorCode errorCode) {
+                        onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
+                    }
+                });
             }
 
             @Override
@@ -275,18 +288,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
         });
 
-        RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
-            @Override
-            public void onSuccess() {
-                clearAll();
-                onSuccessWithCheck(callback);
-            }
-
-            @Override
-            public void onFailed(RTCErrorCode errorCode) {
-                onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
-            }
-        });
     }
 
     @Override
@@ -1696,6 +1697,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
         @Override
         public void onRemoteUserPublishResource(RCRTCRemoteUser remoteUser, List<RCRTCInputStream> streams) {
+            Log.d(TAG, "onRemoteUserPublishResource : " + "remoteUser = " + remoteUser + "," + "streams = " + streams);
             if (mRoom != null && mCurrentRole == RCRTCLiveRole.BROADCASTER) {
                 mRoom.getLocalUser().subscribeStreams(streams, new IRCRTCResultCallback() {
                     @Override
@@ -1713,31 +1715,32 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
         @Override
         public void onRemoteUserMuteAudio(RCRTCRemoteUser remoteUser, RCRTCInputStream stream, boolean mute) {
-
+            Log.d(TAG, "onRemoteUserMuteAudio : " + "remoteUser = " + remoteUser + "," + "stream = " + stream + "," + "mute = " + mute);
         }
 
         @Override
         public void onRemoteUserMuteVideo(RCRTCRemoteUser remoteUser, RCRTCInputStream stream, boolean mute) {
-
+            Log.d(TAG, "onRemoteUserMuteVideo : " + "remoteUser = " + remoteUser + "," + "stream = " + stream + "," + "mute = " + mute);
         }
 
         @Override
         public void onRemoteUserUnpublishResource(RCRTCRemoteUser remoteUser, List<RCRTCInputStream> streams) {
-
+            Log.d(TAG, "onRemoteUserUnpublishResource : " + "remoteUser = " + remoteUser + "," + "streams = " + streams);
         }
 
         @Override
         public void onUserJoined(RCRTCRemoteUser remoteUser) {
-
+            Log.d(TAG, "onUserJoined : " + "remoteUser = " + remoteUser);
         }
 
         @Override
         public void onUserLeft(RCRTCRemoteUser remoteUser) {
-
+            Log.d(TAG, "onUserLeft : " + "remoteUser = " + remoteUser);
         }
 
         @Override
         public void onUserOffline(final RCRTCRemoteUser remoteUser) {
+            Log.d(TAG, "onUserOffline : " + "remoteUser = " + remoteUser.getUserId());
             final int index = getSeatIndexByUserId(remoteUser.getUserId());
             if (index > -1) {
                 kickSeatFromSeat(remoteUser.getUserId(), new RCVoiceRoomCallback() {
@@ -1781,7 +1784,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
         @Override
         public void onLeaveRoom(int reasonCode) {
-
+            Log.d(TAG, "onLeaveRoom : " + "reasonCode = " + reasonCode);
         }
     }
 
@@ -1814,10 +1817,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             }
         }
-    }
-
-    private interface CompletionListener {
-        void onComplete();
     }
 
 }

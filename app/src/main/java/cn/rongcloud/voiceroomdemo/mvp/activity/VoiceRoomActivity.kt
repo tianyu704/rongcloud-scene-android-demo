@@ -454,7 +454,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
     }
 
-    override fun switchToAdminRole(isAdmin: Boolean) {
+    override fun switchToAdminRole(isAdmin: Boolean, roomInfo: UiRoomModel) {
         if (currentRole is Audience && currentRole !is Admin && isAdmin) {
             currentRole = Admin(mRootView).apply {
                 initView(roomInfo)

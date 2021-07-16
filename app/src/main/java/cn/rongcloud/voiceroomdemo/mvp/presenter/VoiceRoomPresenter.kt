@@ -148,7 +148,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 if (it.userId == AccountStore.getUserId()) {
                     // 监听当前用户是否为管理员
                     if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId != AccountStore.getUserId()) {
-                        view.switchToAdminRole(it.isAdmin)
+                        view.switchToAdminRole(it.isAdmin,roomModel.currentUIRoomInfo)
                     }
                 }
             })
