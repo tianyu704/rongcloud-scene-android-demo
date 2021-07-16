@@ -417,7 +417,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
             ?: LocalUserInfoManager.getMemberByUserId(userId)?.run {
                 UiMemberModel(memberInfoChangeSubject).apply {
                     this.member = member
-                    roomMemberInfoList.add(this)
                 }
             }
     }
