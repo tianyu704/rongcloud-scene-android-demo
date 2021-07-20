@@ -161,7 +161,6 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     override fun initData() {
         LocalUserInfoManager.getMemberByUserId("")
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this)
-        AudioEffectManager.init()
     }
 
     override fun modifyInfoSuccess() {

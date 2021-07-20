@@ -17,10 +17,14 @@ import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.model.Message
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -44,7 +48,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
 
     var currentStatus = STATUS_NOT_ON_SEAT
 
-    private lateinit var currentUserId:String
+    private lateinit var currentUserId: String
 
 
     private var hasInit = false
@@ -63,7 +67,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                         initRoomEventListener()
                         joinRoom()
                         afterInitView()
-                        currentUserId = AccountStore.getUserId()?:""
+                        currentUserId = AccountStore.getUserId() ?: ""
                     } else {
                         view.refreshRoomInfo(roomInfo)
                     }
@@ -148,7 +152,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 if (it.userId == AccountStore.getUserId()) {
                     // 监听当前用户是否为管理员
                     if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId != AccountStore.getUserId()) {
-                        view.switchToAdminRole(it.isAdmin,roomModel.currentUIRoomInfo)
+                        view.switchToAdminRole(it.isAdmin, roomModel.currentUIRoomInfo)
                     }
                 }
             })
@@ -198,10 +202,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                             if (it is RCChatroomGiftAll || it is RCChatroomGift) {
                                 roomModel.refreshGift()
                             }
-                            if(it is RCChatroomEnter) {
+                            if (it is RCChatroomEnter) {
                                 val member =
                                     roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
-                                if(member?.member == null){
+                                if (member?.member == null) {
                                     roomModel.refreshAllMemberInfoList()
                                 }
                             }
@@ -342,6 +346,9 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 roomModel.getOnLineUsersCount()
                 roomModel.refreshAllMemberInfoList()
                 sendSystemMessage()
+                GlobalScope.launch(Dispatchers.IO) {
+                    AudioEffectManager.init()
+                }
             }
         })
     }
@@ -355,11 +362,13 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
             roomId,
             "感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。"
         )
-        RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomEnter()
-            .apply {
-            this.userId = AccountStore.getUserId()
-            this.userName = AccountStore.getUserName()
-        }, false)
+        RCChatRoomMessageManager.sendChatMessage(
+            roomId, RCChatroomEnter()
+                .apply {
+                    this.userId = AccountStore.getUserId()
+                    this.userName = AccountStore.getUserName()
+                }, false
+        )
     }
 
     fun leaveRoom() {
@@ -486,7 +495,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     fun sendFovMessage() {
         RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomLike()
             .apply {
-        },
+            },
             true,
             {
             }, { code, _ ->
@@ -497,10 +506,10 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
     fun sendMessage(message: String) {
         RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomBarrage()
             .apply {
-            userId = AccountStore.getUserId()
-            userName = AccountStore.getUserName()
-            content = message
-        },
+                userId = AccountStore.getUserId()
+                userName = AccountStore.getUserName()
+                content = message
+            },
             true,
             {
                 view.sendTextMessageSuccess(message)

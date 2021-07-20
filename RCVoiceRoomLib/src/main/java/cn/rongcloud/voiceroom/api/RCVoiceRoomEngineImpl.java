@@ -1179,7 +1179,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void onChatRoomKVSync(String roomId) {
-
+        Log.d(TAG, "onChatRoomKVSync : " + "roomId = " + roomId);
     }
 
     @Override
@@ -1742,40 +1742,40 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         @Override
         public void onUserOffline(final RCRTCRemoteUser remoteUser) {
             Log.d(TAG, "onUserOffline : " + "remoteUser = " + remoteUser.getUserId());
-            final int index = getSeatIndexByUserId(remoteUser.getUserId());
-            if (index > -1) {
-                kickSeatFromSeat(remoteUser.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
-                        if (currentRoomEventListener != null) {
-                            currentRoomEventListener.onUserLeaveSeat(index, remoteUser.getUserId());
-                        }
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-
-                    }
-                });
-            }
+//            final int index = getSeatIndexByUserId(remoteUser.getUserId());
+//            if (index > -1) {
+//                kickSeatFromSeat(remoteUser.getUserId(), new RCVoiceRoomCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
+//                        if (currentRoomEventListener != null) {
+//                            currentRoomEventListener.onUserLeaveSeat(index, remoteUser.getUserId());
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(int code, String message) {
+//
+//                    }
+//                });
+//            }
         }
 
         @Override
         public void onPublishLiveStreams(List<RCRTCInputStream> streams) {
-            if (mRoom != null && mCurrentRole == RCRTCLiveRole.AUDIENCE) {
-                mRoom.getLocalUser().subscribeStreams(streams, new IRCRTCResultCallback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onFailed(RTCErrorCode errorCode) {
-
-                    }
-                });
-            }
+//            if (mRoom != null && mCurrentRole == RCRTCLiveRole.AUDIENCE) {
+//                mRoom.getLocalUser().subscribeStreams(streams, new IRCRTCResultCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onFailed(RTCErrorCode errorCode) {
+//
+//                    }
+//                });
+//            }
         }
 
         @Override

@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.utils
 
+import android.util.Log
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.common.showToast
@@ -22,17 +23,23 @@ val MUSIC_ATMOSPHERE_NAME_LIST = arrayListOf<String>(
     MUSIC_ATMOSPHERE_CLAP, MUSIC_ATMOSPHERE_CHEER
 )
 
+private const val TAG = "AudioEffectManager"
+
 object AudioEffectManager {
     fun init() {
         MUSIC_ATMOSPHERE_NAME_LIST.forEachIndexed { index, name ->
-            RCRTCEngine.getInstance().audioEffectManager
-                .preloadEffect(
-                    getMusicAtmospherePathByName(name), index
-                ) { result ->
-                    if (result == -1) {
-                        MyApp.context.showToast("音效文件加载失败")
+            try {
+                RCRTCEngine.getInstance().audioEffectManager
+                    .preloadEffect(
+                        getMusicAtmospherePathByName(name), index
+                    ) { result ->
+                        if (result == -1) {
+                            MyApp.context.showToast("音效文件加载失败")
+                        }
                     }
-                }
+            } catch (e: Exception) {
+                Log.e(TAG, "init: ", e)
+            }
         }
     }
 
@@ -45,11 +52,15 @@ object AudioEffectManager {
     }
 
     fun playEffect(name: String) {
-        RCRTCEngine.getInstance().audioEffectManager.stopAllEffects()
-        RCRTCEngine.getInstance().audioEffectManager.playEffect(
-            getMusicAtmosphereIndexByName(name),
-            1,
-            50
-        )
+        try {
+            RCRTCEngine.getInstance().audioEffectManager.stopAllEffects()
+            RCRTCEngine.getInstance().audioEffectManager.playEffect(
+                getMusicAtmosphereIndexByName(name),
+                1,
+                50
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "playEffect: ", e)
+        }
     }
 }
