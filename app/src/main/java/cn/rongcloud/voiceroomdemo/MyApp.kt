@@ -24,6 +24,7 @@ import com.vanniktech.emoji.EmojiManager
 import com.vanniktech.emoji.EmojiProvider
 import com.vanniktech.emoji.emoji.EmojiCategory
 import com.vanniktech.emoji.ios.category.*
+import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.rong.imlib.RongIMClient
 import kotlin.properties.Delegates
@@ -34,6 +35,7 @@ import kotlin.properties.Delegates
  */
 private const val TAG = "MyApp"
 
+@HiltAndroidApp
 class MyApp : Application() {
 
     private val activityList: ArrayList<Activity> = arrayListOf()

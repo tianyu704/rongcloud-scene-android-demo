@@ -6,6 +6,8 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -138,4 +140,7 @@ dependencies {
     implementation "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
     implementation project(path: ':RCVoiceRoomLib')
     implementation project(path: ':callkit')
+
+    implementation("com.google.dagger:hilt-android:$hilt_version")
+    kapt("com.google.dagger:hilt-android-compiler:$hilt_version")
 }
