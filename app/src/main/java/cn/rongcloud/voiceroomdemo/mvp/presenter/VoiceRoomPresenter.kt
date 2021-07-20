@@ -11,8 +11,8 @@ import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.common.isNotNullOrEmpty
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
+import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.mvp.model.*
-import cn.rongcloud.voiceroomdemo.mvp.model.message.*
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
@@ -27,6 +27,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author gusd
@@ -38,13 +40,12 @@ const val STATUS_ON_SEAT = 0
 const val STATUS_NOT_ON_SEAT = 1
 const val STATUS_WAIT_FOR_SEAT = 2
 
-class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
+class VoiceRoomPresenter @Inject constructor(
+    val view: IVoiceRoomView,
+    @Named("roomId") private val roomId: String,
+    val roomModel: VoiceRoomModel
+) :
     BaseLifeCyclePresenter<IVoiceRoomView>(view), IRongCoreListener.OnReceiveMessageListener {
-
-
-    private val roomModel: VoiceRoomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     var currentStatus = STATUS_NOT_ON_SEAT
 

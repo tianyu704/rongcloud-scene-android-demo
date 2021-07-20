@@ -8,29 +8,35 @@ import androidx.recyclerview.widget.GridLayoutManager
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.dialog.EditDialog
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration
+import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Maybe
 import kotlinx.android.synthetic.main.fragment_background_setting.*
 import kotlinx.android.synthetic.main.fragment_room_setting.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/22
  */
+
+@AndroidEntryPoint
 class RoomSettingFragment(
     view: IRoomSettingView,
-    private val roomInfoBean: VoiceRoomBean
 ) :
     BaseBottomSheetDialogFragment<RoomSettingPresenter, IRoomSettingView>(R.layout.fragment_room_setting),
     IRoomSettingView by view {
 
     private var passwordDialog: InputPasswordDialog? = null
-    private var modifyNameDialog:EditDialog? = null
+    private var modifyNameDialog: EditDialog? = null
+
+    @Inject
+    lateinit var presenter: RoomSettingPresenter
+
     override fun initPresenter(): RoomSettingPresenter {
-        return RoomSettingPresenter(this, roomInfoBean)
+        return presenter
     }
 
     override fun onDestroy() {
@@ -75,18 +81,19 @@ class RoomSettingFragment(
 
     override fun showModifyRoomNameDialog(roomName: String?): Maybe<String>? {
         return Maybe.create { emitter ->
-            modifyNameDialog = EditDialog(requireActivity(), "修改房间标题", "请输入房间名", roomName ?: "", cancelListener = {
-                emitter.onComplete()
-            }) { newName ->
-                if (newName.isNullOrEmpty()) {
-                    requireActivity().showToast("房间名不能为空")
-                    return@EditDialog
+            modifyNameDialog =
+                EditDialog(requireActivity(), "修改房间标题", "请输入房间名", roomName ?: "", cancelListener = {
+                    emitter.onComplete()
+                }) { newName ->
+                    if (newName.isNullOrEmpty()) {
+                        requireActivity().showToast("房间名不能为空")
+                        return@EditDialog
+                    }
+                    modifyNameDialog?.dismiss()
+                    emitter.onSuccess(newName)
+                }.apply {
+                    show()
                 }
-                modifyNameDialog?.dismiss()
-                emitter.onSuccess(newName)
-            }.apply {
-                show()
-            }
         }
     }
 

@@ -12,19 +12,26 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_list.*
 import kotlinx.android.synthetic.main.layout_music_play_item.view.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicListFragment(val view: IMusicListView, val roomId: String) :
+@AndroidEntryPoint
+class MusicListFragment(val view: IMusicListView) :
     BaseFragment<MusicListPresenter, IMusicListView>(
         R.layout.fragment_music_list
     ), IMusicListView by view {
+
+    @Inject
+    lateinit var presenter: MusicListPresenter
+
     override fun initPresenter(): MusicListPresenter {
-        return MusicListPresenter(this, roomId)
+        return presenter
     }
 
     override fun initView() {

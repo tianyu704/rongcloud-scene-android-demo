@@ -10,14 +10,17 @@ import cn.rongcloud.voiceroomdemo.net.api.bean.respond.LoginRespondBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VerificationCodeRespondBean
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.utils.DeviceUtils
+import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/07
  */
-class LoginModel {
+@ActivityScoped
+class LoginModel @Inject constructor() {
     suspend fun getVerificationCode(phoneNumber: String): Single<VerificationCodeRespondBean> {
         return RetrofitManager.commonService.getVerificationCode(GetVerificationCode(phoneNumber))
             .observeOn(

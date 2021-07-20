@@ -5,19 +5,19 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/07/05
  */
-class MusicSettingPresenter(roomId: String, view: IMusicSettingView) :
+class MusicSettingPresenter @Inject constructor(
+    view: IMusicSettingView,
+    private val roomModel: VoiceRoomModel
+) :
     BaseLifeCyclePresenter<IMusicSettingView>(view) {
-
-    private val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     fun playMusicAtmosphere(name: String) {
         AudioEffectManager.playEffect(name)

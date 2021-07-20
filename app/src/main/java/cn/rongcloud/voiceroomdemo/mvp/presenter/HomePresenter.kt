@@ -13,6 +13,9 @@ import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
 import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Inject
 
 /**
  * @author gusd
@@ -20,7 +23,11 @@ import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
  */
 private const val TAG = "HomePresenter"
 
-class HomePresenter(val view: IHomeView, val context: Context) :
+@ActivityScoped
+class HomePresenter @Inject constructor(
+    val view: IHomeView,
+    @ActivityContext val context: Context
+) :
     BaseLifeCyclePresenter<IHomeView>(view) {
 
     override fun onDestroy() {
@@ -28,23 +35,30 @@ class HomePresenter(val view: IHomeView, val context: Context) :
 
     fun modifyUserInfo(userName: String, selectedPicPath: Uri?) {
         view.showWaitingDialog()
-        if (selectedPicPath!=null) {
-            addDisposable(FileModel.imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,selectedPicPath), context).flatMap { url ->
-                return@flatMap RetrofitManager.commonService.updateUserInfo(
-                    UpdateUserInfoRequestBean(
-                        userName,
-                        url
+        if (selectedPicPath != null) {
+            addDisposable(
+                FileModel.imageUpload(
+                    RealPathFromUriUtils.getRealPathFromUri(
+                        context,
+                        selectedPicPath
+                    ), context
+                ).flatMap { url ->
+                    return@flatMap RetrofitManager.commonService.updateUserInfo(
+                        UpdateUserInfoRequestBean(
+                            userName,
+                            url
+                        )
                     )
-                )
-            }.subscribe({ respond ->
-                val accountInfo = AccountStore.getAccountInfo()
-                    .copy(userName = respond.data?.name, portrait = respond.data?.portrait)
-                AccountStore.saveAccountInfo(accountInfo)
-                view.modifyInfoSuccess()
-                view.hideWaitingDialog()
-            }, { t ->
-                view.showError(-1, t.message)
-            }))
+                }.subscribe({ respond ->
+                    val accountInfo = AccountStore.getAccountInfo()
+                        .copy(userName = respond.data?.name, portrait = respond.data?.portrait)
+                    AccountStore.saveAccountInfo(accountInfo)
+                    view.modifyInfoSuccess()
+                    view.hideWaitingDialog()
+                }, { t ->
+                    view.showError(-1, t.message)
+                })
+            )
         } else {
             addDisposable(
                 RetrofitManager.commonService.updateUserInfo(

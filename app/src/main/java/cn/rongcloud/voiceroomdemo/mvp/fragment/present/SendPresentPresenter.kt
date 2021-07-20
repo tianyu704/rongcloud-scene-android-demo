@@ -6,27 +6,25 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 
 import android.util.Log
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.Present
+import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
 
-class SendPresentPresenter(
+class SendPresentPresenter @Inject constructor(
     val view: ISendPresentView,
-    roomId: String,
-    private val selectedIds: List<String>
+    @Named("selectedIds") private val selectedIds: List<String>,
+    private val roomModel: VoiceRoomModel
 ) :
     BaseLifeCyclePresenter<ISendPresentView>(view) {
 
-    private val roomModel: VoiceRoomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     fun initeialObserve() {
         view.onPresentInited(roomModel.presents)

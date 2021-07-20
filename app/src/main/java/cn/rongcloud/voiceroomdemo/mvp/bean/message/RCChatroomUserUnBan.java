@@ -2,10 +2,9 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model.message;
+package cn.rongcloud.voiceroomdemo.mvp.bean.message;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -21,14 +20,14 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/17
  */
-@MessageTag(value = "RC:Chatroom:User:UnBlock")
-public class RCChatroomUserUnBlock extends MessageContent {
-    private static final String TAG = "RCChatroomUserUnBlock";
+@MessageTag(value = "RC:Chatroom:User:UnBan")
+public class RCChatroomUserUnBan  extends MessageContent {
+    private static final String TAG = "RCChatroomUserUnBan";
 
     private String id;
     private String extra;
 
-    public RCChatroomUserUnBlock(byte[] data){
+    public RCChatroomUserUnBan(byte[] data){
         super(data);
         String jsonStr = null;
         jsonStr = new String(data, StandardCharsets.UTF_8);
@@ -49,7 +48,7 @@ public class RCChatroomUserUnBlock extends MessageContent {
     }
 
     @Override
-    public byte[] encode() {
+    public byte[] encode(){
         JSONObject jsonObj = new JSONObject();
         try {
             if (!TextUtils.isEmpty(id)) {
@@ -81,6 +80,7 @@ public class RCChatroomUserUnBlock extends MessageContent {
         this.extra = extra;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -97,25 +97,23 @@ public class RCChatroomUserUnBlock extends MessageContent {
         this.extra = source.readString();
     }
 
-    public RCChatroomUserUnBlock() {
+    public RCChatroomUserUnBan() {
     }
 
-
-
-    protected RCChatroomUserUnBlock(Parcel in) {
+    protected RCChatroomUserUnBan(Parcel in) {
         this.id = in.readString();
         this.extra = in.readString();
     }
 
-    public static final Parcelable.Creator<RCChatroomUserUnBlock> CREATOR = new Parcelable.Creator<RCChatroomUserUnBlock>() {
+    public static final Creator<RCChatroomUserUnBan> CREATOR = new Creator<RCChatroomUserUnBan>() {
         @Override
-        public RCChatroomUserUnBlock createFromParcel(Parcel source) {
-            return new RCChatroomUserUnBlock(source);
+        public RCChatroomUserUnBan createFromParcel(Parcel source) {
+            return new RCChatroomUserUnBan(source);
         }
 
         @Override
-        public RCChatroomUserUnBlock[] newArray(int size) {
-            return new RCChatroomUserUnBlock[size];
+        public RCChatroomUserUnBan[] newArray(int size) {
+            return new RCChatroomUserUnBan[size];
         }
     };
 }

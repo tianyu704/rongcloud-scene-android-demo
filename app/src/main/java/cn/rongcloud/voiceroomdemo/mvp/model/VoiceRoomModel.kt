@@ -17,13 +17,15 @@ import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.showToast
-import cn.rongcloud.voiceroomdemo.mvp.model.message.*
+import cn.rongcloud.voiceroomdemo.mvp.bean.Present
+import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.*
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -38,18 +40,14 @@ import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.Message
 import kotlinx.coroutines.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author gusd
  * @Date 2021/06/18
  */
 
-private val map = HashMap<String, VoiceRoomModel>()
-fun getVoiceRoomModelByRoomId(roomId: String): VoiceRoomModel {
-    return map[roomId] ?: VoiceRoomModel(roomId).apply {
-        map[roomId] = this
-    }
-}
 
 val EMPTY_ROOM_INFO: VoiceRoomBean = VoiceRoomBean(roomId = "")
 
@@ -70,8 +68,12 @@ const val EVENT_REQUEST_SEAT_CANCEL = "EVENT_REQUEST_SEAT_CANCEL"
 
 const val EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM"
 
-
-class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
+@ActivityScoped
+class VoiceRoomModel @Inject constructor(
+    @Named("roomId") val roomId: String,
+    private val voiceRoomListModel: VoiceRoomListModel
+) :
+    RCVoiceRoomEventListener {
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -84,10 +86,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
     private val systemMusicList = arrayListOf<UiMusicModel>()
 
     private var isInitRoomSetting = false
-
-    private val voiceRoomListModel by lazy {
-        VoiceRoomListModel
-    }
 
     private val dataModifyScheduler by lazy {
         Schedulers.computation()
@@ -321,10 +319,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                 if (it.code == 10000) {
                     RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomAdmin()
                         .apply {
-                        this.userId = userId
-                        this.userName = getMemberInfoByUserIdOnlyLocal(userId)?.userName
-                        this.isAdmin = isAdmin
-                    })
+                            this.userId = userId
+                            this.userName = getMemberInfoByUserIdOnlyLocal(userId)?.userName
+                            this.isAdmin = isAdmin
+                        })
                     roomMemberInfoList.firstOrNull { model ->
                         model.userId == userId
                     }?.let { model ->
@@ -429,7 +427,6 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
     fun onDestroy() {
         dataModifyWorker.dispose()
-        map.remove(roomId)
         compositeDisposable.dispose()
     }
 
@@ -513,8 +510,8 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                     pushRoomSettingToServer(setSeatNumber = count)
                     RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomSeats()
                         .apply {
-                        this.count = count - 1
-                    })
+                            this.count = count - 1
+                        })
                 }
             })
         }
@@ -1022,11 +1019,11 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                                         roomId,
                                         RCChatroomKickOut()
                                             .apply {
-                                            this.userId = AccountStore.getUserId()
-                                            this.userName = AccountStore.getUserName()
-                                            this.targetId = it.userId
-                                            this.targetName = it.userName
-                                        }, true
+                                                this.userId = AccountStore.getUserId()
+                                                this.userName = AccountStore.getUserName()
+                                                this.targetId = it.userId
+                                                this.targetName = it.userName
+                                            }, true
                                     )
                                 }
 
@@ -1241,13 +1238,13 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
         if (isAll) {
             RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomGiftAll()
                 .apply {
-                userId = AccountStore.getUserId()
-                userName = AccountStore.getUserName()
-                giftId = "${present.index}"
-                giftName = present.name
-                number = nums
-                price = present.price
-            })
+                    userId = AccountStore.getUserId()
+                    userName = AccountStore.getUserName()
+                    giftId = "${present.index}"
+                    giftName = present.name
+                    number = nums
+                    price = present.price
+                })
         } else {
             RCChatRoomMessageManager.sendChatMessages(roomId,
                 members.map { member ->

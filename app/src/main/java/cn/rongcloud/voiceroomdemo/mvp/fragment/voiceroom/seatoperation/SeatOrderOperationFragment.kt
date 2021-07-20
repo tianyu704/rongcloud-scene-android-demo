@@ -13,28 +13,32 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.google.android.material.tabs.TabLayoutMediator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_viewpage_list.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/24
  */
+@AndroidEntryPoint
 class SeatOrderOperationFragment(
     view: IViewPageListView,
-    private val roomInfoBean: VoiceRoomBean,
     private val selectPageIndex: Int = 0
 ) :
     BaseBottomSheetDialogFragment<SeatOrderOperationPresenter, IViewPageListView>(R.layout.fragment_viewpage_list),
     IViewPageListView by view, IInviteSeatListView, IRequestSeatListView {
 
+    @Inject
+    lateinit var presenter: SeatOrderOperationPresenter
 
     override fun initPresenter(): SeatOrderOperationPresenter {
-        return SeatOrderOperationPresenter(this,roomInfoBean.roomId)
+        return presenter
     }
 
     override fun initView() {
         val fragmentList =
-            arrayListOf(RequestSeatListFragment(this,roomInfoBean.roomId), InviteSeatListFragment(this,roomInfoBean.roomId))
+            arrayListOf(RequestSeatListFragment(this), InviteSeatListFragment(this))
 
         vp_page.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         vp_page.adapter = object : FragmentStateAdapter(childFragmentManager, lifecycle) {

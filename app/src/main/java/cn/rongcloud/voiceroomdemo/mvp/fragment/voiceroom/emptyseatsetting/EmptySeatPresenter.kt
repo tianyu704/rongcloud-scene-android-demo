@@ -7,23 +7,23 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import dagger.hilt.android.scopes.FragmentScoped
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
-class EmptySeatPresenter(
+@FragmentScoped
+class EmptySeatPresenter @Inject constructor(
     val view: IEmptySeatView,
-    var uiSeatModel: UiSeatModel,
-    val roomId: String
+    @Named("EmptySeatSetting") var uiSeatModel: UiSeatModel,
+    val roomModel: VoiceRoomModel
 ) :
     BaseLifeCyclePresenter<IEmptySeatView>(view) {
 
-    private val roomModel: VoiceRoomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     override fun onCreate() {
         super.onCreate()

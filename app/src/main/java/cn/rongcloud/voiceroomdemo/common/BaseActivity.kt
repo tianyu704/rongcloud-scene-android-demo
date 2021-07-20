@@ -31,7 +31,7 @@ private const val DEFAULT_LOADING_VIEW = R.layout.layout_loading
 abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : cn.rongcloud.voiceroomdemo.mvp.activity.PermissionActivity(),
     IBaseView, EasyPermissions.PermissionCallbacks {
 
-    lateinit var presenter: P
+    private lateinit var presenter: P
 
     private var isFront = false
     protected lateinit var mRootView: View

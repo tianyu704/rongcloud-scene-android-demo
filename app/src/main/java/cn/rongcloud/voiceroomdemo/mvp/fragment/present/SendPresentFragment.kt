@@ -7,42 +7,56 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 import android.annotation.SuppressLint
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bcq.adapter.recycle.RcyHolder
-import com.bcq.adapter.recycle.RcySAdapter
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.loadPortrait
 import cn.rongcloud.voiceroomdemo.common.ui
+import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager.HORIZONTAL
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.PagerSnapHelper
-import cn.rongcloud.voiceroomdemo.mvp.model.Present
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.utils.UiUtils
+import com.bcq.adapter.recycle.RcyHolder
+import com.bcq.adapter.recycle.RcySAdapter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragmeng_send_present.*
 import kotlinx.android.synthetic.main.layout_present_item.view.*
 import kotlinx.android.synthetic.main.layout_present_member_item.view.*
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author baicq
  * @Date 2021/07/05
  */
+@AndroidEntryPoint
 class SendPresentFragment(
     view: ISendPresentView,
-    private val roomId: String,
     private val selectedIds: List<String> = emptyList()
 ) :
     BaseBottomSheetDialogFragment<SendPresentPresenter, ISendPresentView>(R.layout.fragmeng_send_present),
     ISendPresentView by view {
+
+    @Inject
+    @Named("roomId")
+    lateinit var roomId: String
+
+    @Inject
+    lateinit var presenter: SendPresentPresenter
+
     override fun initPresenter(): SendPresentPresenter {
-        return SendPresentPresenter(this, roomId, selectedIds)
+        return presenter
     }
 
-    val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
+
+    @Inject
+    lateinit var roomModel: VoiceRoomModel
+
     var members: List<UiMemberModel> = ArrayList()
+
+
+    public fun getSelectedIds() = selectedIds
 
     override fun initListener() {
         btn_selectall.setOnClickListener {

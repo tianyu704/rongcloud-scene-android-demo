@@ -12,12 +12,13 @@ import android.provider.MediaStore
 import android.util.Log
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FROM_TYPE_LOCAL
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File
+import javax.inject.Inject
 
 /**
  * @author gusd
@@ -25,15 +26,12 @@ import java.io.File
  */
 private const val TAG = "MusicAddPresenter"
 
-class MusicAddPresenter(val view: IMusicAddView, roomId: String) :
+class MusicAddPresenter @Inject constructor(
+    val view: IMusicAddView,
+    val roomModel: VoiceRoomModel
+) :
     BaseLifeCyclePresenter<IMusicAddView>(view) {
-    private val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
-    private val fileModel by lazy {
-        FileModel
-    }
 
     override fun onStart() {
         super.onStart()

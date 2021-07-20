@@ -12,24 +12,30 @@ import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.layout_member_setting.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/21
  */
+@AndroidEntryPoint
 class MemberSettingFragment(
     val view: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean,
-    private val member: UiMemberModel,
-    private val isFromSeat: Boolean = false // 麦位上点击  管理员管理非管理员 可以闭麦和关闭座位  列表中点击不可以操作
+     val member: UiMemberModel,
 ) :
     BaseBottomSheetDialogFragment<MemberSettingPresenter, IMemberSettingView>(R.layout.layout_member_setting),
     IMemberSettingView by view {
+
+    @Inject
+    lateinit var presenter: MemberSettingPresenter
+
     override fun initPresenter(): MemberSettingPresenter {
-        return MemberSettingPresenter(this, roomInfoBean, member)
+        return presenter
     }
 
     override fun initView() {

@@ -12,20 +12,21 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/09
  */
-class VoiceRoomListPresenter(
-    val view: IVoiceRoomListView
+@ActivityScoped
+class VoiceRoomListPresenter @Inject constructor(
+    val view: IVoiceRoomListView,
+    private val voiceRoomListMode: VoiceRoomListModel
 ) :
     BaseLifeCyclePresenter<IVoiceRoomListView>(view) {
 
-    private val voiceRoomListMode: VoiceRoomListModel by lazy {
-        VoiceRoomListModel
-    }
 
     override fun onCreate() {
         super.onCreate()

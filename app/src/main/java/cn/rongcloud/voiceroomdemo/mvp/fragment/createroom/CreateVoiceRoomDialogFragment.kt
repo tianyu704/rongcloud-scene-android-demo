@@ -20,7 +20,9 @@ import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_create_room.*
+import javax.inject.Inject
 
 /**
  * @author gusd
@@ -30,6 +32,7 @@ private const val TAG = "CreateVoiceRoomDialogFr"
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
 
+@AndroidEntryPoint
 class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     BaseBottomSheetDialogFragment<CreateVoiceRoomPresenter, ICreateVoiceRoomView>(R.layout.layout_create_room),
     ICreateVoiceRoomView by view {
@@ -43,9 +46,11 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     private var roomPassword: String? = null
     private var inputPasswordDialog: InputPasswordDialog? = null
 
+    @Inject
+    lateinit var presenter: CreateVoiceRoomPresenter
 
     override fun initPresenter(): CreateVoiceRoomPresenter {
-        return CreateVoiceRoomPresenter(this, requireContext())
+        return presenter
     }
 
     override fun onDestroy() {

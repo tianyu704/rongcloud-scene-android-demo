@@ -17,6 +17,8 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * @author gusd
@@ -24,7 +26,8 @@ import io.reactivex.rxjava3.subjects.PublishSubject
  */
 private const val TAG = "VoiceRoomListModel"
 
-object VoiceRoomListModel {
+@Singleton
+class VoiceRoomListModel @Inject constructor() {
 
     private val pageSize = 10
     private var page = 0

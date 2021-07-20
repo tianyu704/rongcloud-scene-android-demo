@@ -13,20 +13,24 @@ import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
+import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/04
  */
-class LoginPresenter(val view: ILoginView, private val context: Context) :
+@ActivityScoped
+class LoginPresenter @Inject constructor(
+    val view: ILoginView,
+    private val loginModel: LoginModel,
+    @ActivityContext private val context: Context
+) :
     BaseLifeCyclePresenter<ILoginView>(view) {
-
-    private val loginModel: LoginModel by lazy {
-        LoginModel()
-    }
 
     override fun onCreate() {
     }

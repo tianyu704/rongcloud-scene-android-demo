@@ -7,24 +7,22 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting
 import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/21
  */
-class MemberSettingPresenter(
+class MemberSettingPresenter @Inject constructor(
     private val view: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean,
-    private var member: UiMemberModel
+    private var member: UiMemberModel,
+    private val roomModel: VoiceRoomModel
 ) :
     BaseLifeCyclePresenter<IMemberSettingView>(view) {
-    private val roomModel: VoiceRoomModel by lazy {
-        getVoiceRoomModelByRoomId(roomInfoBean.roomId)
-    }
 
     override fun onCreate() {
         super.onCreate()

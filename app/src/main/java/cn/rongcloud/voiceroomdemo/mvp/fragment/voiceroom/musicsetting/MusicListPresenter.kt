@@ -5,19 +5,17 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicListPresenter(val view: IMusicListView, roomId: String) :
+class MusicListPresenter @Inject constructor(val view: IMusicListView, val roomModel: VoiceRoomModel) :
     BaseLifeCyclePresenter<IMusicListView>(view) {
-    private val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     override fun onStart() {
         super.onStart()

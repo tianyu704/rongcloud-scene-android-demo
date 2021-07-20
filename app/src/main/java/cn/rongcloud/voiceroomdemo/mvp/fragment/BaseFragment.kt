@@ -19,7 +19,8 @@ import cn.rongcloud.voiceroomdemo.common.IBaseView
  */
 abstract class BaseFragment<P : BaseLifeCyclePresenter<V>, V : IBaseView>(@LayoutRes val layoutId: Int) :
     Fragment() {
-    protected lateinit var presenter: P
+    private lateinit var presenter: P
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presenter = initPresenter()

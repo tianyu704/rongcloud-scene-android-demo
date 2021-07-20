@@ -14,7 +14,6 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
-import cn.rongcloud.rtc.utils.AudioUtil
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
@@ -45,6 +44,7 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.IViewPage
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.SeatOrderOperationFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.ISelfSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.SelfSettingFragment
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
@@ -57,11 +57,13 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import com.vanniktech.emoji.EmojiPopup
+import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_voice_room.*
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
+import javax.inject.Inject
 
 
 private const val TAG = "VoiceRoomActivity"
@@ -70,6 +72,7 @@ private const val NOTICATION_ID = 10020
 private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
 private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
+@AndroidEntryPoint
 class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
     IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, ISendPresentView,
@@ -117,13 +120,22 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     private var roomSettingFragment: RoomSettingFragment? = null
 
+    @Inject
+    lateinit var presenter: VoiceRoomPresenter
+
     override fun initPresenter(): VoiceRoomPresenter {
-        return VoiceRoomPresenter(this, roomId)
+        return presenter
+    }
+
+    fun getVoiceRoomModel():VoiceRoomModel{
+        return presenter.roomModel
     }
 
     override fun isLightThemeActivity(): Boolean {
         return false
     }
+
+    fun getRoomId(): String = roomId
 
     val favAnimation: FavAnimation by lazy {
         return@lazy FavAnimation(this).apply {
@@ -215,7 +227,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             Audience(mRootView)
         }
 
-        rv_message_list.adapter = VoiceRoomMessageAdapter(roomId) { userId ->
+        rv_message_list.adapter = VoiceRoomMessageAdapter(presenter.roomModel) { userId ->
             if (userId == AccountStore.getUserId()) {
                 return@VoiceRoomMessageAdapter
             }
@@ -228,7 +240,12 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             }
         }
         //开启前台服务
-        startService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
+        startService(
+            Intent(
+                this,
+                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
+            )
+        )
     }
 
     override fun onMemberInfoChange() {
@@ -270,13 +287,13 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
         iv_room_setting.setOnClickListener {
             roomInfo.roomBean?.let {
-                roomSettingFragment = RoomSettingFragment(this, it)
+                roomSettingFragment = RoomSettingFragment(this)
                 roomSettingFragment?.show(supportFragmentManager)
             }
         }
         btn_seat_order.setOnClickListener {
             roomInfo.roomBean?.let {
-                SeatOrderOperationFragment(this, it).show(supportFragmentManager)
+                SeatOrderOperationFragment(this).show(supportFragmentManager)
             }
         }
 
@@ -289,7 +306,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         }
         iv_send_gift.setOnClickListener {
             roomInfo.roomBean?.let {
-                SendPresentFragment(this, it.roomId).show(supportFragmentManager)
+                SendPresentFragment(this).show(supportFragmentManager)
             }
         }
     }
@@ -393,7 +410,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
     override fun showInviteUserView() {
         presenter.getCurrentRoomInfo().roomBean?.let {
-            SeatOrderOperationFragment(this, it, 1).show(supportFragmentManager)
+            SeatOrderOperationFragment(this, 1).show(supportFragmentManager)
         }
     }
 
@@ -505,7 +522,12 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         favAnimation.let {
             it.release()
         }
-        stopService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
+        stopService(
+            Intent(
+                this,
+                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
+            )
+        )
         AudioManagerUtil.dispose()
     }
 
@@ -539,7 +561,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            BackgroundSettingFragment(it, this).show(supportFragmentManager)
+            BackgroundSettingFragment(this).show(supportFragmentManager)
         }
     }
 
@@ -547,7 +569,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            MusicSettingFragment(it.roomId, this).show(supportFragmentManager)
+            MusicSettingFragment(this).show(supportFragmentManager)
         }
     }
 
@@ -563,7 +585,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     override fun sendGift(userId: String) {
         memberSettingFragment?.dismiss()
         memberListFragment?.dismiss()
-        SendPresentFragment(this, roomId, arrayListOf<String>(userId)).show(supportFragmentManager)
+        SendPresentFragment(this, arrayListOf<String>(userId)).show(supportFragmentManager)
     }
 
 
@@ -573,7 +595,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
 
             }
             STATUS_WAIT_FOR_SEAT -> {
-                RevokeSeatRequestFragment(this@VoiceRoomActivity, roomId).show(
+                RevokeSeatRequestFragment(this@VoiceRoomActivity).show(
                     supportFragmentManager
                 )
             }
@@ -701,8 +723,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                             MemberSettingFragment(
                                 this@VoiceRoomActivity,
                                 roomInfo,
-                                memberInfo,
-                                true
+                                memberInfo
                             ).show(supportFragmentManager)
                         }
                     }
@@ -722,8 +743,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
             memberSettingFragment = MemberSettingFragment(
                 this@VoiceRoomActivity,
                 roomBean,
-                member,
-                false
+                member
             ).apply {
                 show(supportFragmentManager)
             }
@@ -798,8 +818,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                             memberSettingFragment = MemberSettingFragment(
                                 this@VoiceRoomActivity,
                                 roomBean,
-                                member,
-                                true
+                                member
                             ).apply {
                                 show(supportFragmentManager)
                             }
@@ -873,8 +892,7 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
                                 memberSettingFragment = MemberSettingFragment(
                                     this@VoiceRoomActivity,
                                     roomBean,
-                                    member,
-                                    true
+                                    member
                                 ).apply {
                                     show(supportFragmentManager)
                                 }

@@ -10,18 +10,23 @@ import cn.rongcloud.voiceroomdemo.common.loadPortrait
 import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragmeng_creator_setting.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
+@AndroidEntryPoint
 class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: VoiceRoomBean) :
     BaseBottomSheetDialogFragment<CreatorSettingPresenter, ICreatorView>(R.layout.fragmeng_creator_setting),
     ICreatorView by view {
-    override fun initPresenter(): CreatorSettingPresenter {
-        return CreatorSettingPresenter(this, roomInfoBean)
-    }
+
+    @Inject
+    lateinit var presenter: CreatorSettingPresenter
+
+    override fun initPresenter(): CreatorSettingPresenter = presenter
 
     override fun initView() {
         btn_out_of_seat.setOnClickListener {

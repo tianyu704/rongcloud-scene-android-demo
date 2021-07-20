@@ -19,8 +19,8 @@ import cn.rongcloud.voiceroomdemo.common.*
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
-import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
+import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.IRongCoreListener
@@ -30,12 +30,13 @@ import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
+import javax.inject.Inject
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
 
 private const val TAG = "HomeActivity"
 
-
+@AndroidEntryPoint
 class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     IRongCoreListener.OnReceiveMessageListener {
 
@@ -46,10 +47,12 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         }
     }
 
+    @Inject
+    lateinit var presenter: HomePresenter
 
     private var userInfoDialog: UserInfoDialog? = null
 
-    override fun initPresenter(): HomePresenter = HomePresenter(this, this)
+    override fun initPresenter(): HomePresenter = presenter
 
     override fun getContentView(): Int = R.layout.activity_home
 

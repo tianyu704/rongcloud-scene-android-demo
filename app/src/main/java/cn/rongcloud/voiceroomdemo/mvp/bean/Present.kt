@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model
+package cn.rongcloud.voiceroomdemo.mvp.bean
 
 import androidx.annotation.DrawableRes
 

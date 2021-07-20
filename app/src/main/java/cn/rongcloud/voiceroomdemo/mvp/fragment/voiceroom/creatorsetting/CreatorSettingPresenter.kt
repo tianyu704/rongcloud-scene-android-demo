@@ -7,20 +7,20 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import dagger.hilt.android.scopes.FragmentScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
-class CreatorSettingPresenter(val view: ICreatorView, roomInfoBean: VoiceRoomBean) :
+@FragmentScoped
+class CreatorSettingPresenter @Inject constructor(
+    val view: ICreatorView,
+    val roomModel: VoiceRoomModel
+) :
     BaseLifeCyclePresenter<ICreatorView>(view) {
-
-    private val roomModel: VoiceRoomModel by lazy {
-        getVoiceRoomModelByRoomId(roomInfoBean.roomId)
-    }
 
     override fun onCreate() {
         super.onCreate()

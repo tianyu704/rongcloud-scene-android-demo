@@ -9,18 +9,24 @@ import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_control.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicControlFragment(view: IMusicControlView, roomId: String) :
+@AndroidEntryPoint
+class MusicControlFragment(view: IMusicControlView) :
     BaseFragment<MusicControlPresenter, IMusicControlView>(
         R.layout.fragment_music_control
     ), IMusicControlView by view, SeekBar.OnSeekBarChangeListener {
+
+    @Inject
+    lateinit var presenter: MusicControlPresenter
     override fun initPresenter(): MusicControlPresenter {
-        return MusicControlPresenter(this)
+        return presenter
     }
 
     override fun initView() {

@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model.message;
+package cn.rongcloud.voiceroomdemo.mvp.bean.message;
 
 import android.os.Parcel;
 import android.text.TextUtils;
@@ -20,14 +20,15 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/17
  */
-@MessageTag(value = "RC:Chatroom:User:Ban")
-public class RCChatroomUserBan extends MessageContent {
-    private static final String TAG = "RCChatroomUserBan";
+@MessageTag(value = "RC:Chatroom:User:Block")
+public class RCChatroomUserBlock extends MessageContent {
+    private static final String TAG = "RCChatroomUserBlock";
+
     private String id;
     private long duration;
     private String extra;
 
-    public RCChatroomUserBan(byte[] data) {
+    public RCChatroomUserBlock(byte[] data) {
         super(data);
         String jsonStr = null;
         jsonStr = new String(data, StandardCharsets.UTF_8);
@@ -40,9 +41,11 @@ public class RCChatroomUserBan extends MessageContent {
             if (jsonObj.has("extra")) {
                 extra = jsonObj.getString("extra");
             }
+
             if (jsonObj.has("duration")) {
                 duration = jsonObj.getLong("duration");
             }
+
         } catch (JSONException e) {
             Log.e(TAG, "JSONException " + e.getMessage());
         }
@@ -58,7 +61,6 @@ public class RCChatroomUserBan extends MessageContent {
             if (!TextUtils.isEmpty(extra)) {
                 jsonObj.put("extra", extra);
             }
-
             jsonObj.put("duration", duration);
             return jsonObj.toString().getBytes(StandardCharsets.UTF_8);
         } catch (JSONException e) {
@@ -79,7 +81,7 @@ public class RCChatroomUserBan extends MessageContent {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
@@ -90,6 +92,7 @@ public class RCChatroomUserBan extends MessageContent {
     public void setExtra(String extra) {
         this.extra = extra;
     }
+
 
     @Override
     public int describeContents() {
@@ -105,29 +108,29 @@ public class RCChatroomUserBan extends MessageContent {
 
     public void readFromParcel(Parcel source) {
         this.id = source.readString();
-        this.duration = source.readInt();
+        this.duration = source.readLong();
         this.extra = source.readString();
     }
 
-    public RCChatroomUserBan() {
+    public RCChatroomUserBlock() {
     }
 
 
-    protected RCChatroomUserBan(Parcel in) {
+    protected RCChatroomUserBlock(Parcel in) {
         this.id = in.readString();
-        this.duration = in.readInt();
+        this.duration = in.readLong();
         this.extra = in.readString();
     }
 
-    public static final Creator<RCChatroomUserBan> CREATOR = new Creator<RCChatroomUserBan>() {
+    public static final Creator<RCChatroomUserBlock> CREATOR = new Creator<RCChatroomUserBlock>() {
         @Override
-        public RCChatroomUserBan createFromParcel(Parcel source) {
-            return new RCChatroomUserBan(source);
+        public RCChatroomUserBlock createFromParcel(Parcel source) {
+            return new RCChatroomUserBlock(source);
         }
 
         @Override
-        public RCChatroomUserBan[] newArray(int size) {
-            return new RCChatroomUserBan[size];
+        public RCChatroomUserBlock[] newArray(int size) {
+            return new RCChatroomUserBlock[size];
         }
     };
 }

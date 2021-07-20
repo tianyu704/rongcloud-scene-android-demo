@@ -14,10 +14,13 @@ import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_login.*
+import javax.inject.Inject
 
 private const val TAG = "LoginActivity"
 
+@AndroidEntryPoint
 class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
 
     companion object {
@@ -26,6 +29,9 @@ class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
             context.startActivity(intent)
         }
     }
+
+    @Inject
+    lateinit var presenter: LoginPresenter
 
     private var getVerificationCodeCountDownTimer: CountDownTimer? = null
 
@@ -89,7 +95,7 @@ class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
     }
 
     override fun initPresenter(): LoginPresenter {
-        return LoginPresenter(this, this)
+        return presenter
     }
 
     override fun onLogout() {

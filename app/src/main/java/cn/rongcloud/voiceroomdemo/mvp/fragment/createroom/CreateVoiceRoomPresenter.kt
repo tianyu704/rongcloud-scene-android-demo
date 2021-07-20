@@ -14,12 +14,17 @@ import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.Kv
 import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
+import dagger.hilt.android.qualifiers.ActivityContext
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/15
  */
-class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Context) :
+class CreateVoiceRoomPresenter @Inject constructor(
+    val view: ICreateVoiceRoomView,
+    @ActivityContext val context: Context
+) :
     BaseLifeCyclePresenter<ICreateVoiceRoomView>(view) {
 
     fun createVoiceRoom(
@@ -42,7 +47,10 @@ class CreateVoiceRoomPresenter(val view: ICreateVoiceRoomView, val context: Cont
         }
         if (roomCover != null) {
             addDisposable(FileModel
-                .imageUpload(RealPathFromUriUtils.getRealPathFromUri(context,roomCover), context)
+                .imageUpload(
+                    RealPathFromUriUtils.getRealPathFromUri(context, roomCover),
+                    context
+                )
                 .flatMap {
                     return@flatMap RetrofitManager
                         .commonService

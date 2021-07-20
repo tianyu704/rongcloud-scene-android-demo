@@ -14,19 +14,22 @@ import androidx.appcompat.widget.AppCompatImageView
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
+import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomListAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.CreateVoiceRoomDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.ICreateVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomListPresenter
 import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomListAdapter
 import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_voice_room_list.*
 import kotlinx.android.synthetic.main.layout_input_password_dialog.*
+import javax.inject.Inject
 
 private const val TAG = "VoiceRoomListActivity"
 
+@AndroidEntryPoint
 class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomListView>(),
     IVoiceRoomListView, ICreateVoiceRoomView {
     companion object {
@@ -41,8 +44,11 @@ class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomLis
     private var createVoiceRoomDialogFragment: CreateVoiceRoomDialogFragment? = null
     private var messageDialog: ConfirmDialog? = null
 
+    @Inject
+    lateinit var presenter: VoiceRoomListPresenter
+
     override fun initPresenter(): VoiceRoomListPresenter {
-        return VoiceRoomListPresenter(this)
+        return presenter
     }
 
     override fun getContentView(): Int = R.layout.activity_voice_room_list
@@ -82,7 +88,7 @@ class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomLis
             }
             if (password == bean.password) {
                 passwordDialog?.dismiss()
-                presenter.turnToRoom(this,bean)
+                presenter.turnToRoom(this, bean)
             } else {
                 showToast(R.string.password_error)
             }

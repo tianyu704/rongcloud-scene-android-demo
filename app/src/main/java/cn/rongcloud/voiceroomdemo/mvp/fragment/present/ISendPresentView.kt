@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 
 import cn.rongcloud.voiceroomdemo.common.IBaseView
-import cn.rongcloud.voiceroomdemo.mvp.model.Present
+import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 
 /**

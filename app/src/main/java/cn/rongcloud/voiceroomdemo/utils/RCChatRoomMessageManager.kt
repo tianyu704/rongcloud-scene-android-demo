@@ -4,7 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.utils
 
-import cn.rongcloud.voiceroomdemo.mvp.model.message.*
+import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -29,14 +29,14 @@ object RCChatRoomMessageManager {
     fun registerMessageTypes() {
         RongCoreClient.registerMessageType(
             listOf(
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomEnter::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomBarrage::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomKickOut::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGift::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomGiftAll::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomAdmin::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomSeats::class.java,
-                cn.rongcloud.voiceroomdemo.mvp.model.message.RCChatroomLike::class.java
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomEnter::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomBarrage::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomKickOut::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomGift::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomGiftAll::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomAdmin::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomSeats::class.java,
+                cn.rongcloud.voiceroomdemo.mvp.bean.message.RCChatroomLike::class.java
             )
         )
     }

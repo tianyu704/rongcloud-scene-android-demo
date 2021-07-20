@@ -6,13 +6,13 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.background
 
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.common.LocalDataStore
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/22
  */
-class BackgroundSettingPresenter(val view: IBackgroundSettingView, roomInfoBean: VoiceRoomBean) :
+class BackgroundSettingPresenter @Inject constructor(val view: IBackgroundSettingView) :
     BaseLifeCyclePresenter<IBackgroundSettingView>(view) {
 
     override fun onResume() {

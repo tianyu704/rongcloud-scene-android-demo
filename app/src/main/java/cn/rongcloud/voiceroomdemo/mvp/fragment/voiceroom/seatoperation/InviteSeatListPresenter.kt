@@ -5,21 +5,20 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.getVoiceRoomModelByRoomId
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/24
  */
-class InviteSeatListPresenter(val view: IInviteSeatListView, roomId: String) :
+class InviteSeatListPresenter @Inject constructor(
+    val view: IInviteSeatListView,
+    val roomModel: VoiceRoomModel
+) :
     BaseLifeCyclePresenter<IInviteSeatListView>(view) {
-
-
-    private val roomModel by lazy {
-        getVoiceRoomModelByRoomId(roomId)
-    }
 
     override fun onResume() {
         super.onResume()

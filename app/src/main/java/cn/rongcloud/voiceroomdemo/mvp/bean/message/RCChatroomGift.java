@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model.message;
+package cn.rongcloud.voiceroomdemo.mvp.bean.message;
 
 import android.os.Parcel;
 import android.text.TextUtils;
@@ -17,22 +17,24 @@ import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
 /**
- *
+ * 人到人送礼物
  * @author gusd
  * @Date 2021/06/17
  */
-@MessageTag(value = "RC:Chatroom:GiftAll")
-public class RCChatroomGiftAll extends MessageContent {
-    private static final String TAG = "RCChatroomGiftAll";
+@MessageTag(value = "RC:Chatroom:Gift")
+public class RCChatroomGift extends MessageContent {
+    private static final String TAG = "RCChatroomGift";
 
     private String userId;
     private String userName;
+    private String targetId;
+    private String targetName;
     private String giftId;
     private String giftName;
-    private int number;
+    private String number;
     private int price;
 
-    public RCChatroomGiftAll(byte[] data) {
+    public RCChatroomGift(byte[] data) {
         super(data);
         String jsonStr = null;
         jsonStr = new String(data, StandardCharsets.UTF_8);
@@ -46,7 +48,12 @@ public class RCChatroomGiftAll extends MessageContent {
                 userName = jsonObj.getString("userName");
             }
 
-
+            if (jsonObj.has("targetId")) {
+                targetId = jsonObj.getString("targetId");
+            }
+            if (jsonObj.has("targetName")) {
+                targetName = jsonObj.getString("targetName");
+            }
             if (jsonObj.has("giftId")) {
                 giftId = jsonObj.getString("giftId");
             }
@@ -54,18 +61,16 @@ public class RCChatroomGiftAll extends MessageContent {
                 giftName = jsonObj.getString("giftName");
             }
             if (jsonObj.has("number")) {
-                number = jsonObj.getInt("number");
+                number = jsonObj.getString("number");
             }
             if (jsonObj.has("price")) {
                 price = jsonObj.getInt("price");
             }
-
         } catch (JSONException e) {
             Log.e(TAG, "JSONException " + e.getMessage());
         }
     }
 
-    @Override
     public byte[] encode() {
         JSONObject jsonObj = new JSONObject();
         try {
@@ -76,14 +81,21 @@ public class RCChatroomGiftAll extends MessageContent {
                 jsonObj.put("userName", userName);
             }
 
+            if (!TextUtils.isEmpty(targetId)) {
+                jsonObj.put("targetId", targetId);
+            }
+            if (!TextUtils.isEmpty(targetName)) {
+                jsonObj.put("targetName", targetName);
+            }
             if (!TextUtils.isEmpty(giftId)) {
                 jsonObj.put("giftId", giftId);
             }
             if (!TextUtils.isEmpty(giftName)) {
                 jsonObj.put("giftName", giftName);
             }
-
-            jsonObj.put("number", number);
+            if (!TextUtils.isEmpty(number)) {
+                jsonObj.put("number", number);
+            }
             jsonObj.put("price", price);
             return jsonObj.toString().getBytes(StandardCharsets.UTF_8);
         } catch (JSONException e) {
@@ -91,6 +103,7 @@ public class RCChatroomGiftAll extends MessageContent {
         }
         return null;
     }
+
 
     public String getUserId() {
         return userId;
@@ -106,6 +119,22 @@ public class RCChatroomGiftAll extends MessageContent {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getTargetId() {
+        return targetId;
+    }
+
+    public void setTargetId(String targetId) {
+        this.targetId = targetId;
+    }
+
+    public String getTargetName() {
+        return targetName;
+    }
+
+    public void setTargetName(String targetName) {
+        this.targetName = targetName;
     }
 
     public String getGiftId() {
@@ -124,11 +153,11 @@ public class RCChatroomGiftAll extends MessageContent {
         this.giftName = giftName;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
 
@@ -140,6 +169,7 @@ public class RCChatroomGiftAll extends MessageContent {
         this.price = price;
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -149,42 +179,48 @@ public class RCChatroomGiftAll extends MessageContent {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.userId);
         dest.writeString(this.userName);
+        dest.writeString(this.targetId);
+        dest.writeString(this.targetName);
         dest.writeString(this.giftId);
         dest.writeString(this.giftName);
-        dest.writeInt(this.number);
+        dest.writeString(this.number);
         dest.writeInt(this.price);
     }
 
     public void readFromParcel(Parcel source) {
         this.userId = source.readString();
         this.userName = source.readString();
+        this.targetId = source.readString();
+        this.targetName = source.readString();
         this.giftId = source.readString();
         this.giftName = source.readString();
-        this.number = source.readInt();
+        this.number = source.readString();
         this.price = source.readInt();
     }
 
-    public RCChatroomGiftAll() {
+    public RCChatroomGift() {
     }
 
-    protected RCChatroomGiftAll(Parcel in) {
+    protected RCChatroomGift(Parcel in) {
         this.userId = in.readString();
         this.userName = in.readString();
+        this.targetId = in.readString();
+        this.targetName = in.readString();
         this.giftId = in.readString();
         this.giftName = in.readString();
-        this.number = in.readInt();
+        this.number = in.readString();
         this.price = in.readInt();
     }
 
-    public static final Creator<RCChatroomGiftAll> CREATOR = new Creator<RCChatroomGiftAll>() {
+    public static final Creator<RCChatroomGift> CREATOR = new Creator<RCChatroomGift>() {
         @Override
-        public RCChatroomGiftAll createFromParcel(Parcel source) {
-            return new RCChatroomGiftAll(source);
+        public RCChatroomGift createFromParcel(Parcel source) {
+            return new RCChatroomGift(source);
         }
 
         @Override
-        public RCChatroomGiftAll[] newArray(int size) {
-            return new RCChatroomGiftAll[size];
+        public RCChatroomGift[] newArray(int size) {
+            return new RCChatroomGift[size];
         }
     };
 }

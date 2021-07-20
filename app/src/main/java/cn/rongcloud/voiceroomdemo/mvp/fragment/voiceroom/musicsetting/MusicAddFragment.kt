@@ -18,8 +18,10 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FROM_TYPE_SYSTEM
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FUNCTION_LOCAL_ADD
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_add.*
 import kotlinx.android.synthetic.main.layout_add_music_item.view.*
+import javax.inject.Inject
 
 /**
  * @author gusd
@@ -28,12 +30,16 @@ import kotlinx.android.synthetic.main.layout_add_music_item.view.*
 private const val TAG = "MusicAddFragment"
 private const val MUSIC_PICK_REQUEST_CODE = 10000
 
-class MusicAddFragment(view: IMusicAddView, val roomId: String) :
+@AndroidEntryPoint
+class MusicAddFragment(view: IMusicAddView) :
     BaseFragment<MusicAddPresenter, IMusicAddView>(R.layout.fragment_music_add),
     IMusicAddView by view {
 
+    @Inject
+    lateinit var presenter: MusicAddPresenter
+
     override fun initPresenter(): MusicAddPresenter {
-        return MusicAddPresenter(this, roomId)
+        return presenter
     }
 
     override fun initView() {
@@ -80,7 +86,7 @@ class MusicAddFragment(view: IMusicAddView, val roomId: String) :
             val uri = data?.data
             uri?.let {
                 Log.d(TAG, "onActivityResult: ${uri.path}")
-                presenter.addMusicFromLocal(requireContext(),uri)
+                presenter.addMusicFromLocal(requireContext(), uri)
             }
         }
     }

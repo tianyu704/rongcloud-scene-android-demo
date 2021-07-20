@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model.message;
+package cn.rongcloud.voiceroomdemo.mvp.bean.message;
 
 import android.os.Parcel;
 

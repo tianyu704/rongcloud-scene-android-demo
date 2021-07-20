@@ -41,9 +41,6 @@
             android:theme="@style/Theme.VoiceRoomActivityTheme"
             android:windowSoftInputMode="adjustResize" />
 
-        <activity
-            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.MessageListActivity"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomListActivity"

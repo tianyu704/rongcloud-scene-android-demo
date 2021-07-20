@@ -10,21 +10,30 @@ import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_empty_seat_setting.*
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
+
+@AndroidEntryPoint
 class EmptySeatFragment(
     val view: IEmptySeatView,
-    private var seatInfo: UiSeatModel,
+    var seatInfo: UiSeatModel,
     val roomId: String
 ) :
     BaseBottomSheetDialogFragment<EmptySeatPresenter, IEmptySeatView>(R.layout.fragment_empty_seat_setting),
     IEmptySeatView by view {
+
+
+    @Inject
+    lateinit var presenter: EmptySeatPresenter
+
     override fun initPresenter(): EmptySeatPresenter {
-        return EmptySeatPresenter(this, seatInfo, roomId)
+        return presenter
     }
 
     override fun initView() {

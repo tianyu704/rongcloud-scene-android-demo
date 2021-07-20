@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model.message;
+package cn.rongcloud.voiceroomdemo.mvp.bean.message;
 
 import android.os.Parcel;
 import android.text.TextUtils;
@@ -17,20 +17,17 @@ import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
 /**
- *
  * @author gusd
  * @Date 2021/06/17
  */
-@MessageTag(value = "RC:Chatroom:Follow")
-public class RCChatroomFollow extends MessageContent {
-    private static final String TAG = "RCChatroomFollow";
-
+@MessageTag(value = "RC:Chatroom:User:Ban")
+public class RCChatroomUserBan extends MessageContent {
+    private static final String TAG = "RCChatroomUserBan";
     private String id;
-    private int rank;
-    private int level;
+    private long duration;
     private String extra;
 
-    public RCChatroomFollow(byte[] data) {
+    public RCChatroomUserBan(byte[] data) {
         super(data);
         String jsonStr = null;
         jsonStr = new String(data, StandardCharsets.UTF_8);
@@ -40,21 +37,16 @@ public class RCChatroomFollow extends MessageContent {
             if (jsonObj.has("id")) {
                 id = jsonObj.getString("id");
             }
-
             if (jsonObj.has("extra")) {
                 extra = jsonObj.getString("extra");
             }
-            if (jsonObj.has("rank")) {
-                rank = jsonObj.getInt("rank");
-            }
-            if (jsonObj.has("level")) {
-                level = jsonObj.getInt("level");
+            if (jsonObj.has("duration")) {
+                duration = jsonObj.getLong("duration");
             }
         } catch (JSONException e) {
             Log.e(TAG, "JSONException " + e.getMessage());
         }
     }
-
 
     @Override
     public byte[] encode() {
@@ -66,8 +58,8 @@ public class RCChatroomFollow extends MessageContent {
             if (!TextUtils.isEmpty(extra)) {
                 jsonObj.put("extra", extra);
             }
-            jsonObj.put("rank", rank);
-            jsonObj.put("level", level);
+
+            jsonObj.put("duration", duration);
             return jsonObj.toString().getBytes(StandardCharsets.UTF_8);
         } catch (JSONException e) {
             Log.e(TAG, "JSONException " + e.getMessage());
@@ -83,20 +75,12 @@ public class RCChatroomFollow extends MessageContent {
         this.id = id;
     }
 
-    public int getRank() {
-        return rank;
+    public long getDuration() {
+        return duration;
     }
 
-    public void setRank(int rank) {
-        this.rank = rank;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
     public String getExtra() {
@@ -107,7 +91,6 @@ public class RCChatroomFollow extends MessageContent {
         this.extra = extra;
     }
 
-
     @Override
     public int describeContents() {
         return 0;
@@ -116,37 +99,35 @@ public class RCChatroomFollow extends MessageContent {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.id);
-        dest.writeInt(this.rank);
-        dest.writeInt(this.level);
+        dest.writeLong(this.duration);
         dest.writeString(this.extra);
     }
 
     public void readFromParcel(Parcel source) {
         this.id = source.readString();
-        this.rank = source.readInt();
-        this.level = source.readInt();
+        this.duration = source.readInt();
         this.extra = source.readString();
     }
 
-    public RCChatroomFollow() {
+    public RCChatroomUserBan() {
     }
 
-    protected RCChatroomFollow(Parcel in) {
+
+    protected RCChatroomUserBan(Parcel in) {
         this.id = in.readString();
-        this.rank = in.readInt();
-        this.level = in.readInt();
+        this.duration = in.readInt();
         this.extra = in.readString();
     }
 
-    public static final Creator<RCChatroomFollow> CREATOR = new Creator<RCChatroomFollow>() {
+    public static final Creator<RCChatroomUserBan> CREATOR = new Creator<RCChatroomUserBan>() {
         @Override
-        public RCChatroomFollow createFromParcel(Parcel source) {
-            return new RCChatroomFollow(source);
+        public RCChatroomUserBan createFromParcel(Parcel source) {
+            return new RCChatroomUserBan(source);
         }
 
         @Override
-        public RCChatroomFollow[] newArray(int size) {
-            return new RCChatroomFollow[size];
+        public RCChatroomUserBan[] newArray(int size) {
+            return new RCChatroomUserBan[size];
         }
     };
 }

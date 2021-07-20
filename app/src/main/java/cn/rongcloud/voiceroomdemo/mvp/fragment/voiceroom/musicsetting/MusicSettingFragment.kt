@@ -16,8 +16,11 @@ import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CHEER
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CLAP
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_ENTER
 import com.google.android.material.snackbar.BaseTransientBottomBar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_setting.*
 import kotlinx.android.synthetic.main.layout_music_atmosphere.view.*
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * @author gusd
@@ -26,19 +29,21 @@ import kotlinx.android.synthetic.main.layout_music_atmosphere.view.*
 
 private const val TAG = "MusicSettingFragment"
 
-
-class MusicSettingFragment(val roomId: String, view: IMusicSettingView) :
+@AndroidEntryPoint
+class MusicSettingFragment(view: IMusicSettingView) :
     BaseBottomSheetDialogFragment<MusicSettingPresenter, IMusicSettingView>(R.layout.fragment_music_setting),
     IMusicSettingView by view, IMusicAddView, IMusicListView, IMusicControlView {
 
     private val fragmentList by lazy {
         arrayListOf<Fragment>(
-            MusicListFragment(this, roomId),
-            MusicAddFragment(this, roomId),
-            MusicControlFragment(this, roomId)
+            MusicListFragment(this),
+            MusicAddFragment(this),
+            MusicControlFragment(this)
         )
     }
 
+    @Inject
+    lateinit var presenter: MusicSettingPresenter
 
     private val buttons by lazy {
         arrayListOf<View>(iv_music_list, iv_add_music, iv_music_control)
@@ -91,7 +96,7 @@ class MusicSettingFragment(val roomId: String, view: IMusicSettingView) :
 
 
     override fun initPresenter(): MusicSettingPresenter {
-        return MusicSettingPresenter(roomId, this)
+        return presenter
     }
 
     override fun initView() {
