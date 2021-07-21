@@ -482,7 +482,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                     if (it) {
                         currentStatus = STATUS_WAIT_FOR_SEAT
                         view.changeStatus(STATUS_WAIT_FOR_SEAT)
-                        view.showMessage("已申请排麦，等待房主确认")
+                        view.showMessage("已申请连线，等待房主接受")
                     } else {
                         view.showError("请求排麦失败")
                     }
