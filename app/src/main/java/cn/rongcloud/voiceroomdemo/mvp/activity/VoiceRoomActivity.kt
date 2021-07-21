@@ -851,16 +851,8 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
         Audience(view) {
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
-                    roomInfo.roomBean?.let { roomBean ->
-                        emptySeatFragment = EmptySeatFragment(
-                            this@VoiceRoomActivity,
-                            seatModel,
-                            roomBean.roomId
-                        ).apply {
-                            show(supportFragmentManager)
-                        }
-                    }
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty -> {
+                  presenter.enterSeat(seatModel.index)
                 }
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                     if (seatModel.userId == AccountStore.getUserId()) {
