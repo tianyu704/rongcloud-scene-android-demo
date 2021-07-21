@@ -8,12 +8,13 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.rongcloud.common.dao.api.CallRecordDao
 import com.rongcloud.common.dao.entities.CallRecordEntity
+import com.rongcloud.common.dao.entities.MemberInfoEntity
 
 /**
  * @author gusd
  * @Date 2021/07/21
  */
-@Database(entities = arrayOf(CallRecordEntity::class), version = 1)
+@Database(entities = arrayOf(CallRecordEntity::class, MemberInfoEntity::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun callRecordDao(): CallRecordDao
