@@ -267,27 +267,32 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             @Override
             public void onSuccess() {
                 Log.d(TAG, "onSuccess: ");
-                RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
-                    @Override
-                    public void onSuccess() {
-                        clearAll();
-                        onSuccessWithCheck(callback);
-                    }
-
-                    @Override
-                    public void onFailed(RTCErrorCode errorCode) {
-                        onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
-                    }
-                });
+                leaveRTCRoom(callback);
             }
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
                 Log.d(TAG, "onError : " + "coreErrorCode = " + coreErrorCode.code);
+                leaveRTCRoom(null);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
             }
         });
 
+    }
+
+    private void leaveRTCRoom(final RCVoiceRoomCallback callback){
+        RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
+            @Override
+            public void onSuccess() {
+                clearAll();
+                onSuccessWithCheck(callback);
+            }
+
+            @Override
+            public void onFailed(RTCErrorCode errorCode) {
+                onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
+            }
+        });
     }
 
     @Override
@@ -325,6 +330,17 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     currentRoomEventListener.onUserEnterSeat(seatIndex, mCurrentUserId);
                     currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
                 }
+                updateSeatBeUsedByUser(mCurrentUserId, seatIndex, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(int code, String message) {
+
+                    }
+                });
                 switchRole(RCRTCLiveRole.BROADCASTER, callback);
             }
 
@@ -1537,19 +1553,19 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             }
         });
 
-        if (!TextUtils.isEmpty(info.getUserId())) {
-            updateSeatBeUsedByUser(info.getUserId(), seatIndex, new RCVoiceRoomCallback() {
-                @Override
-                public void onSuccess() {
-
-                }
-
-                @Override
-                public void onError(int code, String message) {
-
-                }
-            });
-        }
+//        if (!TextUtils.isEmpty(info.getUserId())) {
+//            updateSeatBeUsedByUser(info.getUserId(), seatIndex, new RCVoiceRoomCallback() {
+//                @Override
+//                public void onSuccess() {
+//
+//                }
+//
+//                @Override
+//                public void onError(int code, String message) {
+//
+//                }
+//            });
+//        }
     }
 
     private void updateSeatBeUsedByUser(String userId, int seatIndex, final RCVoiceRoomCallback callback) {
