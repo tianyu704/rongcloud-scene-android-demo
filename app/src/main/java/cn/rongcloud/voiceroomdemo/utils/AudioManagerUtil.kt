@@ -32,6 +32,8 @@ object AudioManagerUtil : BroadcastReceiver() {
             addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
             addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
         })
+
+        choiceAudioModel()
     }
 
     fun changeToSpeaker() {
