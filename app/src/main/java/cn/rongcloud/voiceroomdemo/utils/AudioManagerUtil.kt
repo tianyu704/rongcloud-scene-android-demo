@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioManager
 
 
@@ -25,6 +26,12 @@ object AudioManagerUtil : BroadcastReceiver() {
     fun init(context: Context) {
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         lastModel = audioManager.mode
+
+        context.registerReceiver(this, IntentFilter().apply {
+            addAction(Intent.ACTION_HEADSET_PLUG)
+            addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED)
+            addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        })
     }
 
     fun changeToSpeaker() {
@@ -90,9 +97,8 @@ object AudioManagerUtil : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val action = intent.action
-        when {
-            action == Intent.ACTION_HEADSET_PLUG -> {
+        when (intent.action) {
+            Intent.ACTION_HEADSET_PLUG -> {
                 val state = intent.getIntExtra("state", 0)
                 if (state == 0) {// 耳机拔出
                     changeToSpeaker()
@@ -100,14 +106,14 @@ object AudioManagerUtil : BroadcastReceiver() {
                     changeToReceiver()
                 }
             }
-            action == BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
+            BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED -> {
                 val state = intent.getIntExtra(
                     BluetoothHeadset.EXTRA_STATE,
                     BluetoothHeadset.STATE_DISCONNECTED
                 )
                 updateBluetoothIndication(state)
             }
-            AudioManager.ACTION_AUDIO_BECOMING_NOISY == action -> {
+            AudioManager.ACTION_AUDIO_BECOMING_NOISY -> {
                 changeToSpeaker()
             }
         }
