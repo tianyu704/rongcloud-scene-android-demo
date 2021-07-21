@@ -22,6 +22,9 @@ import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
+import io.rong.callkit.DialActivity
+import io.rong.callkit.MultiVideoCallActivity
+import io.rong.callkit.RongCallKit
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.RongIMClient
@@ -62,10 +65,10 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         }
 
         iv_video_call.setOnClickListener {
-            showToast("暂未实现")
+            DialActivity.openDilapadPage(this, true)
         }
         iv_audio_call.setOnClickListener {
-            showToast("暂未实现")
+            DialActivity.openDilapadPage(this, false)
         }
         bg2.setColorFilter(Color.GRAY)
         bg2.alpha = 0.5f

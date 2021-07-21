@@ -71,7 +71,7 @@ object RetrofitManager {
         return Interceptor { chain ->
             val originalRequest = chain.request()
             val requestBuilder = originalRequest.newBuilder()
-                .method(originalRequest.method(), originalRequest.body())
+                .method(originalRequest.method, originalRequest.body)
             var authorization = AccountStore.getAuthorization()
             if (!authorization.isNullOrBlank()) {
                 requestBuilder.addHeader("Authorization", authorization)
