@@ -18,6 +18,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
+import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
@@ -349,6 +350,7 @@ class VoiceRoomPresenter(val view: IVoiceRoomView, val roomId: String) :
                 GlobalScope.launch(Dispatchers.IO) {
                     AudioEffectManager.init()
                 }
+                AudioManagerUtil.choiceAudioModel()
             }
         })
     }
