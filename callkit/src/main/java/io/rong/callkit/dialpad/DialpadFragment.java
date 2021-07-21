@@ -35,11 +35,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 import io.rong.callkit.DialActivity;
 import io.rong.callkit.R;
@@ -192,8 +194,7 @@ public class DialpadFragment extends Fragment
 
         final View floatingActionButtonContainer =
                 fragmentView.findViewById(R.id.dialpad_floating_action_button_container);
-        final ImageButton floatingActionButton =
-                (ImageButton) fragmentView.findViewById(R.id.dialpad_floating_action_button);
+        final ImageButton floatingActionButton = fragmentView.findViewById(R.id.dialpad_floating_action_button);
         floatingActionButton.setOnClickListener(this);
         mFloatingActionButtonController = new FloatingActionButtonController(getActivity(),
                 floatingActionButtonContainer, floatingActionButton);
@@ -404,6 +405,11 @@ public class DialpadFragment extends Fragment
                 hideSelf();
                 return;
             }
+            if (!isMobileNO(num)) {
+                mDigits.getText().clear();
+                Toast.makeText(getContext(), "请输入正确的电话号码", Toast.LENGTH_LONG).show();
+                return;
+            }
             if (null != dialpadListener && null != dialpadListener.get()) {
                 dialpadListener.get().onDialpad(num);
             }
@@ -417,6 +423,17 @@ public class DialpadFragment extends Fragment
             hideSelf();
         } else {
             Log.wtf(TAG, "Unexpected onClick() event from: " + view);
+        }
+    }
+
+    private final static String telRegex = "^((1[3,5,7,8][0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
+
+    private boolean isMobileNO(String mobiles) {
+        if (TextUtils.isEmpty(mobiles)) {
+            return false;
+        } else {
+            Pattern p = Pattern.compile(telRegex);
+            return p.matcher(mobiles).matches();
         }
     }
 
