@@ -1098,6 +1098,9 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
                     }
 
                     override fun onSuccess() {
+                        if(currentMusicState == RCRTCAudioMixer.MixingState.PLAY || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED){
+                            RCRTCAudioMixer.getInstance().stop()
+                        }
                         emitter.onComplete()
                     }
                 })
@@ -1403,6 +1406,10 @@ class VoiceRoomModel(val roomId: String) : RCVoiceRoomEventListener {
 
 
     fun playOrPauseMusic(model: UiMusicModel) {
+        if(getSeatInfoByUserId(AccountStore.getUserId()) == null){
+            MyApp.context.showToast("请先上麦之后再播放音乐")
+            return
+        }
         playNextMusicJob?.let {
             if (it.isActive) {
                 it.cancel()
