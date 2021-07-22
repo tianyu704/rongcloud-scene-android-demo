@@ -22,6 +22,7 @@ import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.*
+import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCycleModel
@@ -671,6 +672,7 @@ class VoiceRoomModel @Inject constructor(
         doOnDataScheduler {
             Log.d(TAG, "onKickSeatReceived: index = $index")
             roomEventSubject.onNext(Pair(EVENT_KICK_OUT_OF_SEAT, arrayListOf()))
+            AudioManagerUtil.choiceAudioModel()
         }
 
     }
@@ -1095,6 +1097,7 @@ class VoiceRoomModel @Inject constructor(
                             stopPlayMusic()
                         }
                         emitter.onComplete()
+                        AudioManagerUtil.choiceAudioModel()
                     }
                 })
             } ?: emitter.onError(Throwable("user not in seat"))
