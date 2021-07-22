@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.room.Room
 import com.rongcloud.common.dao.entities.CallRecordEntity
 import com.rongcloud.common.dao.entities.UserInfoEntity
+import com.rongcloud.common.dao.model.query.CallRecordModel
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -36,8 +37,12 @@ object DatabaseManager {
             .build()
     }
 
-    fun obUserInfoList(): Observable<List<UserInfoEntity>> {
-        return instance.memberInfoDao().queryUserInfoList().toObservable()
+//    fun obUserInfoList(): Observable<List<UserInfoEntity>> {
+//        return instance.memberInfoDao().queryUserInfoList().toObservable()
+//    }
+
+    fun obCallRecordList(userId: String): Observable<List<CallRecordModel>> {
+        return instance.callRecordDao().queryCallRecordList(userId).toObservable()
     }
 
 
