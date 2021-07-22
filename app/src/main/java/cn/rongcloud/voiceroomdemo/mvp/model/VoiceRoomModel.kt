@@ -1482,6 +1482,9 @@ class VoiceRoomModel @Inject constructor(
     private var playNextMusicJob: Job? = null
     private fun playNextMusic() {
         Log.d(TAG, "playNextMusic: ")
+        if (playNextMusicJob?.isActive == true) {
+            playNextMusicJob?.cancel()
+        }
         playNextMusicJob = GlobalScope.launch(Dispatchers.IO) {
             // FIXME: 2021/7/12 sdk 混音存在问题，添加延迟临时处理
             val index = userMusicList.indexOfLast {
@@ -1525,7 +1528,7 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun isPlayingMusic(): Boolean {
-        return currentPlayMusic != null
+        return currentPlayMusic != null || (playNextMusicJob?.isCompleted == false)
     }
 
 }
