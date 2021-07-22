@@ -62,6 +62,7 @@ class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
 
     override fun setNextVerificationDuring(time: Long) {
         ui {
+            et_verification_code.requestFocus()
             btn_get_verification_code.isEnabled = false
             getVerificationCodeCountDownTimer = object : CountDownTimer(time, 1000) {
                 override fun onTick(millisUntilFinished: Long) {

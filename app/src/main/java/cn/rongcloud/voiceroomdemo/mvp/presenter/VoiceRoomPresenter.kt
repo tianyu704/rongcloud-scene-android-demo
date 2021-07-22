@@ -18,6 +18,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
+import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
@@ -350,6 +351,7 @@ class VoiceRoomPresenter @Inject constructor(
                 GlobalScope.launch(Dispatchers.IO) {
                     AudioEffectManager.init()
                 }
+                AudioManagerUtil.choiceAudioModel()
             }
         })
     }
@@ -483,7 +485,7 @@ class VoiceRoomPresenter @Inject constructor(
                     if (it) {
                         currentStatus = STATUS_WAIT_FOR_SEAT
                         view.changeStatus(STATUS_WAIT_FOR_SEAT)
-                        view.showMessage("已申请排麦，等待房主确认")
+                        view.showMessage("已申请连线，等待房主接受")
                     } else {
                         view.showError("请求排麦失败")
                     }
