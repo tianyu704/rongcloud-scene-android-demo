@@ -1,29 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-	android:background="@color/callkit_black"
     android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/rc_voip_call_large_preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
-    </RelativeLayout>
+        android:visibility="gone" />
+
 
     <FrameLayout
         android:id="@+id/rc_voip_call_small_preview"
         android:layout_width="100dp"
         android:layout_height="180dp"
+        android:layout_gravity="right|top"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="5dp"
-        android:layout_gravity="right|top"
-        android:visibility="gone">
-    </FrameLayout>
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/rc_voip_call_information"
@@ -31,12 +28,12 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical"
             android:id="@+id/rc_voip_user_info"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/rc_voip_call_minimize"
             android:gravity="center"
-            android:layout_below="@+id/rc_voip_call_minimize">
+            android:orientation="vertical">
 
         </LinearLayout>
 
@@ -47,8 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/rc_voip_btn"
             android:layout_alignParentEnd="true"
-            android:layout_marginBottom="20dp"
             android:layout_marginEnd="45dp"
+            android:layout_marginBottom="20dp"
             android:visibility="gone">
 
             <ImageView
@@ -59,21 +56,20 @@
                 android:src="@drawable/rc_voip_phone" />
 
             <TextView
+                style="@style/rc_voip_text_style_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/rc_voip_audio_chat_btn"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
-                android:text="@string/rc_voip_switch_to_audio"
-                style="@style/rc_voip_text_style_style" />
+                android:text="@string/rc_voip_switch_to_audio" />
         </RelativeLayout>
 
         <FrameLayout
             android:id="@+id/rc_voip_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true">
-        </FrameLayout>
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
 
@@ -84,7 +80,16 @@
         android:layout_above="@+id/rc_voip_audio_chat"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center"
-        android:visibility="gone"
         android:textColor="@color/rc_voip_white"
-        android:textSize="16sp"/>
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:src="@drawable/ic_back" />
 </FrameLayout>

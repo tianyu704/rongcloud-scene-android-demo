@@ -70,10 +70,10 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         iv_audio_call.setOnClickListener {
             DialActivity.openDilapadPage(this, false)
         }
-        bg2.setColorFilter(Color.GRAY)
-        bg2.alpha = 0.5f
-        bg3.setColorFilter(Color.GRAY)
-        bg3.alpha = 0.5f
+//        bg2.setColorFilter(Color.GRAY)
+//        bg2.alpha = 0.5f
+//        bg3.setColorFilter(Color.GRAY)
+//        bg3.alpha = 0.5f
     }
 
     override fun getActionTitle(): CharSequence? {

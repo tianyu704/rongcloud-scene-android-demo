@@ -111,6 +111,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
 //                super.onResult(result);
 //            }
 //        });
+        String userId = "7537d74e-b1f1-4754-81ee-e104ff4f47ef";
+        RongCallKit.startSingleCall(this,userId, RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
     }
 
     DialpadFragment dialpadFragment;

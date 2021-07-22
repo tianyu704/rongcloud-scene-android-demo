@@ -4,15 +4,11 @@
 
 package io.rong.callkit;
 
-import static io.rong.calllib.RongCallCommon.CallDisconnectedReason.HANGUP;
-
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.media.AudioManager;
-import android.media.Image;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,9 +30,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 
-import io.rong.callkit.util.DefaultPushConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
+import io.rong.callkit.util.DefaultPushConfig;
 import io.rong.callkit.util.GlideUtils;
 import io.rong.callkit.util.HeadsetInfo;
 import io.rong.callkit.util.RingingMode;
@@ -52,9 +52,6 @@ import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.UserInfo;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class SingleCallActivity extends BaseCallActivity implements Handler.Callback {
     private static final String TAG = "VoIPSingleActivity";
@@ -94,6 +91,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rc_voip_activity_single_call);
+        getSupportActionBar().hide();
         Log.i(
                 "AudioPlugin",
                 "savedInstanceState != null="
@@ -344,6 +342,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     private void initView(RongCallCommon.CallMediaType mediaType, RongCallAction callAction) {
+        findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
         RelativeLayout buttonLayout =
                 (RelativeLayout)
                         inflater.inflate(
@@ -382,8 +386,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
 
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-            findViewById(R.id.rc_voip_call_information)
-                    .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
+//            findViewById(R.id.rc_voip_call_information)
+//                    .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
             mLPreviewContainer.setVisibility(View.GONE);
             mSPreviewContainer.setVisibility(View.GONE);
 
@@ -407,9 +411,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             }
         } else if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {
             if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
-                findViewById(R.id.rc_voip_call_information)
-                        .setBackgroundColor(
-                                getResources().getColor(R.color.rc_voip_background_color));
+//                findViewById(R.id.rc_voip_call_information)
+//                        .setBackgroundColor(
+//                                getResources().getColor(R.color.rc_voip_background_color));
                 buttonLayout =
                         (RelativeLayout)
                                 inflater.inflate(
@@ -599,8 +603,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             SurfaceView remoteVideo) {
         mConnectionStateTextView.setVisibility(View.GONE);
         if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {
-            findViewById(R.id.rc_voip_call_information)
-                    .setBackgroundColor(getResources().getColor(android.R.color.transparent));
+//            findViewById(R.id.rc_voip_call_information)
+//                    .setBackgroundColor(getResources().getColor(android.R.color.transparent));
             mLPreviewContainer.setVisibility(View.VISIBLE);
             mLPreviewContainer.removeAllViews();
             remoteVideo.setTag(userId);
@@ -735,8 +739,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         mSPreviewContainer.removeAllViews();
         mSPreviewContainer.setVisibility(View.GONE);
         // 显示全屏底色
-        findViewById(R.id.rc_voip_call_information)
-                .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
+//        findViewById(R.id.rc_voip_call_information)
+//                .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
         findViewById(R.id.rc_voip_audio_chat).setVisibility(View.GONE); // 隐藏语音聊天按钮
 
         View userInfoView = inflater.inflate(R.layout.rc_voip_audio_call_user_info_incoming, null);

@@ -405,11 +405,11 @@ public class DialpadFragment extends Fragment
                 hideSelf();
                 return;
             }
-            if (!isMobileNO(num)) {
-                mDigits.getText().clear();
-                Toast.makeText(getContext(), "请输入正确的电话号码", Toast.LENGTH_LONG).show();
-                return;
-            }
+//            if (!isMobileNO(num)) {
+//                mDigits.getText().clear();
+//                Toast.makeText(getContext(), "请输入正确的电话号码", Toast.LENGTH_LONG).show();
+//                return;
+//            }
             if (null != dialpadListener && null != dialpadListener.get()) {
                 dialpadListener.get().onDialpad(num);
             }

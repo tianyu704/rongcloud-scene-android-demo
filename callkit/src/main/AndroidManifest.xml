@@ -41,6 +41,7 @@
             android:exported="true"
             android:launchMode="singleTop"
             android:screenOrientation="portrait"
+            android:theme="@style/BasisTheme"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="io.rong.intent.action.voip.SINGLEVIDEO" />
