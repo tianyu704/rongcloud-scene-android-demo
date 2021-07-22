@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.utils
 
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothHeadset
 import android.bluetooth.BluetoothProfile
 import android.content.BroadcastReceiver
@@ -68,7 +69,17 @@ object AudioManagerUtil : BroadcastReceiver() {
     }
 
     fun isBluetoothA2dpOn(): Boolean {
-        return audioManager.isBluetoothScoOn
+        return BluetoothAdapter.getDefaultAdapter()?.let { adapter ->
+            if (!adapter.isEnabled) {
+                return false
+            }
+            val a2dp: Int =
+                adapter.getProfileConnectionState(BluetoothProfile.A2DP)
+            return if (a2dp == BluetoothProfile.STATE_CONNECTED || a2dp == BluetoothProfile.STATE_CONNECTING) {
+                audioManager.isBluetoothScoOn = true
+                return audioManager.isBluetoothScoOn || audioManager.isBluetoothA2dpOn
+            } else false
+        } ?: false
     }
 
     fun choiceAudioModel() {
