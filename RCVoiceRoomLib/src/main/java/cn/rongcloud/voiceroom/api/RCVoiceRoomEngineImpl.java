@@ -1832,19 +1832,19 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
         @Override
         public void onPublishLiveStreams(List<RCRTCInputStream> streams) {
-//            if (mRoom != null && mCurrentRole == RCRTCLiveRole.AUDIENCE) {
-//                mRoom.getLocalUser().subscribeStreams(streams, new IRCRTCResultCallback() {
-//                    @Override
-//                    public void onSuccess() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onFailed(RTCErrorCode errorCode) {
-//
-//                    }
-//                });
-//            }
+            if (mRoom != null && mCurrentRole == RCRTCLiveRole.AUDIENCE) {
+                mRoom.getLocalUser().subscribeStreams(streams, new IRCRTCResultCallback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onFailed(RTCErrorCode errorCode) {
+
+                    }
+                });
+            }
         }
 
         @Override
