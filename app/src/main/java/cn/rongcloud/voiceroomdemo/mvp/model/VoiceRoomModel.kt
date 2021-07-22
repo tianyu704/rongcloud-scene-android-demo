@@ -1414,11 +1414,7 @@ class VoiceRoomModel @Inject constructor(
             model.url?.let { playMusic(model.name, it) }
         } else if (currentPlayMusic != model.url) {
             // 当前在播放的和选择的不同,停止播放旧的，直接播放新的
-            try {
-                stopPlayMusic()
-            } catch (e: Exception) {
-                Log.e(TAG, "playOrPauseMusic: ", e)
-            }
+            stopPlayMusic()
             model.url?.let { playMusic(model.name, it) }
         } else {
             // 暂停
@@ -1431,11 +1427,15 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun playMusic(name: String? = "", url: String) {
+        musicStopFlag = false
         GlobalScope.launch(Dispatchers.IO) {
             addDisposable(
                 FileModel
                     .checkOrDownLoadMusic(name ?: "", url)
                     .subscribe({
+                        if (musicStopFlag) {
+                            return@subscribe
+                        }
                         currentPlayMusic = url
                         val path = FileModel.getCompleteMusicPathByName(
                             FileModel.getNameFromUrl(url) ?: ""
@@ -1498,13 +1498,18 @@ class VoiceRoomModel @Inject constructor(
                 .elementAtOrNull((index + 1) % userMusicList.size)?.let {
                     Log.d(TAG, "playNextMusic: $it")
                     delay(1000)
-
+                    if (musicStopFlag) {
+                        return@launch
+                    }
                     it.url?.let { it1 -> playMusic(it.name, it1) }
                 } ?: run {
                 Log.d(TAG, "playNextMusic: not find next music,try play first index music")
                 if (userMusicList.size > 0) {
                     userMusicList[0].let {
                         delay(1000)
+                        if (musicStopFlag) {
+                            return@launch
+                        }
                         it.url?.let { it1 -> playMusic(it.name, it1) }
                     }
                 }
@@ -1521,14 +1526,24 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun stopPlayMusic() {
-        if (playNextMusicJob?.isActive == true) {
-            playNextMusicJob?.cancel()
+        try {
+            musicStopFlag = true
+            if (playNextMusicJob?.isActive == true) {
+                playNextMusicJob?.cancel()
+            }
+            RCRTCAudioMixer.getInstance().stop()
+        } catch (e: Exception) {
+            Log.e(TAG, "stopPlayMusic: ", e)
         }
-        RCRTCAudioMixer.getInstance().stop()
     }
 
     fun isPlayingMusic(): Boolean {
         return currentPlayMusic != null || (playNextMusicJob?.isCompleted == false)
     }
+
+    /**
+     * 用于记录音乐停止的状态
+     */
+    private var musicStopFlag = true
 
 }
