@@ -202,9 +202,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                     }
                 } else {
                     Toast.makeText(
-                                    this,
-                                    getString(R.string.rc_permission_grant_needed),
-                                    Toast.LENGTH_SHORT)
+                            this,
+                            getString(R.string.rc_permission_grant_needed),
+                            Toast.LENGTH_SHORT)
                             .show();
                     if (startForCheckPermissions) {
                         startForCheckPermissions = false;
@@ -292,32 +292,29 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
         if (userInfo != null) {
-            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)
-                    || callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
-                ImageView userPortrait =
-                        (ImageView)
-                                mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
-                if (userPortrait != null && userInfo.getPortraitUri() != null) {
-                    Glide.with(this)
-                            .load(userInfo.getPortraitUri())
-                            .placeholder(R.drawable.rc_default_portrait)
-                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                            .into(userPortrait);
-                }
-                TextView userName =
-                        (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-                userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+//            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)
+//                    || callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
+            TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+            userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+            ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+            if (userPortrait != null && userInfo.getPortraitUri() != null) {
+                Glide.with(this)
+                        .load(userInfo.getPortraitUri())
+                        .placeholder(R.drawable.rc_default_portrait)
+                        .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                        .into(userPortrait);
             }
+            //            }
         }
         if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL) && userInfo != null) {
             ImageView iv_icoming_backgroud =
-                (ImageView) mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
+                    (ImageView) mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
             if (iv_icoming_backgroud != null) {
                 iv_icoming_backgroud.setVisibility(View.VISIBLE);
                 GlideUtils.showBlurTransformation(
-                    SingleCallActivity.this,
-                    iv_icoming_backgroud,
-                    userInfo.getPortraitUri());
+                        SingleCallActivity.this,
+                        iv_icoming_backgroud,
+                        userInfo.getPortraitUri());
             }
         }
         createPickupDetector();
@@ -348,17 +345,13 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 finish();
             }
         });
-        RelativeLayout buttonLayout =
-                (RelativeLayout)
-                        inflater.inflate(
-                                R.layout.rc_voip_call_bottom_connected_button_layout, null);
         RelativeLayout userInfoLayout = null;
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)
                 || callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
             userInfoLayout =
                     (RelativeLayout)
                             inflater.inflate(R.layout.rc_voip_audio_call_user_info_incoming, null);
-            userInfoLayout.findViewById(R.id.iv_large_preview_Mask).setVisibility(View.VISIBLE);
+//            userInfoLayout.findViewById(R.id.iv_large_preview_Mask).setVisibility(View.VISIBLE);
         } else {
             // 单人视频 or 拨打 界面
             userInfoLayout =
@@ -367,6 +360,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                     (TextView) userInfoLayout.findViewById(R.id.rc_voip_call_remind_info);
             CallKitUtils.textViewShadowLayer(callInfo, SingleCallActivity.this);
         }
+        boolean incomming = callAction.equals(RongCallAction.ACTION_INCOMING_CALL);
+        boolean video = mediaType.equals(RongCallCommon.CallMediaType.AUDIO);
+        RelativeLayout buttonLayout = (RelativeLayout) inflater.inflate(
+                incomming ? R.layout.rc_voip_call_bottom_incoming_button_layout
+                        : video ? R.layout.rc_voip_call_bottom_connected_button_layout
+                        : R.layout.rc_video_call_bottom_connected_button_layout, null);
 
         if (callAction.equals(RongCallAction.ACTION_RESUME_CALL) && CallKitUtils.isDial) {
             try {
@@ -392,12 +391,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             mSPreviewContainer.setVisibility(View.GONE);
 
             if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
-                buttonLayout =
-                        (RelativeLayout)
-                                inflater.inflate(
-                                        R.layout.rc_voip_call_bottom_incoming_button_layout, null);
-                ImageView iv_answerBtn =
-                        (ImageView) buttonLayout.findViewById(R.id.rc_voip_call_answer_btn);
+//                buttonLayout =
+//                        (RelativeLayout)
+//                                inflater.inflate(
+//                                        R.layout.rc_voip_call_bottom_incoming_button_layout, null);
+                ImageView iv_answerBtn = buttonLayout.findViewById(R.id.rc_voip_call_answer_btn);
                 iv_answerBtn.setBackground(
                         CallKitUtils.BackgroundDrawable(
                                 R.drawable.rc_voip_audio_answer_selector_new,
@@ -414,12 +412,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 //                findViewById(R.id.rc_voip_call_information)
 //                        .setBackgroundColor(
 //                                getResources().getColor(R.color.rc_voip_background_color));
-                buttonLayout =
-                        (RelativeLayout)
-                                inflater.inflate(
-                                        R.layout.rc_voip_call_bottom_incoming_button_layout, null);
-                ImageView iv_answerBtn =
-                        (ImageView) buttonLayout.findViewById(R.id.rc_voip_call_answer_btn);
+//                buttonLayout =
+//                        (RelativeLayout)
+//                                inflater.inflate(
+//                                        R.layout.rc_voip_call_bottom_incoming_button_layout, null);
+                ImageView iv_answerBtn = buttonLayout.findViewById(R.id.rc_voip_call_answer_btn);
                 iv_answerBtn.setBackground(
                         CallKitUtils.BackgroundDrawable(
                                 R.drawable.rc_voip_vedio_answer_selector_new,
@@ -461,25 +458,25 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 mLPreviewContainer.addView(localVideo, mLargeLayoutParams);
                 if (null != SelfUserInfo && null != SelfUserInfo.getName()) {
                     // 单人视频
-                    TextView callkit_voip_user_name_signleVideo =
-                            (TextView)
-                                    mUserInfoContainer.findViewById(
-                                            R.id.callkit_voip_user_name_signleVideo);
+//                    TextView callkit_voip_user_name_signleVideo =
+//                            (TextView)
+//                                    mUserInfoContainer.findViewById(
+//                                            R.id.callkit_voip_user_name_signleVideo);
 //                    topUserName = SelfUserInfo.getName();
-                    callkit_voip_user_name_signleVideo.setText(CallKitUtils.nickNameRestrict(SelfUserInfo.getName()));
+//                    callkit_voip_user_name_signleVideo.setText(CallKitUtils.nickNameRestrict(SelfUserInfo.getName()));
                 }
             } else if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
                 if (null != InviterUserIdInfo && null != InviterUserIdInfo.getPortraitUri()) {
-                    ImageView iv_icoming_backgroud =
-                            mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
-                    GlideUtils.showBlurTransformation(
-                        SingleCallActivity.this,
-                        iv_icoming_backgroud,
-                        InviterUserIdInfo.getPortraitUri());
-                    iv_icoming_backgroud.setVisibility(View.VISIBLE);
-                    mUserInfoContainer
-                            .findViewById(R.id.iv_large_preview_Mask)
-                            .setVisibility(View.VISIBLE);
+//                    ImageView iv_icoming_backgroud =
+//                            mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
+//                    GlideUtils.showBlurTransformation(
+//                        SingleCallActivity.this,
+//                        iv_icoming_backgroud,
+//                        InviterUserIdInfo.getPortraitUri());
+//                    iv_icoming_backgroud.setVisibility(View.VISIBLE);
+//                    mUserInfoContainer
+//                            .findViewById(R.id.iv_large_preview_Mask)
+//                            .setVisibility(View.VISIBLE);
                 }
             }
         } catch (Exception e) {
@@ -653,11 +650,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                                         && !TextUtils.isEmpty(fromView.getTag().toString())) {
                                     UserInfo userInfo =
                                             RongUserInfoManager.getInstance().getUserInfo(
-                                                            fromView.getTag().toString());
-                                    TextView userName =
-                                            (TextView)
-                                                    mUserInfoContainer.findViewById(
-                                                            R.id.rc_voip_user_name);
+                                                    fromView.getTag().toString());
+                                    TextView userName = mUserInfoContainer.findViewById(
+                                            R.id.rc_voip_user_name);
 //                                    topUserName = userInfo.getName();
                                     userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
                                 }
@@ -674,24 +669,30 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     /**
      * 当通话中的某一个参与者切换通话类型，例如由 audio 切换至 video，回调 onMediaTypeChanged。
      *
-     * @param userId 切换者的 userId。
+     * @param userId    切换者的 userId。
      * @param mediaType 切换者，切换后的媒体类型。
-     * @param video 切换着，切换后的 camera 信息，如果由 video 切换至 audio，则为 null。
+     * @param video     切换着，切换后的 camera 信息，如果由 video 切换至 audio，则为 null。
      */
     @Override
     public void onMediaTypeChanged(
             String userId, RongCallCommon.CallMediaType mediaType, SurfaceView video) {
+        boolean audio = mediaType == RongCallCommon.CallMediaType.AUDIO;
+
         if (callSession.getSelfUserId().equals(userId)) {
-            showShortToast(getString(R.string.rc_voip_switched_to_audio));
+            showShortToast(getString(audio ? R.string.rc_voip_switched_to_audio : R.string.rc_voip_switched_to_video));
         } else {
             if (callSession.getMediaType() != RongCallCommon.CallMediaType.AUDIO) {
                 RongCallClient.getInstance()
                         .changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
                 callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
-                showShortToast(getString(R.string.rc_voip_remote_switched_to_audio));
+                showShortToast(getString(audio ? R.string.rc_voip_remote_switched_to_audio : R.string.rc_voip_remote_switched_to_video));
             }
         }
-        initAudioCallView();
+        if (mediaType == RongCallCommon.CallMediaType.AUDIO) {
+            initAudioCallView();
+        } else {
+            initVideoCallView();
+        }
         handler.removeMessages(EVENT_FULL_SCREEN);
         mButtonContainer.findViewById(R.id.rc_voip_call_mute).setSelected(muted);
     }
@@ -732,7 +733,75 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
     }
 
-    /** 视频转语音 * */
+    private void initVideoCallView() {
+        callSession = RongCallClient.getInstance().getCallSession();
+        if (callSession == null) {
+            setShouldShowFloat(false);
+            finish();
+            return;
+        }
+        RongCallCommon.CallMediaType mediaType = callSession.getMediaType();
+        RongCallAction callAction =
+                RongCallAction.valueOf(getIntent().getStringExtra("callAction"));
+        inflater = LayoutInflater.from(this);
+        initView(mediaType, callAction);
+        targetId = callSession.getTargetId();
+        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
+        if (userInfo != null) {
+            TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+            userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+                ImageView userPortrait =
+                        (ImageView)
+                                mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+                if (userPortrait != null) {
+                    Glide.with(this)
+                            .load(userInfo.getPortraitUri())
+                            .placeholder(R.drawable.rc_default_portrait)
+                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                            .into(userPortrait);
+                }
+            } else if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {
+                if (null != callAction && callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
+                    ImageView iv_large_preview =
+                            mUserInfoContainer.findViewById(R.id.iv_large_preview);
+                    iv_large_preview.setVisibility(View.VISIBLE);
+                    GlideUtils.showBlurTransformation(
+                            SingleCallActivity.this,
+                            iv_large_preview,
+                            null != userInfo ? userInfo.getPortraitUri() : null);
+                }
+            }
+        }
+        SurfaceView localVideo = null;
+        SurfaceView remoteVideo = null;
+        String remoteUserId = null;
+        for (CallUserProfile profile : callSession.getParticipantProfileList()) {
+            if (profile.getUserId().equals(RongIMClient.getInstance().getCurrentUserId())) {
+                localVideo = profile.getVideoView();
+            } else {
+                remoteVideo = profile.getVideoView();
+                remoteUserId = profile.getUserId();
+            }
+        }
+        if (localVideo != null && localVideo.getParent() != null) {
+            ((ViewGroup) localVideo.getParent()).removeView(localVideo);
+        }
+        onCallOutgoing(callSession, localVideo);
+//        if (!(boolean) bundle.get("isDial")) {
+//            onCallConnected(callSession, localVideo);
+//        }
+        if (remoteVideo != null) {
+            if (remoteVideo.getParent() != null) {
+                ((ViewGroup) remoteVideo.getParent()).removeView(remoteVideo);
+            }
+            changeToConnectedState(remoteUserId, mediaType, 1, remoteVideo);
+        }
+    }
+
+    /**
+     * 视频转语音 *
+     */
     private void initAudioCallView() {
         mLPreviewContainer.removeAllViews();
         mLPreviewContainer.setVisibility(View.GONE);
@@ -758,9 +827,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
             userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
             if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
-                ImageView userPortrait =
-                        (ImageView)
-                                mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+                ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
                 if (userPortrait != null) {
                     Glide.with(this)
                             .load(userInfo.getPortraitUri())
@@ -772,9 +839,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 ImageView iv_large_preview = mUserInfoContainer.findViewById(R.id.iv_large_preview);
                 iv_large_preview.setVisibility(View.VISIBLE);
                 GlideUtils.showBlurTransformation(
-                    SingleCallActivity.this,
-                    iv_large_preview,
-                    userInfo.getPortraitUri());
+                        SingleCallActivity.this,
+                        iv_large_preview,
+                        userInfo.getPortraitUri());
             }
         }
         mUserInfoContainer.setVisibility(View.VISIBLE);
@@ -790,20 +857,20 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         View handFreeV = mButtonContainer.findViewById(R.id.rc_voip_handfree);
         handFreeV.setSelected(handFree);
 
-        ImageView iv_large_preview_Mask =
-                (ImageView) userInfoView.findViewById(R.id.iv_large_preview_Mask);
-        iv_large_preview_Mask.setVisibility(View.VISIBLE);
+//        ImageView iv_large_preview_Mask =
+//                (ImageView) userInfoView.findViewById(R.id.iv_large_preview_Mask);
+//        iv_large_preview_Mask.setVisibility(View.VISIBLE);
 
         /** 视频切换成语音 全是语音界面的ui* */
-        ImageView iv_large_preview = mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
+//        ImageView iv_large_preview = mUserInfoContainer.findViewById(R.id.iv_icoming_backgroud);
 
         if (null != userInfo
-            && callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
-            GlideUtils.showBlurTransformation(
-                SingleCallActivity.this,
-                iv_large_preview,
-                userInfo.getPortraitUri());
-            iv_large_preview.setVisibility(View.VISIBLE);
+                && callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
+//            GlideUtils.showBlurTransformation(
+//                SingleCallActivity.this,
+//                iv_large_preview,
+//                userInfo.getPortraitUri());
+//            iv_large_preview.setVisibility(View.VISIBLE);
         }
 
         if (pickupDetector != null) {
@@ -863,7 +930,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                     public void onClick(View v) {
                         if (RongIMClient.getInstance().getCurrentConnectionStatus()
                                 == RongIMClient.ConnectionStatusListener.ConnectionStatus
-                                        .CONNECTED) {
+                                .CONNECTED) {
                             RongCallClient.getInstance()
                                     .changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
                             callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
@@ -873,6 +940,15 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         }
                     }
                 });
+    }
+
+    public void onSwitchButtonClick(View view) {
+        // TODO: 2021/7/22
+//        RongCallCommon.CallMediaType mediaType = callSession.getMediaType();
+//        mediaType = mediaType == RongCallCommon.CallMediaType.VIDEO
+//                ? RongCallCommon.CallMediaType.AUDIO : RongCallCommon.CallMediaType.VIDEO;
+        callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
+//        view.setSelected(callSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO);
     }
 
     public void onHandFreeButtonClick(View view) {
@@ -914,9 +990,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         if (time > 0) {
             if (time >= 3600) {
                 extra =
-                    String.format(
-                        "%d:%02d:%02d",
-                        time / 3600, (time % 3600) / 60, (time % 60));
+                        String.format(
+                                "%d:%02d:%02d",
+                                time / 3600, (time % 3600) / 60, (time % 60));
             } else {
                 extra = String.format("%02d:%02d", (time % 3600) / 60, (time % 60));
             }
@@ -1123,7 +1199,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
         if (targetId != null && targetId.equals(info.getUserId())) {
             TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-            if (info.getName() != null) userName.setText(CallKitUtils.nickNameRestrict(info.getName()));
+            if (info.getName() != null)
+                userName.setText(CallKitUtils.nickNameRestrict(info.getName()));
         }
     }
 

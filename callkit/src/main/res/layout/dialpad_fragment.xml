@@ -54,7 +54,7 @@
             android:layout_height="@dimen/floating_action_button_radius"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="20dp"
-            android:background="@drawable/rc_image_download" />
+            android:background="@drawable/ic_hide_soft" />
 
         <ImageButton
             android:id="@+id/dialpad_right"

@@ -38,6 +38,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private FloatingActionButtonController mFloatingActionButtonController;
     private ImageButton floatingActionButton;
     private RecyclerView recyclerView;
+    private boolean isVideo = false;
 
     public static void openDilapadPage(Activity activity, boolean video) {
         activity.startActivity(new Intent(activity, DialActivity.class).putExtra(TAG, video));
@@ -47,8 +48,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialtacts_activity);
-        boolean video = getIntent().getBooleanExtra(TAG, false);
-        String title = video ? "视频通话" : "语音通话";
+        isVideo = getIntent().getBooleanExtra(TAG, false);
+        String title = isVideo ? "视频通话" : "语音通话";
         initDefalutActionBar(title);
         initView();
     }
@@ -112,7 +113,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
 //            }
 //        });
         String userId = "7537d74e-b1f1-4754-81ee-e104ff4f47ef";
-        RongCallKit.startSingleCall(this,userId, RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+        RongCallKit.startSingleCall(this, userId, isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
     }
 
     DialpadFragment dialpadFragment;
