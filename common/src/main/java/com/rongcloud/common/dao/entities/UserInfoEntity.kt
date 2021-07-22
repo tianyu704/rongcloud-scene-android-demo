@@ -12,8 +12,8 @@ import androidx.room.PrimaryKey
  * @author gusd
  * @Date 2021/07/21
  */
-@Entity(tableName = "MemberInfo")
-data class MemberInfoEntity(
+@Entity(tableName = "UserInfo")
+data class UserInfoEntity(
     @PrimaryKey val userId: String,
     @ColumnInfo(name = "userName") val userName: String?,
     @ColumnInfo(name = "portrait") val portrait: String?,

@@ -38,7 +38,7 @@ public const val VIDEO_CONF_CALL = CALL_TYPE_VIDEO or CALL_TYPE_CONF_CALL
 
 @Entity(tableName = "CallRecord")
 data class CallRecordEntity(
-    @PrimaryKey val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long?,
     @ColumnInfo(name = "callerId") val callerId: String,
     @ColumnInfo(name = "callerNumber") val callerNumber: String?,
     @ColumnInfo(name = "peerId") val peerId: String,

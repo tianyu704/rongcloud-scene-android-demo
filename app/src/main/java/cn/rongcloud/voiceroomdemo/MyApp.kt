@@ -18,6 +18,7 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.dao.database.DatabaseManager
 import com.umeng.analytics.MobclickAgent
 import com.umeng.commonsdk.UMConfigure
 import com.vanniktech.emoji.EmojiManager
@@ -122,6 +123,8 @@ class MyApp : Application() {
         }
 
         AudioManagerUtil.init(this)
+
+        DatabaseManager.init(this)
 
     }
 
