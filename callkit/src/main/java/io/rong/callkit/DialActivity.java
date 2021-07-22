@@ -3,54 +3,35 @@
  */
 package io.rong.callkit;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcq.adapter.interfaces.IHolder;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
-import com.bcq.net.Request;
-import com.bcq.net.api.Method;
-import com.bcq.net.net.ListCallback;
-import com.bcq.net.wrapper.interfaces.IResult;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import io.rong.callkit.dialpad.DialInfo;
 import io.rong.callkit.dialpad.DialpadFragment;
 import io.rong.callkit.dialpad.animation.AnimUtils;
 import io.rong.callkit.dialpad.widget.FloatingActionButtonController;
-import io.rong.imkit.widget.adapter.BaseAdapter;
 
 /**
  * 拨号界面
  */
-public class DialActivity extends AppCompatActivity implements View.OnClickListener, DialpadFragment.DialpadListener {
+public class DialActivity extends BaseActionBarActivity implements View.OnClickListener, DialpadFragment.DialpadListener {
     @VisibleForTesting
     public static final String TAG = "DialActivity";
     public static final String TAG_DIALPAD_FRAGMENT = "dialpad";
@@ -62,31 +43,13 @@ public class DialActivity extends AppCompatActivity implements View.OnClickListe
         activity.startActivity(new Intent(activity, DialActivity.class).putExtra(TAG, video));
     }
 
-    @SuppressLint("RestrictedApi")
-    protected void initActionBar(String title) {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(title);
-        actionBar.setElevation(0f);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.background_dialer_light)));
-        int titleId = Resources.getSystem().getIdentifier("action_bar_title", "id", "android");
-        Log.e(TAG, "titleId = "+titleId);
-        TextView tvTitle = findViewById(titleId);
-        if (null != tvTitle) {
-            tvTitle.setGravity(Gravity.CENTER);
-            Log.e(TAG, "get title");
-        }else {
-            Log.e(TAG, "not get title");
-        }
-    }
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialtacts_activity);
         boolean video = getIntent().getBooleanExtra(TAG, false);
         String title = video ? "视频通话" : "语音通话";
-        initActionBar(title);
+        initDefalutActionBar(title);
         initView();
     }
 
@@ -140,14 +103,14 @@ public class DialActivity extends AppCompatActivity implements View.OnClickListe
         Log.e(TAG, "onInputChanage:input = " + input);
     }
 
-    private void getUserIdByPhone(String phone){
-        String url = "http://120.92.102.127:8081/user/get/"+phone;
-        Request.request( null, url, null, Method.get, new ListCallback<String>(String.class) {
-            @Override
-            public void onResult(IResult.ObjResult<List<String>> result) {
-                super.onResult(result);
-            }
-        });
+    private void getUserIdByPhone(String phone) {
+        String url = "http://120.92.102.127:8081/user/get/" + phone;
+//        Request.request(null, url, null, Method.get, new ListCallback<String>(String.class) {
+//            @Override
+//            public void onResult(IResult.ObjResult<List<String>> result) {
+//                super.onResult(result);
+//            }
+//        });
     }
 
     DialpadFragment dialpadFragment;
