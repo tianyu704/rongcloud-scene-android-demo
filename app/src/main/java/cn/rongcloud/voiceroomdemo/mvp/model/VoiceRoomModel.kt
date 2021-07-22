@@ -1538,12 +1538,15 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun isPlayingMusic(): Boolean {
-        return currentPlayMusic != null || (playNextMusicJob?.isCompleted == false)
+        // 暂停状态下不视为音乐正在播放
+        return (currentPlayMusic != null && currentMusicState == RCRTCAudioMixer.MixingState.PLAY)
+                || (playNextMusicJob?.isCompleted == false)
     }
 
     /**
      * 用于记录音乐停止的状态
      */
+    @Volatile
     private var musicStopFlag = true
 
 }
