@@ -14,4 +14,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 interface IEmptySeatView:IBaseView {
     fun refreshView(uiSeatModel: UiSeatModel){}
     fun showInviteUserView(){}
+    fun getEmptyUiSeatModel():UiSeatModel?{
+        return null
+    }
 }

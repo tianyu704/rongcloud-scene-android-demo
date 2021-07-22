@@ -17,8 +17,10 @@ import javax.inject.Inject
  * @Date 2021/06/28
  */
 @AndroidEntryPoint
-class SelfSettingFragment(view: ISelfSettingView,var seatInfo:UiSeatModel,val roomId:String) :BaseBottomSheetDialogFragment<SelfSettingPresenter,ISelfSettingView>(
-    R.layout.fragment_self_setting),ISelfSettingView by view {
+class SelfSettingFragment(view: ISelfSettingView, var seatInfo: UiSeatModel, val roomId: String) :
+    BaseBottomSheetDialogFragment<SelfSettingPresenter, ISelfSettingView>(
+        R.layout.fragment_self_setting
+    ), ISelfSettingView by view {
 
     @Inject
     lateinit var presenter: SelfSettingPresenter
@@ -27,9 +29,13 @@ class SelfSettingFragment(view: ISelfSettingView,var seatInfo:UiSeatModel,val ro
         return presenter
     }
 
+    override fun getUiSeatModel(): UiSeatModel {
+        return seatInfo
+    }
+
     override fun initView() {
         iv_member_portrait.loadPortrait(seatInfo.portrait)
-        tv_member_name.text  = seatInfo.userName
+        tv_member_name.text = seatInfo.userName
         btn_mute_self.setOnClickListener {
             presenter.muteSelf()
         }
@@ -50,10 +56,10 @@ class SelfSettingFragment(view: ISelfSettingView,var seatInfo:UiSeatModel,val ro
         dismiss()
     }
 
-    override fun onRecordStatusChange(isRecording:Boolean) {
-        if(!isRecording){
+    override fun onRecordStatusChange(isRecording: Boolean) {
+        if (!isRecording) {
             btn_mute_self.text = "打开麦克风"
-        }else{
+        } else {
             btn_mute_self.text = "关闭麦克风"
         }
     }

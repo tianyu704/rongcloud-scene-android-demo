@@ -10,7 +10,6 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.ICreateVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.SendPresentFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.EmptySeatFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.IEmptySeatView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.memberlist.IMemberListView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
@@ -59,14 +58,14 @@ class HiltFragmentModule {
 
     @Named("EmptySeatSetting")
     @Provides
-    fun provideEmptySeatSettingBean(fragment: Fragment): UiSeatModel {
-        return (fragment as EmptySeatFragment).seatInfo
+    fun provideEmptySeatSettingBean(view: IEmptySeatView): UiSeatModel {
+        return view.getEmptyUiSeatModel()!!
     }
 
     @Named("SelfSeatSetting")
     @Provides
-    fun provideSelfSeatSettingBean(fragment: Fragment): UiSeatModel {
-        return (fragment as EmptySeatFragment).seatInfo
+    fun provideSelfSeatSettingBean(view: ISelfSettingView): UiSeatModel {
+        return view.getUiSeatModel()!!
     }
 
     @Provides
@@ -81,8 +80,8 @@ class HiltFragmentModule {
     }
 
     @Provides
-    fun provideMemberModel(fragment: Fragment): UiMemberModel {
-        return (fragment as MemberSettingFragment).member
+    fun provideMemberModel(view: IMemberSettingView): UiMemberModel {
+        return view.getMemberInfo()!!
     }
 
     @Provides

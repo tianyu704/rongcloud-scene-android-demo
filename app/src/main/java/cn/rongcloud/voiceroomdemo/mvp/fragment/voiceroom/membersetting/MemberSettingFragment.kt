@@ -26,7 +26,7 @@ import javax.inject.Inject
 class MemberSettingFragment(
     val view: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean,
-     val member: UiMemberModel,
+    val member: UiMemberModel,
 ) :
     BaseBottomSheetDialogFragment<MemberSettingPresenter, IMemberSettingView>(R.layout.layout_member_setting),
     IMemberSettingView by view {
@@ -36,6 +36,10 @@ class MemberSettingFragment(
 
     override fun initPresenter(): MemberSettingPresenter {
         return presenter
+    }
+
+    override fun getMemberInfo(): UiMemberModel? {
+        return member
     }
 
     override fun initView() {

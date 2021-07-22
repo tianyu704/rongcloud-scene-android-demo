@@ -17,4 +17,10 @@ interface ISelfSettingView:IBaseView {
     fun onRecordStatusChange(isRecording:Boolean) {
 
     }
+
+    fun getUiSeatModel():UiSeatModel?{
+        return null
+    }
+
+
 }
