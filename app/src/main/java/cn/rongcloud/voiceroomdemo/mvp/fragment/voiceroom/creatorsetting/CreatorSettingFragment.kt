@@ -12,6 +12,7 @@ import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
+import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
 import kotlinx.android.synthetic.main.fragmeng_creator_setting.*
 import javax.inject.Inject
 
@@ -29,9 +30,28 @@ class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: Voice
     lateinit var presenter: CreatorSettingPresenter
 
 
+    fun showMusicPauseTip(confirmBlock: () -> Unit) {
+        ConfirmDialog(
+            requireContext(),
+            "播放音乐中下麦会导致音乐中断，是否确定下麦?",
+            true,
+        ) {
+            confirmBlock()
+        }.apply {
+            show()
+        }
+    }
+
     override fun initView() {
         btn_out_of_seat.setOnClickListener {
-            presenter.leaveSeat()
+            if (presenter.isPlayingMusic()) {
+                showMusicPauseTip {
+                    presenter.stopPlayMusic()
+                    presenter.leaveSeat()
+                }
+            } else {
+                presenter.leaveSeat()
+            }
         }
         btn_mute_self.setOnClickListener {
             presenter.muteMic()

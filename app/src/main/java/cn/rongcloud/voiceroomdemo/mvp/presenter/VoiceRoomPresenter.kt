@@ -341,7 +341,6 @@ class VoiceRoomPresenter @Inject constructor(
         }
     }
 
-
     fun joinRoom() {
         Log.d(TAG, "joinRoom: ${roomId}")
         if (isCreate) {

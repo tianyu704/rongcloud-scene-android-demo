@@ -74,8 +74,6 @@ import javax.inject.Inject
 
 
 private const val TAG = "VoiceRoomActivity"
-private const val NOTICATION_ID = 10020
-
 private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
 private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 private const val KEY_IS_CREATE = "KEY_IS_CREATE"
@@ -196,24 +194,6 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     private var detector: GestureDetector? = null
 
     override fun getContentView(): Int = R.layout.activity_voice_room
-
-//    val notificationManager: NotificationManager by lazy {
-//        var manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            var channel = NotificationChannel(TAG, TAG, NotificationManager.IMPORTANCE_DEFAULT)
-//            manager.createNotificationChannel(channel)
-//        }
-//        return@lazy manager
-//    }
-//
-//    fun bindNotification() {
-//        var mBuilder = NotificationCompat.Builder(this, TAG)
-//            .setSmallIcon(R.mipmap.app_icon)
-//            .setContentTitle("语聊房")
-//            .setContentText("正在语聊中...")
-//        val notification: Notification = mBuilder.build()
-//        notificationManager.notify(NOTICATION_ID, notification)
-//    }
 
     override fun initView() {
         detector = GestureDetector(this, simpleGestureListener).apply {

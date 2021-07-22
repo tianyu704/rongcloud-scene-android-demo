@@ -9,6 +9,8 @@ import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.FragmentScoped
+import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
@@ -62,5 +64,14 @@ class CreatorSettingPresenter @Inject constructor(
             )
         }
 
+    }
+
+
+    fun isPlayingMusic(): Boolean {
+        return roomModel.isPlayingMusic()
+    }
+
+    fun stopPlayMusic() {
+        roomModel.stopPlayMusic()
     }
 }
