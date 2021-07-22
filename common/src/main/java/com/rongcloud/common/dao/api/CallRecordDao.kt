@@ -5,6 +5,7 @@
 package com.rongcloud.common.dao.api
 
 import androidx.room.Dao
+import androidx.room.Query
 
 /**
  * @author gusd
@@ -14,5 +15,7 @@ import androidx.room.Dao
 interface CallRecordDao {
 
 
+    @Query("SELECT ")
+    fun queryCallRecordList(userId:String)
 
 }
