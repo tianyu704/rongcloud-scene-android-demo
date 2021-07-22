@@ -1524,4 +1524,8 @@ class VoiceRoomModel @Inject constructor(
         RCRTCAudioMixer.getInstance().stop()
     }
 
+    fun isPlayingMusic(): Boolean {
+        return currentPlayMusic != null
+    }
+
 }
