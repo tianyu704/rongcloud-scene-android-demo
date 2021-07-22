@@ -533,13 +533,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         favAnimation.let {
             it.release()
         }
-        stopService(
-            Intent(
-                this,
-                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
-            )
-        )
-        AudioManagerUtil.dispose()
+        stopService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
     }
 
     override fun onJoinRoomSuccess() {

@@ -324,6 +324,7 @@ class VoiceRoomPresenter @Inject constructor(
         super.onDestroy()
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null)
         RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
+        AudioManagerUtil.dispose()
     }
 
     fun getCurrentRoomInfo(): UiRoomModel {
@@ -467,6 +468,7 @@ class VoiceRoomPresenter @Inject constructor(
             override fun onSuccess() {
                 Log.d(TAG, "onSuccess: ")
                 view.enterSeatSuccess()
+                AudioManagerUtil.choiceAudioModel()
             }
         })
     }
@@ -484,6 +486,7 @@ class VoiceRoomPresenter @Inject constructor(
                 override fun onSuccess() {
                     Log.d(TAG, "onSuccess: ")
 //                    view.enterSeatSuccess()
+                    AudioManagerUtil.choiceAudioModel()
                 }
             })
         } else {
@@ -510,6 +513,7 @@ class VoiceRoomPresenter @Inject constructor(
                     override fun onSuccess() {
                         Log.d(TAG, "enterSeat:onSuccess: ")
                         view.enterSeatSuccess()
+                        AudioManagerUtil.choiceAudioModel()
                     }
                 })
             } else {
@@ -582,6 +586,7 @@ class VoiceRoomPresenter @Inject constructor(
 
                     override fun onSuccess() {
                         view.showMessage("上麦成功")
+                        AudioManagerUtil.choiceAudioModel()
                     }
 
                 })

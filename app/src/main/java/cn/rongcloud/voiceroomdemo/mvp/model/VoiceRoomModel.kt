@@ -1089,8 +1089,10 @@ class VoiceRoomModel @Inject constructor(
                     }
 
                     override fun onSuccess() {
-                        if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
-                            RCRTCAudioMixer.getInstance().stop()
+                        if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY
+                            || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED
+                        ) {
+                            stopPlayMusic()
                         }
                         emitter.onComplete()
                     }
@@ -1376,7 +1378,7 @@ class VoiceRoomModel @Inject constructor(
                         if (url == currentPlayMusic) {
 
                             try {
-                                RCRTCAudioMixer.getInstance().stop()
+                                stopPlayMusic()
                             } catch (e: Exception) {
                                 Log.e(TAG, "deleteMusic: ", e)
                             }
@@ -1413,7 +1415,7 @@ class VoiceRoomModel @Inject constructor(
         } else if (currentPlayMusic != model.url) {
             // 当前在播放的和选择的不同,停止播放旧的，直接播放新的
             try {
-                RCRTCAudioMixer.getInstance().stop()
+                stopPlayMusic()
             } catch (e: Exception) {
                 Log.e(TAG, "playOrPauseMusic: ", e)
             }
@@ -1429,21 +1431,23 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun playMusic(name: String? = "", url: String) {
-        addDisposable(
-            FileModel
-                .checkOrDownLoadMusic(name ?: "", url)
-                .subscribe({
-                    currentPlayMusic = url
-                    val path = FileModel.getCompleteMusicPathByName(
-                        FileModel.getNameFromUrl(url) ?: ""
-                    )
-                    Log.d(TAG, "playMusic: path = $path")
-                    RCRTCAudioMixer.getInstance()
-                        .startMix(path, RCRTCAudioMixer.Mode.MIX, true, 1)
-                }, {
-                    MyApp.context.showToast(it.message)
-                })
-        )
+        GlobalScope.launch(Dispatchers.IO) {
+            addDisposable(
+                FileModel
+                    .checkOrDownLoadMusic(name ?: "", url)
+                    .subscribe({
+                        currentPlayMusic = url
+                        val path = FileModel.getCompleteMusicPathByName(
+                            FileModel.getNameFromUrl(url) ?: ""
+                        )
+                        Log.d(TAG, "playMusic: path = $path")
+                        RCRTCAudioMixer.getInstance()
+                            .startMix(path, RCRTCAudioMixer.Mode.MIX, true, 1)
+                    }, {
+                        MyApp.context.showToast(it.message)
+                    })
+            )
+        }
     }
 
     fun moveMusicToTop(model: UiMusicModel): Completable {
@@ -1451,7 +1455,7 @@ class VoiceRoomModel @Inject constructor(
 
             if (currentPlayMusic.isNullOrEmpty() || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
                 model.url?.let {
-                    RCRTCAudioMixer.getInstance().stop()
+                    stopPlayMusic()
                     playMusic(model.name, it)
                     emitter.onComplete()
                 }
@@ -1506,9 +1510,18 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun onLeaveRoom() {
-        if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED || currentMusicState == RCRTCAudioMixer.MixingState.PLAY) {
-            RCRTCAudioMixer.getInstance().stop()
+        if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED
+            || currentMusicState == RCRTCAudioMixer.MixingState.PLAY
+        ) {
+            stopPlayMusic()
         }
+    }
+
+    fun stopPlayMusic() {
+        if (playNextMusicJob?.isActive == true) {
+            playNextMusicJob?.cancel()
+        }
+        RCRTCAudioMixer.getInstance().stop()
     }
 
 }
