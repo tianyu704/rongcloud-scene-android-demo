@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.ui.dialog
 import android.content.Context
 import android.view.inputmethod.InputMethodManager
 import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
 import kotlinx.android.synthetic.main.layout_edit_dialog.*
 
 /**
@@ -18,6 +19,7 @@ class EditDialog(
     private val title: String = "",
     private val hint: String,
     private val text: String = "",
+    private val maxLength: Int = Int.MAX_VALUE,
     private val cancelListener: (() -> Unit)? = null,
     private val callBack: (context: String?) -> Unit
 ) :
@@ -37,6 +39,7 @@ class EditDialog(
         et_content.hint = hint
         et_content.setText(text)
         et_content.setSelection(text.length)
+        et_content.filters = arrayOf(MaxLengthWithEmojiFilter(maxLength,et_content))
     }
 
     override fun show() {

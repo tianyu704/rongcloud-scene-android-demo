@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.EditDialog
@@ -26,12 +27,14 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RoomSettingFragment(
     view: IRoomSettingView,
+    private val roomInfoBean: VoiceRoomBean
 ) :
     BaseBottomSheetDialogFragment(R.layout.fragment_room_setting),
     IRoomSettingView by view {
 
     private var passwordDialog: InputPasswordDialog? = null
     private var modifyNameDialog: EditDialog? = null
+
 
     @Inject
     lateinit var presenter: RoomSettingPresenter
@@ -79,19 +82,24 @@ class RoomSettingFragment(
 
     override fun showModifyRoomNameDialog(roomName: String?): Maybe<String>? {
         return Maybe.create { emitter ->
-            modifyNameDialog =
-                EditDialog(requireActivity(), "修改房间标题", "请输入房间名", roomName ?: "", cancelListener = {
+            modifyNameDialog = EditDialog(
+                requireActivity(),
+                "修改房间标题",
+                "请输入房间名",
+                roomName ?: "",
+                10,
+                cancelListener = {
                     emitter.onComplete()
                 }) { newName ->
-                    if (newName.isNullOrEmpty()) {
-                        requireActivity().showToast("房间名不能为空")
-                        return@EditDialog
-                    }
-                    modifyNameDialog?.dismiss()
-                    emitter.onSuccess(newName)
-                }.apply {
-                    show()
+                if (newName.isNullOrEmpty()) {
+                    requireActivity().showToast("房间名不能为空")
+                    return@EditDialog
                 }
+                modifyNameDialog?.dismiss()
+                emitter.onSuccess(newName)
+            }.apply {
+                show()
+            }
         }
     }
 
