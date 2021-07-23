@@ -30,6 +30,7 @@ class TipDialog(
 
     override fun initView() {
         btn_cancel.isVisible = false
+        b_divider.isVisible = false
         tv_message.text = message
         btn_cancel.text = cancel
         btn_confirm.text = confirm

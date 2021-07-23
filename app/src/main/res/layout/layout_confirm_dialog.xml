@@ -62,6 +62,7 @@
                 android:textSize="17sp" />
 
             <View
+                android:id="@+id/b_divider"
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:background="#FFE5E6E7"
