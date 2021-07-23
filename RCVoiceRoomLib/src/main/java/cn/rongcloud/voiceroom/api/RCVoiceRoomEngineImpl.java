@@ -379,17 +379,17 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     currentRoomEventListener.onUserEnterSeat(seatIndex, mCurrentUserId);
                     currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
                 }
-                updateSeatBeUsedByUser(mCurrentUserId, seatIndex, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-
-                    }
-                });
+//                updateSeatBeUsedByUser(mCurrentUserId, seatIndex, new RCVoiceRoomCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(int code, String message) {
+//
+//                    }
+//                });
                 switchRole(RCRTCLiveRole.BROADCASTER, callback);
             }
 
@@ -1426,26 +1426,26 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             }
 
-            if (key.startsWith(RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY)) {
-                Log.d(TAG, "handleRequestSeatCancelled: key = " + key);
-                String[] info = key.split("_");
-                String userId = info[info.length - 1];
-                if (!TextUtils.isEmpty(userId)) {
-                    if (isUserOnSeat(userId)) {
-                        kickSeatFromSeat(userId, new RCVoiceRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-
-                            }
-
-                            @Override
-                            public void onError(int code, String message) {
-
-                            }
-                        });
-                    }
-                }
-            }
+//            if (key.startsWith(RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY)) {
+//                Log.d(TAG, "handleRequestSeatCancelled: key = " + key);
+//                String[] info = key.split("_");
+//                String userId = info[info.length - 1];
+//                if (!TextUtils.isEmpty(userId)) {
+//                    if (isUserOnSeat(userId)) {
+//                        kickSeatFromSeat(userId, new RCVoiceRoomCallback() {
+//                            @Override
+//                            public void onSuccess() {
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(int code, String message) {
+//
+//                            }
+//                        });
+//                    }
+//                }
+//            }
         }
     }
 
