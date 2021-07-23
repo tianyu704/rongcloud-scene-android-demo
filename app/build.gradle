@@ -34,6 +34,8 @@ android {
                 includeCompileClasspath = true
             }
         }
+        renderscriptSupportModeEnabled  true
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -105,4 +107,6 @@ dependencies {
 
     api "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    implementation 'com.android.support:multidex:1.0.3'
 }

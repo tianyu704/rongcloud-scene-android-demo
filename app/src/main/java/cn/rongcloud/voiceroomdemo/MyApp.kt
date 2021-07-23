@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import androidx.multidex.MultiDexApplication
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity
@@ -41,7 +42,7 @@ import kotlin.properties.Delegates
 private const val TAG = "MyApp"
 
 @HiltAndroidApp
-class MyApp : Application() {
+class MyApp : MultiDexApplication() {
 
     private val activityList: ArrayList<Activity> = arrayListOf()
 
