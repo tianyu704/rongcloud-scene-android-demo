@@ -20,6 +20,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.media.audiofx.PresetReverb;
 import android.os.Bundle;
 import android.os.Trace;
 import android.telephony.TelephonyManager;
@@ -152,8 +153,19 @@ public class DialpadFragment extends Fragment
         }
     }
 
+    public void setInputNum(String inputNum) {
+        if (null != mDigits && !TextUtils.isEmpty(inputNum) && isMobileNO(inputNum)) {
+            mDigits.setText(inputNum);
+            mDigits.setSelection(inputNum.length());
+            mDigits.requestFocus();
+        }
+    }
+
+    public final static String DEFAU_INPUT = "defau_input";
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
+
         final View fragmentView = inflater.inflate(R.layout.dialpad_fragment, container,
                 false);
         fragmentView.buildLayer();
@@ -165,6 +177,8 @@ public class DialpadFragment extends Fragment
         mDigits.setOnKeyListener(this);
         mDigits.addTextChangedListener(this);
         mDigits.setElegantTextHeight(false);
+        String defaultInput = getArguments().getString(DEFAU_INPUT);
+        setInputNum(defaultInput);
         // Check for the presence of the keypad
         View oneButton = fragmentView.findViewById(R.id.one);
         if (oneButton != null) {
@@ -405,11 +419,11 @@ public class DialpadFragment extends Fragment
                 hideSelf();
                 return;
             }
-//            if (!isMobileNO(num)) {
-//                mDigits.getText().clear();
-//                Toast.makeText(getContext(), "请输入正确的电话号码", Toast.LENGTH_LONG).show();
-//                return;
-//            }
+            if (!isMobileNO(num)) {
+                mDigits.getText().clear();
+                Toast.makeText(getContext(), "请输入正确的电话号码", Toast.LENGTH_LONG).show();
+                return;
+            }
             if (null != dialpadListener && null != dialpadListener.get()) {
                 dialpadListener.get().onDialpad(num);
             }

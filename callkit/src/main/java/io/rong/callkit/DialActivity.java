@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
-import android.util.JsonReader;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,7 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
-import com.google.gson.JsonElement;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
@@ -29,7 +31,6 @@ import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
 
 import java.io.IOException;
-import java.lang.ref.PhantomReference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
@@ -49,8 +50,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.rongcloud.common.dao.entities.CallRecordEntityKt.AUDIO_SINGLE_CALL;
-
 /**
  * 拨号界面
  */
@@ -67,6 +66,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private boolean isVideo = false;
     private String userId, token;
     private List<DialInfo> records = new ArrayList<>();
+    private final static String FILE_PRE = "http://120.92.102.127:8081//file/show?path=";
 
     public static void openDilapadPage(Activity activity, String userId, boolean video, String token) {
         activity.startActivity(new Intent(activity, DialActivity.class)
@@ -90,6 +90,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 .subscribe(new Consumer<List<CallRecordModel>>() {
                     @Override
                     public void accept(List<CallRecordModel> models) {
+                        records.clear();
                         int size = null == models ? 0 : models.size();
                         DialInfo dialInfo;
                         for (int i = 0; i < size; i++) {
@@ -101,12 +102,12 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                             dialInfo.setHead(model.getPortrait());
                             records.add(dialInfo);
                         }
-                        refreshRecords();
+                        refreshRecords(records);
                     }
                 });
     }
 
-    private void refreshRecords() {
+    private void refreshRecords(List<DialInfo> records) {
         if (null != records && null != recyclerView.getAdapter()) {
             ((RcySAdapter) recyclerView.getAdapter()).setData(records, true);
         }
@@ -122,17 +123,43 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         recyclerView = findViewById(R.id.rc_refresh);
         recyclerView.setAdapter(new RcySAdapter<DialInfo, RcyHolder>(this, R.layout.layout_dialpad_item) {
             @Override
-            public void convert(RcyHolder holder, DialInfo info, int position) {
+            public void convert(RcyHolder holder, final DialInfo info, int position) {
                 holder.setText(R.id.tv_number, info.getPhone());
                 holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
                 holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
                 ImageView head = holder.getView(R.id.iv_head);
-                GlideUtils.showBlurTransformation(
-                        context,
-                        head,
-                        Uri.parse(info.getHead()));
+                Log.e("DialActivity", "convert headUrl = " + info.getHead());
+                if (!TextUtils.isEmpty(info.getHead()) && null != head) {
+                    Glide.with(DialActivity.this)
+                            .load(info.getHead())
+                            .placeholder(R.drawable.rc_default_portrait)
+                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                            .into(head);
+                }
+                holder.rootView().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        ((DialActivity) context).onRecordItemClick(info.getPhone());
+                    }
+                });
+                holder.rootView().setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View view) {
+                        removeItem(info);
+                        notifyDataSetChanged();
+                        return true;
+                    }
+                });
             }
         });
+    }
+
+    private void onRecordItemClick(String phone) {
+        if (!mIsDialpadShown) {
+            showDialpadFragment(phone);
+        } else {
+            dialpadFragment.setInputNum(phone);
+        }
     }
 
     boolean mIsDialpadShown;
@@ -142,28 +169,58 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         int resId = view.getId();
         if (resId == R.id.floating_action_button) {
             if (!mIsDialpadShown) {
-                showDialpadFragment();
+                showDialpadFragment("");
+            }
+        }
+    }
+
+    @Override
+    public void onInputFiltter(Editable input) {
+        String filter = input.toString().trim();
+        if (TextUtils.isEmpty(filter)) {
+            refreshRecords(records);
+            return;
+        }
+        int size = null == records ? 0 : records.size();
+        if (size > 0) {
+            List<DialInfo> fits = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                DialInfo info = records.get(i);
+                if (info.getPhone().startsWith(filter)) {
+                    fits.add(info);
+                }
+            }
+            if (!fits.isEmpty()) {
+                refreshRecords(fits);
             }
         }
     }
 
     @Override
     public void onDialpad(String num) {
+//        String targetId = null;
+//        int size = null == records ? 0 : records.size();
+//        if (size > 0) {
+//            for (int i = 0; i < size; i++) {
+//                DialInfo info = records.get(i);
+//                if (info.getPhone().equals(num)) {
+//                    targetId = info.getUserId();
+//                    break;
+//                }
+//            }
+//        }
         getUserIdByPhone(num);
-    }
-
-    @Override
-    public void onInputFiltter(Editable input) {
-//        Log.e(TAG, "onInputChanage:input = " + input);
-        if (null != records && !records.isEmpty()) {
-
-
-        }
+//        if (TextUtils.isEmpty(targetId)) {
+//            getUserIdByPhone(num);
+//        } else {
+//            RongCallKit.startSingleCall(this, targetId,
+//                    isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+//                            : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+//        }
     }
 
     private void getUserIdByPhone(final String phone) {
         String url = "http://120.92.102.127:8081/user/get/" + phone;
-        Log.e(TAG, "getUserIdByPhone:url = " + url);
         OkHttpClient okHttpClient = new OkHttpClient();
         final Request request = new Request.Builder()
                 .url(url)
@@ -185,29 +242,32 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                     int code = jsonObj.get("code").getAsInt();
                     if (code == 10000) {
                         JsonObject data = jsonObj.get("data").getAsJsonObject();
-                        String userId = data.get("uid").getAsString();
-                        DatabaseManager.INSTANCE.insertCallRecord(
+                        String id = data.get("uid").getAsString();
+                        DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
                                 userId,
                                 "",
-                                userId,
+                                "",
+                                "",
+                                id,
                                 phone,
+                                "",
+                                FILE_PRE + data.get("portrait").getAsString(),//拼接前缀
                                 new Date().getTime(),
                                 0,
                                 isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
                         );
-                        RongCallKit.startSingleCall(DialActivity.this, userId,
+                        RongCallKit.startSingleCall(DialActivity.this, id,
                                 isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
                                         : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
                     }
                 }
-
             }
         });
     }
 
     DialpadFragment dialpadFragment;
 
-    private void showDialpadFragment() {
+    private void showDialpadFragment(String defInput) {
         if (mIsDialpadShown) {
             return;
         }
@@ -215,10 +275,14 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         final FragmentTransaction ft = getFragmentManager().beginTransaction();
         if (dialpadFragment == null) {
             dialpadFragment = new DialpadFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(DialpadFragment.DEFAU_INPUT, defInput);
+            dialpadFragment.setArguments(bundle);
             DialpadFragment.dialpadListener = new WeakReference<DialpadFragment.DialpadListener>(DialActivity.this);
             ft.add(R.id.dialtacts_container, dialpadFragment, TAG_DIALPAD_FRAGMENT);
         } else {
             ft.show(dialpadFragment);
+            dialpadFragment.setInputNum(defInput);
         }
         ft.commitAllowingStateLoss();
         mFloatingActionButtonController.scaleOut();

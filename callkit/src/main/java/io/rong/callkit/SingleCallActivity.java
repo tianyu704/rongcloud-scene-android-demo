@@ -1149,14 +1149,20 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     @Override
-    public void onUserUpdate(UserInfo info) {
+    public void onUserUpdate(final UserInfo info) {
         if (isFinishing()) {
             return;
         }
         if (targetId != null && targetId.equals(info.getUserId())) {
-            TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-            if (info.getName() != null)
-                userName.setText(CallKitUtils.nickNameRestrict(info.getName()));
+            final TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+            if (info.getName() != null && null != userName)
+                userName.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        userName.setText(CallKitUtils.nickNameRestrict(info.getName()));
+                    }
+                });
+
         }
     }
 
