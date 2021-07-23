@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import io.rong.callkit.util.ActivityStartCheckUtils;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
@@ -46,11 +47,14 @@ import io.rong.imkit.notification.NotificationUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.message.InformationNotificationMessage;
+
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/** Created by weiqinxiao on 16/3/17. */
+/**
+ * Created by weiqinxiao on 16/3/17.
+ */
 public class CallFloatBoxView {
     private static Context mContext;
     private static Timer timer;
@@ -133,7 +137,7 @@ public class CallFloatBoxView {
             } else {
                 mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
             }
-        }else {
+        } else {
             //视频悬浮窗下，不需要UI显示时间，但是时间值也需要同步更新
             setupTime(null);
         }
@@ -142,16 +146,18 @@ public class CallFloatBoxView {
                         new IRongCallListener() {
                             @Override
                             public void onCallOutgoing(
-                                    RongCallSession callInfo, SurfaceView localVideo) {}
+                                    RongCallSession callInfo, SurfaceView localVideo) {
+                            }
 
                             @Override
-                            public void onRemoteUserRinging(String userId) {}
+                            public void onRemoteUserRinging(String userId) {
+                            }
 
                             @Override
                             public void onCallDisconnected(
                                     RongCallSession callProfile,
                                     RongCallCommon.CallDisconnectedReason reason) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected",reason.getValue(), TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected", reason.getValue(), TAG);
                                 setExcludeFromRecents(mContext, false);
                                 String senderId;
                                 String extra = "";
@@ -187,7 +193,7 @@ public class CallFloatBoxView {
                                             long serverTime =
                                                     System.currentTimeMillis()
                                                             - RongIMClient.getInstance()
-                                                                    .getDeltaTime();
+                                                            .getDeltaTime();
                                             if (senderId.equals(callProfile.getSelfUserId())) {
                                                 callSTerminateMessage.setDirection("MO");
                                                 IMCenter.getInstance()
@@ -204,8 +210,8 @@ public class CallFloatBoxView {
                                                 callSTerminateMessage.setDirection("MT");
                                                 io.rong.imlib.model.Message.ReceivedStatus
                                                         receivedStatus =
-                                                                new io.rong.imlib.model.Message
-                                                                        .ReceivedStatus(0);
+                                                        new io.rong.imlib.model.Message
+                                                                .ReceivedStatus(0);
                                                 IMCenter.getInstance()
                                                         .insertIncomingMessage(
                                                                 Conversation.ConversationType
@@ -224,7 +230,7 @@ public class CallFloatBoxView {
                                             serverTime =
                                                     System.currentTimeMillis()
                                                             - RongIMClient.getInstance()
-                                                                    .getDeltaTime();
+                                                            .getDeltaTime();
                                             if (reason.equals(
                                                     RongCallCommon.CallDisconnectedReason
                                                             .NO_RESPONSE)) {
@@ -254,8 +260,8 @@ public class CallFloatBoxView {
                                             } else {
                                                 io.rong.imlib.model.Message.ReceivedStatus
                                                         receivedStatus =
-                                                                new io.rong.imlib.model.Message
-                                                                        .ReceivedStatus(0);
+                                                        new io.rong.imlib.model.Message
+                                                                .ReceivedStatus(0);
                                                 IMCenter.getInstance()
                                                         .insertIncomingMessage(
                                                                 Conversation.ConversationType.GROUP,
@@ -272,10 +278,10 @@ public class CallFloatBoxView {
                                     }
                                 }
                                 Toast.makeText(
-                                                mContext,
-                                                mContext.getString(
-                                                        R.string.rc_voip_call_terminalted),
-                                                Toast.LENGTH_SHORT)
+                                        mContext,
+                                        mContext.getString(
+                                                R.string.rc_voip_call_terminalted),
+                                        Toast.LENGTH_SHORT)
                                         .show();
 
                                 if (wm != null && mView != null && mView.isAttachedToWindow()) {
@@ -331,7 +337,7 @@ public class CallFloatBoxView {
                                     String userId,
                                     RongCallCommon.CallMediaType mediaType,
                                     SurfaceView video) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,RongCallClient.getInstance().getCallSession(),"state|desc", "onMediaTypeChanged", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, RongCallClient.getInstance().getCallSession(), "state|desc", "onMediaTypeChanged", TAG);
                                 if (mContext == null || !isShown || wm == null) {
                                     Log.e(
                                             TAG,
@@ -413,7 +419,7 @@ public class CallFloatBoxView {
 
                             @Override
                             public void onError(RongCallCommon.CallErrorCode errorCode) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,RongCallClient.getInstance().getCallSession(),"code|state|desc", errorCode.getValue(),"onError", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, RongCallClient.getInstance().getCallSession(), "code|state|desc", errorCode.getValue(), "onError", TAG);
                                 setAudioMode(AudioManager.MODE_NORMAL);
                                 AudioPlayManager.getInstance().setInVoipMode(false);
                             }
@@ -421,7 +427,7 @@ public class CallFloatBoxView {
                             @Override
                             public void onCallConnected(
                                     RongCallSession callInfo, SurfaceView localVideo) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,callInfo,"state|desc","onCallConnected", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callInfo, "state|desc", "onCallConnected", TAG);
                                 CallKitUtils.isDial = false;
                                 setAudioMode(AudioManager.MODE_IN_COMMUNICATION);
                                 AudioPlayManager.getInstance().setInVoipMode(true);
@@ -439,10 +445,12 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onNetworkReceiveLost(String userId, int lossRate) {}
+                            public void onNetworkReceiveLost(String userId, int lossRate) {
+                            }
 
                             @Override
-                            public void onNetworkSendLost(int lossRate, int delay) {}
+                            public void onNetworkSendLost(int lossRate, int delay) {
+                            }
 
                             @Override
                             public void onFirstRemoteVideoFrame(
@@ -451,7 +459,8 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onAudioLevelSend(String audioLevel) {}
+                            public void onAudioLevelSend(String audioLevel) {
+                            }
 
                             public void onRemoteUserPublishVideoStream(
                                     String userId,
@@ -462,7 +471,8 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onAudioLevelReceive(HashMap<String, String> audioLevel) {}
+                            public void onAudioLevelReceive(HashMap<String, String> audioLevel) {
+                            }
 
                             public void onRemoteUserUnpublishVideoStream(
                                     String userId, String streamId, String tag) {
@@ -599,31 +609,32 @@ public class CallFloatBoxView {
                 });
         wm.addView(mView, params);
         showFBCallTime = (TextView) mView.findViewById(R.id.rc_time);
-        showFBCallTime.setVisibility(View.GONE);
-
+//        showFBCallTime.setVisibility(View.GONE);
         ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
         RongCallCommon.CallMediaType mediaType =
                 RongCallCommon.CallMediaType.valueOf(bundle.getInt("mediaType"));
-        if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-            mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
-        } else {
-            mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
-        }
+//        if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+//            mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
+//        } else {
+//            mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
+//        }
         RongCallClient.getInstance()
                 .setVoIPCallListener(
                         new IRongCallListener() {
                             @Override
                             public void onCallOutgoing(
-                                    RongCallSession callInfo, SurfaceView localVideo) {}
+                                    RongCallSession callInfo, SurfaceView localVideo) {
+                            }
 
                             @Override
-                            public void onRemoteUserRinging(String userId) {}
+                            public void onRemoteUserRinging(String userId) {
+                            }
 
                             @Override
                             public void onCallDisconnected(
                                     RongCallSession callProfile,
                                     RongCallCommon.CallDisconnectedReason reason) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected", reason.getValue(),TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected", reason.getValue(), TAG);
                                 setExcludeFromRecents(mContext, false);
                                 String senderId;
                                 String extra = "";
@@ -663,8 +674,8 @@ public class CallFloatBoxView {
                                                 callSTerminateMessage.setDirection("MT");
                                                 io.rong.imlib.model.Message.ReceivedStatus
                                                         receivedStatus =
-                                                                new io.rong.imlib.model.Message
-                                                                        .ReceivedStatus(0);
+                                                        new io.rong.imlib.model.Message
+                                                                .ReceivedStatus(0);
                                                 IMCenter.getInstance()
                                                         .insertIncomingMessage(
                                                                 Conversation.ConversationType
@@ -707,8 +718,8 @@ public class CallFloatBoxView {
                                             } else {
                                                 io.rong.imlib.model.Message.ReceivedStatus
                                                         receivedStatus =
-                                                                new io.rong.imlib.model.Message
-                                                                        .ReceivedStatus(0);
+                                                        new io.rong.imlib.model.Message
+                                                                .ReceivedStatus(0);
                                                 IMCenter.getInstance()
                                                         .insertIncomingMessage(
                                                                 Conversation.ConversationType.GROUP,
@@ -724,10 +735,10 @@ public class CallFloatBoxView {
                                     }
                                 }
                                 Toast.makeText(
-                                                mContext,
-                                                mContext.getString(
-                                                        R.string.rc_voip_call_terminalted),
-                                                Toast.LENGTH_SHORT)
+                                        mContext,
+                                        mContext.getString(
+                                                R.string.rc_voip_call_terminalted),
+                                        Toast.LENGTH_SHORT)
                                         .show();
 
                                 if (wm != null && mView != null) {
@@ -763,7 +774,7 @@ public class CallFloatBoxView {
                                     String userId,
                                     RongCallCommon.CallMediaType mediaType,
                                     SurfaceView video) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,RongCallClient.getInstance().getCallSession(),"state|desc", "onMediaTypeChanged", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, RongCallClient.getInstance().getCallSession(), "state|desc", "onMediaTypeChanged", TAG);
                                 ImageView mediaIconV =
                                         (ImageView) mView.findViewById(R.id.rc_voip_media_type);
                                 if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
@@ -775,7 +786,7 @@ public class CallFloatBoxView {
 
                             @Override
                             public void onError(RongCallCommon.CallErrorCode errorCode) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,RongCallClient.getInstance().getCallSession(),"code|state|desc", errorCode.getValue(),"onError", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, RongCallClient.getInstance().getCallSession(), "code|state|desc", errorCode.getValue(), "onError", TAG);
                                 setAudioMode(AudioManager.MODE_NORMAL);
                                 AudioPlayManager.getInstance().setInVoipMode(false);
                             }
@@ -783,7 +794,7 @@ public class CallFloatBoxView {
                             @Override
                             public void onCallConnected(
                                     RongCallSession callInfo, SurfaceView localVideo) {
-                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER,callInfo,"state|desc","onCallConnected", TAG);
+                                ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callInfo, "state|desc", "onCallConnected", TAG);
                                 if (CallKitUtils.isDial && isShown) {
                                     CallFloatBoxView.showFloatBoxToCallTime();
                                     CallKitUtils.isDial = false;
@@ -823,10 +834,12 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onNetworkReceiveLost(String userId, int lossRate) {}
+                            public void onNetworkReceiveLost(String userId, int lossRate) {
+                            }
 
                             @Override
-                            public void onNetworkSendLost(int lossRate, int delay) {}
+                            public void onNetworkSendLost(int lossRate, int delay) {
+                            }
 
                             @Override
                             public void onFirstRemoteVideoFrame(
@@ -835,7 +848,8 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onAudioLevelSend(String audioLevel) {}
+                            public void onAudioLevelSend(String audioLevel) {
+                            }
 
                             public void onRemoteUserPublishVideoStream(
                                     String userId,
@@ -846,7 +860,8 @@ public class CallFloatBoxView {
                             }
 
                             @Override
-                            public void onAudioLevelReceive(HashMap<String, String> audioLevel) {}
+                            public void onAudioLevelReceive(HashMap<String, String> audioLevel) {
+                            }
 
                             public void onRemoteUserUnpublishVideoStream(
                                     String userId, String streamId, String tag) {
@@ -855,7 +870,9 @@ public class CallFloatBoxView {
                         });
     }
 
-    /** * 调用showFloatBoxToCall 之后 调用该方法设置 */
+    /**
+     * 调用showFloatBoxToCall 之后 调用该方法设置
+     */
     public static void showFloatBoxToCallTime() {
         if (!isShown) {
             return;
@@ -946,11 +963,11 @@ public class CallFloatBoxView {
                                     mBundle = null;
                                 } else {
                                     Toast.makeText(
-                                                    mContext,
-                                                    mContext.getString(
-                                                            R.string
-                                                                    .rc_background_start_actvity_deny),
-                                                    Toast.LENGTH_SHORT)
+                                            mContext,
+                                            mContext.getString(
+                                                    R.string
+                                                            .rc_background_start_actvity_deny),
+                                            Toast.LENGTH_SHORT)
                                             .show();
                                 }
                             }
@@ -959,7 +976,7 @@ public class CallFloatBoxView {
 
     private static void setupTime(final TextView timeView) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        if (timer != null){
+        if (timer != null) {
             timer.cancel();
             timer = null;
         }
@@ -974,9 +991,11 @@ public class CallFloatBoxView {
                                         mTime++;
                                         if (timeView != null) {
                                             if (mTime >= 3600) {
-                                                timeView.setText(String.format("%d:%02d:%02d", mTime / 3600, (mTime % 3600) / 60, (mTime % 60))); timeView.setVisibility(View.VISIBLE);
+                                                timeView.setText(String.format("%d:%02d:%02d", mTime / 3600, (mTime % 3600) / 60, (mTime % 60)));
+                                                timeView.setVisibility(View.VISIBLE);
                                             } else {
-                                                timeView.setText(String.format("%02d:%02d", (mTime % 3600) / 60, (mTime % 60))); timeView.setVisibility(View.VISIBLE);
+                                                timeView.setText(String.format("%02d:%02d", (mTime % 3600) / 60, (mTime % 60)));
+                                                timeView.setVisibility(View.VISIBLE);
                                             }
                                         }
                                     }

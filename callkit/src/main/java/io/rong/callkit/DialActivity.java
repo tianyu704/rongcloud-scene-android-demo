@@ -198,25 +198,24 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
 
     @Override
     public void onDialpad(String num) {
-//        String targetId = null;
-//        int size = null == records ? 0 : records.size();
-//        if (size > 0) {
-//            for (int i = 0; i < size; i++) {
-//                DialInfo info = records.get(i);
-//                if (info.getPhone().equals(num)) {
-//                    targetId = info.getUserId();
-//                    break;
-//                }
-//            }
-//        }
-        getUserIdByPhone(num);
-//        if (TextUtils.isEmpty(targetId)) {
-//            getUserIdByPhone(num);
-//        } else {
-//            RongCallKit.startSingleCall(this, targetId,
-//                    isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
-//                            : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
-//        }
+        String targetId = null;
+        int size = null == records ? 0 : records.size();
+        if (size > 0) {
+            for (int i = 0; i < size; i++) {
+                DialInfo info = records.get(i);
+                if (info.getPhone().equals(num)) {
+                    targetId = info.getUserId();
+                    break;
+                }
+            }
+        }
+        if (TextUtils.isEmpty(targetId)) {
+            getUserIdByPhone(num);
+        } else {
+            RongCallKit.startSingleCall(this, targetId,
+                    isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                            : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+        }
     }
 
     private void getUserIdByPhone(final String phone) {
