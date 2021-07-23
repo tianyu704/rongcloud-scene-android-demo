@@ -513,7 +513,12 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         favAnimation.let {
             it.release()
         }
-        stopService(Intent(this, cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java))
+        stopService(
+            Intent(
+                this,
+                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
+            )
+        )
     }
 
     override fun onJoinRoomSuccess() {
@@ -786,7 +791,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty -> {
                     roomInfo.roomBean?.let { roomBean ->
                         emptySeatFragment = EmptySeatFragment(
                             this@VoiceRoomActivity,
@@ -855,8 +860,11 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         Audience(view) {
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
+                    showMessage("该座位已锁定")
+                }
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty -> {
-                  presenter.enterSeat(seatModel.index)
+                    presenter.enterSeat(seatModel.index)
                 }
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                     if (seatModel.userId == AccountStore.getUserId()) {
