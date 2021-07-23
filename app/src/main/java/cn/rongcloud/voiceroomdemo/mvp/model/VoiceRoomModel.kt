@@ -303,7 +303,6 @@ class VoiceRoomModel @Inject constructor(
             }
 
             override fun onReportPlayingProgress(p0: Float) {
-                TODO("Not yet implemented")
             }
 
         })
