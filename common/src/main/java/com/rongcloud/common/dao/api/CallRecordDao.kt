@@ -19,7 +19,7 @@ interface CallRecordDao {
 
     @Transaction
     @Query(
-        """SELECT cr.* from CallRecord AS cr LEFT JOIN UserInfo AS mi ON cr.peerId = mi.userId 
+        """SELECT cr.*,mi.* from CallRecord AS cr LEFT JOIN UserInfo AS mi ON cr.peerId = mi.userId 
         WHERE cr.callerId = :callId"""
     )
     fun queryCallRecordList(callId: String): Flowable<List<CallRecordModel>>
