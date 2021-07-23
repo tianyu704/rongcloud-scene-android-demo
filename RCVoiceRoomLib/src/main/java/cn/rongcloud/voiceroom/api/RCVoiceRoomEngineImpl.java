@@ -268,12 +268,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             switchRole(RCRTCLiveRole.BROADCASTER, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    // TODO: 2021/6/4  
                 }
 
                 @Override
                 public void onError(int code, String message) {
-                    // TODO: 2021/6/4  
                 }
             });
         }
@@ -305,7 +303,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     private void afterLeaveSeat(final RCVoiceRoomCallback callback) {
-        // FIXME: 2021/6/3 该方式可能导致回调走两次
         notifyVoiceRoom(RC_AUDIENCE_LEAVE_ROOM, mCurrentUserId);
         if (TextUtils.isEmpty(mRoomId)) {
             onSuccessWithCheck(callback);
@@ -564,7 +561,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
-    public void kickSeatFromSeat(final String userId, final RCVoiceRoomCallback callback) {
+    public void kickUserFromSeat(final String userId, final RCVoiceRoomCallback callback) {
         final RCVoiceSeatInfo seatInfo = getSeatInfoByUserId(userId);
         if (seatInfo == null) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomUserNotOnSeat);
@@ -851,6 +848,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 mRoomInfo = roomInfo;
                 if (mRoomInfo.getSeatCount() != mSeatInfoList.size()) {
                     resetListExceptOwnerSeat(roomInfo.getSeatCount());
+                    for (int i = 0; i < mSeatInfoList.size(); i++) {
+                        updateKvSeatInfo(mSeatInfoList.get(i), i,null);
+                    }
                 }
                 onSuccessWithCheck(callback);
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();

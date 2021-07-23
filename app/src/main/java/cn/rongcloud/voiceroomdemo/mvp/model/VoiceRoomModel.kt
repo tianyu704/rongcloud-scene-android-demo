@@ -434,7 +434,7 @@ class VoiceRoomModel @Inject constructor(
         userId: String
     ): Completable {
         return Completable.create {
-            RCVoiceRoomEngine.getInstance().kickSeatFromSeat(userId, object : RCVoiceRoomCallback {
+            RCVoiceRoomEngine.getInstance().kickUserFromSeat(userId, object : RCVoiceRoomCallback {
                 override fun onError(code: Int, message: String?) {
                     it.onError(Throwable(message))
                 }

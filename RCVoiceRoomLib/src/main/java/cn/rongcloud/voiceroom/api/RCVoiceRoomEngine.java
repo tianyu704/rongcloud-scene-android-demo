@@ -143,7 +143,7 @@ public abstract class RCVoiceRoomEngine {
      * @param userId   用户 Id
      * @param callback 结果回调
      */
-    public abstract void kickSeatFromSeat(String userId, RCVoiceRoomCallback callback);
+    public abstract void kickUserFromSeat(String userId, RCVoiceRoomCallback callback);
 
     /**
      * 将某个用户踢出房间
