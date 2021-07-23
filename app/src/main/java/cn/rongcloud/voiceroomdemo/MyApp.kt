@@ -11,6 +11,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
+import cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
@@ -118,6 +120,8 @@ class MyApp : Application() {
                             if (activity is IBaseView) {
                                 Log.d(TAG, "obLogoutSubject: ")
                                 activity.onLogout()
+                            } else if (activity is LauncherActivity) {
+                                // do nothing
                             } else {
                                 activity.finish()
                             }
@@ -131,6 +135,22 @@ class MyApp : Application() {
 
         AudioManagerUtil.init(this)
 
+        if (!AccountStore.getImToken().isNullOrEmpty()) {
+            RCVoiceRoomEngine.getInstance().connectWithToken(
+                context as Application,
+                AccountStore.getImToken(),
+                object : RCVoiceRoomCallback {
+                    override fun onError(code: Int, message: String?) {
+                        context.showToast("RTC 服务器连接失败,请重新登录")
+                        AccountStore.logout()
+                    }
+
+                    override fun onSuccess() {
+
+                    }
+
+                })
+        }
         DatabaseManager.init(this)
 
     }

@@ -21,12 +21,17 @@ class MaxLengthWithEmojiFilter(val maxLength: Int, val editText: EditText) : Inp
         dest: Spanned?,
         dstart: Int,
         dend: Int
-    ): CharSequence {
-        val lengthWithEmoji = getLengthWithEmoji(editText.text)
-        if (lengthWithEmoji >= maxLength) {
-            return ""
+    ): CharSequence? {
+        if (source.isNullOrEmpty()) {
+            return null
         }
-        return source ?: ""
+        val totalLength = getLengthWithEmoji(source.toString() + dest)
+        if (totalLength <= maxLength) {
+            return null
+        }
+        val emojiCount = EmojiParser.extractEmojis(source.toString()).size
+        val redundancyLength = totalLength - maxLength + emojiCount
+        return source.substring(0, source.length - redundancyLength)
     }
 
     private fun getLengthWithEmoji(source: CharSequence?): Int {
