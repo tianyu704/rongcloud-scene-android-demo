@@ -275,7 +275,10 @@ class VoiceRoomModel @Inject constructor(
                 playNextMusic()
             }
 
-            override fun onStateChanged(p0: RCRTCAudioMixer.MixingState) {
+            override fun onStateChanged(
+                p0: RCRTCAudioMixer.MixingState,
+                p1: RCRTCAudioMixer.MixingStateReason?
+            ) {
                 Log.d(TAG, "onStateChanged: $p0")
                 currentMusicState = p0
                 when (p0) {
@@ -297,6 +300,10 @@ class VoiceRoomModel @Inject constructor(
                     }
                 }
                 userMusicListSubject.onNext(userMusicList)
+            }
+
+            override fun onReportPlayingProgress(p0: Float) {
+                TODO("Not yet implemented")
             }
 
         })
