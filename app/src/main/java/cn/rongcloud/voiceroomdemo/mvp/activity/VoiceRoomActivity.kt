@@ -791,7 +791,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
                     roomInfo.roomBean?.let { roomBean ->
                         emptySeatFragment = EmptySeatFragment(
                             this@VoiceRoomActivity,
