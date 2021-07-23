@@ -114,9 +114,11 @@ class MyApp : Application() {
         AccountStore.obLogoutSubject().subscribe {
             try {
                 activityList.lastOrNull()?.run {
-                    this.startActivity(Intent(this, LoginActivity::class.java))
+                    if(this !is LoginActivity && this !is LauncherActivity) {
+                        LoginActivity.startActivity(this)
+                    }
                     activityList.forEach { activity ->
-                        if (activity !is LoginActivity && !activity.isFinishing) {
+                        if (activity !is LoginActivity && activity !is LauncherActivity && !activity.isFinishing) {
                             if (activity is IBaseView) {
                                 Log.d(TAG, "obLogoutSubject: ")
                                 activity.onLogout()
