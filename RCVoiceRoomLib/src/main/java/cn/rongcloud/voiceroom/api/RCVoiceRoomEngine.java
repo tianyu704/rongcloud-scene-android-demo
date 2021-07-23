@@ -14,6 +14,7 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.AudioQuality;
 import cn.rongcloud.voiceroom.model.AudioScenario;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
+import cn.rongcloud.voiceroom.utils.BuildVersion;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.MessageContent;
 
@@ -310,4 +311,13 @@ public abstract class RCVoiceRoomEngine {
      * 断开连接，用户退出时调用
      */
     public abstract void disConnect();
+
+    /**
+     * 获取 SDK 版本号
+     *
+     * @return 版本号
+     */
+    public static String getVersion() {
+        return BuildVersion.SDK_VERSION;
+    }
 }
