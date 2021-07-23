@@ -31,8 +31,9 @@ dependencies {
     implementation "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0'
     compileOnly "cn.rongcloud.sdk:call_lib:$rongcloudSdkVersion"
-    api 'com.github.bumptech.glide:glide:4.9.0'
-    api 'com.google.code.gson:gson:2.8.1'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    implementation 'com.google.code.gson:gson:2.8.1'
     implementation 'com.github.lbasis:adapter:1.0.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation project(path: ':common')
 }

@@ -65,10 +65,20 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
         }
 
         iv_video_call.setOnClickListener {
-            DialActivity.openDilapadPage(this, true)
+            DialActivity.openDilapadPage(
+                this,
+                AccountStore.getUserId(),
+                true,
+                AccountStore.getAuthorization()
+            )
         }
         iv_audio_call.setOnClickListener {
-            DialActivity.openDilapadPage(this, false)
+            DialActivity.openDilapadPage(
+                this,
+                AccountStore.getUserId(),
+                false,
+                AccountStore.getAuthorization()
+            )
         }
 //        bg2.setColorFilter(Color.GRAY)
 //        bg2.alpha = 0.5f
