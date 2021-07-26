@@ -51,7 +51,6 @@ import cn.rongcloud.voiceroom.utils.JsonUtils;
 import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
-import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.chatroom.base.RongChatRoomClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
@@ -376,17 +375,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                     currentRoomEventListener.onUserEnterSeat(seatIndex, mCurrentUserId);
                     currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
                 }
-//                updateSeatBeUsedByUser(mCurrentUserId, seatIndex, new RCVoiceRoomCallback() {
-//                    @Override
-//                    public void onSuccess() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(int code, String message) {
-//
-//                    }
-//                });
                 switchRole(RCRTCLiveRole.BROADCASTER, callback);
             }
 
@@ -470,42 +458,43 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
         final String userId = preSeatInfo.getUserId();
         final RCVoiceSeatInfo preSeatClone = preSeatInfo.clone();
-        preSeatClone.setUserId(null);
-        preSeatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
-
+        synchronized (TAG) {
+            preSeatClone.setUserId(null);
+            preSeatClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+        }
+        final AtomicBoolean isLeaveSeatSuccess = new AtomicBoolean(false);
         updateKvSeatInfo(preSeatClone, preIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
-                userLeaveSeat(userId, preSeatInfo);
-                RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
-                if (currentRoomEventListener != null) {
-                    currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
-                    currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
-                }
+                isLeaveSeatSuccess.set(true);
+                enterSeat(seatIndex, targetSeatInfo, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        userLeaveSeat(userId, preSeatInfo);
+                        userEnterSeat(targetSeatInfo, mCurrentUserId);
+                        RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
+                        if (currentRoomEventListener != null) {
+                            currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
+                            currentRoomEventListener.onUserEnterSeat(seatIndex, mCurrentUserId);
+                            currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
+                        }
+                        muteSelfIfNeed();
+                        onSuccessWithCheck(callback);
+                    }
 
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
-            }
-        });
-
-        RCVoiceSeatInfo targetInfoClone = targetSeatInfo.clone();
-        targetInfoClone.setUserId(mCurrentUserId);
-        targetInfoClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
-
-        updateKvSeatInfo(targetInfoClone, seatIndex, new RCVoiceRoomCallback() {
-            @Override
-            public void onSuccess() {
-                userEnterSeat(targetSeatInfo, mCurrentUserId);
-                RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
-                if (currentRoomEventListener != null) {
-                    currentRoomEventListener.onUserEnterSeat(seatIndex, mCurrentUserId);
-                    currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
-                }
-                muteSelfIfNeed();
-                onSuccessWithCheck(callback);
+                    @Override
+                    public void onError(int code, String message) {
+                        onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
+                        if (isLeaveSeatSuccess.get()) {
+                            userLeaveSeat(userId, preSeatInfo);
+                            RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
+                            if (currentRoomEventListener != null) {
+                                currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
+                                currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
+                            }
+                        }
+                    }
+                });
             }
 
             @Override
@@ -515,6 +504,24 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         });
 
         muteSelfIfNeed();
+    }
+
+    private void enterSeat(final int seatIndex, final RCVoiceSeatInfo targetSeatInfo, final RCVoiceRoomCallback callback) {
+        RCVoiceSeatInfo targetInfoClone = targetSeatInfo.clone();
+        targetInfoClone.setUserId(mCurrentUserId);
+        targetInfoClone.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
+
+        updateKvSeatInfo(targetInfoClone, seatIndex, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                onSuccessWithCheck(callback);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
+            }
+        });
     }
 
     private void muteSelfIfNeed() {

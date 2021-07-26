@@ -26,8 +26,7 @@ import javax.inject.Inject
 @HiltBinding(value = IRoomSettingView::class)
 @AndroidEntryPoint
 class RoomSettingFragment(
-    view: IRoomSettingView,
-    private val roomInfoBean: VoiceRoomBean
+    view: IRoomSettingView
 ) :
     BaseBottomSheetDialogFragment(R.layout.fragment_room_setting),
     IRoomSettingView by view {

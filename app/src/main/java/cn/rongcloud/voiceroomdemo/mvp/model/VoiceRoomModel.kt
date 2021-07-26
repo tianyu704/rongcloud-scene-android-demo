@@ -567,7 +567,7 @@ class VoiceRoomModel @Inject constructor(
             currentUISeatInfoList
                 .elementAtOrNull(seatIndex)?.let { model ->
                     Log.d(TAG, "onUserLeaveSeat: $model")
-                    model.userId = null
+//                    model.userId = null
                     model.member = null
                 }
         }
