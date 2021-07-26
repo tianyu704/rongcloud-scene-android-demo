@@ -133,6 +133,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                     Glide.with(DialActivity.this)
                             .load(info.getHead())
                             .placeholder(R.drawable.rc_default_portrait)
+                            .override(100)
                             .apply(RequestOptions.bitmapTransform(new CircleCrop()))
                             .into(head);
                 }
