@@ -54,7 +54,7 @@
     <string name="rc_voip_mt_busy_toast">对方忙，请稍后再试</string>
     <string name="rc_voip_message_audio">[语音通话]</string>
     <string name="rc_voip_message_video">[视频通话]</string>
-    <string name="rc_voip_switch_to_audio">语音通话</string>
+    <string name="rc_voip_switch_to_audio">切换语音通话</string>
     <string name="rc_voip_remote_switched_to_audio">对方已切换到语音通话</string>
     <string name="rc_voip_remote_switched_to_video" translatable="false">对方已切换到视频通话</string>
     <string name="rc_voip_switched_to_audio">已切换到语音通话</string>

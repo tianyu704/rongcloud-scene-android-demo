@@ -3,38 +3,37 @@
   -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <ImageView
-        android:id="@+id/iv_icoming_backgroud"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/iv_icoming_backgroud"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:visibility="gone" />-->
 
-    <ImageView
-        android:id="@+id/iv_large_preview_Mask"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/callkit_color_90mask"
-        android:visibility="invisible" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/iv_large_preview_Mask"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="@color/callkit_color_90mask"-->
+    <!--        android:visibility="invisible" />-->
 
-    <ImageView
-        android:id="@+id/rc_voip_call_minimize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
-        android:onClick="onMinimizeClick"
-        android:src="@drawable/rc_voip_minimize"
-        android:visibility="gone" />
+    <!--    <ImageView-->
+    <!--        android:id="@+id/rc_voip_call_minimize"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginStart="20dp"-->
+    <!--        android:layout_marginTop="40dp"-->
+    <!--        android:onClick="onMinimizeClick"-->
+    <!--        android:src="@drawable/rc_voip_minimize"-->
+    <!--        android:visibility="gone" />-->
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/rc_voip_call_minimize"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="75dp">
 
         <ImageView
             android:id="@+id/rc_voip_user_portrait"

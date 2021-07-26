@@ -19,8 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:onClick="onMuteButtonClick"
             android:background="@drawable/shape_white_bg"
+            android:onClick="onMuteButtonClick"
             android:scaleType="center"
             android:src="@drawable/rc_voip_mute_selector" />
 
@@ -31,8 +31,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="@string/rc_voip_mute"
-            android:textColor="#9c9c9c"
-            android:textSize="13sp" />
+            android:textColor="@color/color_text_main"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -46,8 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:onClick="onHangupBtnClick"
             android:background="@drawable/shape_huang_up_bg"
+            android:onClick="onHangupBtnClick"
             android:scaleType="center"
             android:src="@drawable/ic_call_only" />
 
@@ -58,8 +58,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="@string/rc_voip_hangup"
-            android:textColor="#9c9c9c"
-            android:textSize="13sp" />
+            android:textColor="@color/color_text_main"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -75,9 +75,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/shape_white_bg"
             android:onClick="onSwitchCameraClick"
             android:scaleType="center"
-            android:src="@drawable/rc_voip_camera" />
+            android:src="@drawable/ic_switch_camera_only" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -86,8 +87,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="@string/rc_voip_camera"
-            android:textColor="#9c9c9c"
-            android:textSize="13sp" />
+            android:textColor="@color/color_text_main"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -102,9 +103,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:background="@drawable/shape_white_bg"
             android:onClick="onHandFreeButtonClick"
             android:scaleType="center"
-            android:background="@drawable/shape_white_bg"
             android:src="@drawable/rc_voip_speaker_selector" />
 
         <TextView
@@ -114,8 +115,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
             android:text="@string/rc_voip_handfree"
-            android:textColor="#9c9c9c"
-            android:textSize="13sp" />
+            android:textColor="@color/color_text_main"
+            android:textSize="14sp" />
     </RelativeLayout>
 
 </RelativeLayout>

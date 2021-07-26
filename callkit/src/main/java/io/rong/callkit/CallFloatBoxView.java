@@ -129,14 +129,14 @@ public class CallFloatBoxView {
             mView = LayoutInflater.from(context).inflate(R.layout.rc_voip_float_box, null);
             mView.setOnTouchListener(createTouchListener());
             wm.addView(mView, params);
-            TextView timeV = (TextView) mView.findViewById(R.id.rc_time);
+            TextView timeV = mView.findViewById(R.id.rc_time);
             setupTime(timeV);
-            ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
-            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-                mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
-            } else {
-                mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
-            }
+//            ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
+//            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+//                mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
+//            } else {
+//                mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
+//            }
         } else {
             //视频悬浮窗下，不需要UI显示时间，但是时间值也需要同步更新
             setupTime(null);
@@ -359,10 +359,10 @@ public class CallFloatBoxView {
                                         TextView timeV =
                                                 (TextView) mView.findViewById(R.id.rc_time);
                                         setupTime(timeV);
-                                        ImageView mediaIconV =
-                                                (ImageView)
-                                                        mView.findViewById(R.id.rc_voip_media_type);
-                                        mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
+//                                        ImageView mediaIconV =
+//                                                (ImageView)
+//                                                        mView.findViewById(R.id.rc_voip_media_type);
+//                                        mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
                                     }
                                 } else if (RongCallClient.getInstance().getCallSession() != null) {
                                     RongCallSession callSession =
@@ -403,16 +403,16 @@ public class CallFloatBoxView {
                                             wm.addView(remoteVideoContainer, params);
                                         }
                                     } else if (mView != null) {
-                                        ImageView mediaIconV =
-                                                (ImageView)
-                                                        mView.findViewById(R.id.rc_voip_media_type);
-                                        if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-                                            mediaIconV.setImageResource(
-                                                    R.drawable.rc_voip_float_audio);
-                                        } else {
-                                            mediaIconV.setImageResource(
-                                                    R.drawable.rc_voip_float_video);
-                                        }
+//                                        ImageView mediaIconV =
+//                                                (ImageView)
+//                                                        mView.findViewById(R.id.rc_voip_media_type);
+//                                        if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+//                                            mediaIconV.setImageResource(
+//                                                    R.drawable.rc_voip_float_audio);
+//                                        } else {
+//                                            mediaIconV.setImageResource(
+//                                                    R.drawable.rc_voip_float_video);
+//                                        }
                                     }
                                 }
                             }
@@ -610,9 +610,9 @@ public class CallFloatBoxView {
         wm.addView(mView, params);
         showFBCallTime = (TextView) mView.findViewById(R.id.rc_time);
 //        showFBCallTime.setVisibility(View.GONE);
-        ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
-        RongCallCommon.CallMediaType mediaType =
-                RongCallCommon.CallMediaType.valueOf(bundle.getInt("mediaType"));
+//        ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
+//        RongCallCommon.CallMediaType mediaType =
+//                RongCallCommon.CallMediaType.valueOf(bundle.getInt("mediaType"));
 //        if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
 //            mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
 //        } else {
@@ -775,13 +775,13 @@ public class CallFloatBoxView {
                                     RongCallCommon.CallMediaType mediaType,
                                     SurfaceView video) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, RongCallClient.getInstance().getCallSession(), "state|desc", "onMediaTypeChanged", TAG);
-                                ImageView mediaIconV =
-                                        (ImageView) mView.findViewById(R.id.rc_voip_media_type);
-                                if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-                                    mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
-                                } else {
-                                    mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
-                                }
+//                                ImageView mediaIconV =
+//                                        (ImageView) mView.findViewById(R.id.rc_voip_media_type);
+//                                if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
+//                                    mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
+//                                } else {
+//                                    mediaIconV.setImageResource(R.drawable.rc_voip_float_video);
+//                                }
                             }
 
                             @Override

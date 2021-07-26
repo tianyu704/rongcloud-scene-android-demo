@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 
@@ -26,4 +25,12 @@
     <color name="colorPrimary">@android:color/white</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="colorAccent">#0099FF</color>
+
+
+    <color name="color_text_main">#020037</color>
+    <color name="color_text_audio">#020037</color>
+    <color name="color_text_video">#FFFFFF</color>
+    <color name="color_light_main">#BBC0CA</color>
+
+
 </resources>
