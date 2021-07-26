@@ -22,7 +22,8 @@
             android:background="@drawable/shape_white_bg"
             android:onClick="onMuteButtonClick"
             android:scaleType="center"
-            android:src="@drawable/rc_voip_mute_selector_video" />
+            android:src="@drawable/rc_voip_mute_selector" />
+<!--            android:src="@drawable/rc_voip_mute_selector_video" />-->
 
         <TextView
             android:layout_width="wrap_content"
@@ -95,6 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
+        android:visibility="gone"
         android:layout_marginEnd="45dp">
 
         <ImageView
@@ -103,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:background="@drawable/shape_white_bg"
-            android:onClick="onSwitchButtonClick"
+            android:onClick="onSwitchCallButtonClick"
             android:scaleType="center"
             android:src="@drawable/rc_voip_switch_selector" />
 

@@ -17,7 +17,7 @@
 
         <ImageView
             android:id="@+id/rc_voip_call_mute_btn"
-            android:layout_width="wrap_content"
+            android:layout_width="22dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:onClick="onMuteButtonClick"

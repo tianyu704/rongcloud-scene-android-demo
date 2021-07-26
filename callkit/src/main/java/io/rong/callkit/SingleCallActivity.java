@@ -5,7 +5,6 @@
 package io.rong.callkit;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -49,7 +48,6 @@ import io.rong.common.RLog;
 import io.rong.common.fwlog.IFwLogConsolePrinter;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.userinfo.RongUserInfoManager;
-import io.rong.imkit.utils.KitStorageUtils;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
@@ -67,8 +65,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     private TextView mConnectionStateTextView;
     private Boolean isInformationShow = false;
     private SurfaceView mLocalVideo = null;
-    private boolean muted = false;
-    private boolean handFree = false;
+    private boolean muted = false; // 静音
+    private boolean handFree = false; // 免提
     private boolean startForCheckPermissions = false;
     private boolean isReceiveLost = false;
     private boolean isSendLost = false;
@@ -118,16 +116,19 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         String receivedCallId = "";
         if (callAction.equals(RongCallAction.ACTION_OUTGOING_CALL)) {
+            Log.e(TAG, "ACTION_OUTGOING_CALL");
             if (intent.getAction().equals(RongVoIPIntent.RONG_INTENT_ACTION_VOIP_SINGLEAUDIO)) {
                 mediaType = RongCallCommon.CallMediaType.AUDIO;
             } else {
                 mediaType = RongCallCommon.CallMediaType.VIDEO;
             }
         } else if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
+            Log.e(TAG, "ACTION_INCOMING_CALL");
             callSession = intent.getParcelableExtra("callSession");
             mediaType = callSession.getMediaType();
             receivedCallId = callSession.getCallId();
         } else {
+            Log.e(TAG, "ELSE");
             callSession = RongCallClient.getInstance().getCallSession();
             if (callSession != null) {
                 mediaType = callSession.getMediaType();
@@ -256,9 +257,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         RongCallCommon.CallMediaType mediaType;
         Intent intent = getIntent();
         RongCallAction callAction = RongCallAction.valueOf(intent.getStringExtra("callAction"));
-        //        if (callAction.equals(RongCallAction.ACTION_RESUME_CALL)) {
-        //            return;
-        //        }
         if (callAction.equals(RongCallAction.ACTION_INCOMING_CALL)) {
             callSession = intent.getParcelableExtra("callSession");
             mediaType = callSession.getMediaType();
@@ -269,18 +267,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             } else {
                 mediaType = RongCallCommon.CallMediaType.VIDEO;
             }
-            Conversation.ConversationType conversationType =
-                    Conversation.ConversationType.valueOf(
-                            intent.getStringExtra("conversationType").toUpperCase(Locale.US));
             targetId = intent.getStringExtra("targetId");
-
-            List<String> userIds = new ArrayList<>();
-            userIds.add(targetId);
-
-            RongCallClient.setPushConfig(DefaultPushConfig.getInviteConfig(this, mediaType == RongCallCommon.CallMediaType.AUDIO, true, ""), DefaultPushConfig.getHangupConfig(this, true, ""));
-
-            RongCallClient.getInstance()
-                    .startCall(conversationType, targetId, userIds, null, mediaType, null);
+            starCall(mediaType, true);
         } else { // resume call
             callSession = RongCallClient.getInstance().getCallSession();
             mediaType = callSession.getMediaType();
@@ -288,10 +276,16 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
             handFree = false;
+            muted = false;
+
         } else if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {
             handFree = true;
+            muted = true;
         }
-
+        View handFreeV = findViewById(R.id.rc_voip_handfree);
+        View callMuteV = findViewById(R.id.rc_voip_call_mute);
+        if (null != handFreeV) handFreeV.setSelected(handFree);
+        if (null != callMuteV) handFreeV.setSelected(muted);
         UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
         if (userInfo != null) {
 //            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)
@@ -320,6 +314,19 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             }
         }
         createPickupDetector();
+    }
+
+    private void starCall(RongCallCommon.CallMediaType mediaType, boolean needCall) {
+        String type = getIntent().getStringExtra("conversationType");
+        Conversation.ConversationType conversationType = Conversation.ConversationType.PRIVATE;
+        if (!TextUtils.isEmpty(type)) {
+            conversationType = Conversation.ConversationType.valueOf(type.toUpperCase(Locale.US));
+        }
+        List<String> userIds = new ArrayList<>();
+        userIds.add(targetId);
+        RongCallClient.setPushConfig(DefaultPushConfig.getInviteConfig(this, mediaType == RongCallCommon.CallMediaType.AUDIO, true, ""), DefaultPushConfig.getHangupConfig(this, true, ""));
+        if (needCall)
+            RongCallClient.getInstance().startCall(conversationType, targetId, userIds, null, mediaType, null);
     }
 
     @Override
@@ -363,19 +370,16 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             CallKitUtils.textViewShadowLayer(callInfo, SingleCallActivity.this);
         }
         boolean incomming = callAction.equals(RongCallAction.ACTION_INCOMING_CALL);
-        boolean video = mediaType.equals(RongCallCommon.CallMediaType.AUDIO);
+        boolean audio = mediaType.equals(RongCallCommon.CallMediaType.AUDIO);
         RelativeLayout buttonLayout = (RelativeLayout) inflater.inflate(
                 incomming ? R.layout.rc_voip_call_bottom_incoming_button_layout
-                        : video ? R.layout.rc_voip_call_bottom_connected_button_layout
+                        : audio ? R.layout.rc_voip_call_bottom_connected_button_layout
                         : R.layout.rc_video_call_bottom_connected_button_layout, null);
 
         if (callAction.equals(RongCallAction.ACTION_RESUME_CALL) && CallKitUtils.isDial) {
-            try {
-                ImageView button = buttonLayout.findViewById(R.id.rc_voip_call_mute_btn);
-                button.setEnabled(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            ImageView button = buttonLayout.findViewById(R.id.rc_voip_call_mute_btn);
+            // 呼出 不静音
+            if (null != button) button.setEnabled(false);
         }
 
         if (callAction.equals(RongCallAction.ACTION_OUTGOING_CALL)) {
@@ -384,6 +388,10 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             ImageView button = buttonLayout.findViewById(R.id.rc_voip_call_mute_btn);
             button.setEnabled(false);
             buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.VISIBLE);
+            // TODO: 2021/7/26 视频通话，暂时屏蔽 不能切换 mediaType 和语音通话共用一个btn id
+            if (!audio) {
+                buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.GONE);
+            }
         }
 
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
@@ -451,6 +459,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     public void onCallOutgoing(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallOutgoing(callSession, localVideo);
         this.callSession = callSession;
+        Log.e(TAG, "onCallOutgoing: mediaType = " + mediaType);
+        mediaType = callSession.getMediaType();
+        Log.e(TAG, "onCallOutgoing: mediaType = " + mediaType);
         try {
             UserInfo InviterUserIdInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
             UserInfo SelfUserInfo = RongUserInfoManager.getInstance().getUserInfo(callSession.getSelfUserId());
@@ -497,6 +508,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     public void onCallConnected(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallConnected(callSession, localVideo);
         this.callSession = callSession;
+        Log.e(TAG, "onCallConnected: mediaType = " + mediaType);
+        mediaType = callSession.getMediaType();
+        Log.e(TAG, "onCallConnected: mediaType = " + mediaType);
         Log.d(TAG, "onCallConnected----mediaType=" + callSession.getMediaType().getValue());
         if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
 //            findViewById(R.id.rc_voip_call_minimize).setVisibility(View.VISIBLE);
@@ -542,9 +556,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         RongCallClient.getInstance().setEnableLocalAudio(!muted);
         View muteV = mButtonContainer.findViewById(R.id.rc_voip_call_mute);
-        if (muteV != null) {
-            muteV.setSelected(muted);
-        }
+        if (muteV != null) muteV.setSelected(muted);
 
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         if (audioManager.isWiredHeadsetOn() || BluetoothUtil.hasBluetoothA2dpConnected()) {
@@ -689,9 +701,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 showShortToast(getString(audio ? R.string.rc_voip_remote_switched_to_audio : R.string.rc_voip_remote_switched_to_video));
             }
         }
-        if (mediaType == RongCallCommon.CallMediaType.AUDIO) {
-            initAudioCallView();
-        }
+        Log.e(TAG, "onMediaTypeChanged: mediaType = " + mediaType);
+        Log.e(TAG, "onMediaTypeChanged: getCallSession = " + RongCallClient.getInstance().getCallSession().getMediaType());
+        initAudioCallView();
         handler.removeMessages(EVENT_FULL_SCREEN);
         mButtonContainer.findViewById(R.id.rc_voip_call_mute).setSelected(muted);
     }
@@ -744,7 +756,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 //        findViewById(R.id.rc_voip_call_information)
 //                .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
         findViewById(R.id.rc_voip_audio_chat).setVisibility(View.GONE); // 隐藏语音聊天按钮
-
+//        buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.VISIBLE);
         View userInfoView = inflater.inflate(R.layout.rc_voip_audio_call_user_info_incoming, null);
         TextView tv_rc_voip_call_remind_info = userInfoView.findViewById(R.id.rc_voip_call_remind_info);
         TextView timeView = userInfoView.findViewById(R.id.tv_setupTime);
@@ -791,7 +803,10 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         handFree = false;
         RongCallClient.getInstance().setEnableSpeakerphone(false);
         View handFreeV = mButtonContainer.findViewById(R.id.rc_voip_handfree);
-        handFreeV.setSelected(handFree);
+        if (null != handFreeV) {
+            handFreeV.setVisibility(View.VISIBLE);
+            handFreeV.setSelected(handFree);
+        }
 
 //        ImageView iv_large_preview_Mask =
 //                (ImageView) userInfoView.findViewById(R.id.iv_large_preview_Mask);
@@ -856,7 +871,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     public void showVideoCallInformation() {
         isInformationShow = true;
         mUserInfoContainer.setVisibility(View.VISIBLE);
-
 //        mUserInfoContainer.findViewById(R.id.rc_voip_call_minimize).setVisibility(View.VISIBLE);
         mButtonContainer.setVisibility(View.VISIBLE);
         RelativeLayout btnLayout =
@@ -879,20 +893,30 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                 });
     }
 
+    public void onSwitchCallButtonClick(View view) {
+        RongCallClient.getInstance().changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
+        callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
+        // 收到修改
+        RongCallClient.getInstance().getCallSession().setMediaType(RongCallCommon.CallMediaType.AUDIO);
+        Log.e(TAG, "onSwitchCallButtonClick: mediaType = " + RongCallClient.getInstance().getCallSession().getMediaType());
+    }
+
     /**
      * 切换语音
      *
      * @param view
      */
     public void onSwitchButtonClick(View view) {
-//        if (RongIMClient.getInstance().getCurrentConnectionStatus() == RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED) {
-        RongCallClient.getInstance()
-                .changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
-        callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
-        initAudioCallView();
-//        } else {
-//            showShortToast(getString(R.string.rc_voip_im_connection_abnormal));
-//        }
+        if (RongIMClient.getInstance().getCurrentConnectionStatus()
+                == RongIMClient.ConnectionStatusListener.ConnectionStatus
+                .CONNECTED) {
+            RongCallClient.getInstance()
+                    .changeCallMediaType(RongCallCommon.CallMediaType.AUDIO);
+            callSession.setMediaType(RongCallCommon.CallMediaType.AUDIO);
+            initAudioCallView();
+        } else {
+            showShortToast(getString(R.string.rc_voip_im_connection_abnormal));
+        }
     }
 
     /**
@@ -1045,7 +1069,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             return;
         }
         RongCallCommon.CallMediaType mediaType = callSession.getMediaType();
-        // TODO: 2021/7/23 VIDEO-> AUDIO 后 从悬浮框过来 还是视频通话 
+        // TODO: 2021/7/23 VIDEO-> AUDIO 后 从悬浮框过来 还是视频通话
         Log.d(TAG, "---single activity onRestoreFloatBox---" + mediaType);
         RongCallAction callAction =
                 RongCallAction.valueOf(getIntent().getStringExtra("callAction"));

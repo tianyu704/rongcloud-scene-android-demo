@@ -123,6 +123,7 @@ public class RongCallProxy implements IRongCallListener {
     public void onMediaTypeChanged(
             String userId, RongCallCommon.CallMediaType mediaType, SurfaceView video) {
         ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, "userId|state|mediaType|desc", userId, "onMediaTypeChanged",mediaType.getValue(), getDescription());
+        RLog.d(TAG, "RongCallProxy onMediaTypeChanged mediaType = " + mediaType);
         if (mCallListener != null) {
             mCallListener.onMediaTypeChanged(userId, mediaType, video);
         }
