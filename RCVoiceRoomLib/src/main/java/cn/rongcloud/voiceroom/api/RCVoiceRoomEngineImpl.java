@@ -146,7 +146,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void initWithAppKey(Application context, String appKey) {
-        RongCoreClient.setServerInfo("http://navqa.cn.ronghub.com", "upload.qiniup.com");
         clientDelegate.initWithAppKey(context, appKey);
         clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
         clientDelegate.setReceiveMessageDelegate(this);
@@ -1451,9 +1450,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         }
     }
 
-//    private boolean containSeatIndex(int index) {
-//        return index >= 0 && index < mSeatInfoList.size();
-//    }
 
     private RCVoiceSeatInfo getSeatInfoByIndex(int index) {
         if (seatIndexInRange(index)) {
@@ -1642,22 +1638,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         });
     }
 
-    private void updateSeatBeUsedByUser(String userId, int seatIndex, final RCVoiceRoomCallback callback) {
-        Log.d(TAG, "updateSeatBeUsedByUser: userId = " + userId);
-        RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatBeUserdKvKey(userId), userId, false, true, "", new IRongCoreCallback.OperationCallback() {
-            @Override
-            public void onSuccess() {
-                onSuccessWithCheck(callback);
-            }
-
-            @Override
-            public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncSeatInfoFailed);
-
-            }
-        });
-    }
-
     private String seatInfoSeatPartKvKey(int index) {
         return String.format(Locale.getDefault(), "%s_%d", RC_SEAT_INFO_SEAT_PART_PREFIX_KEY, index);
     }
@@ -1717,12 +1697,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             callback.onSuccess(data);
         }
     }
-
-//    private void onErrorWithCheck(RCVoiceRoomBaseCallback callback, int code, String message) {
-//        if (checkCallback(callback)) {
-//            callback.onError(code, message);
-//        }
-//    }
 
     private void onErrorWithCheck(RCVoiceRoomBaseCallback callback, VoiceRoomErrorCode errorCode) {
         if (checkCallback(callback)) {
@@ -1848,23 +1822,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         @Override
         public void onUserOffline(final RCRTCRemoteUser remoteUser) {
             Log.d(TAG, "onUserOffline : " + "remoteUser = " + remoteUser.getUserId());
-//            final int index = getSeatIndexByUserId(remoteUser.getUserId());
-//            if (index > -1) {
-//                kickSeatFromSeat(remoteUser.getUserId(), new RCVoiceRoomCallback() {
-//                    @Override
-//                    public void onSuccess() {
-//                        RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
-//                        if (currentRoomEventListener != null) {
-//                            currentRoomEventListener.onUserLeaveSeat(index, remoteUser.getUserId());
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(int code, String message) {
-//
-//                    }
-//                });
-//            }
         }
 
         @Override
