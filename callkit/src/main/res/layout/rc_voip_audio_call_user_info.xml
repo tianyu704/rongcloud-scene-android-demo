@@ -7,44 +7,44 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <!--单人视频 拨打 界面-->
-<!--    <ImageView-->
-<!--        android:id="@+id/iv_large_preview"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:scaleType="centerCrop"-->
-<!--        android:visibility="gone" />-->
+    <!--    <ImageView-->
+    <!--        android:id="@+id/iv_large_preview"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:scaleType="centerCrop"-->
+    <!--        android:visibility="gone" />-->
 
-<!--    <ImageView-->
-<!--        android:id="@+id/iv_large_preview_Mask"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@color/callkit_color_90mask"-->
-<!--        android:visibility="gone" />-->
+    <!--    <ImageView-->
+    <!--        android:id="@+id/iv_large_preview_Mask"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:background="@color/callkit_color_90mask"-->
+    <!--        android:visibility="gone" />-->
 
-<!--    <ImageView-->
-<!--        android:id="@+id/rc_voip_call_minimize"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginLeft="17.5dp"-->
-<!--        android:layout_marginTop="11.5dp"-->
-<!--        android:onClick="onMinimizeClick"-->
-<!--        android:src="@drawable/rc_voip_minimize"-->
-<!--        android:visibility="gone" />-->
+    <!--    <ImageView-->
+    <!--        android:id="@+id/rc_voip_call_minimize"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginLeft="17.5dp"-->
+    <!--        android:layout_marginTop="11.5dp"-->
+    <!--        android:onClick="onMinimizeClick"-->
+    <!--        android:src="@drawable/rc_voip_minimize"-->
+    <!--        android:visibility="gone" />-->
 
-<!--    <RelativeLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:visibility="gone">-->
+    <!--    <RelativeLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:visibility="gone">-->
 
-<!--        <TextView-->
-<!--            android:id="@+id/callkit_voip_user_name_signleVideo"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_centerInParent="true"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:textColor="#333333"-->
-<!--            android:textSize="@dimen/callkit_textsize18sp" />-->
-<!--    </RelativeLayout>-->
+    <!--        <TextView-->
+    <!--            android:id="@+id/callkit_voip_user_name_signleVideo"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_centerInParent="true"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:textColor="#333333"-->
+    <!--            android:textSize="@dimen/callkit_textsize18sp" />-->
+    <!--    </RelativeLayout>-->
 
     <RelativeLayout
         android:id="@+id/rl"
@@ -105,6 +105,7 @@
         android:layout_marginTop="12dp"
         android:text="@string/rc_voip_call_waiting"
         android:textColor="@color/color_light_main"
-        android:textSize="@dimen/callkit_textsize18sp" />
+        android:textSize="14sp" />
+    />
 
 </RelativeLayout>

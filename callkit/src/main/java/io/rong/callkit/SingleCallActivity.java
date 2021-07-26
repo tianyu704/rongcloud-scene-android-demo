@@ -367,7 +367,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
         boolean incomming = callAction.equals(RongCallAction.ACTION_INCOMING_CALL);
         boolean audio = mediaType.equals(RongCallCommon.CallMediaType.AUDIO);
-        ((ImageView) findViewById(R.id.iv_back)).setImageResource(audio ? R.drawable.ic_small : R.drawable.ic_small_white);
         RelativeLayout buttonLayout = (RelativeLayout) inflater.inflate(
                 incomming ? R.layout.rc_voip_call_bottom_incoming_button_layout
                         : audio ? R.layout.rc_voip_call_bottom_connected_button_layout
@@ -452,13 +451,20 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
     }
 
+    private void resetTextOrIconColor(boolean white) {
+        ((ImageView) findViewById(R.id.iv_back)).setImageResource(white ? R.drawable.ic_small_white : R.drawable.ic_small);
+        int color = getResources().getColor(white ? android.R.color.white : R.color.color_text_main);
+
+        TextView rc_voip_user_name = findViewById(R.id.rc_voip_user_name);
+        if (null != rc_voip_user_name) rc_voip_user_name.setTextColor(color);
+    }
+
     @Override
     public void onCallOutgoing(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallOutgoing(callSession, localVideo);
         this.callSession = callSession;
-        Log.e(TAG, "onCallOutgoing: mediaType = " + mediaType);
         mediaType = callSession.getMediaType();
-        Log.e(TAG, "onCallOutgoing: mediaType = " + mediaType);
+        resetTextOrIconColor(mediaType == RongCallCommon.CallMediaType.VIDEO);
         try {
             UserInfo InviterUserIdInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
             UserInfo SelfUserInfo = RongUserInfoManager.getInstance().getUserInfo(callSession.getSelfUserId());
@@ -505,10 +511,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     public void onCallConnected(RongCallSession callSession, SurfaceView localVideo) {
         super.onCallConnected(callSession, localVideo);
         this.callSession = callSession;
-        Log.e(TAG, "onCallConnected: mediaType = " + mediaType);
         mediaType = callSession.getMediaType();
-        Log.e(TAG, "onCallConnected: mediaType = " + mediaType);
-        Log.d(TAG, "onCallConnected----mediaType=" + callSession.getMediaType().getValue());
+        resetTextOrIconColor(mediaType == RongCallCommon.CallMediaType.VIDEO);
         if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
 //            findViewById(R.id.rc_voip_call_minimize).setVisibility(View.VISIBLE);
             RelativeLayout btnLayout =
@@ -747,7 +751,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         mLPreviewContainer.setVisibility(View.GONE);
         mSPreviewContainer.removeAllViews();
         mSPreviewContainer.setVisibility(View.GONE);
-        ((ImageView) findViewById(R.id.iv_back)).setImageResource(R.drawable.ic_small);
+        resetTextOrIconColor(false);
         // 显示全屏底色
 //        findViewById(R.id.rc_voip_call_information)
 //                .setBackgroundColor(getResources().getColor(R.color.rc_voip_background_color));
@@ -872,7 +876,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         RelativeLayout btnLayout =
                 (RelativeLayout)
                         inflater.inflate(
-                                R.layout.rc_voip_call_bottom_connected_button_layout, null);
+                                R.layout.rc_video_call_bottom_connected_button_layout, null);
         btnLayout.findViewById(R.id.rc_voip_call_mute).setSelected(muted);
         btnLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.GONE);
         btnLayout.findViewById(R.id.rc_voip_camera).setVisibility(View.VISIBLE);
