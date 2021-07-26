@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import cn.rongcloud.rtc.api.RCRTCConfig;
@@ -849,7 +850,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 if (mRoomInfo.getSeatCount() != mSeatInfoList.size()) {
                     resetListExceptOwnerSeat(roomInfo.getSeatCount());
                     for (int i = 0; i < mSeatInfoList.size(); i++) {
-                        updateKvSeatInfo(mSeatInfoList.get(i), i,null);
+                        updateKvSeatInfo(mSeatInfoList.get(i), i, null);
                     }
                 }
                 onSuccessWithCheck(callback);
@@ -1426,26 +1427,27 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             }
 
-//            if (key.startsWith(RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY)) {
-//                Log.d(TAG, "handleRequestSeatCancelled: key = " + key);
-//                String[] info = key.split("_");
-//                String userId = info[info.length - 1];
-//                if (!TextUtils.isEmpty(userId)) {
-//                    if (isUserOnSeat(userId)) {
-//                        kickSeatFromSeat(userId, new RCVoiceRoomCallback() {
-//                            @Override
-//                            public void onSuccess() {
-//
-//                            }
-//
-//                            @Override
-//                            public void onError(int code, String message) {
-//
-//                            }
-//                        });
-//                    }
-//                }
-//            }
+            if (key.startsWith(RC_SEAT_INFO_USER_PART_PREFIX_KEY)) {
+                String[] keyInfoArray = key.split("_");
+                if (keyInfoArray.length > 1) {
+                    try {
+                        int index = Integer.parseInt(keyInfoArray[keyInfoArray.length - 1]);
+                        if (seatIndexInRange(index)) {
+                            RCVoiceSeatInfo info = getSeatInfoByIndex(index);
+                            if (info != null) {
+                                info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+                                info.setUserId(null);
+                            }
+                            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
+                            if (listener != null) {
+                                listener.onSeatInfoUpdate(mSeatInfoList);
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
@@ -1591,8 +1593,43 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         });
     }
 
-    private void updateKvSeatInfo(RCVoiceSeatInfo info, int seatIndex, final RCVoiceRoomCallback callback) {
-        RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatInfoKvKey(seatIndex), info.toJson(), false, false, "", new IRongCoreCallback.OperationCallback() {
+    private void updateKvSeatInfo(final RCVoiceSeatInfo info, final int seatIndex, final RCVoiceRoomCallback callback) {
+        final AtomicBoolean isSuccess = new AtomicBoolean(true);
+
+        updateSeatInfoSeatPart(info, seatIndex, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                updateSeatInfoUserPart(info, seatIndex, isSuccess, callback);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                isSuccess.set(false);
+                updateSeatInfoUserPart(info, seatIndex, isSuccess, callback);
+            }
+        });
+    }
+
+    private void updateSeatInfoUserPart(RCVoiceSeatInfo info, int seatIndex, final AtomicBoolean isSuccess, final RCVoiceRoomCallback callback) {
+        RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatInfoUserPartKvKey(seatIndex), info.toJson(), false, true, "", new IRongCoreCallback.OperationCallback() {
+            @Override
+            public void onSuccess() {
+                if (isSuccess.get()) {
+                    onSuccessWithCheck(callback);
+                } else {
+                    onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncSeatInfoFailed);
+                }
+            }
+
+            @Override
+            public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncSeatInfoFailed);
+            }
+        });
+    }
+
+    private void updateSeatInfoSeatPart(RCVoiceSeatInfo info, int seatIndex, final RCVoiceRoomCallback callback) {
+        RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatInfoSeatPartKvKey(seatIndex), info.toJson(), false, false, "", new IRongCoreCallback.OperationCallback() {
             @Override
             public void onSuccess() {
                 onSuccessWithCheck(callback);
@@ -1603,20 +1640,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncSeatInfoFailed);
             }
         });
-
-//        if (!TextUtils.isEmpty(info.getUserId())) {
-//            updateSeatBeUsedByUser(info.getUserId(), seatIndex, new RCVoiceRoomCallback() {
-//                @Override
-//                public void onSuccess() {
-//
-//                }
-//
-//                @Override
-//                public void onError(int code, String message) {
-//
-//                }
-//            });
-//        }
     }
 
     private void updateSeatBeUsedByUser(String userId, int seatIndex, final RCVoiceRoomCallback callback) {
@@ -1635,9 +1658,14 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         });
     }
 
-    private String seatInfoKvKey(int index) {
-        return String.format(Locale.getDefault(), "%s_%d", RC_MIC_SEAT_INFO_PREFIX_KEY, index);
+    private String seatInfoSeatPartKvKey(int index) {
+        return String.format(Locale.getDefault(), "%s_%d", RC_SEAT_INFO_SEAT_PART_PREFIX_KEY, index);
     }
+
+    private String seatInfoUserPartKvKey(int index) {
+        return String.format(Locale.getDefault(), "%s_%d", RC_SEAT_INFO_USER_PART_PREFIX_KEY, index);
+    }
+
 
     private String seatBeUserdKvKey(String userId) {
         return String.format(Locale.getDefault(), "%s_%s", RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY, userId);
@@ -1732,13 +1760,22 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             } else {
                 List<RCVoiceSeatInfo> list = new ArrayList<>();
                 for (int i = 0; i < mRoomInfo.getSeatCount(); i++) {
-                    String seatKey = seatInfoKvKey(i);
+                    String seatKey = seatInfoSeatPartKvKey(i);
+                    String userKey = seatInfoUserPartKvKey(i);
                     RCVoiceSeatInfo newInfo = null;
                     if (map.containsKey(seatKey)) {
-                        newInfo = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
+                        newInfo = new RCVoiceSeatInfo();
+                        RCVoiceSeatInfo temp = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
+                        newInfo.setMute(temp.isMute());
+                        newInfo.setExtra(temp.getExtra());
                     }
                     if (newInfo == null) {
                         newInfo = getSeatInfoByIndex(i);
+                    }
+                    if (map.containsKey(userKey) && newInfo != null) {
+                        RCVoiceSeatInfo temp = JsonUtils.fromJson(map.get(userKey), RCVoiceSeatInfo.class);
+                        newInfo.setStatus(temp.getStatus());
+                        newInfo.setUserId(temp.getUserId());
                     }
                     list.add(newInfo);
                 }

@@ -26,7 +26,6 @@ import io.rong.imlib.model.MessageContent;
  */
 public abstract class RCVoiceRoomEngine {
 
-    public static final String RC_MIC_SEAT_INFO_PREFIX_KEY = "RCMicSeatInfoPrefixKey";
     public static final String RC_REQUEST_SEAT_PREFIX_KEY = "RCRequestSeatPrefixKey";
     public static final String RC_REQUEST_SEAT_CONTENT_REQUEST = "RCRequestSeatContentRequest";
     public static final String RC_REQUEST_SEAT_CONTENT_ACCEPT = "RCRequestSeatContentAccept";
@@ -39,6 +38,9 @@ public abstract class RCVoiceRoomEngine {
     public static final String RC_AUDIENCE_LEAVE_ROOM = "RCAudienceLeaveRoom";
     public static final String RC_USER_ON_SEAT_SPEAKING_KEY = "RCUserOnSeatSpeakingKey";
     public static final String RC_ON_USER_LEAVE_SEAT_EVENT_PREFIX_KEY = "RCOnUserLeaveSeatHappenedPrefixKey";
+
+    public static final String RC_SEAT_INFO_USER_PART_PREFIX_KEY = "RCSeatInfoUserPartPrefixKey";
+    public static final String RC_SEAT_INFO_SEAT_PART_PREFIX_KEY = "RCSeatInfoSeatPartPrefixKey";
 
     public static RCVoiceRoomEngine getInstance() {
         return RCVoiceRoomEngineImpl.getInstance();
