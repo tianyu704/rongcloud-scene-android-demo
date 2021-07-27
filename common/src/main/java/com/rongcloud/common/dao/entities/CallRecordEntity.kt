@@ -41,7 +41,7 @@ data class CallRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long?,
     @ColumnInfo(name = "callerId") val callerId: String,
     @ColumnInfo(name = "callerNumber") val callerNumber: String?,
-    @ColumnInfo(name = "peerId") val peerId: String,
+    @ColumnInfo(name = "peerId") val peerId: String?,
     @ColumnInfo(name = "peerNumber") val peerNumber: String,
     @ColumnInfo(name = "date") val date: Long,
     @ColumnInfo(name = "during") val during: Long,
