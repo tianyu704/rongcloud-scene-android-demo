@@ -7,11 +7,11 @@ package cn.rongcloud.voiceroomdemo.mvp.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.R
@@ -23,8 +23,6 @@ import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.callkit.DialActivity
-import io.rong.callkit.MultiVideoCallActivity
-import io.rong.callkit.RongCallKit
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.RongIMClient
@@ -39,6 +37,7 @@ private const val PICTURE_SELECTED_RESULT_CODE = 10001
 
 private const val TAG = "HomeActivity"
 
+@HiltBinding(value = IHomeView::class)
 @AndroidEntryPoint
 class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
     IRongCoreListener.OnReceiveMessageListener {

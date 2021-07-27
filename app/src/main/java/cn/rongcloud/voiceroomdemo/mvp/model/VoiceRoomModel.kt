@@ -843,6 +843,7 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun queryAllUserInfo(onComplete: (() -> Unit)? = null) {
+        Log.d(TAG, "queryAllUserInfo: ")
         addDisposable(RetrofitManager
             .commonService
             .getMembersList(roomId)

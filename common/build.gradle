@@ -113,6 +113,6 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     api project(path: ':annotation')
-    kapt project(path: ':compiler')
+    kapt project(path: ':processor')
 
 }

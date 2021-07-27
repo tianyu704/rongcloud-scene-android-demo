@@ -13,4 +13,4 @@ import kotlin.reflect.KClass
  */
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
-annotation class HiltBinding(val value: Array<KClass<*>> = [])
+annotation class HiltBinding(val value: KClass<*> = Void::class)

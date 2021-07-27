@@ -10,7 +10,7 @@ import cn.rongcloud.voiceroomdemo.common.IBaseView
  * @author gusd
  * @Date 2021/06/04
  */
-interface IHomeView:IBaseView {
+public interface IHomeView:IBaseView {
 
     fun modifyInfoSuccess()
 }
