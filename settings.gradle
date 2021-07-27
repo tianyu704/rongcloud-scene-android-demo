@@ -9,3 +9,5 @@ include ':callkit'
 
 
 include ':common'
+include ':compiler'
+include ':annotation'

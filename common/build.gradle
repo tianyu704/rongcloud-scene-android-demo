@@ -39,6 +39,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    kapt {
+        correctErrorTypes true
+    }
 }
 
 dependencies {
@@ -107,5 +111,8 @@ dependencies {
 
     api "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    api project(path: ':annotation')
+    kapt project(path: ':compiler')
 
 }
