@@ -22,7 +22,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/02
  */
-@MessageTag(value = "RCVoiceRoomInviteMessage", flag = MessageTag.NONE)
+@MessageTag(value = "RC:VRLInviteMsg", flag = MessageTag.NONE)
 public class RCVoiceRoomInviteMessage extends MessageContent {
 
     private static final String TAG = "RCVoiceRoomInviteMessage";

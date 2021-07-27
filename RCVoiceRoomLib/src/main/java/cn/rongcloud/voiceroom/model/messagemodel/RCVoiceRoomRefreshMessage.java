@@ -20,7 +20,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/02
  */
-@MessageTag(value = "RCVoiceRoomRefreshMessage", flag = MessageTag.NONE)
+@MessageTag(value = "RC:VRLRefreshMsg", flag = MessageTag.NONE)
 public class RCVoiceRoomRefreshMessage extends MessageContent {
 
     private static final String TAG = "RCVoiceRoomRefreshMessa";
