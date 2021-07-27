@@ -28,6 +28,12 @@ android {
 
         renderscriptTargetApi 14
         renderscriptSupportModeEnabled true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath = true
+            }
+        }
     }
 
     signingConfigs {
