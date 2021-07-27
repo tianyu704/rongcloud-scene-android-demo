@@ -130,7 +130,11 @@ public class CallFloatBoxView {
             mView.setOnTouchListener(createTouchListener());
             wm.addView(mView, params);
             TextView timeV = mView.findViewById(R.id.rc_time);
-            setupTime(timeV);
+            if (CallKitUtils.callConnected) {
+                setupTime(timeV);
+            } else {
+                timeV.setText("邀请通话");
+            }
 //            ImageView mediaIconV = (ImageView) mView.findViewById(R.id.rc_voip_media_type);
 //            if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
 //                mediaIconV.setImageResource(R.drawable.rc_voip_float_audio);
@@ -948,7 +952,8 @@ public class CallFloatBoxView {
         intent.setPackage(mContext.getPackageName());
         intent.putExtra("floatbox", mBundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
+        intent.putExtra("callAction", isDial ? RongCallAction.ACTION_RESUME_CALL.getName() : RongCallAction.ACTION_INCOMING_CALL.getName());
+        intent.putExtra("callConnected", mBundle.getBoolean("callConnected"));
 
         ActivityStartCheckUtils.getInstance()
                 .startActivity(

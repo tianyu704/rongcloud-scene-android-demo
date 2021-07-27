@@ -76,8 +76,6 @@ import io.rong.imkit.manager.AudioPlayManager;
 import io.rong.imkit.manager.AudioRecordManager;
 
 import static io.rong.callkit.CallFloatBoxView.showFB;
-import static io.rong.callkit.util.CallKitUtils.isDebug;
-import static io.rong.callkit.util.CallKitUtils.isDial;
 
 /**
  * Created by weiqinxiao on 16/3/9.
@@ -337,6 +335,10 @@ public class BaseCallActivity extends BaseNoActionBarActivity
 
     public void onIncomingCallRinging() {
         isIncoming = true;
+        // TODO: 2021/7/27 修改接听也可最小化
+        CallKitUtils.isDial = false;
+        CallKitUtils.shouldShowFloat = true;
+//        CallKitUtils.callConnected = false;
         int ringerMode = NotificationUtil.getInstance().getRingerMode(this);
         if (ringerMode != AudioManager.RINGER_MODE_SILENT) {
             if (ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
@@ -477,6 +479,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity
 
     @Override
     public void onCallConnected(RongCallSession callProfile, SurfaceView localVideo) {
+        RLog.d(TAG, "onCallConnected");
         if (RongCallKit.getCustomerHandlerListener() != null) {
             RongCallKit.getCustomerHandlerListener().onCallConnected(callProfile, localVideo);
         }
@@ -494,13 +497,14 @@ public class BaseCallActivity extends BaseNoActionBarActivity
     @Override
     protected void onStop() {
         super.onStop();
-        RLog.d(TAG, "BaseCallActivity onStop");
         if (CallKitUtils.shouldShowFloat && !checkingOverlaysPermission) {
             Bundle bundle = new Bundle();
             String action = onSaveFloatBoxState(bundle);
+            Log.d(TAG, "onStop:action = " + action);
             if (checkDrawOverlaysPermission(true)) {
                 if (action != null) {
                     bundle.putString("action", action);
+                    bundle.putBoolean("callConnected", CallKitUtils.callConnected);
                     showFB(getApplicationContext(), bundle);
                     int mediaType = bundle.getInt("mediaType");
                     showOnGoingNotification(
@@ -729,9 +733,9 @@ public class BaseCallActivity extends BaseNoActionBarActivity
         Intent intent = new Intent(getIntent().getAction());
         Bundle bundle = new Bundle();
         onSaveFloatBoxState(bundle);
-        bundle.putBoolean("isDial", isDial);
+        bundle.putBoolean("isDial", CallKitUtils.isDial);
         intent.putExtra("floatbox", bundle);
-        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
+        intent.putExtra("callAction", CallKitUtils.isDial ? RongCallAction.ACTION_RESUME_CALL.getName() : RongCallAction.ACTION_INCOMING_CALL.getName());
         PendingIntent pendingIntent =
                 PendingIntent.getActivity(this, 1000, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         showNotification(
