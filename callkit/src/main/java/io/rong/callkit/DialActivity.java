@@ -126,15 +126,12 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
             public void convert(RcyHolder holder, final DialInfo info, int position) {
                 holder.setText(R.id.tv_number, info.getPhone());
                 holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
-                holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
                 ImageView head = holder.getView(R.id.iv_head);
-                Log.e("DialActivity", "convert headUrl = " + info.getHead());
                 if (!TextUtils.isEmpty(info.getHead()) && null != head) {
                     Glide.with(DialActivity.this)
                             .load(info.getHead())
                             .placeholder(R.drawable.rc_default_portrait)
                             .override(100)
-                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
                             .into(head);
                 }
                 holder.rootView().setOnClickListener(new View.OnClickListener() {
@@ -199,21 +196,35 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
 
     @Override
     public void onDialpad(String num) {
-        String targetId = null;
+        DialInfo dial = null;
         int size = null == records ? 0 : records.size();
         if (size > 0) {
             for (int i = 0; i < size; i++) {
                 DialInfo info = records.get(i);
                 if (info.getPhone().equals(num)) {
-                    targetId = info.getUserId();
+                    dial = info;
                     break;
                 }
             }
         }
-        if (TextUtils.isEmpty(targetId)) {
+        if (null == dial) {
             getUserIdByPhone(num);
         } else {
-            RongCallKit.startSingleCall(this, targetId,
+            DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
+                    userId,
+                    "",
+                    "",
+                    "",
+                    dial.getUserId(),
+                    dial.getPhone(),
+                    "",
+                    dial.getHead(),//拼接前缀
+                    new Date().getTime(),
+                    0,
+                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
+            );
+            hideDialpadFragment(true);
+            RongCallKit.startSingleCall(this, dial.getUserId(),
                     isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
                             : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
         }
@@ -256,9 +267,11 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                 0,
                                 isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
                         );
+                        hideDialpadFragment(true);
                         RongCallKit.startSingleCall(DialActivity.this, id,
                                 isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
                                         : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+
                     }
                 }
             }
