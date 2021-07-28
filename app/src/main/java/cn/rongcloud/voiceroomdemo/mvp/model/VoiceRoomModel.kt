@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -15,7 +16,6 @@ import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
@@ -24,12 +24,12 @@ import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.*
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.base.BaseLifeCycleModel
+import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
@@ -71,11 +71,10 @@ const val EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM"
 @ActivityScoped
 class VoiceRoomModel @Inject constructor(
     @Named("roomId") val roomId: String,
-    private val voiceRoomListModel: VoiceRoomListModel
-) :
-    RCVoiceRoomEventListener {
+    private val voiceRoomListModel: VoiceRoomListModel,
+    activity: AppCompatActivity
+) : BaseLifeCycleModel(activity), RCVoiceRoomEventListener {
 
-    private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     private val roomMemberInfoList = arrayListOf<UiMemberModel>()
 
@@ -420,14 +419,8 @@ class VoiceRoomModel @Inject constructor(
     }
 
 
-    fun addDisposable(vararg disposable: Disposable) {
-        compositeDisposable.addAll(*disposable)
-    }
-
-
-    fun onDestroy() {
+    override fun onDestroy() {
         dataModifyWorker.dispose()
-        compositeDisposable.dispose()
     }
 
     fun kickSeat(
@@ -1096,7 +1089,7 @@ class VoiceRoomModel @Inject constructor(
                     }
 
                     override fun onSuccess() {
-                        if(currentMusicState == RCRTCAudioMixer.MixingState.PLAY || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED){
+                        if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
                             RCRTCAudioMixer.getInstance().stop()
                         }
                         emitter.onComplete()
@@ -1404,7 +1397,7 @@ class VoiceRoomModel @Inject constructor(
 
 
     fun playOrPauseMusic(model: UiMusicModel) {
-        if(getSeatInfoByUserId(AccountStore.getUserId()) == null){
+        if (getSeatInfoByUserId(AccountStore.getUserId()) == null) {
             MyApp.context.showToast("请先上麦之后再播放音乐")
             return
         }

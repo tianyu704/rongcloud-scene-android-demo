@@ -20,7 +20,6 @@ import javax.inject.Inject
 /**
  * @author gusd
  * @Date 2021/06/09
- * 虽然为全局单例，但绑定一个 activity 生命周期，activity 生命周期结束之后数据依旧存在，只是不再监听变化
  */
 @ActivityScoped
 class VoiceRoomListPresenter @Inject constructor(

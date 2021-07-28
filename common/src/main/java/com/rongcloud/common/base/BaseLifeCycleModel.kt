@@ -4,7 +4,6 @@
 
 package com.rongcloud.common.base
 
-import android.util.Log
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -13,18 +12,20 @@ import javax.inject.Inject
 
 /**
  * @author gusd
- * @Date 2021/06/04
+ * @Date 2021/07/28
  */
-abstract class BaseLifeCyclePresenter(
-    val lifecycleOwner: LifecycleOwner
-) : BasePresenter(), LifecycleObserver, BaseLifeCycleObserver {
-
+abstract class BaseLifeCycleModel(val lifecycleOwner: LifecycleOwner) : BaseModel,
+    BaseLifeCycleObserver, LifecycleObserver {
     @Inject
     public fun initLifecycle() {
         lifecycleOwner.lifecycle.addObserver(this)
     }
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
+
+    fun addDisposable(vararg disposable: Disposable) {
+        compositeDisposable.addAll(*disposable)
+    }
 
     override fun onCreate() {
 
@@ -45,10 +46,5 @@ abstract class BaseLifeCyclePresenter(
     override fun onResume() {
 
     }
-
-    fun addDisposable(vararg disposable: Disposable) {
-        compositeDisposable.addAll(*disposable)
-    }
-
 
 }

@@ -318,7 +318,6 @@ class VoiceRoomPresenter @Inject constructor(
 
     override fun onDestroy() {
         super.onDestroy()
-        roomModel.onDestroy()
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null)
         RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
     }

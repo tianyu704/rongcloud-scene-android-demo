@@ -11,6 +11,7 @@ import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomInfoBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomListBean
 import cn.rongcloud.voiceroomdemo.throwable.RoomNotExistException
+import com.rongcloud.common.base.BaseModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
@@ -27,7 +28,7 @@ import javax.inject.Singleton
 private const val TAG = "VoiceRoomListModel"
 
 @Singleton
-class VoiceRoomListModel @Inject constructor() {
+class VoiceRoomListModel @Inject constructor() : BaseModel {
 
     private val pageSize = 10
     private var page = 0
@@ -161,6 +162,12 @@ class VoiceRoomListModel @Inject constructor() {
                     })
             }
         }
+    }
+
+    override fun onCreate() {
+    }
+
+    override fun onDestroy() {
     }
 
 
