@@ -1,17 +1,5 @@
 /*
- * Copyright (C) 2011 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright © 2021 RongCloud. All rights reserved.
  */
 
 package io.rong.callkit.dialpad;
@@ -20,10 +8,8 @@ import android.app.Fragment;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.media.audiofx.PresetReverb;
 import android.os.Bundle;
 import android.os.Trace;
-import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -38,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 
 import java.lang.ref.WeakReference;
@@ -56,6 +43,7 @@ import io.rong.callkit.dialpad.widget.FloatingActionButtonController;
 public class DialpadFragment extends Fragment
         implements View.OnClickListener, View.OnKeyListener, TextWatcher, DialpadKeyButton.OnPressedListener {
     private static final String TAG = "DialpadFragment";
+    private ImageButton mFloatingActionButton;
 
     public interface DialpadListener {
         // 拨号回调
@@ -141,7 +129,13 @@ public class DialpadFragment extends Fragment
             }
         }
         if (null != dialpadListener && null != dialpadListener.get()) {
-            dialpadListener.get().onInputFiltter(mDigits.getText());
+            getView().post(new Runnable() {
+                @Override
+                public void run() {
+
+                    dialpadListener.get().onInputFiltter(mDigits.getText());
+                }
+            });
         }
     }
 
@@ -163,6 +157,21 @@ public class DialpadFragment extends Fragment
 
     public final static String DEFAU_INPUT = "defau_input";
 
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mDigits.setKeyListener(UnicodeDialerKeyListener.INSTANCE);
+        mDigits.setOnClickListener(this);
+        mDigits.setOnKeyListener(this);
+        mDigits.addTextChangedListener(this);
+        if (mDelete != null && null != mLeft) {
+            mDelete.setOnClickListener(this);
+            mLeft.setOnClickListener(this);
+        }
+        mFloatingActionButton.setOnClickListener(this);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedState) {
 
@@ -172,10 +181,7 @@ public class DialpadFragment extends Fragment
         mDialpadView = (DialpadView) fragmentView.findViewById(R.id.dialpad_view);
         mDialpadView.setCanDigitsBeEdited(true);
         mDigits = mDialpadView.getDigits();
-        mDigits.setKeyListener(UnicodeDialerKeyListener.INSTANCE);
-        mDigits.setOnClickListener(this);
-        mDigits.setOnKeyListener(this);
-        mDigits.addTextChangedListener(this);
+
         mDigits.setElegantTextHeight(false);
         String defaultInput = getArguments().getString(DEFAU_INPUT);
         setInputNum(defaultInput);
@@ -191,10 +197,7 @@ public class DialpadFragment extends Fragment
         mDelete = fragmentView.findViewById(R.id.dialpad_right);
         mLeft = fragmentView.findViewById(R.id.dialpad_left);
 
-        if (mDelete != null && null != mLeft) {
-            mDelete.setOnClickListener(this);
-            mLeft.setOnClickListener(this);
-        }
+
 
         mSpacer = fragmentView.findViewById(R.id.spacer);
         mSpacer.setOnTouchListener(new View.OnTouchListener() {
@@ -208,10 +211,10 @@ public class DialpadFragment extends Fragment
 
         final View floatingActionButtonContainer =
                 fragmentView.findViewById(R.id.dialpad_floating_action_button_container);
-        final ImageButton floatingActionButton = fragmentView.findViewById(R.id.dialpad_floating_action_button);
-        floatingActionButton.setOnClickListener(this);
+        mFloatingActionButton = fragmentView.findViewById(R.id.dialpad_floating_action_button);
+
         mFloatingActionButtonController = new FloatingActionButtonController(getActivity(),
-                floatingActionButtonContainer, floatingActionButton);
+                floatingActionButtonContainer, mFloatingActionButton);
         Trace.endSection();
         Trace.endSection();
         return fragmentView;

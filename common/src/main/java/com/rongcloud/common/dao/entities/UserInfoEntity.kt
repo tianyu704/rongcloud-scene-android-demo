@@ -17,5 +17,8 @@ data class UserInfoEntity(
     @PrimaryKey val userId: String,
     @ColumnInfo(name = "userName") val userName: String?,
     @ColumnInfo(name = "portrait") val portrait: String?,
+    /**
+     * 数据比较简单，暂不需要单独建表存储号码
+     */
     @ColumnInfo(name = "number") val number: String?
 )

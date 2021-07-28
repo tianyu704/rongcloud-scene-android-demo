@@ -6,7 +6,6 @@ package io.rong.callkit;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -22,8 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
@@ -43,7 +40,6 @@ import io.rong.callkit.dialpad.DialpadFragment;
 import io.rong.callkit.dialpad.animation.AnimUtils;
 import io.rong.callkit.dialpad.widget.FloatingActionButtonController;
 import io.rong.callkit.util.DateUtil;
-import io.rong.callkit.util.GlideUtils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -253,7 +249,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                     int code = jsonObj.get("code").getAsInt();
                     if (code == 10000) {
                         JsonObject data = jsonObj.get("data").getAsJsonObject();
-                        String id = data.get("uid").getAsString();
+                        final String id = data.get("uid").getAsString();
                         DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
                                 userId,
                                 "",
@@ -267,10 +263,16 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                 0,
                                 isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
                         );
-                        hideDialpadFragment(true);
-                        RongCallKit.startSingleCall(DialActivity.this, id,
-                                isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
-                                        : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideDialpadFragment(true);
+                                RongCallKit.startSingleCall(DialActivity.this, id,
+                                        isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                                                : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+                            }
+                        });
+
 
                     }
                 }
