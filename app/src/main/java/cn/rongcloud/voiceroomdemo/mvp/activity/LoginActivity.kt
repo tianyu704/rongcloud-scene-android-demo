@@ -8,10 +8,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.CountDownTimer
 import androidx.core.widget.addTextChangedListener
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.BaseActivity
 import cn.rongcloud.voiceroomdemo.common.showToast
 import cn.rongcloud.voiceroomdemo.common.ui
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +22,7 @@ import javax.inject.Inject
 
 private const val TAG = "LoginActivity"
 
+@HiltBinding(value = ILoginView::class)
 @AndroidEntryPoint
 class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
 

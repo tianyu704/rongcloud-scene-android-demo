@@ -14,9 +14,11 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
@@ -72,6 +74,7 @@ private const val NOTICATION_ID = 10020
 private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
 private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
+@HiltBinding(value = IVoiceRoomView::class)
 @AndroidEntryPoint
 class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,

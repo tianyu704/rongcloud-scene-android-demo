@@ -4,8 +4,10 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest
 
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_cancel_request_seat.*
 import javax.inject.Inject
 
@@ -13,6 +15,8 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/29
  */
+@HiltBinding(value = IRevokeSeatView::class)
+@AndroidEntryPoint
 class RevokeSeatRequestFragment(view: IRevokeSeatView) :
     BaseBottomSheetDialogFragment<RevokeSeatPresenter, IRevokeSeatView>(
         R.layout.fragment_cancel_request_seat

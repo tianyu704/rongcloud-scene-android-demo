@@ -11,8 +11,8 @@ import javax.lang.model.element.Element
  * @Date 2021/07/27
  */
 data class HiltBindingBean(
-    var clazz: Class<*>,
-    var viewClazz: Class<*>,
+    var clazz: String,
+    var viewClazz: String,
     var typeEnum: TypeEnum,
     var element:Element
 )

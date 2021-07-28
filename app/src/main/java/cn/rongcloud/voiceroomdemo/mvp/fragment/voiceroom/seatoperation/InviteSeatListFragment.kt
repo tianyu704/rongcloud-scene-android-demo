@@ -6,8 +6,10 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 
 import android.view.View
 import android.view.ViewGroup
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.loadPortrait
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,6 +21,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/24
  */
+@HiltBinding(value = IInviteSeatListView::class)
 @AndroidEntryPoint
 class InviteSeatListFragment(view: IInviteSeatListView) :
     BaseFragment<InviteSeatListPresenter, IInviteSeatListView>(R.layout.layout_list),

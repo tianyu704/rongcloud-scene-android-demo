@@ -8,7 +8,9 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import cn.rongcloud.voiceroomdemo.ui.widget.ActionSnackBar
@@ -29,6 +31,7 @@ import javax.inject.Named
 
 private const val TAG = "MusicSettingFragment"
 
+@HiltBinding(value = IMusicSettingView::class)
 @AndroidEntryPoint
 class MusicSettingFragment(view: IMusicSettingView) :
     BaseBottomSheetDialogFragment<MusicSettingPresenter, IMusicSettingView>(R.layout.fragment_music_setting),

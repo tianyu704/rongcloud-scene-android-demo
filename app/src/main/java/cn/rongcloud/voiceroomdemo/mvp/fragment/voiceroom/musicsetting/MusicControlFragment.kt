@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import android.widget.SeekBar
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.R
@@ -17,6 +18,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/07/06
  */
+@HiltBinding(value = IMusicControlView::class)
 @AndroidEntryPoint
 class MusicControlFragment(view: IMusicControlView) :
     BaseFragment<MusicControlPresenter, IMusicControlView>(

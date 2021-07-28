@@ -7,9 +7,11 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 import android.annotation.SuppressLint
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.loadPortrait
 import cn.rongcloud.voiceroomdemo.common.ui
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager
@@ -30,6 +32,7 @@ import javax.inject.Named
  * @author baicq
  * @Date 2021/07/05
  */
+@HiltBinding(value = ISendPresentView::class)
 @AndroidEntryPoint
 class SendPresentFragment(
     view: ISendPresentView,

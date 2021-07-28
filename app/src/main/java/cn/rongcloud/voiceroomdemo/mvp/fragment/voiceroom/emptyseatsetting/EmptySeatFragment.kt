@@ -5,9 +5,11 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting
 
 import androidx.core.view.isVisible
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.ui
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,7 +20,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/28
  */
-
+@HiltBinding(value = IEmptySeatView::class)
 @AndroidEntryPoint
 class EmptySeatFragment(
     val view: IEmptySeatView,

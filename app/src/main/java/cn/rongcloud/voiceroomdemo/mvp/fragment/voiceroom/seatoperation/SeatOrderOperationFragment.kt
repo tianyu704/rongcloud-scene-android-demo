@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
@@ -21,6 +22,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/24
  */
+@HiltBinding(value = IViewPageListView::class)
 @AndroidEntryPoint
 class SeatOrderOperationFragment(
     view: IViewPageListView,

@@ -11,6 +11,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
@@ -29,6 +30,7 @@ import javax.inject.Inject
 
 private const val TAG = "VoiceRoomListActivity"
 
+@HiltBinding(value = IVoiceRoomListView::class)
 @AndroidEntryPoint
 class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomListView>(),
     IVoiceRoomListView, ICreateVoiceRoomView {

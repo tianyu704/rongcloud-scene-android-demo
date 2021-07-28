@@ -8,12 +8,13 @@ import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/29
  */
-class RevokeSeatPresenter(val view: IRevokeSeatView, val roomModel: VoiceRoomModel) :
+class RevokeSeatPresenter @Inject constructor(val view: IRevokeSeatView, val roomModel: VoiceRoomModel) :
     BaseLifeCyclePresenter<IRevokeSeatView>(view) {
 
     var cancel: Boolean = false

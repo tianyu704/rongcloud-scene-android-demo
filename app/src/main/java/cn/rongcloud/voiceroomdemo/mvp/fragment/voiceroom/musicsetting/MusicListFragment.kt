@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
@@ -21,6 +22,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/07/06
  */
+@HiltBinding(value = IMusicListView::class)
 @AndroidEntryPoint
 class MusicListFragment(val view: IMusicListView) :
     BaseFragment<MusicListPresenter, IMusicListView>(

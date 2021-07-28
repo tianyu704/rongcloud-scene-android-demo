@@ -24,19 +24,6 @@ import javax.inject.Named
 @InstallIn(ActivityComponent::class)
 public class HiltActivityModule {
 
-    @Provides
-    fun provideLoginView(loginView: Activity): ILoginView = loginView as ILoginView
-
-    @Provides
-    fun provideHomeView(homeView: Activity): IHomeView = homeView as IHomeView
-
-    @Provides
-    fun provideVoiceRoomListView(voiceRoomListView: Activity) =
-        voiceRoomListView as IVoiceRoomListView
-
-    @Provides
-    fun provideVoiceRoomView(voiceRoomView: Activity) = voiceRoomView as IVoiceRoomView
-
     @Named("roomId")
     @Provides
     fun provideVoiceRoomId(activity: Activity): String {

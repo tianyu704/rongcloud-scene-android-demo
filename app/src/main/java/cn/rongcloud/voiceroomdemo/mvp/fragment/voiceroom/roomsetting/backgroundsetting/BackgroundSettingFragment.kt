@@ -5,8 +5,10 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting
 
 import androidx.recyclerview.widget.GridLayoutManager
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.showToast
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
@@ -20,6 +22,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/22
  */
+@HiltBinding(value = IBackgroundSettingView::class)
 @AndroidEntryPoint
 class BackgroundSettingFragment(
     view: IBackgroundSettingView

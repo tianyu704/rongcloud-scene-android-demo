@@ -5,8 +5,10 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.memberlist
 
 import android.util.Log
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.AccountStore
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
@@ -22,6 +24,7 @@ import javax.inject.Inject
  */
 private const val TAG = "MemberListFragment"
 
+@HiltBinding(value = IMemberListView::class)
 @AndroidEntryPoint
 class MemberListFragment(
     view: IMemberListView,

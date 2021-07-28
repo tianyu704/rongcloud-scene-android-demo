@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
@@ -30,6 +31,7 @@ import javax.inject.Inject
 private const val TAG = "MusicAddFragment"
 private const val MUSIC_PICK_REQUEST_CODE = 10000
 
+@HiltBinding(IMusicAddView::class)
 @AndroidEntryPoint
 class MusicAddFragment(view: IMusicAddView) :
     BaseFragment<MusicAddPresenter, IMusicAddView>(R.layout.fragment_music_add),

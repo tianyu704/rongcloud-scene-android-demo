@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.AccountStore
 import cn.rongcloud.voiceroomdemo.common.loadPortrait
@@ -18,6 +19,7 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/28
  */
+@HiltBinding(value = ICreatorView::class)
 @AndroidEntryPoint
 class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: VoiceRoomBean) :
     BaseBottomSheetDialogFragment<CreatorSettingPresenter, ICreatorView>(R.layout.fragmeng_creator_setting),

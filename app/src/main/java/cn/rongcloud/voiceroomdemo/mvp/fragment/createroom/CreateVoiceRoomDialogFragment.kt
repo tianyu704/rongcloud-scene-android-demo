@@ -13,6 +13,7 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatRadioButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
+import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.LocalDataStore
 import cn.rongcloud.voiceroomdemo.common.loadImageView
@@ -32,6 +33,7 @@ private const val TAG = "CreateVoiceRoomDialogFr"
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
 
+@HiltBinding(value = ICreateVoiceRoomView::class)
 @AndroidEntryPoint
 class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     BaseBottomSheetDialogFragment<CreateVoiceRoomPresenter, ICreateVoiceRoomView>(R.layout.layout_create_room),
