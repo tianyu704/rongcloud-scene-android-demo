@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
@@ -16,9 +17,10 @@ import javax.inject.Inject
  */
 class InviteSeatListPresenter @Inject constructor(
     val view: IInviteSeatListView,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<IInviteSeatListView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     override fun onResume() {
         super.onResume()

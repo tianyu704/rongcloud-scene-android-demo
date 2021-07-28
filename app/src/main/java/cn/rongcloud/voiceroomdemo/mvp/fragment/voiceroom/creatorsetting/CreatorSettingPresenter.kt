@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import com.rongcloud.common.utils.AccountStore
@@ -18,9 +19,10 @@ import javax.inject.Inject
 @FragmentScoped
 class CreatorSettingPresenter @Inject constructor(
     val view: ICreatorView,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<ICreatorView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     override fun onCreate() {
         super.onCreate()

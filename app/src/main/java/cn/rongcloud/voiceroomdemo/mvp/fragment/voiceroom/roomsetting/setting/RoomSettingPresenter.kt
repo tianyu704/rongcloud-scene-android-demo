@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.functionmodel.*
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
@@ -16,9 +17,10 @@ import javax.inject.Inject
 
 class RoomSettingPresenter @Inject constructor(
     view: IRoomSettingView,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<IRoomSettingView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     private var functionList: ArrayList<BaseFunctionModel> = arrayListOf()
 

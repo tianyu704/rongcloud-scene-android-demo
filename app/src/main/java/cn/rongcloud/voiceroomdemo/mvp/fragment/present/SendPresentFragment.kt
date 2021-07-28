@@ -37,7 +37,7 @@ class SendPresentFragment(
     view: ISendPresentView,
     private val selectedIds: List<String> = emptyList()
 ) :
-    BaseBottomSheetDialogFragment<SendPresentPresenter, ISendPresentView>(R.layout.fragmeng_send_present),
+    BaseBottomSheetDialogFragment(R.layout.fragmeng_send_present),
     ISendPresentView by view {
 
     @Inject
@@ -47,9 +47,6 @@ class SendPresentFragment(
     @Inject
     lateinit var presenter: SendPresentPresenter
 
-    override fun initPresenter(): SendPresentPresenter {
-        return presenter
-    }
 
 
     @Inject

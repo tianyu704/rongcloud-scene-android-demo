@@ -6,6 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 
 import android.content.Context
 import android.net.Uri
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
@@ -23,9 +24,10 @@ import javax.inject.Inject
  */
 class CreateVoiceRoomPresenter @Inject constructor(
     val view: ICreateVoiceRoomView,
-    @ActivityContext val context: Context
+    @ActivityContext val context: Context,
+    fragment:Fragment
 ) :
-    BaseLifeCyclePresenter<ICreateVoiceRoomView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     fun createVoiceRoom(
         roomCover: Uri? = null,

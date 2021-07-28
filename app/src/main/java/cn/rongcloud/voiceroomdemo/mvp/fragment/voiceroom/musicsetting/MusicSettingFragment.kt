@@ -34,7 +34,7 @@ private const val TAG = "MusicSettingFragment"
 @HiltBinding(value = IMusicSettingView::class)
 @AndroidEntryPoint
 class MusicSettingFragment(view: IMusicSettingView) :
-    BaseBottomSheetDialogFragment<MusicSettingPresenter, IMusicSettingView>(R.layout.fragment_music_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_music_setting),
     IMusicSettingView by view, IMusicAddView, IMusicListView, IMusicControlView {
 
     private val fragmentList by lazy {
@@ -98,9 +98,6 @@ class MusicSettingFragment(view: IMusicSettingView) :
     }
 
 
-    override fun initPresenter(): MusicSettingPresenter {
-        return presenter
-    }
 
     override fun initView() {
         iv_atmosphere_music.setOnClickListener {

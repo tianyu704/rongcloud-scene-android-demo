@@ -43,7 +43,7 @@ private const val TAG = "HomeActivity"
 
 @HiltBinding(value = IHomeView::class)
 @AndroidEntryPoint
-class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
+class HomeActivity : BaseActivity(), IHomeView,
     IRongCoreListener.OnReceiveMessageListener {
 
     companion object {
@@ -58,7 +58,6 @@ class HomeActivity : BaseActivity<HomePresenter, IHomeView>(), IHomeView,
 
     private var userInfoDialog: UserInfoDialog? = null
 
-    override fun initPresenter(): HomePresenter = presenter
 
     override fun getContentView(): Int = R.layout.activity_home
 

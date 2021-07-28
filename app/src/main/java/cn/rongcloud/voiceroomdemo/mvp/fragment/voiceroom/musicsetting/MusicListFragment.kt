@@ -25,16 +25,13 @@ import javax.inject.Inject
 @HiltBinding(value = IMusicListView::class)
 @AndroidEntryPoint
 class MusicListFragment(val view: IMusicListView) :
-    BaseFragment<MusicListPresenter, IMusicListView>(
+    BaseFragment(
         R.layout.fragment_music_list
     ), IMusicListView by view {
 
     @Inject
     lateinit var presenter: MusicListPresenter
 
-    override fun initPresenter(): MusicListPresenter {
-        return presenter
-    }
 
     override fun initView() {
         rv_list.adapter = MyAdapter()

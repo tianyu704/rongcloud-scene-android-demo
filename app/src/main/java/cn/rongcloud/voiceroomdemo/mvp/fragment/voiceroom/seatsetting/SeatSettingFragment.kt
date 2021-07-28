@@ -12,11 +12,8 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
  * @Date 2021/06/22
  */
 class SeatSettingFragment(view: ISeatSettingView) :
-    BaseBottomSheetDialogFragment<SeatSettingPresenter, ISeatSettingView>(R.layout.fragment_seat_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_seat_setting),
     ISeatSettingView by view {
-    override fun initPresenter(): SeatSettingPresenter {
-        return SeatSettingPresenter(this)
-    }
 
     override fun initView() {
 

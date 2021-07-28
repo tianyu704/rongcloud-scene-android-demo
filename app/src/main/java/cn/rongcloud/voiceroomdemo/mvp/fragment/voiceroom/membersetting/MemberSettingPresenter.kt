@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
@@ -20,9 +21,10 @@ class MemberSettingPresenter @Inject constructor(
     private val view: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean,
     private var member: UiMemberModel,
-    private val roomModel: VoiceRoomModel
+    private val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<IMemberSettingView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     override fun onCreate() {
         super.onCreate()

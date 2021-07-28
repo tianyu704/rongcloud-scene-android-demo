@@ -24,15 +24,12 @@ import javax.inject.Inject
 @HiltBinding(value = IInviteSeatListView::class)
 @AndroidEntryPoint
 class InviteSeatListFragment(view: IInviteSeatListView) :
-    BaseFragment<InviteSeatListPresenter, IInviteSeatListView>(R.layout.layout_list),
+    BaseFragment(R.layout.layout_list),
     IInviteSeatListView by view {
 
     @Inject
     lateinit var  presenter: InviteSeatListPresenter
 
-    override fun initPresenter(): InviteSeatListPresenter {
-        return presenter
-    }
 
     override fun initView() {
         rv_list.adapter = MyAdapter()

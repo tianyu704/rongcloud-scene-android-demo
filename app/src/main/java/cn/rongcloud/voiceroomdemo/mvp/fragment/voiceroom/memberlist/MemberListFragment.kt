@@ -31,15 +31,12 @@ class MemberListFragment(
     private val memberSettingView: IMemberSettingView,
     private val roomInfoBean: VoiceRoomBean
 ) :
-    BaseBottomSheetDialogFragment<MemberListPresenter, IMemberListView>(R.layout.layout_member_list),
+    BaseBottomSheetDialogFragment(R.layout.layout_member_list),
     IMemberListView by view{
 
     @Inject
     lateinit var presenter: MemberListPresenter
 
-    override fun initPresenter(): MemberListPresenter {
-        return presenter
-    }
 
 
     override fun initData() {

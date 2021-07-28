@@ -4,8 +4,9 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest
 
-import com.rongcloud.common.base.BaseLifeCyclePresenter
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
@@ -14,8 +15,12 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/29
  */
-class RevokeSeatPresenter @Inject constructor(val view: IRevokeSeatView, val roomModel: VoiceRoomModel) :
-    BaseLifeCyclePresenter<IRevokeSeatView>(view) {
+class RevokeSeatPresenter @Inject constructor(
+    val view: IRevokeSeatView,
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
+) :
+    BaseLifeCyclePresenter(fragment) {
 
     var cancel: Boolean = false
     override fun onCreate() {

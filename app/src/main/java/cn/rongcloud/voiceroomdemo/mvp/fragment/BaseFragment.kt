@@ -17,14 +17,12 @@ import com.rongcloud.common.base.IBaseView
  * @author gusd
  * @Date 2021/06/24
  */
-abstract class BaseFragment<P : BaseLifeCyclePresenter<V>, V : IBaseView>(@LayoutRes val layoutId: Int) :
+abstract class BaseFragment(@LayoutRes val layoutId: Int) :
     Fragment() {
-    private lateinit var presenter: P
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presenter = initPresenter()
-        lifecycle.addObserver(presenter)
     }
 
     override fun onCreateView(
@@ -50,7 +48,6 @@ abstract class BaseFragment<P : BaseLifeCyclePresenter<V>, V : IBaseView>(@Layou
 
     }
 
-    abstract fun initPresenter(): P
 
     abstract fun initView()
 

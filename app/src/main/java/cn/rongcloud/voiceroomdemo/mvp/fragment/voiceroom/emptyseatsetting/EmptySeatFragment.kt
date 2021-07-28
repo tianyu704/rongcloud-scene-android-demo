@@ -27,7 +27,7 @@ class EmptySeatFragment(
     var seatInfo: UiSeatModel,
     val roomId: String
 ) :
-    BaseBottomSheetDialogFragment<EmptySeatPresenter, IEmptySeatView>(R.layout.fragment_empty_seat_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_empty_seat_setting),
     IEmptySeatView by view {
 
     override fun getEmptyUiSeatModel(): UiSeatModel {
@@ -36,10 +36,6 @@ class EmptySeatFragment(
 
     @Inject
     lateinit var presenter: EmptySeatPresenter
-
-    override fun initPresenter(): EmptySeatPresenter {
-        return presenter
-    }
 
     override fun initView() {
 

@@ -28,15 +28,12 @@ class SeatOrderOperationFragment(
     view: IViewPageListView,
     private val selectPageIndex: Int = 0
 ) :
-    BaseBottomSheetDialogFragment<SeatOrderOperationPresenter, IViewPageListView>(R.layout.fragment_viewpage_list),
+    BaseBottomSheetDialogFragment(R.layout.fragment_viewpage_list),
     IViewPageListView by view, IInviteSeatListView, IRequestSeatListView {
 
     @Inject
     lateinit var presenter: SeatOrderOperationPresenter
 
-    override fun initPresenter(): SeatOrderOperationPresenter {
-        return presenter
-    }
 
     override fun initView() {
         val fragmentList =
@@ -54,7 +51,7 @@ class SeatOrderOperationFragment(
         TabLayoutMediator(
             tl_title, vp_page, true
         ) { tab, position ->
-            tab.text = (fragmentList[position] as BaseFragment<*, *>).getTitle()
+            tab.text = (fragmentList[position] as BaseFragment).getTitle()
         }.attach()
     }
 

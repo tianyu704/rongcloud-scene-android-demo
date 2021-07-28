@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
@@ -21,9 +22,10 @@ import javax.inject.Named
 class SendPresentPresenter @Inject constructor(
     val view: ISendPresentView,
     @Named("selectedIds") private val selectedIds: List<String>,
-    private val roomModel: VoiceRoomModel
+    private val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<ISendPresentView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
 
     fun initeialObserve() {

@@ -27,7 +27,7 @@ import javax.inject.Inject
 class BackgroundSettingFragment(
     view: IBackgroundSettingView
 ) :
-    BaseBottomSheetDialogFragment<BackgroundSettingPresenter, IBackgroundSettingView>(R.layout.fragment_background_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_background_setting),
     IBackgroundSettingView by view {
 
     @Inject
@@ -40,9 +40,6 @@ class BackgroundSettingFragment(
     lateinit var presenter:BackgroundSettingPresenter
 
     private var adapter: BackgroundSettingAdapter? = null
-    override fun initPresenter(): BackgroundSettingPresenter {
-        return presenter
-    }
 
     override fun initView() {
         val itemDecoration = GridSpacingItemDecoration(

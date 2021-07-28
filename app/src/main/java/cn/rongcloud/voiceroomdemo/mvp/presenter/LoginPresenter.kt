@@ -6,6 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.app.Application
 import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.MyApp
@@ -28,9 +29,9 @@ import javax.inject.Inject
 class LoginPresenter @Inject constructor(
     val view: ILoginView,
     private val loginModel: LoginModel,
-    @ActivityContext private val context: Context
+    activity:AppCompatActivity
 ) :
-    BaseLifeCyclePresenter<ILoginView>(view) {
+    BaseLifeCyclePresenter(activity) {
 
     override fun onCreate() {
     }

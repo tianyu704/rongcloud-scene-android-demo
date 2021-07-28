@@ -21,15 +21,12 @@ import javax.inject.Inject
 @HiltBinding(value = IMusicControlView::class)
 @AndroidEntryPoint
 class MusicControlFragment(view: IMusicControlView) :
-    BaseFragment<MusicControlPresenter, IMusicControlView>(
+    BaseFragment(
         R.layout.fragment_music_control
     ), IMusicControlView by view, SeekBar.OnSeekBarChangeListener {
 
     @Inject
     lateinit var presenter: MusicControlPresenter
-    override fun initPresenter(): MusicControlPresenter {
-        return presenter
-    }
 
     override fun initView() {
         sb_local_audio_setting.setOnSeekBarChangeListener(this)

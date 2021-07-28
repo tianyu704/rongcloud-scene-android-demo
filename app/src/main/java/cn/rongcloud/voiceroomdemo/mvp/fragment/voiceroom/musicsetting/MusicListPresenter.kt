@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
@@ -14,8 +15,8 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/07/06
  */
-class MusicListPresenter @Inject constructor(val view: IMusicListView, val roomModel: VoiceRoomModel) :
-    BaseLifeCyclePresenter<IMusicListView>(view) {
+class MusicListPresenter @Inject constructor(val view: IMusicListView, val roomModel: VoiceRoomModel,fragment: Fragment) :
+    BaseLifeCyclePresenter(fragment) {
 
     override fun onStart() {
         super.onStart()

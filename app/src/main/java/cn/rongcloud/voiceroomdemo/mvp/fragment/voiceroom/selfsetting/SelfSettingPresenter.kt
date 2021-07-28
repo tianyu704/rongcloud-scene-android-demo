@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting
 
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
@@ -19,9 +20,10 @@ import javax.inject.Named
 class SelfSettingPresenter @Inject constructor(
     val view: ISelfSettingView,
     @Named("SelfSeatSetting") var seatInfo: UiSeatModel,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<ISelfSettingView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
     private var isLeaveSeating = false
 

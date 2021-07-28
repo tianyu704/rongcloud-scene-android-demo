@@ -23,7 +23,7 @@ private const val TAG = "LoginActivity"
 
 @HiltBinding(value = ILoginView::class)
 @AndroidEntryPoint
-class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
+class LoginActivity : BaseActivity(), ILoginView {
 
     companion object {
         fun startActivity(context: Context) {
@@ -97,9 +97,6 @@ class LoginActivity : BaseActivity<LoginPresenter, ILoginView>(), ILoginView {
 
     }
 
-    override fun initPresenter(): LoginPresenter {
-        return presenter
-    }
 
     override fun onLogout() {
 

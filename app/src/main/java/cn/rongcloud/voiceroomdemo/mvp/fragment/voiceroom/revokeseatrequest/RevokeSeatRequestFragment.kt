@@ -18,16 +18,13 @@ import javax.inject.Inject
 @HiltBinding(value = IRevokeSeatView::class)
 @AndroidEntryPoint
 class RevokeSeatRequestFragment(view: IRevokeSeatView) :
-    BaseBottomSheetDialogFragment<RevokeSeatPresenter, IRevokeSeatView>(
+    BaseBottomSheetDialogFragment(
         R.layout.fragment_cancel_request_seat
     ), IRevokeSeatView by view {
 
     @Inject
     lateinit var presenter:RevokeSeatPresenter
 
-    override fun initPresenter(): RevokeSeatPresenter {
-        return presenter
-    }
 
     override fun initView() {
         btn_cancel.setOnClickListener {

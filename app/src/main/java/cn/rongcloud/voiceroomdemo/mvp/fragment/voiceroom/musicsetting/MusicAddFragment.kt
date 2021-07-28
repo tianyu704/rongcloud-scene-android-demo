@@ -34,15 +34,12 @@ private const val MUSIC_PICK_REQUEST_CODE = 10000
 @HiltBinding(IMusicAddView::class)
 @AndroidEntryPoint
 class MusicAddFragment(view: IMusicAddView) :
-    BaseFragment<MusicAddPresenter, IMusicAddView>(R.layout.fragment_music_add),
+    BaseFragment(R.layout.fragment_music_add),
     IMusicAddView by view {
 
     @Inject
     lateinit var presenter: MusicAddPresenter
 
-    override fun initPresenter(): MusicAddPresenter {
-        return presenter
-    }
 
     override fun initView() {
         rv_list.adapter = MyAdapter()

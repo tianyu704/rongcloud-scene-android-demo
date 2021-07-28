@@ -22,13 +22,12 @@ import javax.inject.Inject
 @HiltBinding(value = ICreatorView::class)
 @AndroidEntryPoint
 class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: VoiceRoomBean) :
-    BaseBottomSheetDialogFragment<CreatorSettingPresenter, ICreatorView>(R.layout.fragmeng_creator_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragmeng_creator_setting),
     ICreatorView by view {
 
     @Inject
     lateinit var presenter: CreatorSettingPresenter
 
-    override fun initPresenter(): CreatorSettingPresenter = presenter
 
     override fun initView() {
         btn_out_of_seat.setOnClickListener {

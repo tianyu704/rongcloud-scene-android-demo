@@ -36,7 +36,7 @@ private const val PICTURE_SELECTED_RESULT_CODE = 10001
 @HiltBinding(value = ICreateVoiceRoomView::class)
 @AndroidEntryPoint
 class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
-    BaseBottomSheetDialogFragment<CreateVoiceRoomPresenter, ICreateVoiceRoomView>(R.layout.layout_create_room),
+    BaseBottomSheetDialogFragment(R.layout.layout_create_room),
     ICreateVoiceRoomView by view {
 
     private lateinit var backgroundImages: List<ImageView>
@@ -51,9 +51,6 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
     @Inject
     lateinit var presenter: CreateVoiceRoomPresenter
 
-    override fun initPresenter(): CreateVoiceRoomPresenter {
-        return presenter
-    }
 
     override fun onDestroy() {
         super.onDestroy()

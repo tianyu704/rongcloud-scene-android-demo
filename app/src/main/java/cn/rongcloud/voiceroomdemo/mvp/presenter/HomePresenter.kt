@@ -4,8 +4,10 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
@@ -26,9 +28,10 @@ private const val TAG = "HomePresenter"
 @ActivityScoped
 class HomePresenter @Inject constructor(
     val view: IHomeView,
-    @ActivityContext val context: Context
+    @ActivityContext val context: Context,
+    activity:AppCompatActivity
 ) :
-    BaseLifeCyclePresenter<IHomeView>(view) {
+    BaseLifeCyclePresenter(activity) {
 
     override fun onDestroy() {
     }

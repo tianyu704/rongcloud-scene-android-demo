@@ -22,10 +22,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
  * @author gusd
  * @Date 2021/06/21
  */
-abstract class BaseBottomSheetDialogFragment<P : BaseLifeCyclePresenter<V>, V : IBaseView>(@LayoutRes val layoutId: Int) :
+abstract class BaseBottomSheetDialogFragment(@LayoutRes val layoutId: Int) :
     BottomSheetDialogFragment() {
     private lateinit var mBehavior: BottomSheetBehavior<View>
-    private lateinit var presenter: P
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreate(savedInstanceState)
@@ -44,11 +43,8 @@ abstract class BaseBottomSheetDialogFragment<P : BaseLifeCyclePresenter<V>, V : 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.CustomBottomSheetDialogTheme)
-        presenter = initPresenter()
-        lifecycle.addObserver(presenter)
     }
 
-    abstract fun initPresenter(): P
 
     override fun onStart() {
         super.onStart()
@@ -71,7 +67,6 @@ abstract class BaseBottomSheetDialogFragment<P : BaseLifeCyclePresenter<V>, V : 
     }
 
     override fun onDestroy() {
-        lifecycle.removeObserver(presenter)
         super.onDestroy()
     }
 

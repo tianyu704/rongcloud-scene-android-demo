@@ -35,7 +35,7 @@ private const val TAG = "VoiceRoomListActivity"
 
 @HiltBinding(value = IVoiceRoomListView::class)
 @AndroidEntryPoint
-class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomListView>(),
+class VoiceRoomListActivity : BaseActivity(),
     IVoiceRoomListView, ICreateVoiceRoomView {
     companion object {
         fun startActivity(context: Context) {
@@ -52,9 +52,6 @@ class VoiceRoomListActivity : BaseActivity<VoiceRoomListPresenter, IVoiceRoomLis
     @Inject
     lateinit var presenter: VoiceRoomListPresenter
 
-    override fun initPresenter(): VoiceRoomListPresenter {
-        return presenter
-    }
 
     override fun getContentView(): Int = R.layout.activity_voice_room_list
 

@@ -5,9 +5,9 @@
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.mvp.model.*
@@ -18,6 +18,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
 import com.rongcloud.common.utils.AccountStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -44,9 +45,10 @@ const val STATUS_WAIT_FOR_SEAT = 2
 class VoiceRoomPresenter @Inject constructor(
     val view: IVoiceRoomView,
     @Named("roomId") private val roomId: String,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    activity: AppCompatActivity
 ) :
-    BaseLifeCyclePresenter<IVoiceRoomView>(view), IRongCoreListener.OnReceiveMessageListener {
+    BaseLifeCyclePresenter(activity), IRongCoreListener.OnReceiveMessageListener {
 
     var currentStatus = STATUS_NOT_ON_SEAT
 

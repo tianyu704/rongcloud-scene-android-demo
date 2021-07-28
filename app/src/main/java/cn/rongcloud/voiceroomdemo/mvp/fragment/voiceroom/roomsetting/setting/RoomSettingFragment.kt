@@ -28,7 +28,7 @@ import javax.inject.Inject
 class RoomSettingFragment(
     view: IRoomSettingView,
 ) :
-    BaseBottomSheetDialogFragment<RoomSettingPresenter, IRoomSettingView>(R.layout.fragment_room_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_room_setting),
     IRoomSettingView by view {
 
     private var passwordDialog: InputPasswordDialog? = null
@@ -37,9 +37,6 @@ class RoomSettingFragment(
     @Inject
     lateinit var presenter: RoomSettingPresenter
 
-    override fun initPresenter(): RoomSettingPresenter {
-        return presenter
-    }
 
     override fun onDestroy() {
         super.onDestroy()

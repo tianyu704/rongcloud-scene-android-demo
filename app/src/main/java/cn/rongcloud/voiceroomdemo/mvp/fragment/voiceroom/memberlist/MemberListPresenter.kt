@@ -5,8 +5,9 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.memberlist
 
 import android.util.Log
-import com.rongcloud.common.base.BaseLifeCyclePresenter
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
 
@@ -18,8 +19,9 @@ private const val TAG = "MemberListPresenter"
 
 class MemberListPresenter @Inject constructor(
     private val view: IMemberListView,
-    private val roomModel: VoiceRoomModel
-) : BaseLifeCyclePresenter<IMemberListView>(view) {
+    private val roomModel: VoiceRoomModel,
+    fragment: Fragment
+) : BaseLifeCyclePresenter(fragment) {
 
     fun getMemberList() {
         addDisposable(

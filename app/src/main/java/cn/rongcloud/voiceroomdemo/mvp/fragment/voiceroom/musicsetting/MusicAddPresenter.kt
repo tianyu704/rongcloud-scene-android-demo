@@ -10,6 +10,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
@@ -28,9 +29,10 @@ private const val TAG = "MusicAddPresenter"
 
 class MusicAddPresenter @Inject constructor(
     val view: IMusicAddView,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<IMusicAddView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
 
     override fun onStart() {

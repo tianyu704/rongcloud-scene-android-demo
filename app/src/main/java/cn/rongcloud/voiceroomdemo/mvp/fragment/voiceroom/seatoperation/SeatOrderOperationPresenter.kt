@@ -4,16 +4,21 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 
-import com.rongcloud.common.base.BaseLifeCyclePresenter
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/24
  */
-class SeatOrderOperationPresenter @Inject constructor(view: IViewPageListView,val roomModel: VoiceRoomModel) :
-    BaseLifeCyclePresenter<IViewPageListView>(view) {
+class SeatOrderOperationPresenter @Inject constructor(
+    view: IViewPageListView,
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
+) :
+    BaseLifeCyclePresenter(fragment) {
 
     override fun onCreate() {
         super.onCreate()

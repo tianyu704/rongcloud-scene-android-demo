@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting
 
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
@@ -20,9 +21,10 @@ import javax.inject.Named
 class EmptySeatPresenter @Inject constructor(
     val view: IEmptySeatView,
     @Named("EmptySeatSetting") var uiSeatModel: UiSeatModel,
-    val roomModel: VoiceRoomModel
+    val roomModel: VoiceRoomModel,
+    fragment: Fragment
 ) :
-    BaseLifeCyclePresenter<IEmptySeatView>(view) {
+    BaseLifeCyclePresenter(fragment) {
 
 
     override fun onCreate() {

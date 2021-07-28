@@ -29,10 +29,8 @@ private val DEFAULT_EMPTY_VIEW = R.layout.layout_empty
 private val DEFAULT_ERROR_VIEW = R.layout.layout_error
 private val DEFAULT_LOADING_VIEW = R.layout.layout_loading
 
-abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : PermissionActivity(),
+abstract class BaseActivity : PermissionActivity(),
     IBaseView, EasyPermissions.PermissionCallbacks {
-
-    private lateinit var presenter: P
 
     private var isFront = false
     protected lateinit var mRootView: View
@@ -66,8 +64,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
             setContentView(LayoutInflater.from(this).inflate(getContentView(), null, false).apply {
                 mRootView = this
             })
-            presenter = initPresenter()
-            afterInitPresenter()
             supportActionBar?.let {
                 initActionBar(it)
             }
@@ -119,11 +115,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
     }
 
 
-    private fun afterInitPresenter() {
-        lifecycle.addObserver(presenter)
-    }
-
-    abstract fun initPresenter(): P
 
     abstract fun getContentView(): Int
 
@@ -193,7 +184,6 @@ abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : Perm
 
     override fun onDestroy() {
         super.onDestroy()
-        lifecycle.removeObserver(presenter)
         waitingDialog?.dismiss()
     }
 

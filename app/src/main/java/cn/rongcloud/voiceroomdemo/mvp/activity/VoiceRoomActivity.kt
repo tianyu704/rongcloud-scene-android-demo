@@ -81,7 +81,7 @@ private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 
 @HiltBinding(value = IVoiceRoomView::class)
 @AndroidEntryPoint
-class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IVoiceRoomView,
+class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
     IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, ISendPresentView,
     IMusicSettingView {
@@ -131,9 +131,6 @@ class VoiceRoomActivity : BaseActivity<VoiceRoomPresenter, IVoiceRoomView>(), IV
     @Inject
     lateinit var presenter: VoiceRoomPresenter
 
-    override fun initPresenter(): VoiceRoomPresenter {
-        return presenter
-    }
 
     fun getVoiceRoomModel():VoiceRoomModel{
         return presenter.roomModel

@@ -5,12 +5,13 @@
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.content.Context
-import com.rongcloud.common.base.BaseLifeCyclePresenter
+import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -19,13 +20,15 @@ import javax.inject.Inject
 /**
  * @author gusd
  * @Date 2021/06/09
+ * 虽然为全局单例，但绑定一个 activity 生命周期，activity 生命周期结束之后数据依旧存在，只是不再监听变化
  */
 @ActivityScoped
 class VoiceRoomListPresenter @Inject constructor(
     val view: IVoiceRoomListView,
-    private val voiceRoomListMode: VoiceRoomListModel
+    private val voiceRoomListMode: VoiceRoomListModel,
+    activity: AppCompatActivity
 ) :
-    BaseLifeCyclePresenter<IVoiceRoomListView>(view) {
+    BaseLifeCyclePresenter(activity) {
 
 
     override fun onCreate() {

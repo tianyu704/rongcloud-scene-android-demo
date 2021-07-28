@@ -21,16 +21,12 @@ import javax.inject.Inject
 @HiltBinding(value = ISelfSettingView::class)
 @AndroidEntryPoint
 class SelfSettingFragment(view: ISelfSettingView, var seatInfo: UiSeatModel, val roomId: String) :
-    BaseBottomSheetDialogFragment<SelfSettingPresenter, ISelfSettingView>(
+    BaseBottomSheetDialogFragment(
         R.layout.fragment_self_setting
     ), ISelfSettingView by view {
 
     @Inject
     lateinit var presenter: SelfSettingPresenter
-
-    override fun initPresenter(): SelfSettingPresenter {
-        return presenter
-    }
 
     override fun getUiSeatModel(): UiSeatModel {
         return seatInfo
