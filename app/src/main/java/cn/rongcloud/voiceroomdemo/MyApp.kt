@@ -11,12 +11,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
-import com.rongcloud.common.base.IBaseView
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
-import com.rongcloud.common.ModuleManager
+import com.rongcloud.common.InitService
+import com.rongcloud.common.base.IBaseView
 import com.rongcloud.common.dao.database.DatabaseManager
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.utils.AccountStore
@@ -29,6 +29,7 @@ import com.vanniktech.emoji.ios.category.*
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.plugins.RxJavaPlugins
 import io.rong.imlib.RongIMClient
+import javax.inject.Inject
 import kotlin.properties.Delegates
 
 /**
@@ -42,11 +43,15 @@ class MyApp : Application() {
 
     private val activityList: ArrayList<Activity> = arrayListOf()
 
+    @Inject
+    lateinit var initService: InitService
+
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
         instance = this
-        ModuleManager.init(this)
+
+        initService.init(this)
 
         UMConfigure.init(
             this,

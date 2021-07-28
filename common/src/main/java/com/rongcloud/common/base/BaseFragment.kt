@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.fragment
+package com.rongcloud.common.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

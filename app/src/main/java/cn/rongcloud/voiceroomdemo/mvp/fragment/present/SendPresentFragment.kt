@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager.HORIZONTAL
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel

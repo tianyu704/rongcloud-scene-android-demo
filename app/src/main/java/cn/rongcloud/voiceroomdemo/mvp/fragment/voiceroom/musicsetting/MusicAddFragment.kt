@@ -14,7 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
+import com.rongcloud.common.base.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FROM_TYPE_SYSTEM
 import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FUNCTION_LOCAL_ADD
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel

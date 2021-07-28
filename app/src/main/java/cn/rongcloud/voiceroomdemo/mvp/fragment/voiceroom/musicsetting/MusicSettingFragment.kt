@@ -10,8 +10,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import cn.rongcloud.voiceroomdemo.ui.widget.ActionSnackBar
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CHEER
@@ -22,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_setting.*
 import kotlinx.android.synthetic.main.layout_music_atmosphere.view.*
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * @author gusd

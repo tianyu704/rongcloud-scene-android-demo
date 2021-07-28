@@ -8,8 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
+import com.rongcloud.common.base.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.rongcloud.common.extension.loadPortrait
 import dagger.hilt.android.AndroidEntryPoint

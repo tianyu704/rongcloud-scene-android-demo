@@ -7,8 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.memberlist
 import android.util.Log
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean

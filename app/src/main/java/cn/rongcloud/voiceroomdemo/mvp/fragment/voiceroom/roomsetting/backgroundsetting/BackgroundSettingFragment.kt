@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.showToast
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration

@@ -12,12 +12,12 @@ data class CallRecordModel(
     val id: Long,
     val callerNumber: String,
     val callerId: String,
-    val peerId: String,
+    val peerId: String?,
     val peerNumber: String,
     val date: Long,
     val during: Long,
     val callType: Int,
     val userName: String?,
     val portrait: String?,
-    val number: String?
+    val number: String?,
 )

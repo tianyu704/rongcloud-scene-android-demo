@@ -17,7 +17,7 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.LocalDataStore
 import com.rongcloud.common.extension.showToast
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
 import com.rongcloud.common.extension.loadImageView

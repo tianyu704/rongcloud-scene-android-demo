@@ -6,8 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting
 
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import com.rongcloud.common.extension.loadPortrait
 import dagger.hilt.android.AndroidEntryPoint

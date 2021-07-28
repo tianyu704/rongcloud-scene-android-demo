@@ -9,9 +9,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseFragment
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
+import com.rongcloud.common.base.BaseFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
