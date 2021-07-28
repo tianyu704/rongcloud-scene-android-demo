@@ -6,10 +6,10 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting
 
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.loadPortrait
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import com.rongcloud.common.extension.loadPortrait
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_self_setting.*
 import javax.inject.Inject

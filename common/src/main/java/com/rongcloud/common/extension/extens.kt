@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.common
+package com.rongcloud.common.extension
 
 import android.app.Activity
 import android.content.Context
@@ -17,10 +17,10 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroomdemo.MyApp
-import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
-import cn.rongcloud.voiceroomdemo.utils.ImageLoaderUtil
+import com.rongcloud.common.ModuleManager
+import com.rongcloud.common.R
+import com.rongcloud.common.net.ApiConstant
+import com.rongcloud.common.utils.ImageLoaderUtil
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.concurrent.TimeUnit
@@ -32,7 +32,7 @@ import kotlin.contracts.contract
  * @Date 2021/06/04
  */
 fun getString(@StringRes stringId: Int): String {
-    return MyApp.context.getString(stringId)
+    return ModuleManager.applicationContext.getString(stringId)
 }
 
 

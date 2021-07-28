@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.activity;
+package com.rongcloud.common.base;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rongcloud.common.utils.PermissionUtil;
+
 import org.jetbrains.annotations.NotNull;
 
-import cn.rongcloud.voiceroomdemo.utils.PermissionUtil;
 import pub.devrel.easypermissions.AppSettingsDialog;
 
 

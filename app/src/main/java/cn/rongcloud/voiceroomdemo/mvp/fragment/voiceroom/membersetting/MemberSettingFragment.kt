@@ -7,13 +7,13 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting
 import androidx.core.view.isVisible
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.AccountStore
-import cn.rongcloud.voiceroomdemo.common.loadPortrait
-import cn.rongcloud.voiceroomdemo.common.ui
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import com.rongcloud.common.extension.loadPortrait
+import com.rongcloud.common.extension.ui
+import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation

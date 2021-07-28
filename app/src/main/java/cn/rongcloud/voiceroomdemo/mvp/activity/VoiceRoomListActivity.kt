@@ -19,10 +19,13 @@ import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomListAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.CreateVoiceRoomDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.ICreateVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomListPresenter
-import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
+import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
+import com.rongcloud.common.base.BaseActivity
+import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.extension.ui
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_voice_room_list.*
 import kotlinx.android.synthetic.main.layout_input_password_dialog.*

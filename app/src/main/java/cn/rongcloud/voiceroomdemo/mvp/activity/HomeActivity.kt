@@ -20,6 +20,10 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
+import com.rongcloud.common.base.BaseActivity
+import com.rongcloud.common.extension.loadPortrait
+import com.rongcloud.common.extension.ui
+import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.callkit.DialActivity

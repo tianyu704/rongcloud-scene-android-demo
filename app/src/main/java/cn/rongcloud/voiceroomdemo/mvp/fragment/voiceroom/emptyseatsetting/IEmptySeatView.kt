@@ -4,14 +4,14 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting
 
-import cn.rongcloud.voiceroomdemo.common.IBaseView
+import com.rongcloud.common.base.IBaseView
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 
 /**
  * @author gusd
  * @Date 2021/06/28
  */
-interface IEmptySeatView:IBaseView {
+interface IEmptySeatView: IBaseView {
     fun refreshView(uiSeatModel: UiSeatModel){}
     fun showInviteUserView(){}
     fun getEmptyUiSeatModel():UiSeatModel?{

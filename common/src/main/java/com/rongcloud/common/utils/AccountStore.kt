@@ -2,11 +2,12 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.common
+package com.rongcloud.common.utils
 
-import cn.rongcloud.voiceroomdemo.MyApp
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.AccountInfo
-import cn.rongcloud.voiceroomdemo.utils.JsonUtils
+import android.app.Application
+import com.rongcloud.common.ModuleManager
+import com.rongcloud.common.extension.*
+import com.rongcloud.common.model.AccountInfo
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 
@@ -23,10 +24,12 @@ object AccountStore {
     private val ACCOUNT_INFO by myStringPreferencesKey(EMPTY_ACCOUNT.toJson())
 
     private var currentInfo: AccountInfo
+    private lateinit var context: Application
 
     init {
+        context = ModuleManager.applicationContext
         currentInfo = JsonUtils.fromJson(
-            MyApp.context.getValueSync(ACCOUNT_INFO),
+            context.getValueSync(ACCOUNT_INFO),
             AccountInfo::class.java
         ) ?: EMPTY_ACCOUNT
     }
@@ -34,7 +37,7 @@ object AccountStore {
 
     fun saveAccountInfo(info: AccountInfo?) {
         currentInfo = info ?: EMPTY_ACCOUNT
-        MyApp.context.putValue(ACCOUNT_INFO, currentInfo.toJson())
+        context.putValue(ACCOUNT_INFO, currentInfo.toJson())
     }
 
     fun getAccountInfo(): AccountInfo = currentInfo
@@ -55,7 +58,7 @@ object AccountStore {
 
     // 登出监听
     fun obLogoutSubject(): Observable<Boolean> =
-        MyApp.context.obValue(ACCOUNT_INFO)
+        context.obValue(ACCOUNT_INFO)
             .filter {
                 it.isNullOrEmpty() || it == ACCOUNT_INFO.defaultValue
             }.map {
@@ -70,7 +73,7 @@ object AccountStore {
 
     // 监听账号信息发生变化
     fun obAccountInfoChange(): Observable<AccountInfo> =
-        MyApp.context.obValue(ACCOUNT_INFO).map {
+        context.obValue(ACCOUNT_INFO).map {
             return@map JsonUtils.fromJson(it, AccountInfo::class.java) ?: EMPTY_ACCOUNT
         }.observeOn(AndroidSchedulers.mainThread())
 }

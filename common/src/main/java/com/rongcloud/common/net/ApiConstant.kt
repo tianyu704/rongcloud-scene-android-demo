@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.net.api
+package com.rongcloud.common.net
 
 /**
  * @author gusd

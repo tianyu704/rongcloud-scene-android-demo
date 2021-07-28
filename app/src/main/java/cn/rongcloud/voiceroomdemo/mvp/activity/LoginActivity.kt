@@ -10,12 +10,11 @@ import android.os.CountDownTimer
 import androidx.core.widget.addTextChangedListener
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.BaseActivity
-import cn.rongcloud.voiceroomdemo.common.showToast
-import cn.rongcloud.voiceroomdemo.common.ui
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
+import com.rongcloud.common.base.BaseActivity
+import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
+import com.rongcloud.common.extension.ui
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject

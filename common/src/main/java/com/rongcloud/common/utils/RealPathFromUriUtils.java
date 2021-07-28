@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils;
+package com.rongcloud.common.utils;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

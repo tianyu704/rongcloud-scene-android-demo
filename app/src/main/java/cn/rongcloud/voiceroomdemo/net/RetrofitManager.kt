@@ -4,10 +4,10 @@
 
 package cn.rongcloud.voiceroomdemo.net
 
-import cn.rongcloud.voiceroomdemo.common.AccountStore
-import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
+import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.CommonApiService
 import cn.rongcloud.voiceroomdemo.net.api.DownloadFileApiService
+import com.rongcloud.common.utils.AccountStore
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

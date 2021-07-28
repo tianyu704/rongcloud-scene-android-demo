@@ -10,14 +10,15 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.AccountStore
-import cn.rongcloud.voiceroomdemo.common.setAndroidNativeLightStatusBar
-import cn.rongcloud.voiceroomdemo.common.showToast
+import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.base.PermissionActivity
+import com.rongcloud.common.extension.setAndroidNativeLightStatusBar
+import com.rongcloud.common.utils.AccountStore
 import kotlinx.android.synthetic.main.activity_launcher.*
 import java.util.*
 
 
-class LauncherActivity : cn.rongcloud.voiceroomdemo.mvp.activity.PermissionActivity() {
+class LauncherActivity : PermissionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

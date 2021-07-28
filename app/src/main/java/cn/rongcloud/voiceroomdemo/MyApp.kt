@@ -11,14 +11,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
-import cn.rongcloud.voiceroomdemo.common.AccountStore
-import cn.rongcloud.voiceroomdemo.common.IBaseView
-import cn.rongcloud.voiceroomdemo.common.showToast
+import com.rongcloud.common.base.IBaseView
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.dao.database.DatabaseManager
+import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.utils.AccountStore
 import com.umeng.analytics.MobclickAgent
 import com.umeng.commonsdk.UMConfigure
 import com.vanniktech.emoji.EmojiManager
@@ -45,6 +46,7 @@ class MyApp : Application() {
         super.onCreate()
         context = applicationContext
         instance = this
+        ModuleManager.init(this)
 
         UMConfigure.init(
             this,

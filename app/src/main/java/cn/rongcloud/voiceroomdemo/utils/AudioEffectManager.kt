@@ -7,7 +7,7 @@ package cn.rongcloud.voiceroomdemo.utils
 import android.util.Log
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.MyApp
-import cn.rongcloud.voiceroomdemo.common.showToast
+import com.rongcloud.common.extension.showToast
 
 /**
  * @author gusd

@@ -2,13 +2,13 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.common
+package com.rongcloud.common.extension
 
 import android.content.Context
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder
 import androidx.datastore.rxjava3.RxDataStore
-import cn.rongcloud.voiceroomdemo.MyApp
+import com.rongcloud.common.ModuleManager
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +19,7 @@ import kotlin.properties.ReadOnlyProperty
  * @Date 2021/6/7
  */
 val Context.dataStore: RxDataStore<Preferences> by lazy {
-    RxPreferenceDataStoreBuilder(MyApp.context, "settings").build()
+    RxPreferenceDataStoreBuilder(ModuleManager.applicationContext, "settings").build()
 }
 
 // 用于保存默认值

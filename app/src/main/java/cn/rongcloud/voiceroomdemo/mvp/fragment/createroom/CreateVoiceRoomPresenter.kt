@@ -7,13 +7,13 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
-import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
-import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
+import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.Kv
-import cn.rongcloud.voiceroomdemo.utils.RealPathFromUriUtils
+import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
 

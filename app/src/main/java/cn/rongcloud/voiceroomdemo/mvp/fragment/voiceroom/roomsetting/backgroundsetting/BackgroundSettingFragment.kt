@@ -7,7 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.background
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.showToast
+import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel

@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.activity.iview
 
 import android.graphics.Point
-import cn.rongcloud.voiceroomdemo.common.IBaseView
+import com.rongcloud.common.base.IBaseView
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import io.rong.imlib.model.MessageContent

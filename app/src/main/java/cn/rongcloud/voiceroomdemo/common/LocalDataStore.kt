@@ -6,6 +6,9 @@ package cn.rongcloud.voiceroomdemo.common
 
 import cn.rongcloud.voiceroom.utils.JsonUtils
 import cn.rongcloud.voiceroomdemo.MyApp
+import com.rongcloud.common.extension.getValueSync
+import com.rongcloud.common.extension.myStringPreferencesKey
+import com.rongcloud.common.extension.putValue
 import kotlin.collections.ArrayList
 
 /**

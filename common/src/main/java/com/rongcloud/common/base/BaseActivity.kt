@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.common
+package com.rongcloud.common.base
 
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,9 +14,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
-import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
-import cn.rongcloud.voiceroomdemo.mvp.activity.PermissionActivity
+import com.rongcloud.common.R
+import com.rongcloud.common.extension.setAndroidNativeLightStatusBar
+import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.extension.ui
 import kotlinx.android.synthetic.main.layout_custom_action_bar.*
 import pub.devrel.easypermissions.EasyPermissions
 
@@ -24,11 +25,11 @@ import pub.devrel.easypermissions.EasyPermissions
  * @author gusd
  * @Date 2021/06/04
  */
-private const val DEFAULT_EMPTY_VIEW = R.layout.layout_empty
-private const val DEFAULT_ERROR_VIEW = R.layout.layout_error
-private const val DEFAULT_LOADING_VIEW = R.layout.layout_loading
+private val DEFAULT_EMPTY_VIEW = R.layout.layout_empty
+private val DEFAULT_ERROR_VIEW = R.layout.layout_error
+private val DEFAULT_LOADING_VIEW = R.layout.layout_loading
 
-abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : cn.rongcloud.voiceroomdemo.mvp.activity.PermissionActivity(),
+abstract class BaseActivity<P : BaseLifeCyclePresenter<V>, V : IBaseView> : PermissionActivity(),
     IBaseView, EasyPermissions.PermissionCallbacks {
 
     private lateinit var presenter: P

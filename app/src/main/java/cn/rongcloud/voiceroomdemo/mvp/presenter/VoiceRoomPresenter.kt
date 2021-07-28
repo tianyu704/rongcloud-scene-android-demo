@@ -7,9 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 import android.util.Log
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import cn.rongcloud.voiceroomdemo.common.AccountStore
-import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.common.isNotNullOrEmpty
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.mvp.model.*
@@ -20,6 +18,8 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.extension.isNotNullOrEmpty
+import com.rongcloud.common.utils.AccountStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.model.Message

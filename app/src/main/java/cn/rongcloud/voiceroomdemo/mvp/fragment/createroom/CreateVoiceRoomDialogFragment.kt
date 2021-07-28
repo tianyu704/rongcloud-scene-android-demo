@@ -16,11 +16,11 @@ import androidx.core.view.isVisible
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.LocalDataStore
-import cn.rongcloud.voiceroomdemo.common.loadImageView
-import cn.rongcloud.voiceroomdemo.common.showToast
+import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.mvp.fragment.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
+import com.rongcloud.common.extension.loadImageView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_create_room.*
 import javax.inject.Inject

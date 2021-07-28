@@ -2,15 +2,15 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils
+package com.rongcloud.common.utils
 
 import android.content.Context
 import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.Glide
-import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.getCompletePortraitUrl
+import com.rongcloud.common.R
+import com.rongcloud.common.extension.getCompletePortraitUrl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**

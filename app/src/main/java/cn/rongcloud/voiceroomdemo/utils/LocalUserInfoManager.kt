@@ -6,11 +6,11 @@ package cn.rongcloud.voiceroomdemo.utils
 
 import android.net.Uri
 import android.util.LruCache
-import cn.rongcloud.voiceroomdemo.common.getCompletePortraitUrl
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
-import cn.rongcloud.voiceroomdemo.net.api.ApiConstant
+import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.Member
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.UserIdList
+import com.rongcloud.common.extension.getCompletePortraitUrl
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.internal.disposables.DisposableHelper
 import io.reactivex.rxjava3.schedulers.Schedulers

@@ -10,8 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroomdemo.common.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.common.IBaseView
+import com.rongcloud.common.base.BaseLifeCyclePresenter
+import com.rongcloud.common.base.IBaseView
 
 /**
  * @author gusd

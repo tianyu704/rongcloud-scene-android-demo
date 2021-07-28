@@ -18,7 +18,6 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
@@ -58,6 +57,12 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
+import com.rongcloud.common.base.BaseActivity
+import com.rongcloud.common.extension.loadImageView
+import com.rongcloud.common.extension.loadPortrait
+import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.extension.ui
+import com.rongcloud.common.utils.AccountStore
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils

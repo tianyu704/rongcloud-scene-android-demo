@@ -2,13 +2,13 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils
+package com.rongcloud.common.utils
 
 import android.os.Build
-import cn.rongcloud.voiceroomdemo.MyApp
-import cn.rongcloud.voiceroomdemo.common.DataStoreKeys.DEVICE_ID_KEY
-import cn.rongcloud.voiceroomdemo.common.getValueSync
-import cn.rongcloud.voiceroomdemo.common.putValue
+import com.rongcloud.common.ModuleManager
+import com.rongcloud.common.extension.getValueSync
+import com.rongcloud.common.extension.myStringPreferencesKey
+import com.rongcloud.common.extension.putValue
 import java.util.*
 
 /**
@@ -16,9 +16,10 @@ import java.util.*
  * @Date 2021/06/07
  */
 object DeviceUtils {
+    val DEVICE_ID_KEY by myStringPreferencesKey("")
 
     fun getDeviceId(): String {
-        var deviceId = MyApp.context.getValueSync(DEVICE_ID_KEY)
+        var deviceId = ModuleManager.applicationContext.getValueSync(DEVICE_ID_KEY)
         if (deviceId.isNotBlank()) {
             return deviceId
         }
@@ -33,7 +34,7 @@ object DeviceUtils {
             "serial"
         }
         deviceId = UUID(deviceIdShort.hashCode().toLong(), serial.hashCode().toLong()).toString()
-        MyApp.context.putValue(DEVICE_ID_KEY, deviceId)
+        ModuleManager.applicationContext.putValue(DEVICE_ID_KEY, deviceId)
         return deviceId
 
     }
