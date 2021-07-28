@@ -4,6 +4,7 @@
 
 package io.rong.callkit;
 
+import static io.rong.callkit.util.CallKitUtils.callConnected;
 import static io.rong.callkit.util.CallKitUtils.isDial;
 
 import android.app.ActivityManager;
@@ -69,7 +70,7 @@ public class CallFloatBoxView {
     private static boolean activityResuming = false;
 
     public static void showFB(Context context, Bundle bundle) {
-        Log.i("audioTag", "CallKitUtils.isDial=" + CallKitUtils.isDial);
+        Log.i("audioTag", "showFB : isDial=" + CallKitUtils.isDial);
         setExcludeFromRecents(context, true);
         activityResuming = false;
         if (CallKitUtils.isDial) {
@@ -91,10 +92,9 @@ public class CallFloatBoxView {
         if (mTime > 0) {
             setAudioMode(AudioManager.MODE_IN_COMMUNICATION);
         }
-
         mBundle = bundle;
         wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        WindowManager.LayoutParams params = createLayoutParams(context);
+        final WindowManager.LayoutParams params = createLayoutParams(context);
 
         RongCallCommon.CallMediaType mediaType =
                 RongCallCommon.CallMediaType.valueOf(bundle.getInt("mediaType"));
@@ -163,6 +163,7 @@ public class CallFloatBoxView {
                                     RongCallCommon.CallDisconnectedReason reason) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected", reason.getValue(), TAG);
                                 setExcludeFromRecents(mContext, false);
+                                CallKitUtils.callConnected = false;
                                 String senderId;
                                 String extra = "";
                                 senderId = callProfile.getInviterUserId();
@@ -355,13 +356,11 @@ public class CallFloatBoxView {
                                         remoteVideoContainer = null;
                                     }
                                     if (mView == null) {
-                                        mView =
-                                                LayoutInflater.from(mContext)
-                                                        .inflate(R.layout.rc_voip_float_box, null);
+                                        mView = LayoutInflater.from(mContext)
+                                                .inflate(R.layout.rc_voip_float_box, null);
                                         mView.setOnTouchListener(createTouchListener());
                                         wm.addView(mView, params);
-                                        TextView timeV =
-                                                (TextView) mView.findViewById(R.id.rc_time);
+                                        TextView timeV = mView.findViewById(R.id.rc_time);
                                         setupTime(timeV);
 //                                        ImageView mediaIconV =
 //                                                (ImageView)
@@ -433,6 +432,7 @@ public class CallFloatBoxView {
                                     RongCallSession callInfo, SurfaceView localVideo) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callInfo, "state|desc", "onCallConnected", TAG);
                                 CallKitUtils.isDial = false;
+                                CallKitUtils.callConnected = true;
                                 setAudioMode(AudioManager.MODE_IN_COMMUNICATION);
                                 AudioPlayManager.getInstance().setInVoipMode(true);
                             }
@@ -560,13 +560,35 @@ public class CallFloatBoxView {
         };
     }
 
+    private static void previewRemoteVideo(SurfaceView remoteVideo, WindowManager.LayoutParams params) {
+        if (remoteVideo != null) {
+            ViewGroup parent = (ViewGroup) remoteVideo.getParent();
+            if (parent != null) {
+                parent.removeView(remoteVideo);
+            }
+            Resources resources = mContext.getResources();
+            params.width = resources.getDimensionPixelSize(R.dimen.callkit_dimen_size_60);
+            params.height = resources.getDimensionPixelSize(R.dimen.callkit_dimen_size_80);
+            remoteVideoContainer = new FrameLayout(mContext);
+            remoteVideoContainer.addView(
+                    remoteVideo,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+            remoteVideoContainer.setOnTouchListener(createTouchListener());
+            if (null != mView) {
+                wm.removeView(mView);
+                mView = null;
+            }
+            wm.addView(remoteVideoContainer, params);
+        }
+    }
+
     public static void showFloatBoxToCall(Context context, Bundle bundle) {
         if (isShown) {
             return;
         }
         mContext = context;
         isShown = true;
-
         mBundle = bundle;
         wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         final WindowManager.LayoutParams params = createLayoutParams(context);
@@ -639,6 +661,7 @@ public class CallFloatBoxView {
                                     RongCallSession callProfile,
                                     RongCallCommon.CallDisconnectedReason reason) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callProfile, "state|reason|desc", "onCallDisconnected", reason.getValue(), TAG);
+                                callConnected = false;
                                 setExcludeFromRecents(mContext, false);
                                 String senderId;
                                 String extra = "";
@@ -799,10 +822,11 @@ public class CallFloatBoxView {
                             public void onCallConnected(
                                     RongCallSession callInfo, SurfaceView localVideo) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, callInfo, "state|desc", "onCallConnected", TAG);
-                                if (CallKitUtils.isDial && isShown) {
-                                    CallFloatBoxView.showFloatBoxToCallTime();
-                                    CallKitUtils.isDial = false;
-                                }
+//                                if (CallKitUtils.isDial && isShown) {
+//                                    CallFloatBoxView.showFloatBoxToCallTime();
+//                                    CallKitUtils.isDial = false;
+//                                }
+                                callConnected = true;
                                 AudioPlayManager.getInstance().setInVoipMode(true);
                                 setAudioMode(AudioManager.MODE_IN_COMMUNICATION);
                             }
@@ -815,7 +839,12 @@ public class CallFloatBoxView {
                                     SurfaceView remoteVideo) {
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, "userId|state|desc", userId, "onRemoteUserJoined", TAG);
                                 if (CallKitUtils.isDial && isShown) {
-                                    CallFloatBoxView.showFloatBoxToCallTime();
+                                    if (mediaType == RongCallCommon.CallMediaType.VIDEO) {
+                                        // 被接通后显示远端画面
+                                        previewRemoteVideo(remoteVideo, params);
+                                    } else {
+                                        CallFloatBoxView.showFloatBoxToCallTime();
+                                    }
                                     CallKitUtils.isDial = false;
                                 }
                             }
@@ -907,26 +936,12 @@ public class CallFloatBoxView {
                 timer.cancel();
                 timer = null;
             }
-            isShown = false;
             mView = null;
             mTime = 0;
             mBundle = null;
             showFBCallTime = null;
+            isShown = false;
         }
-    }
-
-    public static Intent getResumeIntent() {
-        if (mBundle == null) {
-            return null;
-        }
-        mBundle.putBoolean("isDial", isDial);
-        RongCallClient.getInstance().setVoIPCallListener(RongCallProxy.getInstance());
-        Intent intent = new Intent(mBundle.getString("action"));
-        intent.putExtra("floatbox", mBundle);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("callAction", RongCallAction.ACTION_RESUME_CALL.getName());
-
-        return intent;
     }
 
     public static void onClickToResume() {
@@ -953,7 +968,7 @@ public class CallFloatBoxView {
         intent.putExtra("floatbox", mBundle);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("callAction", isDial ? RongCallAction.ACTION_RESUME_CALL.getName() : RongCallAction.ACTION_INCOMING_CALL.getName());
-        intent.putExtra("callConnected", mBundle.getBoolean("callConnected"));
+        intent.putExtra("callConnected", callConnected);
 
         ActivityStartCheckUtils.getInstance()
                 .startActivity(

@@ -13,6 +13,7 @@
     <dimen name="callkit_dimen_size_40">40dp</dimen>
     <dimen name="callkit_dimen_size_48">48dp</dimen>
     <dimen name="callkit_dimen_size_60">60dp</dimen>
+    <dimen name="callkit_flox_box_size">75dp</dimen>
     <dimen name="callkit_dimen_size_80">80dp</dimen>
     <dimen name="userNameMarginTop17dp">17dp</dimen>
     <dimen name="asynimg_cornerRadius8dp">8dp</dimen>
