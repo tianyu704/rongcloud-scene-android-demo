@@ -8,7 +8,6 @@ import android.app.Application;
 
 import java.util.List;
 
-import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
@@ -91,6 +90,15 @@ public abstract class RCVoiceRoomEngine {
     public abstract void joinRoom(String roomId, RCVoiceRoomCallback callback);
 
     /**
+     * 创建并加入房间
+     *
+     * @param roomId   房间 Id
+     * @param roomInfo 房间信息
+     * @param callback 结果回调
+     */
+    public abstract void createAndJoinRoom(String roomId, RCVoiceRoomInfo roomInfo, RCVoiceRoomCallback callback);
+
+    /**
      * 离开房间
      *
      * @param callback 结果回调
@@ -108,7 +116,7 @@ public abstract class RCVoiceRoomEngine {
     /**
      * 用户主动下麦
      *
-     * @param callback  结果回调
+     * @param callback 结果回调
      */
     public abstract void leaveSeat(RCVoiceRoomCallback callback);
 
@@ -249,7 +257,7 @@ public abstract class RCVoiceRoomEngine {
      * @param userId
      * @param callback
      */
-    public abstract void rejectRequestSeat(String userId,RCVoiceRoomCallback callback);
+    public abstract void rejectRequestSeat(String userId, RCVoiceRoomCallback callback);
 
     /**
      * 获取当前排麦的用户列表

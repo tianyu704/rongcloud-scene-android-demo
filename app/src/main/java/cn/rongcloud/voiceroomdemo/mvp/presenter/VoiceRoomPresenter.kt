@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.mvp.model.*
@@ -17,6 +18,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
+import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
@@ -45,6 +47,7 @@ const val STATUS_WAIT_FOR_SEAT = 2
 class VoiceRoomPresenter @Inject constructor(
     val view: IVoiceRoomView,
     @Named("roomId") private val roomId: String,
+    @Named("isCreate") private val isCreate: Boolean,
     val roomModel: VoiceRoomModel,
     activity: AppCompatActivity
 ) :
@@ -56,6 +59,7 @@ class VoiceRoomPresenter @Inject constructor(
 
 
     private var hasInit = false
+    private var currentRoomInfo: UiRoomModel? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -65,12 +69,12 @@ class VoiceRoomPresenter @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { roomInfo ->
+                    currentRoomInfo = roomInfo
                     if (!hasInit) {
                         hasInit = true
                         view.initRoleView(roomInfo)
                         initRoomEventListener()
                         joinRoom()
-                        afterInitView()
                         currentUserId = AccountStore.getUserId() ?: ""
                     } else {
                         view.refreshRoomInfo(roomInfo)
@@ -339,22 +343,49 @@ class VoiceRoomPresenter @Inject constructor(
 
     fun joinRoom() {
         Log.d(TAG, "joinRoom: ${roomId}")
-        RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {
-            override fun onError(code: Int, message: String?) {
-                view.showError(code, message)
-            }
-
-            override fun onSuccess() {
-                view.onJoinRoomSuccess()
-                roomModel.getOnLineUsersCount()
-                roomModel.refreshAllMemberInfoList()
-                sendSystemMessage()
-                GlobalScope.launch(Dispatchers.IO) {
-                    AudioEffectManager.init()
+        if (isCreate) {
+            currentRoomInfo?.roomBean?.let { roomBean ->
+                val info = RCVoiceRoomInfo().apply {
+                    roomName = roomBean.roomName
+                    seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT
+                    isFreeEnterSeat = false
+                    isLockAll = false
+                    isMuteAll = false
                 }
-                AudioManagerUtil.choiceAudioModel()
+                RCVoiceRoomEngine.getInstance()
+                    .createAndJoinRoom(roomId, info, object : RCVoiceRoomCallback {
+                        override fun onError(code: Int, message: String?) {
+                            view.showError(code, message)
+                        }
+
+                        override fun onSuccess() {
+                            afterJoinRoomSuccess()
+                        }
+                    })
             }
-        })
+        } else {
+            RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {
+                override fun onError(code: Int, message: String?) {
+                    view.showError(code, message)
+                }
+
+                override fun onSuccess() {
+                    afterJoinRoomSuccess()
+                }
+            })
+        }
+    }
+
+    private fun afterJoinRoomSuccess() {
+        view.onJoinRoomSuccess()
+        afterInitView()
+        roomModel.getOnLineUsersCount()
+        roomModel.refreshAllMemberInfoList()
+        sendSystemMessage()
+        GlobalScope.launch(Dispatchers.IO) {
+            AudioEffectManager.init()
+        }
+        AudioManagerUtil.choiceAudioModel()
     }
 
     private fun sendSystemMessage() {

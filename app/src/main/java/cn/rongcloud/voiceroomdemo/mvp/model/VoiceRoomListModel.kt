@@ -170,5 +170,11 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
     override fun onDestroy() {
     }
 
+    fun addRoomInfo(roomInfo: VoiceRoomBean) {
+        currentRoomList.add(0,roomInfo)
+        currentRoomMap.put(roomInfo.roomId,roomInfo)
+        roomListSubject.onNext(currentRoomList)
+    }
+
 
 }

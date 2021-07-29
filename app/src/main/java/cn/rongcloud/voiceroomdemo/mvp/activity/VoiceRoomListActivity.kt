@@ -78,8 +78,8 @@ class VoiceRoomListActivity : BaseActivity(),
     }
 
 
-    private fun gotoVoiceRoomActivity(bean: VoiceRoomBean) {
-        presenter.gotoVoiceRoomActivity(this, bean.roomId)
+    private fun gotoVoiceRoomActivity(bean: VoiceRoomBean,isCreate:Boolean = false) {
+        presenter.gotoVoiceRoomActivity(this, bean.roomId,isCreate)
     }
 
     override fun showInputPasswordDialog(bean: VoiceRoomBean) {
@@ -139,7 +139,8 @@ class VoiceRoomListActivity : BaseActivity(),
     override fun onCreateRoomSuccess(data: VoiceRoomBean?) {
         createVoiceRoomDialogFragment?.dismiss()
         data?.let {
-            gotoVoiceRoomActivity(it)
+            presenter.addRoomInfo(it)
+            gotoVoiceRoomActivity(it,true)
         }
     }
 

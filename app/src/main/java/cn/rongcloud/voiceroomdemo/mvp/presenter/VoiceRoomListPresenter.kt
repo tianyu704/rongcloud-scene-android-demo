@@ -64,7 +64,11 @@ class VoiceRoomListPresenter @Inject constructor(
         voiceRoomListMode.loadMoreData()
     }
 
-    fun gotoVoiceRoomActivity(context: Context, roomId: String) {
+    fun gotoVoiceRoomActivity(context: Context, roomId: String, isCreate: Boolean = false) {
+        if (isCreate) {
+            VoiceRoomActivity.startActivity(context, roomId, AccountStore.getUserId()!!, isCreate)
+            return
+        }
         view.showWaitingDialog()
         voiceRoomListMode
             .queryRoomInfoFromServer(roomId)
@@ -93,5 +97,9 @@ class VoiceRoomListPresenter @Inject constructor(
         info.createUser?.let {
             VoiceRoomActivity.startActivity(context, info.roomId, info.createUser.userId)
         } ?: view.showError("房间数据错误")
+    }
+
+    fun addRoomInfo(roomInfo: VoiceRoomBean) {
+        voiceRoomListMode.addRoomInfo(roomInfo)
     }
 }

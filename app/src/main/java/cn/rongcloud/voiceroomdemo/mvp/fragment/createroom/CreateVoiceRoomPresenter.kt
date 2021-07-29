@@ -14,6 +14,7 @@ import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.Kv
+import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
@@ -39,14 +40,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
         view.showWaitingDialog()
         val intPrivate = if (isPrivate) 1 else 0
         val password = if (isPrivate) roomPassword else ""
-        val rcRoomInfo: RCVoiceRoomInfo = RCVoiceRoomInfo().apply {
-            this.roomName = roomName
-            this.isFreeEnterSeat = false
-            this.seatCount = 9
-        }
-        val kvList = ArrayList<Kv>().apply {
-            add(Kv("RCRoomInfoKey", rcRoomInfo.toJson()))
-        }
+
+        val kvList = ArrayList<Kv>()
         if (roomCover != null) {
             addDisposable(FileModel
                 .imageUpload(
@@ -59,11 +54,11 @@ class CreateVoiceRoomPresenter @Inject constructor(
                         .createVoiceRoom(
                             CreateRoomRequestBean(
                                 intPrivate,
-                                kvList,
                                 roomName,
                                 password,
                                 "${ApiConstant.FILE_URL}$it",
-                                roomBackground
+                                roomBackground,
+                                kvList
                             )
                         )
                 }.subscribe({ respond ->

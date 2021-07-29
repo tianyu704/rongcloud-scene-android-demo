@@ -6,10 +6,6 @@ package cn.rongcloud.voiceroomdemo.mvp.di
 
 import android.app.Activity
 import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,5 +27,14 @@ public class HiltActivityModule {
             return activity.getRoomId()
         }
         return ""
+    }
+
+    @Named("isCreate")
+    @Provides
+    fun provideVoiceRoomIsCreate(activity: Activity): Boolean {
+        if (activity is VoiceRoomActivity) {
+            return activity.isCreate()
+        }
+        return false
     }
 }

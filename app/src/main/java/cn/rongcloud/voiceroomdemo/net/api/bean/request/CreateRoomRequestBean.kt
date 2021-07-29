@@ -3,6 +3,7 @@
  */
 
 package cn.rongcloud.voiceroomdemo.net.api.bean.request
+
 import com.google.gson.annotations.SerializedName
 
 
@@ -13,8 +14,6 @@ import com.google.gson.annotations.SerializedName
 data class CreateRoomRequestBean(
     @SerializedName("isPrivate")
     val isPrivate: Int = 0,
-    @SerializedName("kv")
-    val kv: List<Kv>? = null,
     @SerializedName("name")
     val name: String? = null,
     @SerializedName("password")
@@ -22,7 +21,9 @@ data class CreateRoomRequestBean(
     @SerializedName("themePictureUrl")
     val themePictureUrl: String? = "",
     @SerializedName("backgroundUrl")
-    val backgroundUrl:String?=""
+    val backgroundUrl: String? = "",
+    @SerializedName("kv")
+    val kv: List<Kv>? = null,
 )
 
 data class Kv(
