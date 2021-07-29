@@ -1441,7 +1441,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                         if (seatIndexInRange(index)) {
                             RCVoiceSeatInfo info = getSeatInfoByIndex(index);
                             if (info != null) {
-                                info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+                                if (info.getStatus() != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+                                    info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+                                }
                                 info.setUserId(null);
                             }
                             RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
@@ -1749,6 +1751,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                         RCVoiceSeatInfo temp = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
                         newInfo.setMute(temp.isMute());
                         newInfo.setExtra(temp.getExtra());
+                        if (temp.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+                            newInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking);
+                        }
                     }
                     if (newInfo == null) {
                         newInfo = getSeatInfoByIndex(i);
