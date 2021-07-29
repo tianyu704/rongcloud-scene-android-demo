@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -21,6 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
@@ -248,7 +251,17 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 if (null != jsonObj) {
                     int code = jsonObj.get("code").getAsInt();
                     if (code == 10000) {
-                        JsonObject data = jsonObj.get("data").getAsJsonObject();
+                        JsonElement element = jsonObj.get("data");
+                        if (null == element || element.isJsonNull()) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(DialActivity.this, "请输入正确的手机号", Toast.LENGTH_LONG).show();
+                                }
+                            });
+                            return;
+                        }
+                        JsonObject data = element.getAsJsonObject();
                         final String id = data.get("uid").getAsString();
                         DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
                                 userId,
@@ -272,8 +285,6 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                                 : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
                             }
                         });
-
-
                     }
                 }
             }
