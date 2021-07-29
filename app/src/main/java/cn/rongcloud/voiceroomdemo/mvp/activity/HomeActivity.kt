@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
 import javax.inject.Inject
+import javax.inject.Named
 
 private const val PICTURE_SELECTED_RESULT_CODE = 10001
 

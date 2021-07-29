@@ -7,76 +7,36 @@ package cn.rongcloud.processor
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.bean.HiltBindingBean
 import cn.rongcloud.bean.TypeEnum
-import com.google.auto.service.AutoService
 import com.squareup.javapoet.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import java.util.*
 import javax.annotation.processing.*
-import javax.lang.model.SourceVersion
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
 import javax.lang.model.type.MirroredTypeException
 import javax.lang.model.type.TypeMirror
-import javax.lang.model.util.Elements
-import javax.lang.model.util.Types
-import javax.tools.Diagnostic
 
 /**
  * @author gusd
  * @Date 2021/07/26
  */
-@AutoService(Processor::class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("cn.rongcloud.annotation.HiltBinding")
-public class HiltInjectProcessor : AbstractProcessor() {
-
-    // 文件操作类，我们将通过此类生成kotlin文件
-    private lateinit var mFiler: Filer
-
-    // 类型工具类，处理Element的类型
-    private lateinit var mTypeTools: Types
-
-    private lateinit var mElementUtils: Elements
-
-    // 生成类的包名
-    private val mGeneratePackage = "cn.rongcloud.generate"
+public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
+    BaseProcessor(processingEnv) {
 
 
-    override fun init(processingEnv: ProcessingEnvironment?) {
-        super.init(processingEnv)
-        if (processingEnv == null) return
-        mFiler = processingEnv.filer
-        mElementUtils = processingEnv.elementUtils
-        mTypeTools = processingEnv.typeUtils
-
-
-    }
-
-    override fun process(
-        annotations: MutableSet<out TypeElement>,
-        processingEnv: RoundEnvironment
-    ): Boolean {
-        return try {
-            processImpl(annotations, processingEnv)
-        } catch (e: Exception) {
-            logError(e.message)
-            true
-        }
-    }
-
-    private fun processImpl(
+    override fun processImpl(
         annotations: MutableSet<out TypeElement>,
         processingEnv: RoundEnvironment
     ): Boolean {
         val hiltBindingElement = processingEnv.getElementsAnnotatedWith(HiltBinding::class.java)
         logDebug("${hiltBindingElement.size}")
 
-        if (hiltBindingElement.size == 0) {
-            return false
-        }
+//        if (hiltBindingElement.isEmpty()) {
+//            return true
+//        }
 
 
         // 获取activity的类型，转换成TypeMirror，用于判断
@@ -239,29 +199,5 @@ public class HiltInjectProcessor : AbstractProcessor() {
             .writeTo(mFiler)
     }
 
-    private fun getPackageAndClassName(classPath: String): Array<String> {
-        val index = classPath.lastIndexOf(".")
-        val packageName = classPath.subSequence(0, index)
-        val className = classPath.subSequence(index + 1, classPath.length)
-        return arrayOf(packageName.toString(), className.toString())
-    }
-
-    private fun logDebug(message: String?) {
-        message?.let {
-            processingEnv.messager.printMessage(
-                Diagnostic.Kind.NOTE,
-                "HiltInjectProcessor: $message\r\n"
-            )
-        }
-    }
-
-    private fun logError(message: String?) {
-        message?.let {
-            processingEnv.messager.printMessage(
-                Diagnostic.Kind.ERROR,
-                "HiltInjectProcessor: $message\r\n"
-            )
-        }
-    }
 
 }

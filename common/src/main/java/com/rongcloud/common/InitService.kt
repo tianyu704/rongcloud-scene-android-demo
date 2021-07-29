@@ -6,7 +6,9 @@ package com.rongcloud.common
 
 import android.app.Application
 import android.util.Log
+import com.rongcloud.common.init.ModuleInit
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
 
 /**
@@ -18,8 +20,14 @@ private const val TAG = "InitService"
 
 @Singleton
 class InitService @Inject constructor() {
+
+    @Inject
+    @Named("autoInit")
+    lateinit var initItemList: ArrayList<ModuleInit>
+
     fun init(application: Application) {
         Log.d(TAG, "init: ")
         ModuleManager.init(application)
+        Log.d(TAG, "init: initItemList = ${initItemList.size}")
     }
 }
