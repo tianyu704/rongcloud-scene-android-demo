@@ -6,6 +6,7 @@ package io.rong.callkit;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -66,6 +67,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private String userId, token;
     private List<DialInfo> records = new ArrayList<>();
     private final static String FILE_PRE = "http://120.92.102.127:8081//file/show?path=";
+    private final static String CUSTOMER_PHONE = "13161856839";
 
     public static void openDilapadPage(Activity activity, String userId, boolean video, String token) {
         activity.startActivity(new Intent(activity, DialActivity.class)
@@ -113,9 +115,10 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     }
 
     private void initView() {
+        findViewById(R.id.ll_customer).setOnClickListener(this);
         final View floatingActionButtonContainer = findViewById(
                 R.id.floating_action_button_container);
-        floatingActionButton = (ImageButton) findViewById(R.id.floating_action_button);
+        floatingActionButton = findViewById(R.id.floating_action_button);
         floatingActionButton.setOnClickListener(this);
         mFloatingActionButtonController = new FloatingActionButtonController(this,
                 floatingActionButtonContainer, floatingActionButton);
@@ -168,6 +171,11 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
             if (!mIsDialpadShown) {
                 showDialpadFragment("");
             }
+        } else if (R.id.ll_customer == resId) {//专属客户经理
+            Intent intent = new Intent(Intent.ACTION_DIAL);
+            Uri data = Uri.parse("tel:" + CUSTOMER_PHONE);
+            intent.setData(data);
+            startActivity(intent);
         }
     }
 
