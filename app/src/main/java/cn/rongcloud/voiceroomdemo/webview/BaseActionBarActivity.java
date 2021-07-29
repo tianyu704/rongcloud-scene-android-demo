@@ -2,9 +2,8 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package io.rong.callkit;
+package cn.rongcloud.voiceroomdemo.webview;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
@@ -13,29 +12,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 
-import io.rong.imkit.utils.language.RongConfigurationManager;
+import com.rongcloud.common.base.BaseActivity;
 
-public class BaseActionBarActivity extends AppCompatActivity {
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        Context newContext =
-                RongConfigurationManager.getInstance().getConfigurationContext(newBase);
-        super.attachBaseContext(newContext);
-    }
+public abstract class BaseActionBarActivity extends BaseActivity {
 
     protected void initDefalutActionBar(String title) {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("");
         actionBar.setElevation(0f);
-//        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.background_dialer_light)));
+//        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(io.rong.callkit.R.color.background_dialer_light)));
         actionBar.setDisplayHomeAsUpEnabled(true);//显示返回
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
         TextView textView = new TextView(this);
         textView.setText(title);
-        textView.setTextSize(18);
+        textView.setTextSize(17);
         textView.setTextColor(Color.parseColor("#333333"));
         LinearLayout actionbarLayout = new LinearLayout(this);
         actionBar.setCustomView(actionbarLayout, new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT));

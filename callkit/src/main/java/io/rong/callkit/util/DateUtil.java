@@ -279,12 +279,12 @@ public class DateUtil {
         if (cal.get(Calendar.YEAR) == current.get(Calendar.YEAR)) {//同年
             if (cal.get(Calendar.DAY_OF_YEAR) == current.get(Calendar.DAY_OF_YEAR)) {//当天
                 return date2String(d, TimeFt.HCm);
-            } else if (Math.abs(cal.get(Calendar.WEEK_OF_YEAR) - current.get(Calendar.WEEK_OF_YEAR)) == 1) {// 昨天
+            } else if (Math.abs(cal.get(Calendar.DAY_OF_YEAR) - current.get(Calendar.DAY_OF_YEAR)) == 1) {// 昨天
                 return "昨天";
-            } else if (Math.abs(cal.get(Calendar.WEEK_OF_YEAR) - current.get(Calendar.WEEK_OF_YEAR)) < 8) {//七天内
+            } else if (Math.abs(cal.get(Calendar.DAY_OF_YEAR) - current.get(Calendar.DAY_OF_YEAR)) < 8) {//七天内
                 return getWeekOfDate(d);
             }
         }
-        return date2String(d, DateFt.MLd, TimeFt.HCm);
+        return date2String(d, DateFt.ySMSd);
     }
 }

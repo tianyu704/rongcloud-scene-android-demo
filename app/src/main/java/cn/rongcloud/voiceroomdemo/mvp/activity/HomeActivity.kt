@@ -97,17 +97,18 @@ class HomeActivity : BaseActivity(), IHomeView,
         val portrait =
             LayoutInflater.from(this).inflate(R.layout.layout_portrait, null) as CircleImageView
         portrait.setOnClickListener {
-            userInfoDialog = UserInfoDialog(this, {
-                // 退出登录
-                presenter.logout()
-            }, { userName, selectedPicPath ->
-                // 修改用户名和头像
-                presenter.modifyUserInfo(userName, selectedPicPath)
-            }, {
-                // 进入头像选择界面
-                startPicSelectActivity()
-            })
-            userInfoDialog?.show()
+//            userInfoDialog = UserInfoDialog(this, {
+//                // 退出登录
+//                presenter.logout()
+//            }, { userName, selectedPicPath ->
+//                // 修改用户名和头像
+//                presenter.modifyUserInfo(userName, selectedPicPath)
+//            }, {
+//                // 进入头像选择界面
+//                startPicSelectActivity()
+//            })
+//            userInfoDialog?.show()
+            SettingActivity.startActivity(this)
         }
         portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
         return portrait

@@ -4,15 +4,14 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
-import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.net.RetrofitManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -29,7 +28,7 @@ private const val TAG = "HomePresenter"
 class HomePresenter @Inject constructor(
     val view: IHomeView,
     @ActivityContext val context: Context,
-    activity:AppCompatActivity
+    activity: AppCompatActivity
 ) :
     BaseLifeCyclePresenter(activity) {
 
