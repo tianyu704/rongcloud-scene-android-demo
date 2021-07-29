@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
+import android.widget.CompoundButton
 import android.widget.SeekBar
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
@@ -41,7 +42,12 @@ class MusicControlFragment(view: IMusicControlView) :
         tv_remote_audio_value.text =
             "${RCRTCAudioMixer.getInstance().mixingVolume}"
         sb_remote_audio_setting.progress = RCRTCAudioMixer.getInstance().mixingVolume
-
+        // 默认关闭耳返
+        sw_checked.setChecked(false)
+        RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(false)
+        sw_checked.setOnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
+            RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(checked)//耳返
+        }
     }
 
 
@@ -53,7 +59,7 @@ class MusicControlFragment(view: IMusicControlView) :
             }
             sb_mic_audio_setting -> {
                 tv_mic_audio_value.text = "$progress"
-                RCRTCEngine.getInstance().defaultAudioStream.adjustRecordingVolume(progress)
+                RCRTCEngine.getInstance().defaultAudioStream.adjustRecordingVolume(progress)//麦克风音量
             }
             sb_remote_audio_setting -> {
                 tv_remote_audio_value.text = "$progress"

@@ -104,8 +104,6 @@
     </declare-styleable>
 
 
-
-
     <declare-styleable name="wave_view">
         <attr name="init_radius" format="dimension" />
         <attr name="max_radius" format="dimension" />
@@ -132,4 +130,14 @@
         <!--路径动画 时长-->
         <attr name="ksg_curve_duration" format="integer"/>
     </declare-styleable>
+
+    <style name="SwitchCompat.Control" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#EF499A</item>
+        <item name="colorSwitchThumbNormal">#ebebeb</item>
+        <item name="android:colorForeground">#ffffff</item>
+    </style>
+    <style name="SwitchCompat.Text" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">9sp</item>
+    </style>
 </resources>
