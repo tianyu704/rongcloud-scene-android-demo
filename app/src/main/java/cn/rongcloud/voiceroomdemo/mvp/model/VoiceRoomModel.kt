@@ -410,7 +410,13 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun doOnDataScheduler(block: () -> Unit) {
-        dataModifyWorker.schedule(block)
+        dataModifyWorker.schedule{
+            try {
+                block()
+            } catch (e: Exception) {
+                Log.e(TAG, "doOnDataScheduler: ", e)
+            }
+        }
     }
 
     fun getMemberInfoByUserIdOnlyLocal(userId: String?): UiMemberModel? {
@@ -843,7 +849,10 @@ class VoiceRoomModel @Inject constructor(
         refreshAllMemberList.onNext(Unit)
     }
 
-    fun queryAllUserInfo(onComplete: (() -> Unit)? = null) {
+    fun queryAllUserInfo(
+        needRefreshRequestSeatUserList: Boolean = false,
+        onComplete: (() -> Unit)? = null
+    ) {
         Log.d(TAG, "queryAllUserInfo: ")
         addDisposable(RetrofitManager
             .commonService
@@ -903,7 +912,9 @@ class VoiceRoomModel @Inject constructor(
                     }
                 }
             }.doOnSuccess {
-                refreshRequestSeatUserList()
+                if (needRefreshRequestSeatUserList) {
+                    refreshRequestSeatUserList()
+                }
             }
             .subscribe({
                 onComplete?.invoke()
@@ -964,7 +975,7 @@ class VoiceRoomModel @Inject constructor(
                         }
                         memberListChangeSubject.onNext(roomMemberInfoList)
                     } else {
-                        refreshAllMemberInfoList()
+                        queryAllUserInfo(false)
                     }
                 }
             }
