@@ -530,7 +530,6 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        Log.e(TAG, "dispatchTouchEvent")
         if (ev?.action == KeyEvent.ACTION_DOWN && cl_input_bar.isVisible) {
             val rect = Rect()
             cl_input_bar.getGlobalVisibleRect(rect)
