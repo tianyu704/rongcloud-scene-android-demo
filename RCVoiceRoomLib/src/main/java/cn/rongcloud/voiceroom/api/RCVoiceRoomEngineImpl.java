@@ -352,7 +352,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void enterSeat(final int seatIndex, final RCVoiceRoomCallback callback) {
-        Log.d(TAG, "enterSeat : " + "seatIndex = " + seatIndex + "," + "thread = " + Thread.currentThread().getId());
         if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
@@ -427,7 +426,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
                 @Override
                 public void onError(int code, String message) {
-                    Log.d(TAG, "onError : " + "code = " + code + "," + "message = " + message);
                     onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
                 }
             });
@@ -440,7 +438,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void switchSeatTo(final int seatIndex, final RCVoiceRoomCallback callback) {
-        Log.d(TAG, "switchSeatTo : " + "seatIndex = " + seatIndex + "," + "thread = " + Thread.currentThread().getId());
         if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
