@@ -7,7 +7,6 @@ package cn.rongcloud.voiceroomdemo.mvp.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Point;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;

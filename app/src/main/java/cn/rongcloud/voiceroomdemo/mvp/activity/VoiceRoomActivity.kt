@@ -56,13 +56,13 @@ import cn.rongcloud.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
-import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.score.ScoreUtil
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils
@@ -87,11 +87,16 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
 
     companion object {
-        fun startActivity(context: Context, roomId: String, createUserId: String,isCreate:Boolean = false) {
+        fun startActivity(
+            context: Context,
+            roomId: String,
+            createUserId: String,
+            isCreate: Boolean = false
+        ) {
             Intent(context, VoiceRoomActivity::class.java).apply {
                 putExtra(KEY_ROOM_ID, roomId)
                 putExtra(KEY_CREATOR_ID, createUserId)
-                putExtra(KEY_IS_CREATE,isCreate)
+                putExtra(KEY_IS_CREATE, isCreate)
                 context.startActivity(this)
             }
         }
@@ -106,7 +111,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
     private lateinit var roomId: String
     private lateinit var creatorId: String
-    private  var isCreate:Boolean = false
+    private var isCreate: Boolean = false
 
     private var memberSettingFragment: MemberSettingFragment? = null
 
@@ -133,7 +138,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     lateinit var presenter: VoiceRoomPresenter
 
 
-    fun getVoiceRoomModel():VoiceRoomModel{
+    fun getVoiceRoomModel(): VoiceRoomModel {
         return presenter.roomModel
     }
 
@@ -143,7 +148,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
     fun getRoomId(): String = roomId
 
-    fun isCreate():Boolean = isCreate
+    fun isCreate(): Boolean = isCreate
 
     val favAnimation: FavAnimation by lazy {
         return@lazy FavAnimation(this).apply {
@@ -261,7 +266,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     override fun beforeInitView() {
         roomId = intent.getStringExtra(KEY_ROOM_ID)!!
         creatorId = intent.getStringExtra(KEY_CREATOR_ID)!!
-        isCreate = intent.getBooleanExtra(KEY_IS_CREATE,false)!!
+        isCreate = intent.getBooleanExtra(KEY_IS_CREATE, false)!!
     }
 
     override fun initRoleView(roomInfo: UiRoomModel) {
@@ -510,6 +515,8 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
     override fun onDestroy() {
         super.onDestroy()
+        // 统计打分
+        ScoreUtil.statistics()
         favAnimation.let {
             it.release()
         }
@@ -790,7 +797,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
         override fun onSeatClick(seatModel: UiSeatModel, position: Int) {
             when (seatModel.seatStatus) {
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking  -> {
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty, RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking -> {
                     roomInfo.roomBean?.let { roomBean ->
                         emptySeatFragment = EmptySeatFragment(
                             this@VoiceRoomActivity,

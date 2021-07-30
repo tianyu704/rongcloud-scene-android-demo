@@ -15,7 +15,7 @@
         android:id="@+id/cl_root_view"
         android:layout_width="295dp"
         android:layout_height="140dp"
-        android:background="@drawable/bg_user_info_popup"
+        android:background="@drawable/shape_score_dialog_bg"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -24,12 +24,12 @@ import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
 import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
+import com.rongcloud.common.score.ScoreUtil;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -74,6 +74,14 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 .putExtra(KEY_VIDEO, video)
                 .putExtra(KEY_ID, userId)
                 .putExtra(KEY_TOKEN, token));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ScoreUtil.enableScore()) {
+            ScoreUtil.showScoreDialog(this);
+        }
     }
 
     @Override

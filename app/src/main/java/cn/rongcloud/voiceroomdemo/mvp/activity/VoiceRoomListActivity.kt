@@ -19,13 +19,14 @@ import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomListAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.CreateVoiceRoomDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.ICreateVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomListPresenter
-import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
+import com.rongcloud.common.net.ApiConstant
+import com.rongcloud.common.score.ScoreUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_voice_room_list.*
 import kotlinx.android.synthetic.main.layout_input_password_dialog.*
@@ -78,8 +79,8 @@ class VoiceRoomListActivity : BaseActivity(),
     }
 
 
-    private fun gotoVoiceRoomActivity(bean: VoiceRoomBean,isCreate:Boolean = false) {
-        presenter.gotoVoiceRoomActivity(this, bean.roomId,isCreate)
+    private fun gotoVoiceRoomActivity(bean: VoiceRoomBean, isCreate: Boolean = false) {
+        presenter.gotoVoiceRoomActivity(this, bean.roomId, isCreate)
     }
 
     override fun showInputPasswordDialog(bean: VoiceRoomBean) {
@@ -105,6 +106,13 @@ class VoiceRoomListActivity : BaseActivity(),
 
     override fun initData() {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (ScoreUtil.enableScore()) {
+            ScoreUtil.showScoreDialog(this)
+        }
     }
 
     override fun onDestroy() {
@@ -140,7 +148,7 @@ class VoiceRoomListActivity : BaseActivity(),
         createVoiceRoomDialogFragment?.dismiss()
         data?.let {
             presenter.addRoomInfo(it)
-            gotoVoiceRoomActivity(it,true)
+            gotoVoiceRoomActivity(it, true)
         }
     }
 

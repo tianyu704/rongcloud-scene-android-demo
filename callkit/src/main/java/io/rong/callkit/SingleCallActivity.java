@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.rongcloud.common.score.ScoreUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -506,6 +507,8 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     @Override
     protected void onDestroy() {
         Log.d(TAG, "---single activity onDestroy---");
+        // 统计打分
+        ScoreUtil.statistics();
         stopRing();
         super.onDestroy();
     }
