@@ -5,7 +5,6 @@
 package cn.rongcloud.voiceroomdemo.webview;
 
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
@@ -21,7 +20,6 @@ public abstract class BaseActionBarActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle("");
         actionBar.setElevation(0f);
-//        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(io.rong.callkit.R.color.background_dialer_light)));
         actionBar.setDisplayHomeAsUpEnabled(true);//显示返回
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);

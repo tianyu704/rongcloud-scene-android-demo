@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Point;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,19 +20,30 @@ import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rongcloud.voiceroomdemo.R;
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView;
+import cn.rongcloud.voiceroomdemo.mvp.presenter.SettingPresenter;
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog;
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb;
 import cn.rongcloud.voiceroomdemo.webview.BaseActionBarActivity;
-import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
-import kotlin.jvm.functions.Function2;
 
 
-public class SettingActivity extends BaseActionBarActivity implements View.OnClickListener {
-    UserInfoDialog dialog;
+public class SettingActivity extends BaseActionBarActivity implements View.OnClickListener, ISettingView {
+    private UserInfoDialog dialog;
+    private boolean needModefy = false;
 
-    public static void startActivity(Activity activity) {
-        activity.startActivity(new Intent(activity, SettingActivity.class));
+    public static void startActivity(Activity activity, int code) {
+        if (code > 0) {
+            activity.startActivityForResult(new Intent(activity, SettingActivity.class), code);
+        } else {
+            activity.startActivity(new Intent(activity, SettingActivity.class));
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (needModefy) setResult(Activity.RESULT_OK);
+        super.onBackPressed();
     }
 
     @Override
@@ -56,32 +68,20 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
         initDefalutActionBar("");
     }
 
+    private SettingPresenter presenter;
+
     @Override
     public void initData() {
+        presenter = new SettingPresenter(this, this, this);
         tv_name.setText(AccountStore.INSTANCE.getUserName());
         String url = AccountStore.INSTANCE.getUserPortrait();
         if (TextUtils.isEmpty(url)) {
             iv_portrait.setImageResource(R.drawable.default_portrait);
         } else {
-            ImageLoaderUtil.INSTANCE.loadPortrait(SettingActivity.this, iv_portrait, url);
+            ImageLoaderUtil.INSTANCE.loadPortraitDef(SettingActivity.this, iv_portrait, url);
         }
     }
 
-    /**
-     * 以绿色版本为准：
-     * Banner 跳转
-     * https://m.rongcloud.cn/activity/rtc20
-     * 套餐方案：
-     * https://m.rongcloud.cn/activity/rtc20
-     * Demo 下载：
-     * https://m.rongcloud.cn/downloads/demo
-     * 在线客服：
-     * https://m.rongcloud.cn/cs
-     * 关于我们：
-     * https://m.rongcloud.cn/about
-     * 专属客户经理：
-     * （系统拨打电话 ActionSheet） 13161856839
-     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -89,7 +89,7 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
                 showEditeInfoDialog();
                 break;
             case R.id.ad_first:
-                ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/activity/rtc20", "套餐方案");
+                ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/activity/rtc20", "套餐方案");//banner
                 break;
             case R.id.ad_second:
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/activity/rtc20", "套餐方案");
@@ -127,26 +127,33 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
         dialog = new UserInfoDialog(this, new Function0() {
             @Override
             public Object invoke() {
-                AccountStore.INSTANCE.logout();
+                presenter.logout();
                 return null;
             }
-        }, new Function2<String, Uri, Unit>() {
-            @Override
-            public Unit invoke(String s, Uri uri) {
-//                        .modifyUserInfo(userName, selectedPicPath);
-                // TODO: 2021/7/29 修改名称
-                return null;
-            }
-        }, new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                Intent intent = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, 10000);
-                return null;
-            }
+        }, (userName, uri) -> {
+            presenter.modifyUserInfo(userName, uri);
+            return null;
+        }, () -> {
+            Intent intent = new Intent(
+                    Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(intent, 10000);
+            return null;
         });
         dialog.show();
+    }
+
+
+    @Override
+    public void modifyInfoSuccess() {
+        needModefy = true;
+        if (null != dialog) {
+            runOnUiThread(() -> {
+                dialog.dismiss();
+                tv_name.setText(AccountStore.INSTANCE.getUserName());
+                String url = AccountStore.INSTANCE.getUserPortrait();
+                ImageLoaderUtil.INSTANCE.loadPortraitDef(SettingActivity.this, iv_portrait, url);
+            });
+        }
     }
 }

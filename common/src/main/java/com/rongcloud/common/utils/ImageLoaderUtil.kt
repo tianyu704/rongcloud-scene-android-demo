@@ -5,6 +5,7 @@
 package com.rongcloud.common.utils
 
 import android.content.Context
+import android.graphics.Point
 import android.net.Uri
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
@@ -33,9 +34,23 @@ object ImageLoaderUtil {
         }
     }
 
-    fun loadPortrait(context: Context, imageView: ImageView, url: String) {
+    fun loadPortraitDef(
+        context: Context,
+        imageView: ImageView,
+        url: String
+    ) {
+        loadPortrait(context, imageView, url)
+    }
+
+    fun loadPortrait(
+        context: Context,
+        imageView: ImageView,
+        url: String,
+        size: Point = Point(250, 250)
+    ) {
         val realUrl = url.getCompletePortraitUrl() ?: ""
-        Glide.with(context).load(realUrl).error(R.drawable.default_portrait)
+        Glide.with(context).load(realUrl).override(size.x, size.y)
+            .error(R.drawable.default_portrait)
             .placeholder(R.drawable.default_portrait).centerCrop().into(imageView)
     }
 

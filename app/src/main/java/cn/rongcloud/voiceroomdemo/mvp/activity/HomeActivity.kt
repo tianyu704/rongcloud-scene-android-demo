@@ -36,9 +36,8 @@ import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
 import javax.inject.Inject
-import javax.inject.Named
 
-private const val PICTURE_SELECTED_RESULT_CODE = 10001
+private const val CODE_SETTING_REQUEST = 10000
 
 private const val TAG = "HomeActivity"
 
@@ -83,32 +82,20 @@ class HomeActivity : BaseActivity(), IHomeView,
                 AccountStore.getAuthorization()
             )
         }
-//        bg2.setColorFilter(Color.GRAY)
-//        bg2.alpha = 0.5f
-//        bg3.setColorFilter(Color.GRAY)
-//        bg3.alpha = 0.5f
     }
 
     override fun getActionTitle(): CharSequence? {
         return null
     }
 
+    val portrait: CircleImageView by lazy {
+        return@lazy LayoutInflater.from(this)
+            .inflate(R.layout.layout_portrait, null) as CircleImageView
+    }
+
     override fun getLeftActionButton(): View? {
-        val portrait =
-            LayoutInflater.from(this).inflate(R.layout.layout_portrait, null) as CircleImageView
         portrait.setOnClickListener {
-//            userInfoDialog = UserInfoDialog(this, {
-//                // 退出登录
-//                presenter.logout()
-//            }, { userName, selectedPicPath ->
-//                // 修改用户名和头像
-//                presenter.modifyUserInfo(userName, selectedPicPath)
-//            }, {
-//                // 进入头像选择界面
-//                startPicSelectActivity()
-//            })
-//            userInfoDialog?.show()
-            SettingActivity.startActivity(this)
+            SettingActivity.startActivity(this, CODE_SETTING_REQUEST)
         }
         portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
         return portrait
@@ -194,21 +181,10 @@ class HomeActivity : BaseActivity(), IHomeView,
     }
 
 
-    private fun startPicSelectActivity() {
-        val intent = Intent(
-            Intent.ACTION_PICK,
-            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        startActivityForResult(intent, PICTURE_SELECTED_RESULT_CODE)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICTURE_SELECTED_RESULT_CODE && resultCode == Activity.RESULT_OK) {
-            val selectImageUrl = data?.data
-            selectImageUrl?.let {
-                userInfoDialog?.setUserPortrait(it)
-            }
+        if (requestCode == CODE_SETTING_REQUEST && resultCode == Activity.RESULT_OK) {
+            portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
         }
     }
 
