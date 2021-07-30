@@ -5,8 +5,9 @@
 package com.rongcloud.common
 
 import android.app.Application
-import android.util.Log
+import android.content.Context
 import com.rongcloud.common.init.ModuleInit
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -25,9 +26,28 @@ class InitService @Inject constructor() {
     @Named("autoInit")
     lateinit var initItemList: ArrayList<ModuleInit>
 
-    fun init(application: Application) {
-        Log.d(TAG, "init: ")
-        ModuleManager.init(application)
-        Log.d(TAG, "init: initItemList = ${initItemList.size}")
+    @Inject
+    @ApplicationContext
+    lateinit var context: Context
+
+    fun init(
+        onBeforeInit: ((name: String, priority: Int) -> Int)?,
+        onInit: ((name: String, priority: Int) -> Unit)?,
+        onInitFinish: (() -> Unit)?
+    ) {
+        val needInitModule = arrayListOf<Pair<Int, ModuleInit>>()
+        initItemList.sortBy { it.getPriority() }
+        initItemList.forEach {
+            val realPriority =
+                onBeforeInit?.invoke(it.getName(context), it.getPriority()) ?: it.getPriority()
+            if (realPriority >= 0) {
+                needInitModule.add(Pair(realPriority, it))
+            }
+        }
+        needInitModule.sortedBy { it.first }.forEach {
+            it.second.onInit(context as Application)
+            onInit?.invoke(it.second.getName(context), it.first)
+        }
+        onInitFinish?.invoke()
     }
 }

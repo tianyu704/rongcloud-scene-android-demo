@@ -7,7 +7,6 @@ package cn.rongcloud.voiceroomdemo
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.multidex.MultiDexApplication
@@ -18,7 +17,7 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
-import com.rongcloud.common.InitService
+import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.base.IBaseView
 import com.rongcloud.common.dao.database.DatabaseManager
 import com.rongcloud.common.extension.showToast
@@ -47,14 +46,14 @@ class MyApp : MultiDexApplication() {
     private val activityList: ArrayList<Activity> = arrayListOf()
 
     @Inject
-    lateinit var initService: InitService
+    lateinit var moduleManager: ModuleManager
 
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
         instance = this
 
-        initService.init(this)
+        moduleManager.init()
 
         UMConfigure.init(
             this,
@@ -115,7 +114,7 @@ class MyApp : MultiDexApplication() {
         AccountStore.obLogoutSubject().subscribe {
             try {
                 activityList.lastOrNull()?.run {
-                    if(this !is LoginActivity && this !is LauncherActivity) {
+                    if (this !is LoginActivity && this !is LauncherActivity) {
                         LoginActivity.startActivity(this)
                     }
                     activityList.forEach { activity ->

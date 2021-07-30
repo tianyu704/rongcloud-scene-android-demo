@@ -4,7 +4,9 @@
 
 package com.rongcloud.common.utils
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.extension.*
 import com.rongcloud.common.model.AccountInfo
@@ -18,16 +20,17 @@ import io.reactivex.rxjava3.core.Observable
 
 private const val TAG = "AccountStore"
 
+@SuppressLint("StaticFieldLeak")
 object AccountStore {
 
     private val EMPTY_ACCOUNT = AccountInfo()
     private val ACCOUNT_INFO by myStringPreferencesKey(EMPTY_ACCOUNT.toJson())
 
     private var currentInfo: AccountInfo
-    private lateinit var context: Application
+
+    private var context: Context = ModuleManager.applicationContext
 
     init {
-        context = ModuleManager.applicationContext
         currentInfo = JsonUtils.fromJson(
             context.getValueSync(ACCOUNT_INFO),
             AccountInfo::class.java

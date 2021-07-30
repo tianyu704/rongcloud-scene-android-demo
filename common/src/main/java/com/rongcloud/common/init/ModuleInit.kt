@@ -15,6 +15,4 @@ interface ModuleInit {
     fun getPriority(): Int
     fun getName(context: Context): String
     fun onInit(application: Application)
-    fun onBeforeInit(application: Application) {}
-    fun onAfterInit(application: Application) {}
 }
