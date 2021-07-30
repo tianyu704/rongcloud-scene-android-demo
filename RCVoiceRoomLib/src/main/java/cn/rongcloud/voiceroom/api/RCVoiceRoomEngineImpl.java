@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
@@ -102,11 +101,14 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private RCVoiceRoomClientDelegate clientDelegate;
 
+    private final Handler mainThreadHandler;
+
     private RCVoiceRoomEngineImpl() {
         mMessageReceiveListenerList = new CopyOnWriteArrayList<>();
         mUserOnSeatMap = new ConcurrentHashMap<>();
         mSeatInfoList = new CopyOnWriteArrayList<>();
         mVREventListener = new IRCRTCVoiceRoomEventsListener();
+        mainThreadHandler = new Handler(Looper.myLooper());
 
         try {
             if (null != Class.forName("io.rong.imkit.RongIM")) {
@@ -1719,21 +1721,48 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         return callback != null;
     }
 
-    private void onSuccessWithCheck(RCVoiceRoomCallback callback) {
+    private void onSuccessWithCheck(final RCVoiceRoomCallback callback) {
         if (checkCallback(callback)) {
-            callback.onSuccess();
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callback.onSuccess();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
-    private <T> void onSuccessWithCheck(RCVoiceRoomResultCallback<T> callback, T data) {
+    private <T> void onSuccessWithCheck(final RCVoiceRoomResultCallback<T> callback, final T data) {
         if (checkCallback(callback)) {
-            callback.onSuccess(data);
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callback.onSuccess(data);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
-    private void onErrorWithCheck(RCVoiceRoomBaseCallback callback, VoiceRoomErrorCode errorCode) {
+    private void onErrorWithCheck(final RCVoiceRoomBaseCallback callback,final VoiceRoomErrorCode errorCode) {
         if (checkCallback(callback)) {
-            callback.onError(errorCode.getCode(), errorCode.getMessage());
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callback.onError(errorCode.getCode(), errorCode.getMessage());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
