@@ -5,6 +5,8 @@
 package cn.rongcloud.voiceroom.api;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,8 +18,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.LockSupport;
 
 import cn.rongcloud.rtc.api.RCRTCConfig;
 import cn.rongcloud.rtc.api.RCRTCEngine;
@@ -62,7 +66,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/01
  */
-class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListener.OnReceiveMessageListener, RongChatRoomClient.KVStatusListener {
+class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEngine, IRongCoreListener.OnReceiveMessageListener, RongChatRoomClient.KVStatusListener {
 
     private static final String TAG = "RCVoiceRoomEngineImpl";
 
@@ -144,11 +148,18 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     @Override
-    public void initWithAppKey(Application context, String appKey) {
-        clientDelegate.initWithAppKey(context, appKey);
-        clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
-        clientDelegate.setReceiveMessageDelegate(this);
-        RongChatRoomClient.getInstance().setKVStatusListener(this);
+    public void initWithAppKey(final Application context, final String appKey) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                // 只能在主线程初始化
+                clientDelegate.initWithAppKey(context, appKey);
+                clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
+                clientDelegate.setReceiveMessageDelegate(RCVoiceRoomEngineImpl.this);
+                RongChatRoomClient.getInstance().setKVStatusListener(RCVoiceRoomEngineImpl.this);
+            }
+        });
+
     }
 
     private void initRCRTCEngine(Application context) {
@@ -341,7 +352,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void enterSeat(final int seatIndex, final RCVoiceRoomCallback callback) {
-        Log.d(TAG, "enterSeat : " + "seatIndex = " + seatIndex + "," + "callback = " + callback);
+        Log.d(TAG, "enterSeat : " + "seatIndex = " + seatIndex + "," + "thread = " + Thread.currentThread().getId());
         if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
@@ -369,6 +380,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         updateKvSeatInfo(seatInfoClone, seatIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
+                Log.d(TAG, "enterSeat:onSuccess : ");
+                unParkHandlerThread();
                 userEnterSeat(seatInfo, mCurrentUserId);
                 RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                 if (currentRoomEventListener != null) {
@@ -380,10 +393,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
             @Override
             public void onError(int code, String message) {
+                unParkHandlerThread();
                 onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
             }
         });
-
+        packHandlerThread();
     }
 
     @Override
@@ -426,7 +440,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
     @Override
     public void switchSeatTo(final int seatIndex, final RCVoiceRoomCallback callback) {
-        // FIXME: 2021/6/3 可能多次回调
+        Log.d(TAG, "switchSeatTo : " + "seatIndex = " + seatIndex + "," + "thread = " + Thread.currentThread().getId());
         if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
@@ -470,6 +484,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 enterSeat(seatIndex, targetSeatInfo, new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
+                        unParkHandlerThread();
                         userLeaveSeat(userId, preSeatInfo);
                         userEnterSeat(targetSeatInfo, mCurrentUserId);
                         RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
@@ -484,6 +499,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
                     @Override
                     public void onError(int code, String message) {
+                        unParkHandlerThread();
                         onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
                         if (isLeaveSeatSuccess.get()) {
                             userLeaveSeat(userId, preSeatInfo);
@@ -500,10 +516,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
             @Override
             public void onError(int code, String message) {
                 onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
+                unParkHandlerThread();
             }
         });
+        packHandlerThread();
 
-        muteSelfIfNeed();
     }
 
     private void enterSeat(final int seatIndex, final RCVoiceSeatInfo targetSeatInfo, final RCVoiceRoomCallback callback) {
@@ -656,6 +673,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         updateKvSeatInfo(seatInfoClone, seatIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
+                unParkHandlerThread();
                 seatInfo.setStatus(seatInfoClone.getStatus());
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                 if (listener != null) {
@@ -667,9 +685,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
             @Override
             public void onError(int code, String message) {
+                unParkHandlerThread();
                 onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
             }
         });
+        packHandlerThread();
     }
 
     @Override
@@ -688,6 +708,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
         updateKvSeatInfo(seatInfoClone, seatIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
+                unParkHandlerThread();
                 seatInfo.setMute(seatInfoClone.isMute());
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                 if (listener != null) {
@@ -699,9 +720,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
 
             @Override
             public void onError(int code, String message) {
+                unParkHandlerThread();
                 onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
             }
         });
+        packHandlerThread();
     }
 
     @Override
@@ -737,6 +760,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setMute(seatInfoClone.isMute());
                     if (requestingCount.decrementAndGet() == 0) {
+                        unParkHandlerThread();
                         updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
@@ -749,6 +773,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 @Override
                 public void onError(int code, String message) {
                     if (requestingCount.decrementAndGet() == 0) {
+                        unParkHandlerThread();
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
                             listener.onSeatInfoUpdate(mSeatInfoList);
@@ -758,6 +783,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             });
         }
+        packHandlerThread();
     }
 
 
@@ -798,6 +824,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 public void onSuccess() {
                     seatInfo.setStatus(seatInfoClone.getStatus());
                     if (atomicInteger.decrementAndGet() == 0) {
+                        unParkHandlerThread();
                         updateKvRoomInfo(mRoomInfo, null);
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
@@ -810,6 +837,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 @Override
                 public void onError(int code, String message) {
                     if (atomicInteger.decrementAndGet() == 0) {
+                        unParkHandlerThread();
                         RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                         if (listener != null) {
                             listener.onSeatInfoUpdate(mSeatInfoList);
@@ -819,6 +847,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             });
         }
+        packHandlerThread();
     }
 
     @Override
@@ -1314,7 +1343,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     private void updateSeatInfoFromEntry(Map<String, String> chatRoomKvMap) {
-        Log.d(TAG, "updateSeatInfoFromEntry : " + "chatRoomKvMap = " + chatRoomKvMap);
         synchronized (TAG) {
             List<RCVoiceSeatInfo> oldInfoList = new ArrayList<>(mSeatInfoList);
             List<RCVoiceSeatInfo> latestInfoList = latestMicInfoListFromEntry(chatRoomKvMap);
@@ -1379,7 +1407,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 mUserOnSeatMap.clear();
                 for (RCVoiceSeatInfo seatInfo : mSeatInfoList) {
                     if (!TextUtils.isEmpty(seatInfo.getUserId())) {
-                        Log.d(TAG, "updateSeatInfoFromEntry : " + "chatRoomKvMap = " + chatRoomKvMap);
                         mUserOnSeatMap.put(seatInfo.getUserId(), seatInfo);
                     }
                 }
@@ -1714,7 +1741,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
     }
 
     private void userEnterSeat(RCVoiceSeatInfo seatInfo, String userId) {
-        Log.d(TAG, "userEnterSeat : " + "seatInfo = " + seatInfo + "," + "userId = " + userId);
         synchronized (TAG) {
             if (!TextUtils.isEmpty(userId)) {
                 seatInfo.setUserId(userId);
@@ -1893,6 +1919,20 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRongCoreListen
                 }
             }
         }
+    }
+
+    private void packHandlerThread() {
+        if (Thread.currentThread() == RCVoiceRoomEngineHandler.getInstance()) {
+            Log.d(TAG, "packHandlerThread : ");
+            // 最多 lock 当前线程三秒，防止死锁的出现
+//            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
+            LockSupport.park();
+        }
+    }
+
+    private void unParkHandlerThread() {
+        Log.d(TAG, "unParkHandlerThread: ");
+        LockSupport.unpark(RCVoiceRoomEngineHandler.getInstance());
     }
 
 }
