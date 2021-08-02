@@ -67,20 +67,10 @@ class HomeActivity : BaseActivity(), IHomeView,
         }
 
         iv_video_call.setOnClickListener {
-            DialActivity.openDilapadPage(
-                this,
-                AccountStore.getUserId(),
-                true,
-                AccountStore.getAuthorization()
-            )
+            DialActivity.openDilapadPage(this, true)
         }
         iv_audio_call.setOnClickListener {
-            DialActivity.openDilapadPage(
-                this,
-                AccountStore.getUserId(),
-                false,
-                AccountStore.getAuthorization()
-            )
+            DialActivity.openDilapadPage(this, false)
         }
     }
 

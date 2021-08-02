@@ -10,8 +10,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.net.IResultBack;
 import com.rongcloud.common.utils.SharedPreferUtil;
@@ -24,11 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.oklib.WrapperCallBack;
 import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.GsonUtil;
-import cn.rong.combusis.oklib.OCallBack;
-import okhttp3.Request;
-import okhttp3.Response;
+import cn.rong.combusis.oklib.Wrapper;
 
 public class FeedbackHelper implements IFeedback {
     private final static String TAG = "FeedbackHelper";
@@ -92,7 +88,7 @@ public class FeedbackHelper implements IFeedback {
     private boolean enableScore() {
         //未打分 且次数大于limt
         return
-                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+//                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
                         SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 
@@ -185,10 +181,10 @@ public class FeedbackHelper implements IFeedback {
      * 点赞
      */
     private void sendFovLikes() {
-        reportFeedback(true, "", new IResultBack<FeedResult>() {
+        reportFeedback(true, "", new IResultBack<Wrapper>() {
             @Override
-            public void onResult(FeedResult feedResult) {
-                boolean success = null != feedResult && feedResult.code == 10000;
+            public void onResult(Wrapper feedResult) {
+                boolean success = null != feedResult && feedResult.ok();
                 Toast.makeText(UIKit.getContext(), success ? "点赞成功" : "点赞是不", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 dismissDialog();
@@ -211,10 +207,10 @@ public class FeedbackHelper implements IFeedback {
             releason = builder.substring(0, builder.length() - 1);
         }
         Log.e(TAG, "releason = " + releason);
-        reportFeedback(false, releason, new IResultBack<FeedResult>() {
+        reportFeedback(false, releason, new IResultBack<Wrapper>() {
             @Override
-            public void onResult(FeedResult feedResult) {
-                boolean success = null != feedResult && feedResult.code == 10000;
+            public void onResult(Wrapper feedResult) {
+                boolean success = null != feedResult && feedResult.ok();
                 Toast.makeText(UIKit.getContext(), success ? "反馈成功" : "反馈失败", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 // 提交成功后显示推荐活动
@@ -308,11 +304,6 @@ public class FeedbackHelper implements IFeedback {
         dismissDialog();
     }
 
-    public static class FeedResult {
-        protected int code;
-        protected int message;
-    }
-
     /**
      * 反馈信息
      *
@@ -320,27 +311,15 @@ public class FeedbackHelper implements IFeedback {
      * @param reason       原因
      * @param resultBack
      */
-    private void reportFeedback(boolean goodFeedback, String reason, IResultBack<FeedResult> resultBack) {
+    private void reportFeedback(boolean goodFeedback, String reason, IResultBack<Wrapper> resultBack) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("isGoodFeedback", goodFeedback);
         params.put("reason", reason);
         String url = ApiConstant.INSTANCE.getBASE_URL() + "feedback/create";
-        Core.core().post(null, url, params, new OCallBack<FeedResult>() {
+        Core.core().post(null, url, params, new WrapperCallBack() {
             @Override
-            public void onBefore(Request.Builder builder) {
-                super.onBefore(builder);
-            }
-
-            @Override
-            public FeedResult onParse(Response response) throws Exception {
-                String string = response.body().string();
-                Log.e(TAG, "string = " + string);
-                JsonObject jsonObj = JsonParser.parseString(string).getAsJsonObject();
-                return GsonUtil.json2Obj(jsonObj, FeedResult.class);
-            }
-
-            @Override
-            public void onResult(FeedResult result) {
+            public void onResult(Wrapper result) {
+                Log.e(TAG, "code = " + result.getCode());
                 resultBack.onResult(result);
             }
         });

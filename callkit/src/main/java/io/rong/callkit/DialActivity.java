@@ -29,6 +29,8 @@ import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
 import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
+import com.rongcloud.common.net.ApiConstant;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -37,6 +39,9 @@ import java.util.Date;
 import java.util.List;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
+import cn.rong.combusis.oklib.Core;
+import cn.rong.combusis.oklib.Wrapper;
+import cn.rong.combusis.oklib.WrapperCallBack;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.callkit.dialpad.DialInfo;
@@ -64,16 +69,13 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private ImageButton floatingActionButton;
     private RecyclerView recyclerView;
     private boolean isVideo = false;
-    private String userId, token;
+    private String userId;
     private List<DialInfo> records = new ArrayList<>();
-    private final static String FILE_PRE = "http://120.92.102.127:8081//file/show?path=";
     private final static String CUSTOMER_PHONE = "13161856839";
 
-    public static void openDilapadPage(Activity activity, String userId, boolean video, String token) {
+    public static void openDilapadPage(Activity activity, boolean video) {
         activity.startActivity(new Intent(activity, DialActivity.class)
-                .putExtra(KEY_VIDEO, video)
-                .putExtra(KEY_ID, userId)
-                .putExtra(KEY_TOKEN, token));
+                .putExtra(KEY_VIDEO, video));
     }
 
     @Override
@@ -87,8 +89,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialtacts_activity);
         isVideo = getIntent().getBooleanExtra(KEY_VIDEO, false);
-        userId = getIntent().getStringExtra(KEY_ID);
-        token = getIntent().getStringExtra(KEY_TOKEN);
+        userId = AccountStore.INSTANCE.getUserId();
         String title = isVideo ? "视频通话" : "语音通话";
         initDefalutActionBar(title);
         initView();
@@ -244,69 +245,45 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         }
     }
 
-    private void getUserIdByPhone(final String phone) {
-        String url = "http://120.92.102.127:8081/user/get/" + phone;
-        OkHttpClient okHttpClient = new OkHttpClient();
-        final Request request = new Request.Builder()
-                .url(url)
-                .get()
-                .addHeader("Authorization", token)
-                .build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "onFailure: " + e);
-            }
+    private static class InfoResult {
+        private String uid;
+        private String name;
+        private String portrait;
+        private String mobile;
+    }
 
+    private void getUserIdByPhone(final String phone) {
+        String url = ApiConstant.INSTANCE.getBASE_URL() + "user/get/" + phone;
+        Core.core().get(null, url, null, new WrapperCallBack() {
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
-                Log.e(TAG, "onResponse: " + result);
-                JsonObject jsonObj = JsonParser.parseString(result).getAsJsonObject();
-                if (null != jsonObj) {
-                    int code = jsonObj.get("code").getAsInt();
-                    if (code == 10000) {
-                        JsonElement element = jsonObj.get("data");
-                        if (null == element || element.isJsonNull()) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(DialActivity.this, "号码未注册", Toast.LENGTH_LONG).show();
-                                }
-                            });
-                            return;
-                        }
-                        JsonObject data = element.getAsJsonObject();
-                        final String id = data.get("uid").getAsString();
-                        DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
-                                userId,
-                                "",
-                                "",
-                                "",
-                                id,
-                                phone,
-                                "",
-                                FILE_PRE + data.get("portrait").getAsString(),//拼接前缀
-                                new Date().getTime(),
-                                0,
-                                isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
-                        );
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                hideDialpadFragment(true);
-                                RongCallKit.startSingleCall(DialActivity.this, id,
-                                        isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
-                                                : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
-                            }
-                        });
-                    }
+            public void onResult(Wrapper result) {
+                InfoResult infoResult = result.get(InfoResult.class);
+                if (null == infoResult) {
+                    Toast.makeText(DialActivity.this, "号码未注册", Toast.LENGTH_LONG).show();
+                    return;
                 }
+                DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
+                        userId,
+                        "",
+                        "",
+                        "",
+                        infoResult.uid,
+                        phone,
+                        "",
+                        TextUtils.isEmpty(infoResult.portrait) ? ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR() : ApiConstant.INSTANCE.getFILE_URL() + infoResult.portrait,//拼接前缀
+                        new Date().getTime(),
+                        0,
+                        isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
+                );
+                hideDialpadFragment(true);
+                RongCallKit.startSingleCall(DialActivity.this, infoResult.uid,
+                        isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                                : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
             }
         });
     }
 
-    DialpadFragment dialpadFragment;
+    private DialpadFragment dialpadFragment;
 
     private void showDialpadFragment(String defInput) {
         if (mIsDialpadShown) {
