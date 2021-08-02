@@ -362,6 +362,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        onMinimizeClick(null);
+    }
+
     private void initView(RongCallCommon.CallMediaType mediaType, RongCallAction callAction) {
         findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -475,6 +480,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                     R.layout.rc_voip_call_bottom_connected_button_layout, null);
             ImageView button = btnLayout.findViewById(R.id.rc_voip_call_mute_btn);
             button.setEnabled(true);
+
             mButtonContainer.removeAllViews();
             mButtonContainer.addView(btnLayout);
         } else {

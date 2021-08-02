@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,7 +71,7 @@ public class CallFloatBoxView {
     private static boolean activityResuming = false;
 
     public static void showFB(Context context, Bundle bundle) {
-        Log.i("audioTag", "showFB : isDial=" + CallKitUtils.isDial);
+        Log.i(TAG, "showFB : isDial=" + CallKitUtils.isDial);
         setExcludeFromRecents(context, true);
         activityResuming = false;
         if (CallKitUtils.isDial) {
@@ -144,6 +145,9 @@ public class CallFloatBoxView {
         } else {
             //视频悬浮窗下，不需要UI显示时间，但是时间值也需要同步更新
             setupTime(null);
+        }
+        if (CallKitUtils.callConnected) {
+            AudioPlayManager.getInstance().setInVoipMode(false);
         }
         RongCallClient.getInstance()
                 .setVoIPCallListener(
@@ -322,6 +326,7 @@ public class CallFloatBoxView {
                                     int userType,
                                     SurfaceView remoteVideo) {
                                 CallKitUtils.isDial = false;
+                                AudioPlayManager.getInstance().setInVoipMode(false);
                                 ReportUtil.appStatus(ReportUtil.TAG.CALL_LISTENER, "userId|state|desc", userId, "onRemoteUserJoined", TAG);
                             }
 
@@ -487,7 +492,6 @@ public class CallFloatBoxView {
 
     private static WindowManager.LayoutParams createLayoutParams(Context context) {
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-
         int type;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && Build.VERSION.SDK_INT < 24) {
             type = WindowManager.LayoutParams.TYPE_TOAST;
@@ -501,11 +505,15 @@ public class CallFloatBoxView {
                 WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-
+        DisplayMetrics display = context.getResources().getDisplayMetrics();
         params.format = PixelFormat.TRANSLUCENT;
         params.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+//        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+        // 修改悬浮框的拖拽问题
+        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.x = display.widthPixels - (int) context.getResources().getDimension(R.dimen.callkit_flox_box_size);
+        params.y = (display.heightPixels - (int) context.getResources().getDimension(R.dimen.callkit_flox_box_size)) / 2;
         return params;
     }
 
@@ -847,6 +855,7 @@ public class CallFloatBoxView {
                                     }
                                     CallKitUtils.isDial = false;
                                 }
+                                AudioPlayManager.getInstance().setInVoipMode(false);
                             }
 
                             @Override

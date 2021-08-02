@@ -92,7 +92,7 @@ public class FeedbackHelper implements IFeedback {
     private boolean enableScore() {
         //未打分 且次数大于limt
         return
-//                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
                         SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 

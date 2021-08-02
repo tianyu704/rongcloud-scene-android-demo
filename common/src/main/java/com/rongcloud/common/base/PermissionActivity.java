@@ -4,6 +4,7 @@
 
 package com.rongcloud.common.base;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -23,7 +24,8 @@ public abstract class PermissionActivity extends AppCompatActivity {
     protected final static String[] PERMISSIONS = new String[]{
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.RECORD_AUDIO
+            android.Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAMERA
     };
 
     @Override

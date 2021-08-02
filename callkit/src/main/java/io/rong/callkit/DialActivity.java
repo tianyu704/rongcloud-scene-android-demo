@@ -196,7 +196,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
             List<DialInfo> fits = new ArrayList<>();
             for (int i = 0; i < size; i++) {
                 DialInfo info = records.get(i);
-                if (info.getPhone().startsWith(filter)) {
+                if (!TextUtils.isEmpty(info.getPhone()) && info.getPhone().startsWith(filter)) {
                     fits.add(info);
                 }
             }
