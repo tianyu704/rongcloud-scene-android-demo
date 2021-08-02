@@ -80,17 +80,17 @@ android {
         checkReleaseBuilds false
         abortOnError false
     }
-    flavorDimensions("config")
+    flavorDimensions("environment")
     productFlavors {
-        production {
-            dimension 'config'
+        developerEnvironment {
+            dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo.dev" // 配置不同的包名，确保切换环境时不会因为缓存导致出现问题
             buildConfigField("String","APP_KEY","\"pvxdm17jpw7ar\"")
             buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
-            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081\"")
+            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
         }
-        official {
-            dimension 'config'
+        releaseEnvironment {
+            dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo"
             buildConfigField("String","APP_KEY","\"uwd1c0sxukso1\"")
             buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
