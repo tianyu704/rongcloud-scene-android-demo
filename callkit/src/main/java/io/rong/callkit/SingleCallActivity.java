@@ -28,12 +28,16 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.rongcloud.common.dao.database.DatabaseManager;
+import com.rongcloud.common.dao.entities.UserInfoEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
 import io.rong.callkit.util.DefaultPushConfig;
@@ -302,6 +306,27 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         .apply(RequestOptions.bitmapTransform(new CircleCrop()))
                         .into(userPortrait);
             }
+        } else {
+            DatabaseManager
+                    .INSTANCE
+                    .obUserInfoByUserId(targetId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<UserInfoEntity>() {
+                        @Override
+                        public void accept(UserInfoEntity userInfoEntity) throws Throwable {
+                            TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+                            userName.setText(CallKitUtils.nickNameRestrict(userInfoEntity.getUserName()));
+                            ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+                            if (userPortrait != null && userInfoEntity.getPortrait() != null) {
+                                Glide.with(SingleCallActivity.this)
+                                        .load(userInfoEntity.getPortrait())
+                                        .override(200)
+                                        .placeholder(R.drawable.rc_default_portrait)
+                                        .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                                        .into(userPortrait);
+                            }
+                        }
+                    });
         }
         createPickupDetector();
     }

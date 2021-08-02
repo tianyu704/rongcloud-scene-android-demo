@@ -27,7 +27,6 @@ import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.utils.AccountStore;
-import com.rongcloud.common.net.ApiConstant;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -35,9 +34,6 @@ import java.util.Date;
 import java.util.List;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
-import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.Wrapper;
-import cn.rong.combusis.oklib.WrapperCallBack;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.callkit.dialpad.DialInfo;
@@ -97,10 +93,18 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                         for (int i = 0; i < size; i++) {
                             CallRecordModel model = models.get(i);
                             dialInfo = new DialInfo();
-                            dialInfo.setPhone(model.getPeerNumber());
-                            dialInfo.setUserId(model.getPeerId());
-                            dialInfo.setDate(model.getDate());
-                            dialInfo.setHead(model.getPortrait());
+                            if (model.getDirection() == CallRecordEntityKt.DIRECTION_CALL) {
+                                dialInfo.setPhone(TextUtils.isEmpty(model.getPeerNumber()) ? model.getPeerNumberFromInfo() : model.getPeerNumber());
+                                dialInfo.setUserId(model.getPeerId());
+                                dialInfo.setDate(model.getDate());
+                                dialInfo.setHead(model.getPeerPortrait());
+                            } else {
+                                dialInfo.setPhone(TextUtils.isEmpty(model.getCallerNumber()) ? model.getCallNumberFromInfo() : model.getCallerNumber());
+                                dialInfo.setUserId(model.getCallerId());
+                                dialInfo.setDate(model.getDate());
+                                dialInfo.setHead(model.getCallPortrait());
+                            }
+
                             records.add(dialInfo);
                         }
                         refreshRecords(records);
@@ -240,7 +244,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                     ApiConstant.INSTANCE.getFILE_URL() + userInfo.getPortrait(),//拼接前缀
                                     new Date().getTime(),
                                     0,
-                                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
+                                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
+                                    CallRecordEntityKt.DIRECTION_CALL
                             );
                             runOnUiThread(new Runnable() {
                                 @Override

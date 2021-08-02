@@ -7,7 +7,6 @@ package com.rongcloud.common.dao.api
 import androidx.room.*
 import com.rongcloud.common.dao.entities.UserInfoEntity
 import io.reactivex.rxjava3.core.Flowable
-import io.reactivex.rxjava3.core.Observable
 
 /**
  * @author gusd
@@ -23,5 +22,8 @@ interface UserInfoDao {
 
     @Query("SELECT * FROM UserInfo")
     fun queryUserInfoList(): Flowable<List<UserInfoEntity>>
+
+    @Query("SELECT * FROM USERINFO WHERE userId = :userId")
+    fun queryUserInfoById(userId: String): Flowable<UserInfoEntity>
 
 }

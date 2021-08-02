@@ -6,6 +6,8 @@ package com.rongcloud.common.dao.api
 
 import androidx.room.*
 import com.rongcloud.common.dao.entities.CallRecordEntity
+import com.rongcloud.common.dao.entities.DIRECTION_CALL
+import com.rongcloud.common.dao.entities.DIRECTION_CALLED
 import com.rongcloud.common.dao.model.query.CallRecordModel
 import io.reactivex.rxjava3.core.Flowable
 
@@ -19,9 +21,13 @@ interface CallRecordDao {
 
     @Transaction
     @Query(
-        """SELECT cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,ui.userName,ui.number,ui.portrait,max(cr.date) as recentTime 
-            From CallRecord AS cr LEFT JOIN UserInfo AS ui ON cr.peerId = ui.userId 
-        WHERE cr.callerId = :userId or cr.peerId = :userId  GROUP BY cr.callerNumber ORDER BY cr.date DESC """
+        """SELECT cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,cr.direction, 
+            callInfo.userName as callName,callInfo.number as callNumberFromInfo,callInfo.portrait as callPortrait,
+            peerInfo.userName as peerName,peerInfo.number as peerNumberFromInfo,peerInfo.portrait as peerPortrait,
+            max(cr.date) as recentTime From CallRecord AS cr LEFT JOIN UserInfo AS callInfo ON cr.callerId = callInfo.userId 
+            LEFT JOIN UserInfo AS peerInfo ON cr.peerId = peerInfo.userId WHERE 
+            (cr.callerId = :userId AND cr.direction = '$DIRECTION_CALL') or (cr.peerId = :userId AND cr.direction = '$DIRECTION_CALLED')  
+            GROUP BY cr.callerNumber ORDER BY cr.date DESC """
     )
     fun queryCallRecordList(userId: String): Flowable<List<CallRecordModel>>
 

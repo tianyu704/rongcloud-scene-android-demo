@@ -20,5 +20,5 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun callRecordDao(): CallRecordDao
 
-    abstract fun memberInfoDao(): UserInfoDao
+    abstract fun userInfoDao(): UserInfoDao
 }

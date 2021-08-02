@@ -10,15 +10,19 @@ package com.rongcloud.common.dao.model.query
  */
 data class CallRecordModel(
     val id: Long,
-    val callerNumber: String,
+    val callerNumber: String?,
     val callerId: String,
     val peerId: String?,
-    val peerNumber: String,
+    val peerNumber: String?,
     val date: Long,
     val during: Long,
     val callType: Int,
-    val userName: String?,
-    val portrait: String?,
-    val number: String?,
+    val callName: String?,
+    val callPortrait: String?,
+    val callNumberFromInfo: String?,
+    val peerName: String?,
+    val peerNumberFromInfo: String?,
+    val peerPortrait: String?,
+    val direction:Int,
     val recentTime:Long
 )

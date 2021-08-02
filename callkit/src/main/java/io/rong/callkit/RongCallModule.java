@@ -13,19 +13,20 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
 import com.rongcloud.common.dao.database.DatabaseManager;
-
-import io.rong.calllib.ReportUtil;
+import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import io.rong.callkit.util.ActivityStartCheckUtils;
+import io.rong.callkit.util.UserInfoProvider;
 import io.rong.calllib.IRongReceivedCallListener;
+import io.rong.calllib.ReportUtil;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
 import io.rong.calllib.RongCallMissedListener;
@@ -233,6 +234,17 @@ public class RongCallModule implements IExtensionModule {
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setPackage(context.getPackageName());
+
+            DatabaseManager.INSTANCE.insertCallRecord(callSession.getCallerUserId(),
+                    null,
+                    callSession.getSelfUserId(),
+                    null,
+                    new Date().getTime(),
+                    0,
+                    callSession.getMediaType().equals(RongCallCommon.CallMediaType.VIDEO) ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
+                    CallRecordEntityKt.DIRECTION_CALLED);
+
+            UserInfoProvider.getInstance().getUserInfoByPhoneNumber(callSession.getCallerUserId()).subscribe();
         }
         return intent;
     }

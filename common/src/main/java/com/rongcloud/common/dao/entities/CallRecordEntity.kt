@@ -35,6 +35,11 @@ public const val AUDIO_CONF_CALL = CALL_TYPE_AUDIO or CALL_TYPE_CONF_CALL
 // 视频会议
 public const val VIDEO_CONF_CALL = CALL_TYPE_VIDEO or CALL_TYPE_CONF_CALL
 
+// 呼叫
+public const val DIRECTION_CALL = 0
+
+// 被呼叫
+public const val DIRECTION_CALLED = 1
 
 @Entity(tableName = "CallRecord")
 data class CallRecordEntity(
@@ -42,8 +47,9 @@ data class CallRecordEntity(
     @ColumnInfo(name = "callerId") val callerId: String,
     @ColumnInfo(name = "callerNumber") val callerNumber: String?,
     @ColumnInfo(name = "peerId") val peerId: String?,
-    @ColumnInfo(name = "peerNumber") val peerNumber: String,
+    @ColumnInfo(name = "peerNumber") val peerNumber: String?,
     @ColumnInfo(name = "date") val date: Long,
     @ColumnInfo(name = "during") val during: Long,
     @ColumnInfo(name = "callType") val callType: Int,
+    @ColumnInfo(name = "direction") val direction: Int
 )
