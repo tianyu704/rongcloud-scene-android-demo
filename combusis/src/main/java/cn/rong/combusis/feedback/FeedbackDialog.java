@@ -13,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -31,6 +32,12 @@ public class FeedbackDialog extends Dialog {
 
     public boolean enable() {
         return null != reference.get();
+    }
+
+    public void showToast(String message) {
+        if (null != reference.get()) {
+            Toast.makeText(reference.get(), message, Toast.LENGTH_LONG).show();
+        }
     }
 
     public boolean startActivty(Intent intent) {

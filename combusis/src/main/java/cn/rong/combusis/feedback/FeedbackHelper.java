@@ -6,22 +6,53 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.rongcloud.common.dao.database.DatabaseManager;
+import com.rongcloud.common.dao.entities.CallRecordEntityKt;
+import com.rongcloud.common.net.ApiConstant;
+import com.rongcloud.common.net.IResultBack;
+import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.SharedPreferUtil;
+import com.rongcloud.common.utils.UIKit;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.oklib.Core;
+import cn.rong.combusis.oklib.GsonUtil;
+import cn.rong.combusis.oklib.OCallBack;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class FeedbackHelper {
+    private final static String TAG = "FeedbackHelper";
     private final static String KEY_TIME = "score_time";
     private final static String KEY_SCORE_FLAG = "score_falg";
     private final static int LIMT = 3;
     private final static FeedbackHelper helper = new FeedbackHelper();
+    private final static String[] DEF_REASON = new String[]{
+            "场景功能",
+            "音质质量",
+            "使用流程",
+            "交互体验"
+    };
     private FeedEnableListener feedEnableListener;
 
     public interface FeedEnableListener {
@@ -68,8 +99,7 @@ public class FeedbackHelper {
      */
     public boolean enableScore() {
         //未打分 且次数大于limt
-        return
-//        !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+        return !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
                 SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 
@@ -116,13 +146,14 @@ public class FeedbackHelper {
                 }
             });
         }
-        feedbackDialog.replaceContent("请留下您的使用感受吧", "稍后再说", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismissDialog();
-                clearStatistics();
-            }
-        }, "", null, initScoreView());
+        feedbackDialog.replaceContent("请留下您的使用感受吧",
+                "稍后再说", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dismissDialog();
+                        clearStatistics();
+                    }
+                }, "", null, initScoreView());
         feedbackDialog.show();
     }
 
@@ -171,7 +202,17 @@ public class FeedbackHelper {
      * 点赞
      */
     private void sendFovLikes() {
-
+        reportFeedback(true, "", new IResultBack<FeedResult>() {
+            @Override
+            public void onResult(FeedResult feedResult) {
+                if (null != feedbackDialog) {
+                    String message = "点赞" + (feedResult.code == 10000 ? "成功" : "失败");
+                    feedbackDialog.showToast(message);
+                }
+                alreadyScore();
+                dismissDialog();
+            }
+        });
     }
 
     /**
@@ -180,9 +221,21 @@ public class FeedbackHelper {
     private void sendReport() {
         Log.e("ScoreUtil", "selecteds = " + selectedDowns);
         Log.e("ScoreUtil", "selecteds len = " + selectedDowns.size());
-        // TODO: 2021/7/30 提交成功后显示推荐活动
-        alreadyScore();
-        showLastPromotion();
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < selectedDowns.size(); i++) {
+            builder.append(DEF_REASON[selectedDowns.get(i)]);
+        }
+        reportFeedback(false, builder.toString(), new IResultBack<FeedResult>() {
+            @Override
+            public void onResult(FeedResult feedResult) {
+                if (feedResult.code == 10000) {
+                    Log.e(TAG, "反馈成功");
+                }
+                alreadyScore();
+                // 提交成功后显示推荐活动
+                showLastPromotion();
+            }
+        });
     }
 
     /**
@@ -268,5 +321,31 @@ public class FeedbackHelper {
             feedbackDialog.startActivty(intent);
         }
         dismissDialog();
+    }
+
+    public static class FeedResult {
+        protected int code;
+        protected int message;
+    }
+
+    private void reportFeedback(boolean goodFeedback, String reason, IResultBack<FeedResult> resultBack) {
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("isGoodFeedback", goodFeedback);
+        params.put("reason", reason);
+        String url = ApiConstant.INSTANCE.getBASE_URL() + "feedback/create";
+        Core.core().post(null, url, params, new OCallBack<FeedResult>() {
+            @Override
+            public FeedResult onParse(Response response) throws Exception {
+                String string = response.body().string();
+                Log.e(TAG, "string = " + string);
+                JsonObject jsonObj = JsonParser.parseString(string).getAsJsonObject();
+                return GsonUtil.json2Obj(jsonObj, FeedResult.class);
+            }
+
+            @Override
+            public void onResult(FeedResult result) {
+                resultBack.onResult(result);
+            }
+        });
     }
 }
