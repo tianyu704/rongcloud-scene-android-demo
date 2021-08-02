@@ -20,4 +20,5 @@ data class CallRecordModel(
     val userName: String?,
     val portrait: String?,
     val number: String?,
+    val recentTime:Long
 )

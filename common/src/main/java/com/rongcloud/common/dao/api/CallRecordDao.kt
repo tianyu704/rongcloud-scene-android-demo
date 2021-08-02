@@ -19,7 +19,7 @@ interface CallRecordDao {
 
     @Transaction
     @Query(
-        """SELECT cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,ui.userName,ui.number,ui.portrait 
+        """SELECT cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,ui.userName,ui.number,ui.portrait,max(cr.date) as recentTime 
             From CallRecord AS cr LEFT JOIN UserInfo AS ui ON cr.peerId = ui.userId 
         WHERE cr.callerId = :callId  GROUP BY cr.callerNumber ORDER BY cr.date DESC """
     )
