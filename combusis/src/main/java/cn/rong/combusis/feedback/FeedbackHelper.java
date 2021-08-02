@@ -10,21 +10,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.rongcloud.common.dao.database.DatabaseManager;
-import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.net.IResultBack;
-import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.SharedPreferUtil;
 import com.rongcloud.common.utils.UIKit;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,74 +27,50 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.oklib.Core;
 import cn.rong.combusis.oklib.GsonUtil;
 import cn.rong.combusis.oklib.OCallBack;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class FeedbackHelper {
+public class FeedbackHelper implements IFeedback {
     private final static String TAG = "FeedbackHelper";
-    private final static String KEY_TIME = "score_time";
-    private final static String KEY_SCORE_FLAG = "score_falg";
-    private final static int LIMT = 3;
-    private final static FeedbackHelper helper = new FeedbackHelper();
-    private final static String[] DEF_REASON = new String[]{
-            "场景功能",
-            "音质质量",
-            "使用流程",
-            "交互体验"
-    };
-    private FeedEnableListener feedEnableListener;
+    private final static IFeedback helper = new FeedbackHelper();
+    private FeedbackListener feedbackListener;
 
-    public interface FeedEnableListener {
-        void onFeedback();
-    }
 
     private FeedbackHelper() {
     }
 
-    public static FeedbackHelper getHelper() {
+    public static IFeedback getHelper() {
         return helper;
     }
 
-    public void setFeedEnableListener(FeedEnableListener feedEnableListener) {
-        this.feedEnableListener = feedEnableListener;
-    }
-
+    /**
+     * 注销反馈监听
+     */
     public void unregisteObservice() {
-        setFeedEnableListener(null);
+        this.feedbackListener = null;
         dismissDialog();
         selectedDowns.clear();
     }
 
+    /**
+     * 注册反馈信息提示监听
+     *
+     * @param activity
+     */
     public void registeFeedbackObservice(@NonNull Activity activity) {
         final WeakReference<Activity> con = new WeakReference(activity);
-        setFeedEnableListener(new FeedEnableListener() {
+        this.feedbackListener = new FeedbackListener() {
             @Override
             public void onFeedback() {
                 if (null != con && null != con.get()) {
-                    showScoreDialog(con.get());
+                    showFeedbackDialog(con.get());
                 }
             }
-        });
+        };
         //注册后立即检测状态
-        if (enableScore() && null != feedEnableListener) {
-            feedEnableListener.onFeedback();
+        if (enableScore() && null != feedbackListener) {
+            feedbackListener.onFeedback();
         }
-    }
-
-    /**
-     * 是否显示统计打分
-     *
-     * @return
-     */
-    public boolean enableScore() {
-        //未打分 且次数大于limt
-        return !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
-                SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 
     /**
@@ -109,22 +79,35 @@ public class FeedbackHelper {
     public void statistics() {
         int last = SharedPreferUtil.get(KEY_TIME, 0);
         SharedPreferUtil.set(KEY_TIME, last + 1);
-        if (enableScore() && null != feedEnableListener) {
-            feedEnableListener.onFeedback();
+        if (enableScore() && null != feedbackListener) {
+            feedbackListener.onFeedback();
         }
     }
 
     /**
+     * 是否显示统计打分
+     *
+     * @return
+     */
+    private boolean enableScore() {
+        //未打分 且次数大于limt
+        return
+                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+                        SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
+    }
+
+
+    /**
      * 清空统计：取消评价后清空
      */
-    public void clearStatistics() {
+    private void clearStatistics() {
         SharedPreferUtil.set(KEY_TIME, 0);
     }
 
     /**
      * 设置已打分：评价后设置
      */
-    public void alreadyScore() {
+    private void alreadyScore() {
         SharedPreferUtil.set(KEY_SCORE_FLAG, true);
     }
 
@@ -137,7 +120,7 @@ public class FeedbackHelper {
 
     private FeedbackDialog feedbackDialog;
 
-    public void showScoreDialog(Activity activity) {
+    private void showFeedbackDialog(Activity activity) {
         if (null == feedbackDialog || !feedbackDialog.enable()) {
             feedbackDialog = new FeedbackDialog(activity, new DialogInterface.OnDismissListener() {
                 @Override
@@ -205,10 +188,8 @@ public class FeedbackHelper {
         reportFeedback(true, "", new IResultBack<FeedResult>() {
             @Override
             public void onResult(FeedResult feedResult) {
-                if (null != feedbackDialog) {
-                    String message = "点赞" + (feedResult.code == 10000 ? "成功" : "失败");
-                    feedbackDialog.showToast(message);
-                }
+                boolean success = null != feedResult && feedResult.code == 10000;
+                Toast.makeText(UIKit.getContext(), success ? "点赞成功" : "点赞是不", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 dismissDialog();
             }
@@ -219,18 +200,22 @@ public class FeedbackHelper {
      * 提交反馈
      */
     private void sendReport() {
-        Log.e("ScoreUtil", "selecteds = " + selectedDowns);
-        Log.e("ScoreUtil", "selecteds len = " + selectedDowns.size());
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < selectedDowns.size(); i++) {
-            builder.append(DEF_REASON[selectedDowns.get(i)]);
+            int index = selectedDowns.get(i);
+            builder.append(DEF_REASON[index]);
+            builder.append(",");
         }
-        reportFeedback(false, builder.toString(), new IResultBack<FeedResult>() {
+        String releason = "";
+        if (builder.length() > 1) {
+            releason = builder.substring(0, builder.length() - 1);
+        }
+        Log.e(TAG, "releason = " + releason);
+        reportFeedback(false, releason, new IResultBack<FeedResult>() {
             @Override
             public void onResult(FeedResult feedResult) {
-                if (feedResult.code == 10000) {
-                    Log.e(TAG, "反馈成功");
-                }
+                boolean success = null != feedResult && feedResult.code == 10000;
+                Toast.makeText(UIKit.getContext(), success ? "反馈成功" : "反馈失败", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 // 提交成功后显示推荐活动
                 showLastPromotion();
@@ -328,12 +313,24 @@ public class FeedbackHelper {
         protected int message;
     }
 
+    /**
+     * 反馈信息
+     *
+     * @param goodFeedback 是否是点赞
+     * @param reason       原因
+     * @param resultBack
+     */
     private void reportFeedback(boolean goodFeedback, String reason, IResultBack<FeedResult> resultBack) {
         Map<String, Object> params = new HashMap<>(4);
         params.put("isGoodFeedback", goodFeedback);
         params.put("reason", reason);
         String url = ApiConstant.INSTANCE.getBASE_URL() + "feedback/create";
         Core.core().post(null, url, params, new OCallBack<FeedResult>() {
+            @Override
+            public void onBefore(Request.Builder builder) {
+                super.onBefore(builder);
+            }
+
             @Override
             public FeedResult onParse(Response response) throws Exception {
                 String string = response.body().string();

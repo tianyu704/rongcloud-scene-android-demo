@@ -1,6 +1,7 @@
 package cn.rong.combusis.oklib;
 
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,7 +22,9 @@ public class Transform {
      * @return RequestBody
      */
     public static RequestBody param2Body(Map<String, Object> params) {
-        return RequestBody.create(json, GsonUtil.obj2Json(params));
+        String jsonParams = GsonUtil.obj2Json(params);
+        Log.e("Transform", "params : " + jsonParams);
+        return RequestBody.create(json, jsonParams);
     }
 
 
