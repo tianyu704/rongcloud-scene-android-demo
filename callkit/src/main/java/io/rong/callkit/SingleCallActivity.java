@@ -28,12 +28,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
-import com.rongcloud.common.score.ScoreUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import cn.rong.combusis.feedback.FeedbackHelper;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
 import io.rong.callkit.util.DefaultPushConfig;
@@ -508,7 +508,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onDestroy() {
         Log.d(TAG, "---single activity onDestroy---");
         // 统计打分
-        ScoreUtil.statistics();
+        FeedbackHelper.getHelper().statistics();
         stopRing();
         super.onDestroy();
     }

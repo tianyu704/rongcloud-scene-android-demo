@@ -1,12 +1,13 @@
 /*
  * Copyright © 2021 RongCloud. All rights reserved.
  */
-
 rootProject.name = "VoiceRoomDemo"
 include ':app'
 include ':RCVoiceRoomLib'
 include ':callkit'
 
+//公共业务模块:评价反馈
+include ':combusis'
 
 include ':common'
 include ':processor'

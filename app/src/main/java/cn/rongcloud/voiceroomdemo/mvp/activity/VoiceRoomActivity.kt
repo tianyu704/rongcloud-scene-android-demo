@@ -14,6 +14,7 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
@@ -62,7 +63,6 @@ import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
-import com.rongcloud.common.score.ScoreUtil
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.imkit.utils.RouteUtils
@@ -516,7 +516,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     override fun onDestroy() {
         super.onDestroy()
         // 统计打分
-        ScoreUtil.statistics()
+        FeedbackHelper.getHelper().statistics()
         favAnimation.let {
             it.release()
         }

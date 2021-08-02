@@ -1,91 +1,133 @@
-package com.rongcloud.common.score;
+package cn.rong.combusis.feedback;
 
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.rongcloud.common.R;
+import androidx.annotation.NonNull;
+
 import com.rongcloud.common.utils.SharedPreferUtil;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-public class ScoreUtil {
+import cn.rong.combusis.R;
+
+public class FeedbackHelper {
     private final static String KEY_TIME = "score_time";
     private final static String KEY_SCORE_FLAG = "score_falg";
     private final static int LIMT = 3;
+    private final static FeedbackHelper helper = new FeedbackHelper();
+    private FeedEnableListener feedEnableListener;
+
+    public interface FeedEnableListener {
+        void onFeedback();
+    }
+
+    private FeedbackHelper() {
+    }
+
+    public static FeedbackHelper getHelper() {
+        return helper;
+    }
+
+    public void setFeedEnableListener(FeedEnableListener feedEnableListener) {
+        this.feedEnableListener = feedEnableListener;
+    }
+
+    public void unregisteObservice() {
+        setFeedEnableListener(null);
+        dismissDialog();
+        selectedDowns.clear();
+    }
+
+    public void registeFeedbackObservice(@NonNull Activity activity) {
+        final WeakReference<Activity> con = new WeakReference(activity);
+        setFeedEnableListener(new FeedEnableListener() {
+            @Override
+            public void onFeedback() {
+                if (null != con && null != con.get()) {
+                    showScoreDialog(con.get());
+                }
+            }
+        });
+        //注册后立即检测状态
+        if (enableScore() && null != feedEnableListener) {
+            feedEnableListener.onFeedback();
+        }
+    }
 
     /**
      * 是否显示统计打分
      *
      * @return
      */
-    public static boolean enableScore() {
+    public boolean enableScore() {
         //未打分 且次数大于limt
-        return !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG)
-                && SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
+        return
+//        !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+                SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 
     /**
      * 统计次数 累加
      */
-    public static void statistics() {
+    public void statistics() {
         int last = SharedPreferUtil.get(KEY_TIME, 0);
         SharedPreferUtil.set(KEY_TIME, last + 1);
+        if (enableScore() && null != feedEnableListener) {
+            feedEnableListener.onFeedback();
+        }
     }
 
     /**
      * 清空统计：取消评价后清空
      */
-    public static void clearStatistics() {
+    public void clearStatistics() {
         SharedPreferUtil.set(KEY_TIME, 0);
     }
 
     /**
      * 设置已打分：评价后设置
      */
-    public static void alreadyScore() {
+    public void alreadyScore() {
         SharedPreferUtil.set(KEY_SCORE_FLAG, true);
     }
 
-    private static void dismissDialog() {
-        if (null != scoreDialog) {
-            scoreDialog.dismiss();
+    private void dismissDialog() {
+        if (null != feedbackDialog) {
+            feedbackDialog.dismiss();
         }
-        scoreDialog = null;
+        feedbackDialog = null;
     }
 
-    private static ScoreDialog scoreDialog;
+    private FeedbackDialog feedbackDialog;
 
-    public static void showScoreDialog(Activity activity) {
-        if (null == scoreDialog || !scoreDialog.enable()) {
-            scoreDialog = new ScoreDialog(activity, new DialogInterface.OnDismissListener() {
+    public void showScoreDialog(Activity activity) {
+        if (null == feedbackDialog || !feedbackDialog.enable()) {
+            feedbackDialog = new FeedbackDialog(activity, new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    scoreDialog = null;
+                    feedbackDialog = null;
                 }
             });
         }
-        scoreDialog.replaceContent("请留下您的使用感受吧", "稍后再说", new View.OnClickListener() {
+        feedbackDialog.replaceContent("请留下您的使用感受吧", "稍后再说", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismissDialog();
                 clearStatistics();
             }
         }, "", null, initScoreView());
-        scoreDialog.show();
+        feedbackDialog.show();
     }
 
-    private static View initScoreView() {
-        View view = scoreDialog.getLayoutInflater().inflate(R.layout.layout_score_tip, null);
+    private View initScoreView() {
+        View view = feedbackDialog.getLayoutInflater().inflate(R.layout.layout_score_tip, null);
         View up_selected = view.findViewById(R.id.iv_up_selected);
         View down_selected = view.findViewById(R.id.iv_down_selected);
         view.findViewById(R.id.cl_up).setOnTouchListener(new View.OnTouchListener() {
@@ -128,14 +170,14 @@ public class ScoreUtil {
     /**
      * 点赞
      */
-    private static void sendFovLikes() {
+    private void sendFovLikes() {
 
     }
 
     /**
      * 提交反馈
      */
-    private static void sendReport() {
+    private void sendReport() {
         Log.e("ScoreUtil", "selecteds = " + selectedDowns);
         Log.e("ScoreUtil", "selecteds len = " + selectedDowns.size());
         // TODO: 2021/7/30 提交成功后显示推荐活动
@@ -146,9 +188,9 @@ public class ScoreUtil {
     /**
      * 显示吐槽弹框
      */
-    private static void shwoDownDialog() {
-        if (null == scoreDialog) return;
-        scoreDialog.replaceContent("请问哪个方面需要改进呢？",
+    private void shwoDownDialog() {
+        if (null == feedbackDialog) return;
+        feedbackDialog.replaceContent("请问哪个方面需要改进呢？",
                 "提交反馈", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -164,10 +206,10 @@ public class ScoreUtil {
                 }, initDownView());
     }
 
-    private final static List<Integer> selectedDowns = new ArrayList();
+    private final List<Integer> selectedDowns = new ArrayList();
 
-    private static View initDownView() {
-        View view = scoreDialog.getLayoutInflater().inflate(R.layout.layout_score_down, null);
+    private View initDownView() {
+        View view = feedbackDialog.getLayoutInflater().inflate(R.layout.layout_score_down, null);
         View[] views = new View[4];
         View[] selectVs = new View[4];
         views[0] = view.findViewById(R.id.cl_first);
@@ -202,9 +244,9 @@ public class ScoreUtil {
     /**
      * 显示最新活动
      */
-    private static void showLastPromotion() {
-        if (null == scoreDialog) return;
-        scoreDialog.replaceContent("融云最近活动，了解一下？",
+    private void showLastPromotion() {
+        if (null == feedbackDialog) return;
+        feedbackDialog.replaceContent("融云最近活动，了解一下？",
                 "我想了解", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -215,15 +257,15 @@ public class ScoreUtil {
                     public void onClick(View v) {
                         dismissDialog();
                     }
-                }, scoreDialog.getLayoutInflater().inflate(R.layout.layout_promotion, null));
+                }, feedbackDialog.getLayoutInflater().inflate(R.layout.layout_promotion, null));
     }
 
-    private static void jumpPromotionPage() {
-        if (null != scoreDialog && scoreDialog.enable()) {
+    private void jumpPromotionPage() {
+        if (null != feedbackDialog && feedbackDialog.enable()) {
             Intent intent = new Intent("io.rong.intent.action.commonwebpage");
             intent.putExtra("key_url", "https://m.rongcloud.cn/activity/rtc20");
             intent.putExtra("key_basic", "最近活动");
-            scoreDialog.startActivty(intent);
+            feedbackDialog.startActivty(intent);
         }
         dismissDialog();
     }

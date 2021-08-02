@@ -198,7 +198,6 @@ public class DialpadFragment extends Fragment
         mLeft = fragmentView.findViewById(R.id.dialpad_left);
 
 
-
         mSpacer = fragmentView.findViewById(R.id.spacer);
         mSpacer.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -443,7 +442,8 @@ public class DialpadFragment extends Fragment
         }
     }
 
-    private final static String telRegex = "^((1[3,5,7,8][0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
+    // 添加166号段
+    private final static String telRegex = "^((1[3,5,6,7,8][0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
 
     private boolean isMobileNO(String mobiles) {
         if (TextUtils.isEmpty(mobiles)) {

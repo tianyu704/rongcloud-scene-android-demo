@@ -11,6 +11,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
+import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.common.*
@@ -26,7 +27,6 @@ import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.net.ApiConstant
-import com.rongcloud.common.score.ScoreUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_voice_room_list.*
 import kotlinx.android.synthetic.main.layout_input_password_dialog.*
@@ -76,6 +76,7 @@ class VoiceRoomListActivity : BaseActivity(),
         rv_voice_room.setLoadMoreListener {
             presenter.loadMore()
         }
+        FeedbackHelper.getHelper().registeFeedbackObservice(this)
     }
 
 
@@ -108,15 +109,9 @@ class VoiceRoomListActivity : BaseActivity(),
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (ScoreUtil.enableScore()) {
-            ScoreUtil.showScoreDialog(this)
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
+        FeedbackHelper.getHelper().unregisteObservice()
         passwordDialog?.dismiss()
         messageDialog?.dismiss()
     }

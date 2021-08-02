@@ -1,4 +1,4 @@
-package com.rongcloud.common.score;
+package cn.rong.combusis.feedback;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -20,12 +18,11 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rongcloud.common.R;
-
 import java.lang.ref.WeakReference;
-import java.util.zip.Inflater;
 
-public class ScoreDialog extends Dialog {
+import cn.rong.combusis.R;
+
+public class FeedbackDialog extends Dialog {
     private WeakReference<Activity> reference;
     private FrameLayout container;
     private View divider;
@@ -44,7 +41,7 @@ public class ScoreDialog extends Dialog {
         return false;
     }
 
-    public ScoreDialog(Activity activity, OnDismissListener onDismissListener) {
+    public FeedbackDialog(Activity activity, OnDismissListener onDismissListener) {
         super(activity, R.style.CustomDialog);
         setOnDismissListener(onDismissListener);
         reference = new WeakReference<>(activity);

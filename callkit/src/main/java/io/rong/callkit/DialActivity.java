@@ -29,7 +29,6 @@ import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
 import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
-import com.rongcloud.common.score.ScoreUtil;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -37,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.rong.combusis.feedback.FeedbackHelper;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.callkit.dialpad.DialInfo;
@@ -77,11 +77,9 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (ScoreUtil.enableScore()) {
-            ScoreUtil.showScoreDialog(this);
-        }
+    protected void onDestroy() {
+        FeedbackHelper.getHelper().unregisteObservice();
+        super.onDestroy();
     }
 
     @Override
@@ -114,6 +112,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                         refreshRecords(records);
                     }
                 });
+        FeedbackHelper.getHelper().registeFeedbackObservice(this);
     }
 
     private void refreshRecords(List<DialInfo> records) {
@@ -272,7 +271,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(DialActivity.this, "请输入正确的手机号", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(DialActivity.this, "号码未注册", Toast.LENGTH_LONG).show();
                                 }
                             });
                             return;
