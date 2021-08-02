@@ -235,16 +235,16 @@ public class RongCallModule implements IExtensionModule {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setPackage(context.getPackageName());
 
-            DatabaseManager.INSTANCE.insertCallRecord(callSession.getCallerUserId(),
-                    null,
-                    callSession.getSelfUserId(),
-                    null,
-                    new Date().getTime(),
-                    0,
-                    callSession.getMediaType().equals(RongCallCommon.CallMediaType.VIDEO) ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
-                    CallRecordEntityKt.DIRECTION_CALLED);
-
-            UserInfoProvider.getInstance().getUserInfoByPhoneNumber(callSession.getCallerUserId()).subscribe();
+//            DatabaseManager.INSTANCE.insertCallRecord(callSession.getCallerUserId(),
+//                    null,
+//                    callSession.getSelfUserId(),
+//                    null,
+//                    new Date().getTime(),
+//                    0,
+//                    callSession.getMediaType().equals(RongCallCommon.CallMediaType.VIDEO) ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
+//                    CallRecordEntityKt.DIRECTION_CALLED);
+//
+//            UserInfoProvider.getInstance().getUserInfoByPhoneNumber(callSession.getCallerUserId()).subscribe();
         }
         return intent;
     }
