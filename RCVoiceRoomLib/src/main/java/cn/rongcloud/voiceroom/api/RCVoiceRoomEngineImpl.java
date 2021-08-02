@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.LockSupport;
@@ -151,10 +152,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void initWithAppKey(final Application context, final String appKey) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                // 只能在主线程初始化
                 clientDelegate.initWithAppKey(context, appKey);
                 clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
                 clientDelegate.setReceiveMessageDelegate(RCVoiceRoomEngineImpl.this);
@@ -1723,14 +1723,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private void onSuccessWithCheck(final RCVoiceRoomCallback callback) {
         if (checkCallback(callback)) {
-            mainThreadHandler.post(new Runnable() {
+            runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        callback.onSuccess();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    callback.onSuccess();
                 }
             });
         }
@@ -1738,32 +1734,37 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private <T> void onSuccessWithCheck(final RCVoiceRoomResultCallback<T> callback, final T data) {
         if (checkCallback(callback)) {
-            mainThreadHandler.post(new Runnable() {
+            runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        callback.onSuccess(data);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    callback.onSuccess(data);
                 }
             });
         }
     }
 
-    private void onErrorWithCheck(final RCVoiceRoomBaseCallback callback,final VoiceRoomErrorCode errorCode) {
+    private void onErrorWithCheck(final RCVoiceRoomBaseCallback callback, final VoiceRoomErrorCode errorCode) {
         if (checkCallback(callback)) {
-            mainThreadHandler.post(new Runnable() {
+            runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        callback.onError(errorCode.getCode(), errorCode.getMessage());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    callback.onError(errorCode.getCode(), errorCode.getMessage());
                 }
             });
         }
+    }
+
+    private void runOnMainThread(final Runnable runnable) {
+        mainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void userEnterSeat(RCVoiceSeatInfo seatInfo, String userId) {
@@ -1950,9 +1951,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
     private void packHandlerThread() {
         if (Thread.currentThread() == RCVoiceRoomEngineHandler.getInstance()) {
             Log.d(TAG, "packHandlerThread : ");
-            // 最多 lock 当前线程三秒，防止死锁的出现
-//            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
-            LockSupport.park();
+            // 最多 lock 当前线程三秒，防止某些情况下可能出现的卡死线程
+            LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(3));
         }
     }
 
