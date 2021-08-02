@@ -8,11 +8,23 @@ import android.app.Application
 import android.content.Context
 
 /**
+ * 自动化初始化注解，释放方式参考 CommonInit，每个模块支持包含多个初始化类
  * @author gusd
  * @Date 2021/07/28
  */
 interface ModuleInit {
+    /**
+     * 初始化优先级，当小于 0 时不初始化该模块
+     */
     fun getPriority(): Int
+
+    /**
+     * 模块名称
+     */
     fun getName(context: Context): String
+
+    /**
+     * 初始化回调
+     */
     fun onInit(application: Application)
 }

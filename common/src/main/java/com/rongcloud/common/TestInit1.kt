@@ -9,27 +9,17 @@ import android.content.Context
 import android.util.Log
 import cn.rongcloud.annotation.AutoInit
 import com.rongcloud.common.init.ModuleInit
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 /**
  * @author gusd
- * @Date 2021/07/29
+ * @Date 2021/07/30
  */
-private const val TAG = "CommonInit"
-
+private const val TAG = "TestInit1"
 @AutoInit
-class CommonInit @Inject constructor() : ModuleInit {
-
-    /**
-     * 可通过该种方式获取 ApplicationContext
-     */
-    @Inject
-    @ApplicationContext
-    lateinit var context: Context
-
+class TestInit1 @Inject constructor():ModuleInit  {
     override fun getPriority(): Int {
-        return 0
+        return 100
     }
 
     override fun getName(context: Context): String {

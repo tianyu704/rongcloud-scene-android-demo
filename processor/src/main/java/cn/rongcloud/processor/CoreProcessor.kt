@@ -14,18 +14,22 @@ import javax.tools.Diagnostic
  * @Date 2021/07/28
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("cn.rongcloud.annotation.HiltBinding", "cn.rongcloud.annotation.AutoInit")
+@SupportedAnnotationTypes(
+    "cn.rongcloud.annotation.HiltBinding",
+    "cn.rongcloud.annotation.AutoInit"
+)
 class CoreProcessor : AbstractProcessor() {
 
-    private var hiltInjectProcessor: HiltInjectProcessor? = null
-    private var moduleInitProcessor: ModuleInitProcessor? = null
+    private val processorImplList = arrayListOf<BaseProcessor>()
 
 
     override fun init(processingEnv: ProcessingEnvironment?) {
         super.init(processingEnv)
         if (processingEnv == null) return
-        hiltInjectProcessor = HiltInjectProcessor(processingEnv)
-        moduleInitProcessor = ModuleInitProcessor(processingEnv)
+        processorImplList.apply {
+            add(HiltInjectProcessor(processingEnv))
+            add(ModuleInitProcessor(processingEnv))
+        }
     }
 
     override fun process(
@@ -44,8 +48,9 @@ class CoreProcessor : AbstractProcessor() {
         annotations: MutableSet<out TypeElement>,
         processingEnv: RoundEnvironment,
     ): Boolean {
-        moduleInitProcessor?.processImpl(annotations, processingEnv)
-        hiltInjectProcessor?.processImpl(annotations, processingEnv)
+        processorImplList.forEach {
+            it.processImpl(annotations, processingEnv)
+        }
         return true
     }
 

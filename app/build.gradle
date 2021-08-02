@@ -15,11 +15,10 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "cn.rongcloud.voiceroomdemo"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.5.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
@@ -34,7 +33,7 @@ android {
                 includeCompileClasspath = true
             }
         }
-        renderscriptSupportModeEnabled  true
+        renderscriptSupportModeEnabled true
         multiDexEnabled true
     }
 
@@ -80,6 +79,23 @@ android {
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
+    }
+    flavorDimensions("config")
+    productFlavors {
+        production {
+            dimension 'config'
+            applicationId "cn.rongcloud.voiceroomdemo.dev" // 配置不同的包名，确保切换环境时不会因为缓存导致出现问题
+            buildConfigField("String","APP_KEY","\"pvxdm17jpw7ar\"")
+            buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
+            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081\"")
+        }
+        official {
+            dimension 'config'
+            applicationId "cn.rongcloud.voiceroomdemo"
+            buildConfigField("String","APP_KEY","\"uwd1c0sxukso1\"")
+            buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
+            buildConfigField("String","BASE_SERVER_ADDRES","\"http://120.92.102.127:8081/\"")
+        }
     }
 }
 

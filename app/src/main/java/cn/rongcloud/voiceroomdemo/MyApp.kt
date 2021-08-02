@@ -17,9 +17,11 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.CrashCollectHandler
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
+import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.base.IBaseView
 import com.rongcloud.common.dao.database.DatabaseManager
+import com.rongcloud.common.extension.isNotNullOrEmpty
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.utils.AccountStore
 import com.umeng.analytics.MobclickAgent
@@ -55,15 +57,24 @@ class MyApp : MultiDexApplication() {
 
         moduleManager.init()
 
-        UMConfigure.init(
-            this,
-            "60c062bf8d6cd512500c78ed",
+        AppConfig.initConfig(
+            BuildConfig.APP_KEY,
+            BuildConfig.UM_APP_KEY,
             "rcrtc",
-            UMConfigure.DEVICE_TYPE_PHONE,
-            null
+            BuildConfig.BASE_SERVER_ADDRES
         )
-        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.MANUAL)
-        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+
+        if (AppConfig.UM_APP_KEY.isNotNullOrEmpty()) {
+            UMConfigure.init(
+                this,
+                BuildConfig.UM_APP_KEY,
+                AppConfig.CHANNEL_NAME,
+                UMConfigure.DEVICE_TYPE_PHONE,
+                null
+            )
+            MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.MANUAL)
+            UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+        }
 
         RCVoiceRoomEngine.getInstance().initWithAppKey(this, APP_KEY)
         RCChatRoomMessageManager.registerMessageTypes()
@@ -86,11 +97,15 @@ class MyApp : MultiDexApplication() {
             }
 
             override fun onActivityResumed(activity: Activity) {
-                MobclickAgent.onResume(activity)
+                if (AppConfig.UM_APP_KEY.isNotNullOrEmpty()) {
+                    MobclickAgent.onResume(activity)
+                }
             }
 
             override fun onActivityPaused(activity: Activity) {
-                MobclickAgent.onPause(activity)
+                if (AppConfig.UM_APP_KEY.isNotNullOrEmpty()) {
+                    MobclickAgent.onPause(activity)
+                }
             }
 
             override fun onActivityStopped(activity: Activity) {
@@ -161,7 +176,9 @@ class MyApp : MultiDexApplication() {
     companion object {
         var context: Context by Delegates.notNull()
             private set
-        const val APP_KEY: String = "uwd1c0sxukso1"
+        val APP_KEY by lazy {
+            AppConfig.APP_KEY
+        }
 
         var instance: MyApp by Delegates.notNull()
     }
