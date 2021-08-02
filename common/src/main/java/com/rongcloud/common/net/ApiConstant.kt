@@ -18,4 +18,8 @@ object ApiConstant {
     val HOME_PAGE = "https://docs.rongcloud.cn/v4/5X/views/scene/voiceroom/android/intro/intro.html"
 
     val DEFAULT_PORTRAIT_ULR = "https://cdn.ronghub.com/demo/default/rce_default_avatar.png"
+
+    const val REQUEST_SUCCESS_CODE = 10000
+
+    const val CUSTOMER_PHONE = "13161856839"
 }

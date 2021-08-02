@@ -18,7 +18,7 @@ import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
-import cn.rongcloud.voiceroomdemo.net.RetrofitManager
+import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.*
@@ -27,6 +27,7 @@ import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -317,12 +318,12 @@ class VoiceRoomModel @Inject constructor(
 
 
     fun setAdmin(userId: String, isAdmin: Boolean): Single<Boolean> {
-        return RetrofitManager
-            .commonService
+        return VoiceRoomNetManager
+            .voiceRoomService
             .setAdmin(SettingAdminRequest(roomId, userId, isAdmin))
             .observeOn(dataModifyScheduler)
             .map {
-                if (it.code == 10000) {
+                if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                     RCChatRoomMessageManager.sendChatMessage(roomId, RCChatroomAdmin()
                         .apply {
                             this.userId = userId
@@ -336,26 +337,26 @@ class VoiceRoomModel @Inject constructor(
                     }
                     RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "")
                 }
-                return@map it.code == 10000
+                return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
     }
 
     fun setRoomLock(lock: Boolean, password: String?): Single<Boolean> {
-        return RetrofitManager
-            .commonService
+        return VoiceRoomNetManager
+            .voiceRoomService
             .setRoomPasswordRequest(
                 RoomPasswordRequest(if (lock) 1 else 0, password, roomId)
             )
             .doOnSuccess {
                 queryRoomInfoFromServer()
             }.map {
-                return@map it.code == 10000
+                return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
     }
 
     fun setRoomBackground(backgroundUrl: String): Single<Boolean> {
-        return RetrofitManager
-            .commonService
+        return VoiceRoomNetManager
+            .voiceRoomService
             .setRoomBackgroundRequest(
                 RoomBackgroundRequest(
                     backgroundUrl,
@@ -366,13 +367,13 @@ class VoiceRoomModel @Inject constructor(
                 RCVoiceRoomEngine.getInstance()
                     .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, backgroundUrl)
             }.map {
-                return@map it.code == 10000
+                return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
     }
 
     fun setRoomName(newName: String): Single<Boolean> {
-        return RetrofitManager
-            .commonService
+        return VoiceRoomNetManager
+            .voiceRoomService
             .setRoomName(RoomNameRequest(newName, roomId))
             .doOnSuccess {
                 refreshRoomInfo()
@@ -389,7 +390,7 @@ class VoiceRoomModel @Inject constructor(
                     })
                 }
             }.map {
-                return@map it.code == 10000
+                return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
     }
 
@@ -771,8 +772,8 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun queryRoomInfoFromServer() {
-        addDisposable(RetrofitManager
-            .commonService
+        addDisposable(VoiceRoomNetManager
+            .voiceRoomService
             .getVoiceRoomInfo(roomId)
             .subscribe { bean ->
                 currentUIRoomInfo.roomBean = bean.room
@@ -795,15 +796,15 @@ class VoiceRoomModel @Inject constructor(
             setSeatNumber
         )
         addDisposable(
-            RetrofitManager
-                .commonService
+            VoiceRoomNetManager
+                .voiceRoomService
                 .setRoomSetting(setting).subscribe()
         )
     }
 
     fun refreshAdminList() {
-        addDisposable(RetrofitManager
-            .commonService
+        addDisposable(VoiceRoomNetManager
+            .voiceRoomService
             .getAdminList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -819,8 +820,8 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun refreshGift() {
-        addDisposable(RetrofitManager
-            .commonService
+        addDisposable(VoiceRoomNetManager
+            .voiceRoomService
             .getGiftList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -854,8 +855,8 @@ class VoiceRoomModel @Inject constructor(
         onComplete: (() -> Unit)? = null
     ) {
         Log.d(TAG, "queryAllUserInfo: ")
-        addDisposable(RetrofitManager
-            .commonService
+        addDisposable(VoiceRoomNetManager
+            .voiceRoomService
             .getMembersList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -890,7 +891,7 @@ class VoiceRoomModel @Inject constructor(
                 memberListChangeSubject.onNext(roomMemberInfoList)
                 return@map roomId
             }.flatMap {
-                return@flatMap RetrofitManager.commonService.getAdminList(it)
+                return@flatMap VoiceRoomNetManager.voiceRoomService.getAdminList(it)
             }.map {
                 it.data?.let { adminList ->
                     roomMemberInfoList.forEach { member ->
@@ -900,7 +901,7 @@ class VoiceRoomModel @Inject constructor(
                 }
                 return@map roomId
             }.flatMap {
-                return@flatMap RetrofitManager.commonService.getGiftList(it)
+                return@flatMap VoiceRoomNetManager.voiceRoomService.getGiftList(it)
             }.map {
                 it.data?.let { listMap ->
                     listMap.forEach { map ->
@@ -1218,7 +1219,7 @@ class VoiceRoomModel @Inject constructor(
         val result = arrayListOf<UiMemberModel>()
 
         val publisherList = members.map { model ->
-            RetrofitManager.commonService.sendGifts(
+            VoiceRoomNetManager.voiceRoomService.sendGifts(
                 SendGiftsRequest(
                     present.index,
                     num,
@@ -1226,7 +1227,7 @@ class VoiceRoomModel @Inject constructor(
                     model.userId
                 )
             ).doOnSuccess {
-                if (it.code == 10000) {
+                if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                     result.add(model)
                 }
             }.toFlowable()
@@ -1304,8 +1305,8 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun queryMusicListByType(type: Int): Single<List<UiMusicModel>> {
-        return RetrofitManager
-            .commonService
+        return VoiceRoomNetManager
+            .voiceRoomService
             .getMusicList(MusicListRequest(roomId, type))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -1355,8 +1356,8 @@ class VoiceRoomModel @Inject constructor(
         Log.d(TAG, "addMusic: name = $name,author = $author,type = $type,url = $url")
         return Completable.create { emitter ->
             addDisposable(
-                RetrofitManager
-                    .commonService
+                VoiceRoomNetManager
+                    .voiceRoomService
                     .addMusic(
                         AddMusicRequest(
                             name = name,
@@ -1367,7 +1368,7 @@ class VoiceRoomModel @Inject constructor(
                             size = size
                         )
                     ).subscribe({ result ->
-                        if (result.code == 10000) {
+                        if (result.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                             refreshMusicList {
                                 if (userMusicList.size == 1) {
                                     Log.d(TAG, "addMusic: list only one music,start play")
@@ -1390,11 +1391,11 @@ class VoiceRoomModel @Inject constructor(
 
     fun deleteMusic(url: String, id: Int): Completable {
         return Completable.create { emitter ->
-            RetrofitManager
-                .commonService
+            VoiceRoomNetManager
+                .voiceRoomService
                 .musicDelete(DeleteMusicRequest(id, roomId))
                 .subscribe({
-                    if (it.code == 10000) {
+                    if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                         if (url == currentPlayMusic) {
 
                             try {
@@ -1483,10 +1484,10 @@ class VoiceRoomModel @Inject constructor(
                 val currentMusic = userMusicList.lastOrNull {
                     it.url == currentPlayMusic
                 }
-                RetrofitManager.commonService.modifyMusicOrder(
+                VoiceRoomNetManager.voiceRoomService.modifyMusicOrder(
                     MusicOrderRequest(roomId, model.id, currentMusic?.id ?: 0)
                 ).subscribe({
-                    if (it.code == 10000) {
+                    if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                         refreshMusicList()
                         emitter.onComplete()
                     } else {

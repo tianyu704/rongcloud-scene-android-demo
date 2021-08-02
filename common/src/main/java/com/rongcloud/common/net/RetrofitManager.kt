@@ -2,11 +2,8 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.net
+package com.rongcloud.common.net
 
-import com.rongcloud.common.net.ApiConstant
-import cn.rongcloud.voiceroomdemo.net.api.CommonApiService
-import cn.rongcloud.voiceroomdemo.net.api.DownloadFileApiService
 import com.rongcloud.common.utils.AccountStore
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -18,25 +15,17 @@ import java.util.concurrent.TimeUnit
 
 /**
  * @author gusd
- * @Date 2021/06/07
+ * @Date 2021/08/02
  */
-private const val TAG = "RetrofitManager"
-
 object RetrofitManager {
-    val commonService: CommonApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        getRetrofit().create(CommonApiService::class.java)
-    }
 
-    val downloadService: DownloadFileApiService by lazy {
-        getDownloadRetrofit().create(DownloadFileApiService::class.java)
-    }
 
-    private fun getDownloadRetrofit(): Retrofit {
+    public fun getDownloadRetrofit(): Retrofit {
         return Retrofit.Builder().baseUrl("http://127.0.0.1").client(getOkHttpClient())
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create()).build()
     }
 
-    private fun getRetrofit(): Retrofit {
+    public fun getRetrofit(): Retrofit {
         // 获取retrofit的实例
 
         return Retrofit.Builder()
@@ -80,6 +69,4 @@ object RetrofitManager {
             chain.proceed(request)
         }
     }
-
-
 }

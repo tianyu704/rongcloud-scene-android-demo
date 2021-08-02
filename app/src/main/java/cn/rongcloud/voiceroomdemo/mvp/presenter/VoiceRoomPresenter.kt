@@ -12,7 +12,7 @@ import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
 import cn.rongcloud.voiceroomdemo.mvp.model.*
-import cn.rongcloud.voiceroomdemo.net.RetrofitManager
+import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
@@ -22,6 +22,7 @@ import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
+import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
@@ -440,13 +441,13 @@ class VoiceRoomPresenter @Inject constructor(
     fun closeRoom() {
         view.showWaitingDialog()
         RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "")
-        RetrofitManager
-            .commonService
+        VoiceRoomNetManager
+            .voiceRoomService
             .deleteRoom(roomId)
             .delay(2, TimeUnit.SECONDS)
             .subscribe({ result ->
                 view.hideWaitingDialog()
-                if (result.code == 10000) {
+                if (result.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                     leaveRoom()
                 } else {
                     view.showError(result.code, result.msg)

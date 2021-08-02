@@ -7,14 +7,12 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
-import cn.rongcloud.voiceroomdemo.net.RetrofitManager
+import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.Kv
-import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
@@ -49,8 +47,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
                     context
                 )
                 .flatMap {
-                    return@flatMap RetrofitManager
-                        .commonService
+                    return@flatMap VoiceRoomNetManager
+                        .voiceRoomService
                         .createVoiceRoom(
                             CreateRoomRequestBean(
                                 intPrivate,
@@ -81,8 +79,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
             )
         } else {
             addDisposable(
-                RetrofitManager
-                    .commonService
+                VoiceRoomNetManager
+                    .voiceRoomService
                     .createVoiceRoom(
                         CreateRoomRequestBean(
                             isPrivate = intPrivate,

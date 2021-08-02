@@ -10,7 +10,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -23,16 +22,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.rongcloud.common.dao.database.DatabaseManager;
 import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.net.ApiConstant;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,12 +44,9 @@ import io.rong.callkit.dialpad.DialInfo;
 import io.rong.callkit.dialpad.DialpadFragment;
 import io.rong.callkit.dialpad.animation.AnimUtils;
 import io.rong.callkit.dialpad.widget.FloatingActionButtonController;
+import io.rong.callkit.net.model.UserInfoModel;
 import io.rong.callkit.util.DateUtil;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import io.rong.callkit.util.UserInfoProvider;
 
 /**
  * 拨号界面
@@ -93,7 +86,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         String title = isVideo ? "视频通话" : "语音通话";
         initDefalutActionBar(title);
         initView();
-        DatabaseManager.INSTANCE.obCallRecordList(userId)
+        addDisposable(DatabaseManager.INSTANCE.obCallRecordList(userId)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<CallRecordModel>>() {
                     @Override
@@ -112,7 +105,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                         }
                         refreshRecords(records);
                     }
-                });
+                }));
         FeedbackHelper.getHelper().registeFeedbackObservice(this);
     }
 
@@ -181,7 +174,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
             }
         } else if (R.id.ll_customer == resId) {//专属客户经理
             Intent intent = new Intent(Intent.ACTION_DIAL);
-            Uri data = Uri.parse("tel:" + CUSTOMER_PHONE);
+            Uri data = Uri.parse("tel:" + ApiConstant.CUSTOMER_PHONE);
             intent.setData(data);
             startActivity(intent);
         }
@@ -211,76 +204,57 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
 
     @Override
     public void onDialpad(String num) {
-        DialInfo dial = null;
-        int size = null == records ? 0 : records.size();
-        if (size > 0) {
-            for (int i = 0; i < size; i++) {
-                DialInfo info = records.get(i);
-                if (info.getPhone().equals(num)) {
-                    dial = info;
-                    break;
-                }
-            }
+        if (TextUtils.isEmpty(num)) {
+            return;
         }
-        if (null == dial) {
-            getUserIdByPhone(num);
-        } else {
-            DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
-                    userId,
-                    "",
-                    "",
-                    "",
-                    dial.getUserId(),
-                    dial.getPhone(),
-                    "",
-                    dial.getHead(),//拼接前缀
-                    new Date().getTime(),
-                    0,
-                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
-            );
-            hideDialpadFragment(true);
-            RongCallKit.startSingleCall(this, dial.getUserId(),
-                    isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
-                            : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
-        }
-    }
+        getUserIdByPhone(num);
 
-    private static class InfoResult {
-        private String uid;
-        private String name;
-        private String portrait;
-        private String mobile;
     }
 
     private void getUserIdByPhone(final String phone) {
-        String url = ApiConstant.INSTANCE.getBASE_URL() + "user/get/" + phone;
-        Core.core().get(null, url, null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                InfoResult infoResult = result.get(InfoResult.class);
-                if (null == infoResult) {
-                    Toast.makeText(DialActivity.this, "号码未注册", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
-                        userId,
-                        "",
-                        "",
-                        "",
-                        infoResult.uid,
-                        phone,
-                        "",
-                        TextUtils.isEmpty(infoResult.portrait) ? ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR() : ApiConstant.INSTANCE.getFILE_URL() + infoResult.portrait,//拼接前缀
-                        new Date().getTime(),
-                        0,
-                        isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
-                );
-                hideDialpadFragment(true);
-                RongCallKit.startSingleCall(DialActivity.this, infoResult.uid,
-                        isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
-                                : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
-            }
-        });
+        addDisposable(UserInfoProvider
+                .getInstance()
+                .getUserInfoByPhoneNumber(phone)
+                .subscribe(new Consumer<UserInfoModel>() {
+                    @Override
+                    public void accept(UserInfoModel userInfoModel) throws Throwable {
+                        if (userInfoModel.getCode() == ApiConstant.REQUEST_SUCCESS_CODE) {
+                            final UserInfoModel.UserInfo userInfo = userInfoModel.getData();
+                            if (userInfo == null) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(DialActivity.this, "号码未注册", Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                                return;
+                            }
+                            DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
+                                    userId,
+                                    "",
+                                    "",
+                                    "",
+                                    userInfo.getUid(),
+                                    phone,
+                                    "",
+                                    ApiConstant.INSTANCE.getFILE_URL() + userInfo.getPortrait(),//拼接前缀
+                                    new Date().getTime(),
+                                    0,
+                                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL
+                            );
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    hideDialpadFragment(true);
+                                    RongCallKit.startSingleCall(DialActivity.this, userInfo.getUid(),
+                                            isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                                                    : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+                                }
+                            });
+
+                        }
+                    }
+                }));
     }
 
     private DialpadFragment dialpadFragment;

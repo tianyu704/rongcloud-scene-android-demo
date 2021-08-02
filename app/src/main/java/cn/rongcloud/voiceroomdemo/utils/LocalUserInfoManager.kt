@@ -6,7 +6,7 @@ package cn.rongcloud.voiceroomdemo.utils
 
 import android.net.Uri
 import android.util.LruCache
-import cn.rongcloud.voiceroomdemo.net.RetrofitManager
+import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.Member
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.UserIdList
@@ -56,7 +56,7 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
             .flatMapSingle {
                 val list = ArrayList<String>(it)
                 it.clear()
-                return@flatMapSingle RetrofitManager.commonService.getUserInfoList(UserIdList(list))
+                return@flatMapSingle VoiceRoomNetManager.voiceRoomService.getUserInfoList(UserIdList(list))
             }
             .subscribe { bean ->
                 bean.data?.forEach {

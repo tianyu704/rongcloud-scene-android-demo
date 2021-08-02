@@ -9,7 +9,7 @@ import android.os.Environment
 import android.util.Log
 import cn.rongcloud.voiceroomdemo.MyApp
 import com.rongcloud.common.extension.showToast
-import cn.rongcloud.voiceroomdemo.net.RetrofitManager
+import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.FileUtil
@@ -44,8 +44,8 @@ object FileModel {
             .flatMap {
                 val requestBody = RequestBody.create(MediaType.parse("image/*"), it)
                 val part = MultipartBody.Part.createFormData("file", it.name, requestBody)
-                return@flatMap RetrofitManager
-                    .commonService
+                return@flatMap VoiceRoomNetManager
+                    .voiceRoomService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${shortUrl.data}"
@@ -70,7 +70,7 @@ object FileModel {
         MyApp.context.showToast("开始下载: $displayName")
         isDownloading = true
         return Completable.create { emitter ->
-            RetrofitManager
+            VoiceRoomNetManager
                 .downloadService
                 .downloadFile(url)
                 .observeOn(Schedulers.io())
@@ -145,8 +145,8 @@ object FileModel {
                         getUploadNameByUrl(url = it),
                         requestBody
                     )
-                return@flatMapSingle RetrofitManager
-                    .commonService
+                return@flatMapSingle VoiceRoomNetManager
+                    .voiceRoomService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${ApiConstant.FILE_URL}${shortUrl.data}"

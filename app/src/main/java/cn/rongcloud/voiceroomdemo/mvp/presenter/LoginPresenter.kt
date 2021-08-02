@@ -13,6 +13,7 @@ import cn.rongcloud.voiceroomdemo.MyApp
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
+import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
@@ -51,7 +52,7 @@ class LoginPresenter @Inject constructor(
                     .subscribe({ bean ->
                         view.apply {
 
-                            if (bean.code == 10000) {
+                            if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                                 setNextVerificationDuring(60 * 1000L)
                             } else {
                                 view.showError(bean.code, bean.msg)
@@ -76,7 +77,7 @@ class LoginPresenter @Inject constructor(
                         view.hideWaitingDialog()
                     }
                     .subscribe({ bean ->
-                        if (bean.code == 10000) {
+                        if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                             AccountStore.saveAccountInfo(bean.data)
                             if (!AccountStore.getImToken().isNullOrBlank()) {
                                 RCVoiceRoomEngine

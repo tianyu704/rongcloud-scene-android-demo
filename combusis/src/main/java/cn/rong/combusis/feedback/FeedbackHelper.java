@@ -1,3 +1,7 @@
+/*
+ * Copyright © 2021 RongCloud. All rights reserved.
+ */
+
 package cn.rong.combusis.feedback;
 
 import android.app.Activity;

@@ -15,9 +15,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.rong.imkit.utils.language.RongConfigurationManager;
 
 public class BaseActionBarActivity extends AppCompatActivity {
+
+    private CompositeDisposable  compositeDisposable = new CompositeDisposable();
+
     @Override
     protected void attachBaseContext(Context newBase) {
         Context newContext =
@@ -52,5 +57,15 @@ public class BaseActionBarActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        compositeDisposable.dispose();
+        super.onDestroy();
+    }
+
+    public void addDisposable(Disposable ... disposables){
+        compositeDisposable.addAll(disposables);
     }
 }
