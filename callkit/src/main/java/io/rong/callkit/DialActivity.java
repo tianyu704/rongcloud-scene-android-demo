@@ -60,7 +60,6 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private boolean isVideo = false;
     private String userId;
     private List<DialInfo> records = new ArrayList<>();
-    private final static String CUSTOMER_PHONE = "13161856839";
 
     public static void openDilapadPage(Activity activity, boolean video) {
         activity.startActivity(new Intent(activity, DialActivity.class)
@@ -134,12 +133,20 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 holder.setText(R.id.tv_number, info.getPhone());
                 holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
                 ImageView head = holder.getView(R.id.iv_head);
-                if (!TextUtils.isEmpty(info.getHead()) && null != head) {
-                    Glide.with(DialActivity.this)
-                            .load(info.getHead())
-                            .placeholder(R.drawable.rc_default_portrait)
-                            .override(100)
-                            .into(head);
+                if (null != head) {
+                    if (!TextUtils.isEmpty(info.getHead()) && info.getHead().equals(ApiConstant.INSTANCE.getFILE_URL())) {
+                        Glide.with(DialActivity.this)
+                                .load(info.getHead())
+                                .placeholder(R.drawable.rc_default_portrait)
+                                .override(100)
+                                .into(head);
+                    } else {
+                        Glide.with(DialActivity.this)
+                                .load(ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR())
+                                .placeholder(R.drawable.rc_default_portrait)
+                                .override(100)
+                                .into(head);
+                    }
                 }
                 holder.rootView().setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -241,7 +248,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                     userInfo.getUid(),
                                     phone,
                                     "",
-                                    ApiConstant.INSTANCE.getFILE_URL() + userInfo.getPortrait(),//拼接前缀
+                                    TextUtils.isEmpty(userInfo.getPortrait()) ? ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR()
+                                            : ApiConstant.INSTANCE.getFILE_URL() + userInfo.getPortrait(),//拼接前缀
                                     new Date().getTime(),
                                     0,
                                     isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,

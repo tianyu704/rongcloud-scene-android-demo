@@ -25,7 +25,13 @@ public abstract class PermissionActivity extends AppCompatActivity {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.CAMERA
+            //音视需要频权限
+            Manifest.permission.CAMERA,
+            Manifest.permission.INTERNET,
+            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.READ_PHONE_STATE,
     };
 
     @Override
