@@ -45,6 +45,8 @@ object AccountStore {
 
     fun getAccountInfo(): AccountInfo = currentInfo
 
+    fun getPhone(): String = currentInfo.phone ?: ""
+
 
     fun getImToken() = getAccountInfo().imToken
 

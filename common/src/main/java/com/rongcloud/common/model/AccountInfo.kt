@@ -13,6 +13,7 @@ import com.rongcloud.common.utils.JsonUtils
 data class AccountInfo(
     val authorization: String? = null,
     val imToken: String? = null,
+    var phone: String? = null,
     val portrait: String? = null,
     val type: Int? = null,
     val userId: String? = null,

@@ -281,10 +281,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             targetId = callSession.getInviterUserId();
             mediaType = callSession.getMediaType();
         }
-        //处理铃声问题
-        if (CallKitUtils.callConnected) {
-            stopRing();
-        }
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
             handFree = false;
             muted = false;
@@ -310,7 +306,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         .apply(RequestOptions.bitmapTransform(new CircleCrop()))
                         .into(userPortrait);
             }
-        } else if (!TextUtils.isEmpty(targetId)){
+        } else if (!TextUtils.isEmpty(targetId)) {
             DatabaseManager
                     .INSTANCE
                     .obUserInfoByUserId(targetId)

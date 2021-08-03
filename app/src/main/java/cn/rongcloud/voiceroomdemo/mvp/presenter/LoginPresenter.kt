@@ -30,7 +30,7 @@ import javax.inject.Inject
 class LoginPresenter @Inject constructor(
     val view: ILoginView,
     private val loginModel: LoginModel,
-    activity:AppCompatActivity
+    activity: AppCompatActivity
 ) :
     BaseLifeCyclePresenter(activity) {
 
@@ -78,7 +78,9 @@ class LoginPresenter @Inject constructor(
                     }
                     .subscribe({ bean ->
                         if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
-                            AccountStore.saveAccountInfo(bean.data)
+                            AccountStore.saveAccountInfo(bean.data?.apply {
+                                this.phone = phoneNumber
+                            })
                             if (!AccountStore.getImToken().isNullOrBlank()) {
                                 RCVoiceRoomEngine
                                     .getInstance()

@@ -134,7 +134,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 holder.setText(R.id.tv_date, DateUtil.getRecordDate(info.getDate()));
                 ImageView head = holder.getView(R.id.iv_head);
                 if (null != head) {
-                    if (!TextUtils.isEmpty(info.getHead()) && info.getHead().equals(ApiConstant.INSTANCE.getFILE_URL())) {
+                    if (!TextUtils.isEmpty(info.getHead()) && !info.getHead().equals(ApiConstant.INSTANCE.getFILE_URL())) {
                         Glide.with(DialActivity.this)
                                 .load(info.getHead())
                                 .placeholder(R.drawable.rc_default_portrait)
@@ -218,7 +218,40 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         if (TextUtils.isEmpty(num)) {
             return;
         }
-        getUserIdByPhone(num);
+        if (num.equals(AccountStore.INSTANCE.getPhone())) {
+            Toast.makeText(DialActivity.this, "不可拨打自己", Toast.LENGTH_LONG).show();
+            return;
+        }
+        DialInfo dialInfo = null;
+        int size = records.size();
+        for (int i = 0; i < size; i++) {
+            DialInfo temp = records.get(i);
+            if (num.equals(temp.getPhone())) {
+                dialInfo = temp;
+            }
+        }
+        if (null != dialInfo) {
+            DatabaseManager.INSTANCE.insertCallRecordAndMemberInfo(
+                    userId,
+                    "",
+                    AccountStore.INSTANCE.getUserName(),
+                    AccountStore.INSTANCE.getUserPortrait(),
+                    dialInfo.getUserId(),
+                    dialInfo.getPhone(),
+                    "",
+                    dialInfo.getHead(),//拼接前缀
+                    new Date().getTime(),
+                    0,
+                    isVideo ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
+                    CallRecordEntityKt.DIRECTION_CALL
+            );
+            hideDialpadFragment(true);
+            RongCallKit.startSingleCall(DialActivity.this, dialInfo.getUserId(),
+                    isVideo ? RongCallKit.CallMediaType.CALL_MEDIA_TYPE_VIDEO
+                            : RongCallKit.CallMediaType.CALL_MEDIA_TYPE_AUDIO);
+        } else {
+            getUserIdByPhone(num);
+        }
 
     }
 
