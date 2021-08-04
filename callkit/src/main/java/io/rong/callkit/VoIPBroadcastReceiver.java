@@ -30,6 +30,7 @@ import io.rong.push.common.PushConst;
 import io.rong.push.common.RLog;
 import io.rong.push.notification.PushNotificationMessage;
 import io.rong.push.notification.RongNotificationInterface;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
     public static final String ACTION_CALLINVITEMESSAGE = "action.push.CallInviteMessage";
     public final static String ACTION_CALLINVITEMESSAGE_CLICKED = "action.push.CallInviteMessage.CLICKED";
     private static final String TAG = "VoIPBroadcastReceiver";
-    private static Map<String,Integer> notificationCache = new HashMap<>();
+    private static Map<String, Integer> notificationCache = new HashMap<>();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -89,8 +90,10 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
             intent = RongCallModule.createVoIPIntent(context, callSession, checkPermissions);
             RLog.d(TAG, "handleNotificationClickEvent: start call activity");
         } else {
-            intent = createConversationListIntent(context);
-            RLog.d(TAG, "handleNotificationClickEvent: start conversation activity");
+//            intent = createConversationListIntent(context);
+//            RLog.d(TAG, "handleNotificationClickEvent: start conversation activity");
+            boolean video = null == callSession ? false : callSession.getMediaType() == RongCallCommon.CallMediaType.VIDEO;
+            intent = createDialIntent(context, video);
         }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setPackage(context.getPackageName());
@@ -100,8 +103,8 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
     private void sendNotification(Context context, PushNotificationMessage message, RongCallSession callSession, boolean checkPermissions, UserInfo userInfo) {
         String pushContent;
         boolean isAudio = callSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO;
-        if(message.getObjectName().equals(HANGUP)){
-            pushContent = context.getResources().getString( R.string.rc_voip_call_terminalted_notify);
+        if (message.getObjectName().equals(HANGUP)) {
+            pushContent = context.getResources().getString(R.string.rc_voip_call_terminalted_notify);
             if (callSession.getConversationType().equals(ConversationType.GROUP) && RongCallClient.getInstance().getCallSession() != null) {
                 return;//群组消息，getCallSession不为空，说明收到的hangup并不是最后一个人发出的，此时不需要生成通知
             }
@@ -124,15 +127,15 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
             }
         }
         if (callSession != null && callSession.getPushConfig() != null) {
-            MessagePushConfig messagePushConfig= callSession.getPushConfig();
-            if(!TextUtils.isEmpty(messagePushConfig.getPushTitle())){
-               message.setPushTitle(messagePushConfig.getPushTitle());
+            MessagePushConfig messagePushConfig = callSession.getPushConfig();
+            if (!TextUtils.isEmpty(messagePushConfig.getPushTitle())) {
+                message.setPushTitle(messagePushConfig.getPushTitle());
             }
             if (!TextUtils.isEmpty(messagePushConfig.getPushContent()) &&
-                !messagePushConfig.getPushContent().equals("voip")) {
+                    !messagePushConfig.getPushContent().equals("voip")) {
                 message.setPushContent(messagePushConfig.getPushContent());
             }
-            if(messagePushConfig.isForceShowDetailContent()){
+            if (messagePushConfig.isForceShowDetailContent()) {
                 message.setShowDetail(messagePushConfig.isForceShowDetailContent());
             }
             AndroidConfig androidConfig = messagePushConfig.getAndroidConfig();
@@ -168,7 +171,7 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
-        Notification notification = RongNotificationInterface.createNotification(context, title, createPendingIntent(context, message, callSession, checkPermissions, IncomingCallExtraHandleUtil.VOIP_REQUEST_CODE, false), content, RongNotificationInterface.SoundType.VOIP,message.isShowDetail());
+        Notification notification = RongNotificationInterface.createNotification(context, title, createPendingIntent(context, message, callSession, checkPermissions, IncomingCallExtraHandleUtil.VOIP_REQUEST_CODE, false), content, RongNotificationInterface.SoundType.VOIP, message.isShowDetail());
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -186,13 +189,13 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
             RLog.i(TAG, "sendNotification() real notify! notificationId: " + notificationId +
                     " notification: " + notification.toString());
             if (message.getObjectName().equals(INVITE)) {
-                notificationCache.put(callSession.getCallId(),notificationId);
+                notificationCache.put(callSession.getCallId(), notificationId);
                 nm.notify(notificationId, notification);
                 IncomingCallExtraHandleUtil.VOIP_NOTIFICATION_ID++;
             } else if (notificationCache.containsKey(callSession.getCallId())) {
-                    notificationId = notificationCache.get(callSession.getCallId());
-                    nm.notify(notificationId, notification);
-                }
+                notificationId = notificationCache.get(callSession.getCallId());
+                nm.notify(notificationId, notification);
+            }
         }
     }
 
@@ -213,6 +216,14 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
         Uri uri = Uri.parse("rong://" + context.getPackageName()).buildUpon()
                 .appendPath("conversationlist").build();
         intent.setData(uri);
+        intent.setPackage(context.getPackageName());
+        return intent;
+    }
+
+    private static Intent createDialIntent(Context context, boolean video) {
+        RLog.i(TAG, "createDialIntent:video = " + video);
+        Intent intent = new Intent("io.rong.intent.action.voip.DIAL");
+        intent.putExtra("is_video", video);
         intent.setPackage(context.getPackageName());
         return intent;
     }

@@ -55,7 +55,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".DialActivity"
-            android:theme="@style/BasisTheme"/>
+            android:theme="@style/BasisTheme">
+            <intent-filter>
+                <action android:name="io.rong.intent.action.voip.DIAL" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".MultiAudioCallActivity"
