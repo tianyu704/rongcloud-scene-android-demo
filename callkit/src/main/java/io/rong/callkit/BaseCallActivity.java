@@ -44,13 +44,28 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import cn.rongcloud.rtc.api.stream.RCRTCVideoStreamConfig;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import cn.rongcloud.rtc.api.stream.RCRTCVideoStreamConfig.Builder;
-import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoResolution;
 import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoFps;
+import cn.rongcloud.rtc.base.RCRTCParamsType.RCRTCVideoResolution;
 import cn.rongcloud.rtc.utils.FinLog;
+import io.rong.callkit.util.BluetoothUtil;
+import io.rong.callkit.util.CallKitUtils;
+import io.rong.callkit.util.CallReasonUtil;
 import io.rong.callkit.util.HeadsetInfo;
+import io.rong.callkit.util.RingingMode;
+import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.PublishCallBack;
+import io.rong.calllib.RongCallClient;
+import io.rong.calllib.RongCallCommon;
+import io.rong.calllib.RongCallSession;
+import io.rong.common.RLog;
+import io.rong.imkit.manager.AudioPlayManager;
+import io.rong.imkit.manager.AudioRecordManager;
 import io.rong.imkit.notification.NotificationUtil;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.userinfo.model.GroupUserInfo;
@@ -58,22 +73,6 @@ import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 import io.rong.push.notification.RongNotificationInterface;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import io.rong.callkit.util.BluetoothUtil;
-import io.rong.callkit.util.CallKitUtils;
-import io.rong.callkit.util.RingingMode;
-import io.rong.calllib.IRongCallListener;
-import io.rong.calllib.RongCallClient;
-import io.rong.calllib.RongCallCommon;
-import io.rong.calllib.RongCallSession;
-import io.rong.common.RLog;
-import io.rong.imkit.manager.AudioPlayManager;
-import io.rong.imkit.manager.AudioRecordManager;
 
 import static io.rong.callkit.CallFloatBoxView.showFB;
 
@@ -422,9 +421,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity
         }
         CallKitUtils.callConnected = false;
         CallKitUtils.shouldShowFloat = false;
-
-        toastDisconnectReason(reason);
-
+        CallReasonUtil.showToastByReason(reason);
         AudioPlayManager.getInstance().setInVoipMode(false);
         stopRing();
         NotificationUtil.getInstance().clearNotification(this, BaseCallActivity.CALL_NOTIFICATION_ID);
@@ -456,7 +453,7 @@ public class BaseCallActivity extends BaseNoActionBarActivity
                         + userId
                         + ", CallDisconnectedReason :"
                         + reason.name());
-        toastDisconnectReason(reason);
+        CallReasonUtil.showToastByReason(reason);
     }
 
     @Override
@@ -648,52 +645,6 @@ public class BaseCallActivity extends BaseNoActionBarActivity
 
     @Override
     public void onAudioLevelReceive(HashMap<String, String> audioLevel) {
-    }
-
-    private void toastDisconnectReason(RongCallCommon.CallDisconnectedReason reason) {
-        String text = null;
-        switch (reason) {
-            case CANCEL:
-                text = getString(R.string.rc_voip_mo_cancel);
-                break;
-            case REJECT:
-                text = getString(R.string.rc_voip_mo_reject);
-                break;
-            case NO_RESPONSE:
-            case BUSY_LINE:
-                text = getString(R.string.rc_voip_mo_no_response);
-                break;
-            case REMOTE_BUSY_LINE:
-                text = getString(R.string.rc_voip_mt_busy_toast);
-                break;
-            case REMOTE_CANCEL:
-                text = getString(R.string.rc_voip_mt_cancel);
-                break;
-            case REMOTE_REJECT:
-                text = getString(R.string.rc_voip_mt_reject);
-                break;
-            case REMOTE_NO_RESPONSE:
-                text = getString(R.string.rc_voip_mt_no_response);
-                break;
-            case NETWORK_ERROR:
-                if (!CallKitUtils.isNetworkAvailable(this)) {
-                    text = getString(R.string.rc_voip_call_network_error);
-                } else {
-                    text = getString(R.string.rc_voip_call_terminalted);
-                }
-                break;
-            case REMOTE_HANGUP:
-            case HANGUP:
-            case INIT_VIDEO_ERROR:
-                text = getString(R.string.rc_voip_call_terminalted);
-                break;
-            case OTHER_DEVICE_HAD_ACCEPTED:
-                text = getString(R.string.rc_voip_call_other);
-                break;
-        }
-        if (text != null) {
-            showShortToast(text);
-        }
     }
 
     public void onRemoteUserPublishVideoStream(

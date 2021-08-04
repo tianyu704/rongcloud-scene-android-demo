@@ -37,7 +37,6 @@ object AccountStore {
         ) ?: EMPTY_ACCOUNT
     }
 
-
     fun saveAccountInfo(info: AccountInfo?) {
         currentInfo = info ?: EMPTY_ACCOUNT
         context.putValue(ACCOUNT_INFO, currentInfo.toJson())

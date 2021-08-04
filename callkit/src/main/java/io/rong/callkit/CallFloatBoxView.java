@@ -4,9 +4,6 @@
 
 package io.rong.callkit;
 
-import static io.rong.callkit.util.CallKitUtils.callConnected;
-import static io.rong.callkit.util.CallKitUtils.isDial;
-
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -28,13 +25,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.rong.callkit.util.ActivityStartCheckUtils;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
+import io.rong.callkit.util.CallReasonUtil;
 import io.rong.calllib.CallUserProfile;
 import io.rong.calllib.IRongCallListener;
 import io.rong.calllib.ReportUtil;
@@ -50,9 +50,8 @@ import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.message.InformationNotificationMessage;
 
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import static io.rong.callkit.util.CallKitUtils.callConnected;
+import static io.rong.callkit.util.CallKitUtils.isDial;
 
 /**
  * Created by weiqinxiao on 16/3/17.
@@ -289,13 +288,7 @@ public class CallFloatBoxView {
                                             break;
                                     }
                                 }
-                                Toast.makeText(
-                                        mContext,
-                                        mContext.getString(
-                                                R.string.rc_voip_call_terminalted),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
-
+                                CallReasonUtil.showToastByReason(reason);
                                 if (wm != null && mView != null && mView.isAttachedToWindow()) {
                                     wm.removeView(mView);
                                     mView = null;
@@ -780,13 +773,7 @@ public class CallFloatBoxView {
                                             break;
                                     }
                                 }
-                                Toast.makeText(
-                                        mContext,
-                                        mContext.getString(
-                                                R.string.rc_voip_call_terminalted),
-                                        Toast.LENGTH_SHORT)
-                                        .show();
-
+                                CallReasonUtil.showToastByReason(reason);
                                 if (wm != null && mView != null) {
                                     wm.removeView(mView);
                                     if (null != timer) {
@@ -1002,13 +989,13 @@ public class CallFloatBoxView {
                                 if (isActivityStarted) {
                                     mBundle = null;
                                 } else {
-                                    Toast.makeText(
-                                            mContext,
-                                            mContext.getString(
-                                                    R.string
-                                                            .rc_background_start_actvity_deny),
-                                            Toast.LENGTH_SHORT)
-                                            .show();
+//                                    Toast.makeText(
+//                                            mContext,
+//                                            mContext.getString(
+//                                                    R.string
+//                                                            .rc_background_start_actvity_deny),
+//                                            Toast.LENGTH_SHORT)
+//                                            .show();
                                 }
                             }
                         });

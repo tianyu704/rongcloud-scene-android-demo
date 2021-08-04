@@ -29,13 +29,14 @@ public class ActivityStartCheckUtils {
 
     private static class SingletonHolder {
 
-      static ActivityStartCheckUtils sInstance = new ActivityStartCheckUtils();
+        static ActivityStartCheckUtils sInstance = new ActivityStartCheckUtils();
     }
 
-    private ActivityStartCheckUtils() {}
+    private ActivityStartCheckUtils() {
+    }
 
     public static ActivityStartCheckUtils getInstance() {
-     return SingletonHolder.sInstance;
+        return SingletonHolder.sInstance;
     }
 
     public void registerActivityLifecycleCallbacks(Context context) {
@@ -48,10 +49,12 @@ public class ActivityStartCheckUtils {
         application.registerActivityLifecycleCallbacks(
                 new Application.ActivityLifecycleCallbacks() {
                     @Override
-                    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {}
+                    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                    }
 
                     @Override
-                    public void onActivityStarted(Activity activity) {}
+                    public void onActivityStarted(Activity activity) {
+                    }
 
                     @Override
                     public void onActivityResumed(Activity activity) {
@@ -60,7 +63,8 @@ public class ActivityStartCheckUtils {
                     }
 
                     @Override
-                    public void onActivityPaused(Activity activity) {}
+                    public void onActivityPaused(Activity activity) {
+                    }
 
                     @Override
                     public void onActivityStopped(Activity activity) {
@@ -70,10 +74,12 @@ public class ActivityStartCheckUtils {
                     }
 
                     @Override
-                    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {}
+                    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+                    }
 
                     @Override
-                    public void onActivityDestroyed(Activity activity) {}
+                    public void onActivityDestroyed(Activity activity) {
+                    }
                 });
     }
 
@@ -114,7 +120,7 @@ public class ActivityStartCheckUtils {
         return result;
     }
 
-    private Runnable mRunnable =
+    private final Runnable mRunnable =
             new Runnable() {
                 @Override
                 public void run() {
