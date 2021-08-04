@@ -56,12 +56,34 @@ abstract class BaseProcessor(val processingEnv: ProcessingEnvironment) {
         }
     }
 
+    public fun logWarning(message: String?){
+        message?.let {
+            processingEnv.messager.printMessage(
+                Diagnostic.Kind.WARNING,
+                "${this.javaClass.name}: $message\r\n"
+            )
+        }
+    }
+
+    /**
+     * 调用该方法会导致编译出错，除非真实错误，否则请勿调用
+     */
     public fun logError(message: String?) {
         message?.let {
             processingEnv.messager.printMessage(
                 Diagnostic.Kind.ERROR,
                 "${this.javaClass.name}: $message\r\n"
             )
+        }
+    }
+
+    // 使用路径的第三级作为默认模块名
+    public fun getDefaultModuleName(classPath: String): String {
+        val split = classPath.split(".")
+        return if (split.size >= 3) {
+            split[2]
+        } else {
+            split[split.size - 1]
         }
     }
 }

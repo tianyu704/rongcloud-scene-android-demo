@@ -17,7 +17,7 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
-import cn.rongcloud.voiceroomdemo.utils.AudioManagerUtil
+import com.rongcloud.common.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter

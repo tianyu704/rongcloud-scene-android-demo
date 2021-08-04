@@ -14,6 +14,8 @@ public class ProcessorConstant {
         const val FRAGMENT_PACKAGE = "androidx.fragment.app.Fragment"
         const val VIEW_PACKAGE = "android.view.View"
         const val INIT_MODULE = "com.rongcloud.common.init.ModuleInit"
-        const val INIT_PROVIDE_NAMED = "autoInit"
+
+        const val IS_APP_MODULE = "isAppModule"
+        const val MODULE_NAME = "moduleName"
     }
 }

@@ -29,9 +29,9 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
 
     override fun processImpl(
         annotations: MutableSet<out TypeElement>,
-        processingEnv: RoundEnvironment
+        roundEnvironment: RoundEnvironment
     ): Boolean {
-        val hiltBindingElement = processingEnv.getElementsAnnotatedWith(HiltBinding::class.java)
+        val hiltBindingElement = roundEnvironment.getElementsAnnotatedWith(HiltBinding::class.java)
         logDebug("${hiltBindingElement.size}")
 
 //        if (hiltBindingElement.isEmpty()) {
@@ -98,12 +98,16 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
             }
 
         }
-
-        generateHiltInjectFile(elementList)
+        if (elementList.isNotEmpty()) {
+            generateHiltInjectFile(getDefaultModuleName(elementList[0].clazz), elementList)
+        }
         return true
     }
 
-    private fun generateHiltInjectFile(elementList: ArrayList<HiltBindingBean>) {
+    private fun generateHiltInjectFile(
+        moduleName: String = "",
+        elementList: ArrayList<HiltBindingBean>
+    ) {
         val activityElement = elementList.filter { it.typeEnum == TypeEnum.ACTIVITY }
         val fragmentElement = elementList.filter { it.typeEnum == TypeEnum.FRAGMENT }
         val viewElement = elementList.filter { it.typeEnum == TypeEnum.VIEW }
@@ -114,7 +118,7 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
                     activityElement,
                     ProcessorConstant.ACTIVITY_PACKAGE,
                     "ActivityComponent",
-                    "Generate_ActivityModule"
+                    "${moduleName}_Generate_ActivityModule"
                 )
             } catch (e: Exception) {
                 logError(e.message)
@@ -127,7 +131,7 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
                     fragmentElement,
                     ProcessorConstant.FRAGMENT_PACKAGE,
                     "FragmentComponent",
-                    "Generate_FragmentModule"
+                    "${moduleName}_Generate_FragmentModule"
                 )
             } catch (e: Exception) {
                 logError(e.message)

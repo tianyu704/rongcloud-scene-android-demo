@@ -7,6 +7,7 @@ package com.rongcloud.common
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import com.rongcloud.common.init.ModuleInit
 
 /**
  * @author gusd
@@ -18,21 +19,28 @@ object ModuleManager {
     @SuppressLint("StaticFieldLeak")
     private lateinit var initService: InitService
 
-     lateinit var applicationContext:Context
+    lateinit var applicationContext: Context
 
-    fun bindInitService(application: Application,initService: InitService) {
+    val moduleList: ArrayList<ModuleInit> = arrayListOf()
+
+    fun bindInitService(application: Application, initService: InitService) {
         this.initService = initService
         applicationContext = application
+
     }
 
     fun init(
         onBeforeInit: ((name: String, priority: Int) -> Int)? = null,
-        onInit: ((name: String, priority: Int) -> Unit)? = null,
-        onInitFinish: (() -> Unit)? = null
+        onModuleInitFinish: ((name: String, priority: Int) -> Unit)? = null,
+        onAllInitFinish: (() -> Unit)? = null
     ) {
-        initService.init(onBeforeInit, onInit, onInitFinish)
+        initService.init(onBeforeInit, onModuleInitFinish, onAllInitFinish)
     }
 
+
+    fun registerModuleInit(moduleInit: ModuleInit) {
+        moduleList.add(moduleInit)
+    }
 
 
 }

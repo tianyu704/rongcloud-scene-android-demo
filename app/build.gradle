@@ -31,6 +31,8 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 includeCompileClasspath = true
+                // 此参数用于编译期生成相关代码的标识，请勿删除
+                arguments += [ isAppModule : 'true' ]
             }
         }
         renderscriptSupportModeEnabled true

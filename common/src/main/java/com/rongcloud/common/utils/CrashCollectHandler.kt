@@ -2,12 +2,15 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils
+package com.rongcloud.common.utils
 
 import android.content.Context
 import android.os.Looper
 import android.widget.Toast
-import cn.rongcloud.voiceroomdemo.MyApp
+import com.rongcloud.common.ActivityManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.system.exitProcess
 
 /**
@@ -16,7 +19,9 @@ import kotlin.system.exitProcess
  */
 private const val TAG = "CrashCollectHandler"
 
-class CrashCollectHandler(val context: Context) : Thread.UncaughtExceptionHandler {
+@Singleton
+class CrashCollectHandler @Inject constructor(@ApplicationContext val context: Context, private val activityManager: ActivityManager) :
+    Thread.UncaughtExceptionHandler {
     private var mDefaultHandler: Thread.UncaughtExceptionHandler? =
         Thread.getDefaultUncaughtExceptionHandler()
 
@@ -40,7 +45,7 @@ class CrashCollectHandler(val context: Context) : Thread.UncaughtExceptionHandle
                 e.printStackTrace()
             }
             //退出程序
-            MyApp.instance.finishAllActivity()
+            activityManager.finishAllActivity()
             android.os.Process.killProcess(android.os.Process.myPid())
             exitProcess(0)
 
@@ -54,7 +59,7 @@ class CrashCollectHandler(val context: Context) : Thread.UncaughtExceptionHandle
         }
         Thread {
             Looper.prepare()
-            Toast.makeText(MyApp.context, "很抱歉,程序出现异常,即将退出", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "很抱歉,程序出现异常,即将退出", Toast.LENGTH_SHORT).show()
             Looper.loop()
         }.start()
 

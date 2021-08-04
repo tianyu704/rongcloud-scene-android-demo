@@ -4,6 +4,8 @@
 
 package cn.rongcloud.processor
 
+import cn.rongcloud.annotation.AutoInit
+import cn.rongcloud.annotation.HiltBinding
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
@@ -14,10 +16,7 @@ import javax.tools.Diagnostic
  * @Date 2021/07/28
  */
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes(
-    "cn.rongcloud.annotation.HiltBinding",
-    "cn.rongcloud.annotation.AutoInit"
-)
+@SupportedOptions(value = ["isAppModule"])
 class CoreProcessor : AbstractProcessor() {
 
     private val processorImplList = arrayListOf<BaseProcessor>()
@@ -31,6 +30,21 @@ class CoreProcessor : AbstractProcessor() {
             add(ModuleInitProcessor(processingEnv))
         }
     }
+
+    override fun getSupportedAnnotationTypes(): MutableSet<String> {
+        return HashSet<String>().apply {
+            add(HiltBinding::class.java.canonicalName)
+            add(AutoInit::class.java.canonicalName)
+        }
+    }
+
+    override fun getSupportedOptions(): MutableSet<String> {
+        return HashSet<String>().apply {
+            add(ProcessorConstant.IS_APP_MODULE)
+            add(ProcessorConstant.MODULE_NAME)
+        }
+    }
+
 
     override fun process(
         annotations: MutableSet<out TypeElement>,
@@ -46,10 +60,10 @@ class CoreProcessor : AbstractProcessor() {
 
     private fun processImpl(
         annotations: MutableSet<out TypeElement>,
-        processingEnv: RoundEnvironment,
+        roundEnvironment: RoundEnvironment,
     ): Boolean {
         processorImplList.forEach {
-            it.processImpl(annotations, processingEnv)
+            it.processImpl(annotations, roundEnvironment)
         }
         return true
     }

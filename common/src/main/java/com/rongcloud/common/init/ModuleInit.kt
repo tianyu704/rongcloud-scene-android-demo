@@ -6,9 +6,10 @@ package com.rongcloud.common.init
 
 import android.app.Application
 import android.content.Context
+import com.rongcloud.common.ModuleManager
 
 /**
- * 自动化初始化注解，释放方式参考 CommonInit，每个模块支持包含多个初始化类
+ * 自动化无侵入式的初始化注解，使用方式参考 CommonInit，单个模块支持包含多个初始化类
  * @author gusd
  * @Date 2021/07/28
  */

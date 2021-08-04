@@ -7,6 +7,7 @@ package com.rongcloud.common
 import android.app.Application
 import android.content.Context
 import com.rongcloud.common.init.ModuleInit
+import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -23,21 +24,22 @@ private const val TAG = "InitService"
 class InitService @Inject constructor() {
 
     @Inject
-    @Named("autoInit")
-    lateinit var initItemList: ArrayList<ModuleInit>
-
-    @Inject
     @ApplicationContext
     lateinit var context: Context
 
+    @Named("autoInit")
+    @Inject
+    lateinit var initModuleList:Lazy<ArrayList<ModuleInit>>
+
     fun init(
         onBeforeInit: ((name: String, priority: Int) -> Int)?,
-        onInit: ((name: String, priority: Int) -> Unit)?,
-        onInitFinish: (() -> Unit)?
+        onModuleInitFinish: ((name: String, priority: Int) -> Unit)?,
+        onAllInitFinish: (() -> Unit)?
     ) {
+        val initList = initModuleList.get()
         val needInitModule = arrayListOf<Pair<Int, ModuleInit>>()
-        initItemList.sortBy { it.getPriority() }
-        initItemList.forEach {
+        initList.sortBy { it.getPriority() }
+        initList.forEach {
             val realPriority =
                 onBeforeInit?.invoke(it.getName(context), it.getPriority()) ?: it.getPriority()
             if (realPriority >= 0) {
@@ -46,8 +48,8 @@ class InitService @Inject constructor() {
         }
         needInitModule.sortedBy { it.first }.forEach {
             it.second.onInit(context as Application)
-            onInit?.invoke(it.second.getName(context), it.first)
+            onModuleInitFinish?.invoke(it.second.getName(context), it.first)
         }
-        onInitFinish?.invoke()
+        onAllInitFinish?.invoke()
     }
 }
