@@ -15,19 +15,23 @@ import io.reactivex.rxjava3.core.Flowable
  * @author gusd
  * @Date 2021/07/21
  */
+
+private const val CALL_RECORD_PARAMETERS =
+    """cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,cr.direction, 
+            callInfo.userName as callName,callInfo.number as callNumberFromInfo,callInfo.portrait as callPortrait,
+            peerInfo.userName as peerName,peerInfo.number as peerNumberFromInfo,peerInfo.portrait as peerPortrait,
+            max(cr.date) as recentTime From CallRecord AS cr LEFT JOIN UserInfo AS callInfo ON cr.callerId = callInfo.userId 
+            LEFT JOIN UserInfo AS peerInfo ON cr.peerId = peerInfo.userId"""
+
 @Dao
 interface CallRecordDao {
 
 
     @Transaction
     @Query(
-        """SELECT cr.id,cr.callerNumber,cr.callerId,cr.peerId,cr.peerNumber,cr.date,cr.during,cr.callType,cr.direction, 
-            callInfo.userName as callName,callInfo.number as callNumberFromInfo,callInfo.portrait as callPortrait,
-            peerInfo.userName as peerName,peerInfo.number as peerNumberFromInfo,peerInfo.portrait as peerPortrait,
-            max(cr.date) as recentTime From CallRecord AS cr LEFT JOIN UserInfo AS callInfo ON cr.callerId = callInfo.userId 
-            LEFT JOIN UserInfo AS peerInfo ON cr.peerId = peerInfo.userId WHERE 
-            (cr.callerId = :userId AND cr.direction = '$DIRECTION_CALL') or (cr.peerId = :userId AND cr.direction = '$DIRECTION_CALLED')  
-            GROUP BY cr.callerNumber ORDER BY cr.date DESC """
+        """SELECT * FROM(SELECT $CALL_RECORD_PARAMETERS WHERE (cr.callerId = :userId AND cr.direction = '$DIRECTION_CALL') GROUP BY cr.peerNumber UNION 
+                SELECT $CALL_RECORD_PARAMETERS WHERE (cr.peerId = :userId AND cr.direction = '$DIRECTION_CALLED') GROUP BY cr.callerNumber)
+             ORDER BY date DESC """
     )
     fun queryCallRecordList(userId: String): Flowable<List<CallRecordModel>>
 
