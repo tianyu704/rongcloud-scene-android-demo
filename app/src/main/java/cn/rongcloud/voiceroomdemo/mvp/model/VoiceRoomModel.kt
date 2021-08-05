@@ -269,6 +269,16 @@ class VoiceRoomModel @Inject constructor(
                 }
             })
 
+        addDisposable(refreshAllMemberList
+            .debounce(30L, TimeUnit.MILLISECONDS)
+            .subscribe {
+                queryAllUserInfo()
+            })
+
+    }
+
+    override fun onCreate() {
+        super.onCreate()
         RCRTCAudioMixer.getInstance().setAudioMixingStateChangeListener(object :
             RCRTCAudioMixingStateChangeListener() {
             override fun onMixEnd() {
@@ -307,13 +317,6 @@ class VoiceRoomModel @Inject constructor(
             }
 
         })
-
-        addDisposable(refreshAllMemberList
-            .debounce(30L, TimeUnit.MILLISECONDS)
-            .subscribe {
-                queryAllUserInfo()
-            })
-
     }
 
 
@@ -435,6 +438,7 @@ class VoiceRoomModel @Inject constructor(
 
     override fun onDestroy() {
         dataModifyWorker.dispose()
+        RCRTCAudioMixer.getInstance().setAudioMixingStateChangeListener(null)
     }
 
     fun kickSeat(
