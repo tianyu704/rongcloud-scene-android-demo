@@ -18,15 +18,21 @@ import androidx.annotation.Nullable;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
+import javax.inject.Inject;
+
+import cn.rongcloud.annotation.HiltBinding;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView;
 import cn.rongcloud.voiceroomdemo.mvp.presenter.SettingPresenter;
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog;
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb;
 import cn.rongcloud.voiceroomdemo.webview.BaseActionBarActivity;
+import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.jvm.functions.Function0;
 
 
+@HiltBinding(value = ISettingView.class)
+@AndroidEntryPoint
 public class SettingActivity extends BaseActionBarActivity implements View.OnClickListener, ISettingView {
     private UserInfoDialog dialog;
     private boolean needModefy = false;
@@ -67,11 +73,11 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
         initDefalutActionBar("");
     }
 
-    private SettingPresenter presenter;
+    @Inject
+    SettingPresenter presenter;
 
     @Override
     public void initData() {
-        presenter = new SettingPresenter(this, this, this);
         tv_name.setText(AccountStore.INSTANCE.getUserName());
         String url = AccountStore.INSTANCE.getUserPortrait();
         if (TextUtils.isEmpty(url)) {
