@@ -539,8 +539,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onDestroy() {
         Log.d(TAG, "---single activity onDestroy---");
         // 统计打分
-        FeedbackHelper.getHelper().statistics();
-        stopRing();
+        if (!CallFloatBoxView.isCallFloatBoxShown()){
+            FeedbackHelper.getHelper().statistics();
+        }
         super.onDestroy();
     }
 

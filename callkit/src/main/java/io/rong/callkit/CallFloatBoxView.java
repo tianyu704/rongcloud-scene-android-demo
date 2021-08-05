@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cn.rong.combusis.feedback.FeedbackHelper;
 import io.rong.callkit.util.ActivityStartCheckUtils;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
@@ -289,6 +290,8 @@ public class CallFloatBoxView {
                                     }
                                 }
                                 CallReasonUtil.showToastByReason(reason);
+                                // 修改音视频界面销毁后通话一悬浮框形式进行
+                                FeedbackHelper.getHelper().statistics();
                                 if (wm != null && mView != null && mView.isAttachedToWindow()) {
                                     wm.removeView(mView);
                                     mView = null;
@@ -774,6 +777,8 @@ public class CallFloatBoxView {
                                     }
                                 }
                                 CallReasonUtil.showToastByReason(reason);
+                                // 修改音视频界面销毁后通话一悬浮框形式进行
+                                FeedbackHelper.getHelper().statistics();
                                 if (wm != null && mView != null) {
                                     wm.removeView(mView);
                                     if (null != timer) {
