@@ -5,8 +5,8 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting
 
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroomdemo.common.LocalDataStore
 import com.rongcloud.common.base.BaseLifeCyclePresenter
+import com.rongcloud.common.utils.LocalDataStore
 import javax.inject.Inject
 
 /**

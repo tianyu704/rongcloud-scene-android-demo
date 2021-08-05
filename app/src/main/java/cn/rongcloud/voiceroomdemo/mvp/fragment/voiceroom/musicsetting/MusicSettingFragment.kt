@@ -12,7 +12,7 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
-import cn.rongcloud.voiceroomdemo.ui.widget.ActionSnackBar
+import com.rongcloud.common.ui.widget.ActionSnackBar
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CHEER
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CLAP
 import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_ENTER

@@ -7,7 +7,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package cn.rongcloud.voiceroomdemo.ui.widget;
+package com.rongcloud.common.ui.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;

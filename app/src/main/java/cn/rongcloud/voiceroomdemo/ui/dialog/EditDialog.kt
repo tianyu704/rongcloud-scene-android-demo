@@ -39,7 +39,7 @@ class EditDialog(
         et_content.hint = hint
         et_content.setText(text)
         et_content.setSelection(text.length)
-        et_content.filters = arrayOf(MaxLengthWithEmojiFilter(maxLength,et_content))
+        et_content.filters = arrayOf(MaxLengthWithEmojiFilter(maxLength))
     }
 
     override fun show() {

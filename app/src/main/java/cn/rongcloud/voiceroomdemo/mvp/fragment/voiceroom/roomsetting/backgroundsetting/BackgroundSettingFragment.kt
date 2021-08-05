@@ -11,7 +11,7 @@ import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration
+import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_background_setting.*

@@ -20,6 +20,7 @@ import javax.inject.Named
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
+import javax.tools.StandardLocation
 
 /**
  * @author gusd
@@ -36,7 +37,6 @@ class ModuleInitProcessor(processingEnv: ProcessingEnvironment) : BaseProcessor(
         annotations: MutableSet<out TypeElement>,
         roundEnvironment: RoundEnvironment
     ): Boolean {
-        logDebug("------------>${roundEnvironment.rootElements.size}")
         val options = processingEnv.options
         val isAppModule = options[ProcessorConstant.IS_APP_MODULE].toBoolean()
         val autoInitElement = roundEnvironment.getElementsAnnotatedWith(AutoInit::class.java)
@@ -96,11 +96,21 @@ class ModuleInitProcessor(processingEnv: ProcessingEnvironment) : BaseProcessor(
         }
 
         generateAutoInitFile(moduleName ?: "", elementList)
+        createTestFile(moduleName)
         if (isAppModule) {
             // 生成 APP 层的注入策略
             generateTotalInitFile()
         }
+
         return true
+    }
+
+
+    private fun createTestFile(moduleName: String?) {
+        mFiler.createResource(StandardLocation.CLASS_OUTPUT, "", "META-INFO/moduleInitInfo.properties")
+            .openWriter()
+            .append("moduleName = $moduleName")
+            .close()
     }
 
     private fun removeModuleNameFromFile() {

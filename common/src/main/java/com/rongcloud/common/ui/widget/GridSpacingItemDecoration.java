@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.ui.widget;
+package com.rongcloud.common.ui.widget;
 
 import android.graphics.Rect;
 import android.view.View;

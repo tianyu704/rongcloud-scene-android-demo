@@ -7,7 +7,6 @@ package cn.rongcloud.voiceroomdemo.ui.dialog
 import android.content.Context
 import android.net.Uri
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.*
 import com.rongcloud.common.extension.getString
 import com.rongcloud.common.extension.loadLocalPortrait
 import com.rongcloud.common.extension.loadPortrait

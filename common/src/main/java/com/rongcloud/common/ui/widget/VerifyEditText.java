@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.ui.widget;
+package com.rongcloud.common.ui.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -26,7 +26,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
-import cn.rongcloud.voiceroomdemo.R;
+
+import com.rongcloud.common.R;
 
 import java.util.ArrayList;
 import java.util.List;

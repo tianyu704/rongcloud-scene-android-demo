@@ -15,12 +15,12 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isVisible
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.common.LocalDataStore
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
 import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
 import com.rongcloud.common.extension.loadImageView
+import com.rongcloud.common.utils.LocalDataStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_create_room.*
 import javax.inject.Inject
@@ -82,7 +82,7 @@ class CreateVoiceRoomDialogFragment(view: ICreateVoiceRoomView) :
             R.drawable.test_background
         )
 
-        et_room_name.filters = arrayOf(MaxLengthWithEmojiFilter(10, et_room_name))
+        et_room_name.filters = arrayOf(MaxLengthWithEmojiFilter(10))
     }
 
     override fun initListener() {

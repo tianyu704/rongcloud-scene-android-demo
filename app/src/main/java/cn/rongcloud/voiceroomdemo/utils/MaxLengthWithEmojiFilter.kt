@@ -13,7 +13,7 @@ import com.vdurmont.emoji.EmojiParser
  * @author gusd
  * @Date 2021/07/01
  */
-class MaxLengthWithEmojiFilter(val maxLength: Int, val editText: EditText) : InputFilter {
+class MaxLengthWithEmojiFilter(val maxLength: Int) : InputFilter {
     override fun filter(
         source: CharSequence?,
         start: Int,

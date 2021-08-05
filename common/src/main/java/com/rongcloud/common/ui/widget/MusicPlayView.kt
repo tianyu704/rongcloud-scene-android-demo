@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.ui.widget
+package com.rongcloud.common.ui.widget
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,7 +11,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.ContextCompat
-import cn.rongcloud.voiceroomdemo.R
+import com.rongcloud.common.R
 import java.util.*
 
 

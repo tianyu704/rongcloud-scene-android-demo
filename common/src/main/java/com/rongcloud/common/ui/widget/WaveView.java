@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.ui.widget;
+package com.rongcloud.common.ui.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,7 +16,8 @@ import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.ColorInt;
 
-import cn.rongcloud.voiceroomdemo.R;
+
+import com.rongcloud.common.R;
 
 import java.util.ArrayList;
 import java.util.Iterator;

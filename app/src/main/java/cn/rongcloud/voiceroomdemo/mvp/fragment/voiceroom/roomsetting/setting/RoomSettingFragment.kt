@@ -7,12 +7,11 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting
 import androidx.recyclerview.widget.GridLayoutManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.dialog.EditDialog
 import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
-import cn.rongcloud.voiceroomdemo.ui.widget.GridSpacingItemDecoration
+import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Maybe
 import kotlinx.android.synthetic.main.fragment_background_setting.*

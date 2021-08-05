@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.ui.widget;
+package com.rongcloud.common.ui.widget;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,7 +19,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import cn.rongcloud.voiceroomdemo.R;
+import com.rongcloud.common.R;
 
 
 /**

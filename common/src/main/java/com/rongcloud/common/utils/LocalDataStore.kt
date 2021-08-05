@@ -2,10 +2,9 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.common
+package com.rongcloud.common.utils
 
-import cn.rongcloud.voiceroom.utils.JsonUtils
-import cn.rongcloud.voiceroomdemo.MyApp
+import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.extension.getValueSync
 import com.rongcloud.common.extension.myStringPreferencesKey
 import com.rongcloud.common.extension.putValue
@@ -29,7 +28,7 @@ object LocalDataStore {
             backgroundCacheList
         } else {
             (JsonUtils.fromJson(
-                MyApp.context.getValueSync(KEY_BACKGROUND),
+                ModuleManager.applicationContext.getValueSync(KEY_BACKGROUND),
                 List::class.java
             ) as? List<String> ?: emptyList()).apply {
                 backgroundCacheList.clear()
@@ -39,7 +38,7 @@ object LocalDataStore {
     }
 
     fun saveBackGroundUrl(list: List<String>) {
-        MyApp.context.putValue(KEY_BACKGROUND, JsonUtils.toJson(list).apply {
+        ModuleManager.applicationContext.putValue(KEY_BACKGROUND, JsonUtils.toJson(list).apply {
             backgroundCacheList.clear()
             backgroundCacheList.addAll(list)
         })
