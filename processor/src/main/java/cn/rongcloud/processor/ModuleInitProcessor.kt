@@ -96,7 +96,7 @@ class ModuleInitProcessor(processingEnv: ProcessingEnvironment) : BaseProcessor(
         }
 
         generateAutoInitFile(moduleName ?: "", elementList)
-        createTestFile(moduleName)
+//        createTestFile(moduleName)
         if (isAppModule) {
             // 生成 APP 层的注入策略
             generateTotalInitFile()
