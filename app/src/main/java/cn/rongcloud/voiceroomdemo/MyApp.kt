@@ -49,7 +49,7 @@ class MyApp : MultiDexApplication() {
         )
 
         // 初始化所有模块，通话参数可修改初始化优先级，获取初始化总的模块数和初始进度
-        moduleManager.init({ name, priority ->
+        moduleManager.init(this,{ name, priority ->
             Log.d(TAG, "initModule: $name")
             priority
         })

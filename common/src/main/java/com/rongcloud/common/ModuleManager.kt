@@ -29,12 +29,12 @@ object ModuleManager {
 
     }
 
-    fun init(
+    fun init(application: Application,
         onBeforeInit: ((name: String, priority: Int) -> Int)? = null,
         onModuleInitFinish: ((name: String, priority: Int) -> Unit)? = null,
         onAllInitFinish: (() -> Unit)? = null
     ) {
-        initService.init(onBeforeInit, onModuleInitFinish, onAllInitFinish)
+        initService.init(application,onBeforeInit, onModuleInitFinish, onAllInitFinish)
     }
 
 

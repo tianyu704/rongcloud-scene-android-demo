@@ -24,15 +24,16 @@ private const val TAG = "InitService"
 @Singleton
 class InitService @Inject constructor() {
 
-    @Inject
-    @ApplicationContext
-    lateinit var context: Context
+//    @Inject
+//    @ApplicationContext
+//    lateinit var context: Context
 
     @Named("autoInit")
     @Inject
     lateinit var initModuleList: Lazy<ArrayList<ModuleInit>>
 
     fun init(
+        application: Application,
         onBeforeInit: ((name: String, priority: Int) -> Int)?,
         onModuleInitFinish: ((name: String, priority: Int) -> Unit)?,
         onAllInitFinish: (() -> Unit)?
@@ -44,7 +45,7 @@ class InitService @Inject constructor() {
         initList.sortBy { it.getPriority() }
         initList.forEach {
             val realPriority =
-                onBeforeInit?.invoke(it.getName(context), it.getPriority()) ?: it.getPriority()
+                onBeforeInit?.invoke(it.getName(application), it.getPriority()) ?: it.getPriority()
             if (realPriority >= 0) {
                 needInitModule.add(Pair(realPriority, it))
             }
@@ -52,12 +53,12 @@ class InitService @Inject constructor() {
         needInitModule.sortedBy { it.first }.forEach {
 
             try {
-                it.second.onInit(context as Application)
+                it.second.onInit(application)
             } catch (e: Exception) {
                 Log.e(TAG, "init: ", e)
             } finally {
                 try {
-                    onModuleInitFinish?.invoke(it.second.getName(context), it.first)
+                    onModuleInitFinish?.invoke(it.second.getName(application), it.first)
                 } catch (e: Exception) {
                     Log.e(TAG, "init: ", e)
                 }
