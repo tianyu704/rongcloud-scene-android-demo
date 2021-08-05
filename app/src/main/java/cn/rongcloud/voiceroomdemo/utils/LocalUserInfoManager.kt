@@ -101,7 +101,6 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
             }.apply {
                 mDisposable = this
             })
-
         }
     }
 
