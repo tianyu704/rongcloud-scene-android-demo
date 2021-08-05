@@ -28,16 +28,13 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
-import com.rongcloud.common.dao.database.DatabaseManager;
-import com.rongcloud.common.dao.entities.UserInfoEntity;
+import com.rongcloud.common.net.IResultBack;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
 import io.rong.callkit.util.DefaultPushConfig;
@@ -51,9 +48,11 @@ import io.rong.calllib.message.CallSTerminateMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.userinfo.RongUserInfoManager;
+import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
 public class SingleCallActivity extends BaseCallActivity implements Handler.Callback {
@@ -293,42 +292,75 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         View callMuteV = findViewById(R.id.rc_voip_call_mute);
         if (null != handFreeV) handFreeV.setSelected(handFree);
         if (null != callMuteV) handFreeV.setSelected(muted);
-        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
-        if (userInfo != null) {
-            TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-            userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
-            ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
-            if (userPortrait != null && userInfo.getPortraitUri() != null) {
-                Glide.with(this)
-                        .load(userInfo.getPortraitUri())
-                        .override(200)
-                        .placeholder(R.drawable.rc_default_portrait)
-                        .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                        .into(userPortrait);
+        refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(UserInfo userInfo) {
+                TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+                userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+                ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+                if (userPortrait != null && userInfo.getPortraitUri() != null) {
+                    Glide.with(SingleCallActivity.this)
+                            .load(userInfo.getPortraitUri())
+                            .override(200)
+                            .placeholder(R.drawable.rc_default_portrait)
+                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                            .into(userPortrait);
+                }
             }
-        } else if (!TextUtils.isEmpty(targetId)) {
-            DatabaseManager
-                    .INSTANCE
-                    .obUserInfoByUserId(targetId)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<UserInfoEntity>() {
+        });
+        createPickupDetector();
+    }
+
+    /**
+     * 处理：因异步导致第一次获取头像失败问题
+     *
+     * @param userId
+     * @param resultBack
+     */
+    private void getUserInfoFromManager(String userId, final IResultBack<UserInfo> resultBack) {
+        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(userId);
+        if (userInfo != null) {
+            if (null != resultBack) resultBack.onResult(userInfo);
+            return;
+        }
+        userDataObserver = new RongUserInfoManager.UserDataObserver() {
+            @Override
+            public void onUserUpdate(UserInfo userInfo) {
+                if (null != resultBack) resultBack.onResult(userInfo);
+            }
+
+            @Override
+            public void onGroupUpdate(Group group) {
+            }
+
+            @Override
+            public void onGroupUserInfoUpdate(GroupUserInfo groupUserInfo) {
+            }
+        };
+        RongUserInfoManager.getInstance().addUserDataObserver(userDataObserver);
+    }
+
+    private RongUserInfoManager.UserDataObserver userDataObserver;
+
+    private void refreshUserInfo(String userId, final IResultBack<UserInfo> resultBack) {
+        if (TextUtils.isEmpty(userId)) return;
+        getUserInfoFromManager(userId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(final UserInfo userInfo) {
+                if (null != userDataObserver) {
+                    RongUserInfoManager.getInstance().removeUserDataObserver(userDataObserver);
+                    userDataObserver = null;
+                }
+                if (null != mButtonContainer) {
+                    mUserInfoContainer.post(new Runnable() {
                         @Override
-                        public void accept(UserInfoEntity userInfoEntity) throws Throwable {
-                            TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-                            userName.setText(CallKitUtils.nickNameRestrict(userInfoEntity.getUserName()));
-                            ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
-                            if (userPortrait != null && userInfoEntity.getPortrait() != null) {
-                                Glide.with(SingleCallActivity.this)
-                                        .load(userInfoEntity.getPortrait())
-                                        .override(200)
-                                        .placeholder(R.drawable.rc_default_portrait)
-                                        .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                                        .into(userPortrait);
-                            }
+                        public void run() {
+                            if (resultBack != null) resultBack.onResult(userInfo);
                         }
                     });
-        }
-        createPickupDetector();
+                }
+            }
+        });
     }
 
     private void starCall(RongCallCommon.CallMediaType mediaType, boolean needCall) {
@@ -489,11 +521,16 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             // 二人视频通话接通后 mUserInfoContainer 中更换为无头像的布局
             mUserInfoContainer.removeAllViews();
             inflater.inflate(R.layout.rc_voip_video_call_user_info, mUserInfoContainer);
-            UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
-            if (userInfo != null) {
-                TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-                userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
-            }
+//            UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
+            refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+                @Override
+                public void onResult(UserInfo userInfo) {
+                    if (userInfo != null) {
+                        TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+                        userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+                    }
+                }
+            });
             mLocalVideo = localVideo;
             mLocalVideo.setTag(callSession.getSelfUserId());
         }
@@ -539,8 +576,12 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     protected void onDestroy() {
         Log.d(TAG, "---single activity onDestroy---");
         // 统计打分
-        if (!CallFloatBoxView.isCallFloatBoxShown()){
+        if (!CallFloatBoxView.isCallFloatBoxShown()) {
             FeedbackHelper.getHelper().statistics();
+        }
+        if (null != userDataObserver) {
+            RongUserInfoManager.getInstance().removeUserDataObserver(userDataObserver);
+            userDataObserver = null;
         }
         super.onDestroy();
     }
@@ -565,7 +606,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
     }
 
     private void changeToConnectedState(
-            String userId,
+            final String userId,
             RongCallCommon.CallMediaType mediaType,
             int userType,
             SurfaceView remoteVideo) {
@@ -616,11 +657,19 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         mSPreviewContainer.addView(toView);
                         if (null != fromView.getTag()
                                 && !TextUtils.isEmpty(fromView.getTag().toString())) {
-                            UserInfo userInfo =
-                                    RongUserInfoManager.getInstance().getUserInfo(
-                                            fromView.getTag().toString());
-                            TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-                            userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+//                            UserInfo userInfo =
+//                                    RongUserInfoManager.getInstance().getUserInfo(
+//                                            fromView.getTag().toString());
+                            refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+                                @Override
+                                public void onResult(UserInfo userInfo) {
+                                    if (null != userInfo) {
+                                        TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+                                        userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+                                    }
+                                }
+                            });
+
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -714,21 +763,26 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         mUserInfoContainer.removeAllViews();
         mUserInfoContainer.addView(userInfoView);
-        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
-        if (userInfo != null) {
-            TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
-            userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
-            if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
-                ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
-                if (userPortrait != null) {
-                    Glide.with(this)
-                            .load(userInfo.getPortraitUri())
-                            .placeholder(R.drawable.rc_default_portrait)
-                            .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                            .into(userPortrait);
+//        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
+        refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(UserInfo userInfo) {
+                if (userInfo != null) {
+                    TextView userName = (TextView) mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
+                    userName.setText(CallKitUtils.nickNameRestrict(userInfo.getName()));
+                    if (callSession.getMediaType().equals(RongCallCommon.CallMediaType.AUDIO)) {
+                        ImageView userPortrait = mUserInfoContainer.findViewById(R.id.rc_voip_user_portrait);
+                        if (userPortrait != null) {
+                            Glide.with(SingleCallActivity.this)
+                                    .load(userInfo.getPortraitUri())
+                                    .placeholder(R.drawable.rc_default_portrait)
+                                    .apply(RequestOptions.bitmapTransform(new CircleCrop()))
+                                    .into(userPortrait);
+                        }
+                    }
                 }
             }
-        }
+        });
         mUserInfoContainer.setVisibility(View.VISIBLE);
         View button = inflater.inflate(R.layout.rc_voip_call_bottom_connected_button_layout, null);
         mButtonContainer.removeAllViews();
