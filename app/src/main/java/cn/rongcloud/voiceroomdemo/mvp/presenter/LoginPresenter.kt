@@ -5,7 +5,6 @@
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.app.Application
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
@@ -15,7 +14,6 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
-import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

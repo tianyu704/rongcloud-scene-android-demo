@@ -10,7 +10,8 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
-import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
+import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
@@ -19,7 +20,6 @@ import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.utils.AudioEffectManager
 import com.rongcloud.common.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
-import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
 import com.rongcloud.common.net.ApiConstant

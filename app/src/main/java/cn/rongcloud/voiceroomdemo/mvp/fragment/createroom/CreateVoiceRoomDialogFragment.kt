@@ -17,8 +17,8 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
-import cn.rongcloud.voiceroomdemo.utils.MaxLengthWithEmojiFilter
+import com.rongcloud.common.ui.dialog.InputPasswordDialog
+import com.rongcloud.common.utils.MaxLengthWithEmojiFilter
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.utils.LocalDataStore
 import dagger.hilt.android.AndroidEntryPoint

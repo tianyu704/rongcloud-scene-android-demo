@@ -17,14 +17,14 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.mvp.bean.message.*
+import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.ui.uimodel.*
 import com.rongcloud.common.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
-import cn.rongcloud.voiceroomdemo.utils.RCChatRoomMessageManager
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.net.ApiConstant

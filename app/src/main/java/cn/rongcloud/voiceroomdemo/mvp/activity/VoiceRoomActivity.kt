@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
@@ -50,9 +49,10 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomPresenter
-import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
-import cn.rongcloud.voiceroomdemo.ui.dialog.TipDialog
-import cn.rongcloud.voiceroomdemo.ui.popupwindow.ExitRoomPopupWindow
+import com.rongcloud.common.ui.dialog.ConfirmDialog
+import com.rongcloud.common.ui.dialog.TipDialog
+import cn.rongcloud.mvoiceroom.ui.popup.ExitRoomPopupWindow
+import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel

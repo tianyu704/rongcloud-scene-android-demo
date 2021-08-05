@@ -9,8 +9,8 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.ui.dialog.EditDialog
-import cn.rongcloud.voiceroomdemo.ui.dialog.InputPasswordDialog
+import com.rongcloud.common.ui.dialog.EditDialog
+import com.rongcloud.common.ui.dialog.InputPasswordDialog
 import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Maybe

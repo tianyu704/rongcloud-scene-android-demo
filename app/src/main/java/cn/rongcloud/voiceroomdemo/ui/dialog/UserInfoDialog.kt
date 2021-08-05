@@ -11,6 +11,7 @@ import com.rongcloud.common.extension.getString
 import com.rongcloud.common.extension.loadLocalPortrait
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
+import com.rongcloud.common.ui.dialog.BaseDialog
 import com.rongcloud.common.utils.AccountStore
 import kotlinx.android.synthetic.main.layout_user_info_popup_window.*
 

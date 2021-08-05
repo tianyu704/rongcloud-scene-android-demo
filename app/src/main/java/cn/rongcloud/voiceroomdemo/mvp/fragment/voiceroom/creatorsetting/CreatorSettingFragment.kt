@@ -12,7 +12,7 @@ import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
-import cn.rongcloud.voiceroomdemo.ui.dialog.ConfirmDialog
+import com.rongcloud.common.ui.dialog.ConfirmDialog
 import kotlinx.android.synthetic.main.fragmeng_creator_setting.*
 import javax.inject.Inject
 
