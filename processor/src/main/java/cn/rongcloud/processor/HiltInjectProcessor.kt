@@ -32,11 +32,6 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
         roundEnvironment: RoundEnvironment
     ): Boolean {
         val hiltBindingElement = roundEnvironment.getElementsAnnotatedWith(HiltBinding::class.java)
-        logDebug("${hiltBindingElement.size}")
-
-//        if (hiltBindingElement.isEmpty()) {
-//            return true
-//        }
 
 
         // 获取activity的类型，转换成TypeMirror，用于判断
@@ -53,7 +48,6 @@ public class HiltInjectProcessor(processingEnv: ProcessingEnvironment) :
         val elementList = arrayListOf<HiltBindingBean>()
 
         hiltBindingElement.forEach { element ->
-            logDebug("element name = ${element.simpleName}")
 
             if (element.kind != ElementKind.CLASS) {
                 return@forEach

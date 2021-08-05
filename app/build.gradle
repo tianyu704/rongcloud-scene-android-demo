@@ -123,6 +123,7 @@ dependencies {
     implementation project(path: ':callkit')
     implementation project(path: ':common')
     implementation project(path: ':combusis')
+    implementation project(path: ':voiceroom')
 
     api "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"

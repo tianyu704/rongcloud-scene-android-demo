@@ -6,6 +6,7 @@ package com.rongcloud.common
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import com.rongcloud.common.init.ModuleInit
 import dagger.Lazy
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,14 +30,16 @@ class InitService @Inject constructor() {
 
     @Named("autoInit")
     @Inject
-    lateinit var initModuleList:Lazy<ArrayList<ModuleInit>>
+    lateinit var initModuleList: Lazy<ArrayList<ModuleInit>>
 
     fun init(
         onBeforeInit: ((name: String, priority: Int) -> Int)?,
         onModuleInitFinish: ((name: String, priority: Int) -> Unit)?,
         onAllInitFinish: (() -> Unit)?
     ) {
+
         val initList = initModuleList.get()
+//        Log.d(TAG, "init: initModuleList:${initList.size}")
         val needInitModule = arrayListOf<Pair<Int, ModuleInit>>()
         initList.sortBy { it.getPriority() }
         initList.forEach {
@@ -47,8 +50,19 @@ class InitService @Inject constructor() {
             }
         }
         needInitModule.sortedBy { it.first }.forEach {
-            it.second.onInit(context as Application)
-            onModuleInitFinish?.invoke(it.second.getName(context), it.first)
+
+            try {
+                it.second.onInit(context as Application)
+            } catch (e: Exception) {
+                Log.e(TAG, "init: ", e)
+            } finally {
+                try {
+                    onModuleInitFinish?.invoke(it.second.getName(context), it.first)
+                } catch (e: Exception) {
+                    Log.e(TAG, "init: ", e)
+                }
+            }
+
         }
         onAllInitFinish?.invoke()
     }

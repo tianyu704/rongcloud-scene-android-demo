@@ -26,8 +26,8 @@ class CoreProcessor : AbstractProcessor() {
         super.init(processingEnv)
         if (processingEnv == null) return
         processorImplList.apply {
-            add(HiltInjectProcessor(processingEnv))
             add(ModuleInitProcessor(processingEnv))
+            add(HiltInjectProcessor(processingEnv))
         }
     }
 

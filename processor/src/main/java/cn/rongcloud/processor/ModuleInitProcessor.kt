@@ -20,7 +20,6 @@ import javax.inject.Named
 import javax.lang.model.element.ElementKind
 import javax.lang.model.element.Modifier
 import javax.lang.model.element.TypeElement
-import kotlin.collections.HashSet
 
 /**
  * @author gusd
@@ -28,36 +27,47 @@ import kotlin.collections.HashSet
  */
 class ModuleInitProcessor(processingEnv: ProcessingEnvironment) : BaseProcessor(processingEnv) {
     private val moduleInitTempFile = File(".${File.separator}build${File.separator}temp.txt")
+
+    private var isFirst = true
+    private var hasInitModuleClass = false
+    private var moduleName: String? = null
+
     override fun processImpl(
         annotations: MutableSet<out TypeElement>,
         roundEnvironment: RoundEnvironment
     ): Boolean {
-
+        logDebug("------------>${roundEnvironment.rootElements.size}")
         val options = processingEnv.options
         val isAppModule = options[ProcessorConstant.IS_APP_MODULE].toBoolean()
-        var moduleName = options[ProcessorConstant.MODULE_NAME]
-
-        if (isAppModule && roundEnvironment.processingOver()) {
-            if (moduleInitTempFile.exists()) {
-                try {
-                    moduleInitTempFile.delete()
-                } catch (e: Exception) {
+        val autoInitElement = roundEnvironment.getElementsAnnotatedWith(AutoInit::class.java)
+        if (moduleName.isNullOrEmpty()) {
+            var moduleName = options[ProcessorConstant.MODULE_NAME]
+            // 从第一个类中获取 module 名
+            if (!moduleName.isNullOrEmpty() && isFirst) {
+                roundEnvironment.rootElements.firstOrNull()?.let {
+                    moduleName = getDefaultModuleName(it.asType().toString())
                 }
             }
         }
+        if (autoInitElement.isNotEmpty()) {
+            hasInitModuleClass = true
+        }
 
-        val autoInitElement = roundEnvironment.getElementsAnnotatedWith(AutoInit::class.java)
-        logDebug("${autoInitElement.size}")
+
+
+
+        if (roundEnvironment.processingOver()) {
+            if (!hasInitModuleClass && getModuleNameFromFile().contains(moduleName)) {
+                removeModuleNameFromFile()
+            }
+        }
+
+        isFirst = false
+
         if (autoInitElement.isEmpty()) {
             return true
         }
 
-
-        if (options.isNotEmpty()) {
-            options.forEach {
-                logDebug("key = ${it.key},value = ${it.value}")
-            }
-        }
 
         val elementList = arrayListOf<AutoInitBean>()
         autoInitElement.forEach { element ->
@@ -76,45 +86,48 @@ class ModuleInitProcessor(processingEnv: ProcessingEnvironment) : BaseProcessor(
         if (!moduleInitTempFile.exists()) {
             moduleInitTempFile.createNewFile()
         }
-        moduleName?.let {
-            val fw = FileWriter(moduleInitTempFile.path, true)
-            fw.appendLine(it)
-            fw.close()
+        if (!moduleName.isNullOrEmpty()) {
+            val moduleNameFromFile = getModuleNameFromFile()
+            if (!moduleNameFromFile.contains(moduleName)) {
+                val fw = FileWriter(moduleInitTempFile.path, true)
+                fw.appendLine(moduleName)
+                fw.close()
+            }
         }
 
         generateAutoInitFile(moduleName ?: "", elementList)
-        if(isAppModule){
+        if (isAppModule) {
             // 生成 APP 层的注入策略
             generateTotalInitFile()
         }
         return true
     }
 
-    private fun generateTotalInitFile() {
+    private fun removeModuleNameFromFile() {
+        if (!moduleName.isNullOrEmpty()) {
+            val moduleNameFromFile = getModuleNameFromFile()
+            val set = moduleNameFromFile.toHashSet()
+            set.remove(moduleName)
+            val fw = FileWriter(moduleInitTempFile.path, false)
+            set.forEach {
+                fw.appendLine(it)
+            }
+            fw.close()
+
+        }
+    }
+
+    private fun getModuleNameFromFile(): Set<String> {
         val fileReader = FileReader(moduleInitTempFile.path)
         val readLines = fileReader.readLines()
-        val moduleSet = HashSet<String>()
-        readLines.forEach { line ->
-            if (!line.isNullOrEmpty()) {
-                moduleSet.add(line)
-            }
-        }
+        fileReader.close()
+        return readLines.toSet()
+    }
 
-//        @Module
-//        @InstallIn(SingletonComponent::class)
-//        class ModuleInitComponent {
-//            @Provides
-//            @Named("autoInit")
-//            public fun provideModuleItem(
-//                @Named("voiceroomdemo") list1: ArrayList<ModuleInit>,
-//                @Named("common") list2: ArrayList<ModuleInit>
-//            ): ArrayList<ModuleInit> {
-//                return arrayListOf<ModuleInit>().apply {
-//                    addAll(list1)
-//                    addAll(list2)
-//                }
-//            }
-//        }
+    private fun generateTotalInitFile() {
+
+        val moduleSet = getModuleNameFromFile()
+
         val moduleAndClassName = getPackageAndClassName(ProcessorConstant.INIT_MODULE)
         val moduleInitType = ClassName.get(moduleAndClassName[0], moduleAndClassName[1])
         val arrayList = ClassName.get("java.util", "ArrayList")
