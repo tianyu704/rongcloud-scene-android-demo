@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseFragment
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMusicModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_list.*
 import kotlinx.android.synthetic.main.layout_music_play_item.view.*

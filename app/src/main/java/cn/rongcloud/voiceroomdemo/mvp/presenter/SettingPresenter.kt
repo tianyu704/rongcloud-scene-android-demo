@@ -9,6 +9,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
+import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
 import com.rongcloud.common.base.BaseLifeCyclePresenter
@@ -45,7 +46,9 @@ class SettingPresenter @Inject constructor(
                         selectedPicPath
                     ), context
                 ).flatMap { url ->
-                    return@flatMap VoiceRoomNetManager.voiceRoomService.updateUserInfo(
+                    return@flatMap CommonNetManager
+                        .commonService
+                        .updateUserInfo(
                         UpdateUserInfoRequestBean(
                             userName,
                             url
@@ -63,7 +66,9 @@ class SettingPresenter @Inject constructor(
             )
         } else {
             addDisposable(
-                VoiceRoomNetManager.voiceRoomService.updateUserInfo(
+                CommonNetManager
+                    .commonService
+                    .updateUserInfo(
                     UpdateUserInfoRequestBean(
                         userName,
                         null

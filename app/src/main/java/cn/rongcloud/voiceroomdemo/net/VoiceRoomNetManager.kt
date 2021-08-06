@@ -5,7 +5,9 @@
 package cn.rongcloud.voiceroomdemo.net
 
 import cn.rongcloud.voiceroomdemo.net.api.CommonApiService
-import cn.rongcloud.voiceroomdemo.net.api.DownloadFileApiService
+import cn.rongcloud.voiceroomdemo.net.api.GiftApiService
+import cn.rongcloud.voiceroomdemo.net.api.MusicApiService
+import cn.rongcloud.voiceroomdemo.net.api.VoiceRoomApiService
 import com.rongcloud.common.net.RetrofitManager
 
 /**
@@ -15,11 +17,16 @@ import com.rongcloud.common.net.RetrofitManager
 private const val TAG = "RetrofitManager"
 
 object VoiceRoomNetManager {
-    val voiceRoomService: CommonApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        RetrofitManager.getRetrofit().create(CommonApiService::class.java)
+
+    val voiceRoomService: VoiceRoomApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        RetrofitManager.getRetrofit().create(VoiceRoomApiService::class.java)
     }
 
-    val downloadService: DownloadFileApiService by lazy {
-        RetrofitManager.getDownloadRetrofit().create(DownloadFileApiService::class.java)
+    val musicService: MusicApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        RetrofitManager.getRetrofit().create(MusicApiService::class.java)
+    }
+
+    val giftService: GiftApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        RetrofitManager.getRetrofit().create(GiftApiService::class.java)
     }
 }

@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseFragment
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 import com.rongcloud.common.extension.loadPortrait
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_list.*

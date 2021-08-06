@@ -6,6 +6,11 @@ package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.mvoiceroom.net.bean.request.*
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.mvoiceroom.ui.uimodel.*
+import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -17,18 +22,14 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.mvoiceroom.message.*
-import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroomdemo.ui.uimodel.*
-import com.rongcloud.common.utils.AudioManagerUtil
 import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.AudioManagerUtil
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
@@ -414,7 +415,7 @@ class VoiceRoomModel @Inject constructor(
     }
 
     private fun doOnDataScheduler(block: () -> Unit) {
-        dataModifyWorker.schedule{
+        dataModifyWorker.schedule {
             try {
                 block()
             } catch (e: Exception) {
@@ -825,7 +826,7 @@ class VoiceRoomModel @Inject constructor(
 
     fun refreshGift() {
         addDisposable(VoiceRoomNetManager
-            .voiceRoomService
+            .giftService
             .getGiftList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -905,7 +906,9 @@ class VoiceRoomModel @Inject constructor(
                 }
                 return@map roomId
             }.flatMap {
-                return@flatMap VoiceRoomNetManager.voiceRoomService.getGiftList(it)
+                return@flatMap VoiceRoomNetManager
+                    .giftService
+                    .getGiftList(it)
             }.map {
                 it.data?.let { listMap ->
                     listMap.forEach { map ->
@@ -1223,18 +1226,20 @@ class VoiceRoomModel @Inject constructor(
         val result = arrayListOf<UiMemberModel>()
 
         val publisherList = members.map { model ->
-            VoiceRoomNetManager.voiceRoomService.sendGifts(
-                SendGiftsRequest(
-                    present.index,
-                    num,
-                    roomId,
-                    model.userId
-                )
-            ).doOnSuccess {
-                if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
-                    result.add(model)
-                }
-            }.toFlowable()
+            VoiceRoomNetManager
+                .giftService
+                .sendGifts(
+                    SendGiftsRequest(
+                        present.index,
+                        num,
+                        roomId,
+                        model.userId
+                    )
+                ).doOnSuccess {
+                    if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
+                        result.add(model)
+                    }
+                }.toFlowable()
         }.toTypedArray()
 
 
@@ -1310,7 +1315,7 @@ class VoiceRoomModel @Inject constructor(
 
     private fun queryMusicListByType(type: Int): Single<List<UiMusicModel>> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .musicService
             .getMusicList(MusicListRequest(roomId, type))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -1361,7 +1366,7 @@ class VoiceRoomModel @Inject constructor(
         return Completable.create { emitter ->
             addDisposable(
                 VoiceRoomNetManager
-                    .voiceRoomService
+                    .musicService
                     .addMusic(
                         AddMusicRequest(
                             name = name,
@@ -1396,7 +1401,7 @@ class VoiceRoomModel @Inject constructor(
     fun deleteMusic(url: String, id: Int): Completable {
         return Completable.create { emitter ->
             VoiceRoomNetManager
-                .voiceRoomService
+                .musicService
                 .musicDelete(DeleteMusicRequest(id, roomId))
                 .subscribe({
                     if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
@@ -1488,18 +1493,20 @@ class VoiceRoomModel @Inject constructor(
                 val currentMusic = userMusicList.lastOrNull {
                     it.url == currentPlayMusic
                 }
-                VoiceRoomNetManager.voiceRoomService.modifyMusicOrder(
-                    MusicOrderRequest(roomId, model.id, currentMusic?.id ?: 0)
-                ).subscribe({
-                    if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
-                        refreshMusicList()
-                        emitter.onComplete()
-                    } else {
-                        emitter.onError(Throwable(it.msg))
-                    }
-                }, {
-                    emitter.onError(it)
-                })
+                VoiceRoomNetManager
+                    .musicService
+                    .modifyMusicOrder(
+                        MusicOrderRequest(roomId, model.id, currentMusic?.id ?: 0)
+                    ).subscribe({
+                        if (it.code == ApiConstant.REQUEST_SUCCESS_CODE) {
+                            refreshMusicList()
+                            emitter.onComplete()
+                        } else {
+                            emitter.onError(Throwable(it.msg))
+                        }
+                    }, {
+                        emitter.onError(it)
+                    })
             }
         }
     }

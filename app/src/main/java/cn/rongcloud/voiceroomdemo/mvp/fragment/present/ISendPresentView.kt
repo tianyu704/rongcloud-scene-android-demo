@@ -6,7 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 
 import com.rongcloud.common.base.IBaseView
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 
 /**
  * @author baicq

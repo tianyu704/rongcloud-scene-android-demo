@@ -10,7 +10,7 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
@@ -81,8 +81,8 @@ class VoiceRoomListPresenter @Inject constructor(
                 if (info.room == null || info.room == EMPTY_ROOM_INFO) {
                     view.showError("房间不存在")
                 } else {
-                    if (info.room.isPrivate == 1 && info.room.createUser?.userId != AccountStore.getUserId()) {
-                        view.showInputPasswordDialog(info.room)
+                    if (info.room?.isPrivate == 1 && info.room?.createUser?.userId != AccountStore.getUserId()) {
+                        view.showInputPasswordDialog(info.room!!)
                     } else {
                         turnToRoom(context, info.room)
                     }
@@ -93,9 +93,9 @@ class VoiceRoomListPresenter @Inject constructor(
 
     }
 
-    fun turnToRoom(context: Context, info: VoiceRoomBean) {
-        info.createUser?.let {
-            VoiceRoomActivity.startActivity(context, info.roomId, info.createUser.userId)
+    fun turnToRoom(context: Context, info: VoiceRoomBean?) {
+        info?.createUser?.let {
+            VoiceRoomActivity.startActivity(context, info.roomId, it.userId)
         } ?: view.showError("房间数据错误")
     }
 

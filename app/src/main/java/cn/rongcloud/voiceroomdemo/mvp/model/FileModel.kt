@@ -8,9 +8,11 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import cn.rongcloud.voiceroomdemo.MyApp
+import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
+import com.rongcloud.common.net.FileDownloadNetManager
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.FileUtil
 import io.reactivex.rxjava3.core.Completable
@@ -44,8 +46,8 @@ object FileModel {
             .flatMap {
                 val requestBody = RequestBody.create(MediaType.parse("image/*"), it)
                 val part = MultipartBody.Part.createFormData("file", it.name, requestBody)
-                return@flatMap VoiceRoomNetManager
-                    .voiceRoomService
+                return@flatMap CommonNetManager
+                    .commonService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${shortUrl.data}"
@@ -70,7 +72,7 @@ object FileModel {
         MyApp.context.showToast("开始下载: $displayName")
         isDownloading = true
         return Completable.create { emitter ->
-            VoiceRoomNetManager
+            FileDownloadNetManager
                 .downloadService
                 .downloadFile(url)
                 .observeOn(Schedulers.io())
@@ -145,8 +147,8 @@ object FileModel {
                         getUploadNameByUrl(url = it),
                         requestBody
                     )
-                return@flatMapSingle VoiceRoomNetManager
-                    .voiceRoomService
+                return@flatMapSingle CommonNetManager
+                    .commonService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${ApiConstant.FILE_URL}${shortUrl.data}"

@@ -8,8 +8,8 @@ import android.net.Uri
 import android.util.LruCache
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.Member
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.UserIdList
+import cn.rongcloud.mvoiceroom.net.bean.respond.Member
+import cn.rongcloud.mvoiceroom.net.bean.respond.UserIdList
 import com.rongcloud.common.extension.getCompletePortraitUrl
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.internal.disposables.DisposableHelper

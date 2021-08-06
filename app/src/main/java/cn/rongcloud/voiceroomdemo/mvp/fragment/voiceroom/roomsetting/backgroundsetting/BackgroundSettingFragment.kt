@@ -10,7 +10,7 @@ import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -30,7 +30,7 @@ class BackgroundSettingFragment(
     IBackgroundSettingView by view {
 
     @Inject
-    lateinit var roomInfoBean:VoiceRoomBean
+    lateinit var roomInfoBean: VoiceRoomBean
 
     @Inject
     lateinit var roomModel: VoiceRoomModel

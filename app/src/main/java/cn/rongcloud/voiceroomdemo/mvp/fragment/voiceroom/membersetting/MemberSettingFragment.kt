@@ -8,8 +8,8 @@ import androidx.core.view.isVisible
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore

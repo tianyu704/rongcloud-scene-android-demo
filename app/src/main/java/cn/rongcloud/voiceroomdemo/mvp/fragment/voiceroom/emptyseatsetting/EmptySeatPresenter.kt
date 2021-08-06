@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Named

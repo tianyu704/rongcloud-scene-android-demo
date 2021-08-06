@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import com.rongcloud.common.base.IBaseView
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMusicModel
 
 /**
  * @author gusd

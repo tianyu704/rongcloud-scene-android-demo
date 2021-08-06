@@ -14,7 +14,7 @@ import cn.rongcloud.mvoiceroom.utils.MUSIC_ATMOSPHERE_CLAP
 import cn.rongcloud.mvoiceroom.utils.MUSIC_ATMOSPHERE_ENTER
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMusicModel
 import com.rongcloud.common.ui.widget.ActionSnackBar
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint

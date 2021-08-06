@@ -11,8 +11,8 @@ import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.CreateRoomRequestBean
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.Kv
+import cn.rongcloud.mvoiceroom.net.bean.request.CreateRoomRequestBean
+import cn.rongcloud.mvoiceroom.net.bean.request.Kv
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject

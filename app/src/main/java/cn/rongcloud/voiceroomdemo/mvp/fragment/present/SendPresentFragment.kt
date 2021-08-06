@@ -14,7 +14,7 @@ import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutManager.HORIZONTAL
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 import com.rongcloud.common.utils.UiUtils
 import com.bcq.adapter.recycle.RcyHolder
 import com.bcq.adapter.recycle.RcySAdapter

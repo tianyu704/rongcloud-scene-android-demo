@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroomdemo.ui.uimodel.MUSIC_FROM_TYPE_LOCAL
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.MUSIC_FROM_TYPE_LOCAL
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMusicModel
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File

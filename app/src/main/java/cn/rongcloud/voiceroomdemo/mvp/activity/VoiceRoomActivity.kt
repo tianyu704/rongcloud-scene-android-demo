@@ -53,9 +53,9 @@ import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.TipDialog
 import cn.rongcloud.mvoiceroom.ui.popup.ExitRoomPopupWindow
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiRoomModel
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiSeatModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiRoomModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait

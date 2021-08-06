@@ -5,10 +5,10 @@
 package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomInfoBean
+import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomListBean
 import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomInfoBean
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VoiceRoomListBean
 import cn.rongcloud.voiceroomdemo.throwable.RoomNotExistException
 import com.rongcloud.common.base.BaseModel
 import com.rongcloud.common.net.ApiConstant
@@ -69,7 +69,7 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
             .subscribe({ bean ->
                 onRoomListChange(bean)
                 bean.data?.images?.let {
-                    LocalDataStore.saveBackGroundUrl(bean.data.images)
+                    LocalDataStore.saveBackGroundUrl(it)
                 }
             }, { t ->
                 roomListErrorSubject.onNext(t)
@@ -129,9 +129,11 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
                     } else {
                         val indexOf = currentRoomList.indexOf(currentRoom)
                         if (indexOf >= 0) {
-                            currentRoomList[indexOf] = it.room
-                            currentRoomMap[roomId] = it.room
-                            roomInfoChangeSubject.onNext(it.room)
+                            it.room?.let { room ->
+                                currentRoomList[indexOf] = room
+                                currentRoomMap[roomId] = room
+                                roomInfoChangeSubject.onNext(room)
+                            }
                         }
                     }
                 } else {
@@ -172,8 +174,8 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
     }
 
     fun addRoomInfo(roomInfo: VoiceRoomBean) {
-        currentRoomList.add(0,roomInfo)
-        currentRoomMap.put(roomInfo.roomId,roomInfo)
+        currentRoomList.add(0, roomInfo)
+        currentRoomMap.put(roomInfo.roomId, roomInfo)
         roomListSubject.onNext(currentRoomList)
     }
 

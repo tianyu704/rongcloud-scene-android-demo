@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 
 import com.rongcloud.common.base.IBaseView
-import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMemberModel
+import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 
 /**
  * @author gusd

@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.model
 
 import androidx.appcompat.app.AppCompatActivity
+import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCode
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.LoginRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.LoginRespondBean
@@ -24,14 +25,14 @@ import javax.inject.Inject
 @ActivityScoped
 class LoginModel @Inject constructor(activity:AppCompatActivity):BaseLifeCycleModel(activity) {
     suspend fun getVerificationCode(phoneNumber: String): Single<VerificationCodeRespondBean> {
-        return VoiceRoomNetManager.voiceRoomService.getVerificationCode(GetVerificationCode(phoneNumber))
+        return CommonNetManager.commonService.getVerificationCode(GetVerificationCode(phoneNumber))
             .observeOn(
                 AndroidSchedulers.mainThread()
             )
     }
 
     suspend fun login(phoneNumber: String, verifyCode: String): Single<LoginRespondBean> {
-        return VoiceRoomNetManager.voiceRoomService.login(
+        return CommonNetManager.commonService.login(
             LoginRequestBean(
                 mobile = phoneNumber,
                 verifyCode = verifyCode,
