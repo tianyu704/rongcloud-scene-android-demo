@@ -176,9 +176,9 @@ public class RongCallModule implements IExtensionModule {
         // 在 Android 10 以上版本不再允许后台运行 Activity
         if (Build.VERSION.SDK_INT < 29 || isAppOnForeground(context)) {
             context.startActivity(createVoIPIntent(context, callSession, startForCheckPermissions));
-        } else {
-            onSendBroadcast(context, callSession, startForCheckPermissions);
         }
+        // 调整都发生通知
+        onSendBroadcast(context, callSession, startForCheckPermissions);
         mCallSession = null;
     }
 

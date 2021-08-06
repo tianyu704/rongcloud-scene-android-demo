@@ -43,7 +43,7 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
     private static final String HANGUP = "RC:VCHangup";
     private static final String INVITE = "RC:VCInvite";
     public static final String ACTION_CALLINVITEMESSAGE = "action.push.CallInviteMessage";
-    public final static String ACTION_CALLINVITEMESSAGE_CLICKED = "action.push.CallInviteMessage.CLICKED";
+    public final static String ACTION_CALLINVITEMESSAGE_CLICKED = "action.push.CallInviteMessage.CLICKED";//通知pantent发送的广播
     private static final String TAG = "VoIPBroadcastReceiver";
     private static Map<String, Integer> notificationCache = new HashMap<>();
 
@@ -180,7 +180,7 @@ public class VoIPBroadcastReceiver extends BroadcastReceiver {
             NotificationChannel notificationChannel = new NotificationChannel("rc_notification_id", channelName, importance);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.GREEN);
-            if (notification != null && notification.sound != null) {
+            if (notification != null && notification.sound != null && !objName.equals(HANGUP)) {//挂断不需要铃声
                 notificationChannel.setSound(notification.sound, null);
             }
             nm.createNotificationChannel(notificationChannel);
