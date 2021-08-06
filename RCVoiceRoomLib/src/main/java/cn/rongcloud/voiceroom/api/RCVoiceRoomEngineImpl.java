@@ -347,9 +347,9 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
             @Override
             public void onSuccess() {
+                unInitRCRTCEngine();
                 clearAll();
                 onSuccessWithCheck(callback);
-                unInitRCRTCEngine();
             }
 
             @Override
@@ -1524,13 +1524,13 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             RCRTCEngine.getInstance().leaveRoom(new IRCRTCResultCallback() {
                 @Override
                 public void onSuccess() {
+                    unInitRCRTCEngine();
                     // FIXME: 2021/6/21 暂时延迟处理
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    unInitRCRTCEngine();
                     Log.d(TAG, "switchRole: role = " + role.getType());
                     joinRTCRoom(mRoomId, role, callback);
                 }
