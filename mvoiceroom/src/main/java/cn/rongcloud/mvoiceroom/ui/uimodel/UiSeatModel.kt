@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
  * @author gusd
  * @Date 2021/06/18
  */
-class UiSeatModel(
+class UiSeatModel constructor(
     val index: Int = -1,
     private val seatModel: RCVoiceSeatInfo,
     private val seatInfoChangeSubject: BehaviorSubject<UiSeatModel>
@@ -20,11 +20,11 @@ class UiSeatModel(
     /**
      * 记录上次通话状态，防止频繁触发
      */
-    private var preSpeakingStatus:Boolean? = null
+    private var preSpeakingStatus: Boolean? = null
 
     var member: UiMemberModel? = null
         set(value) {
-            if (value != field) {
+            if (value != field || value == null) {
                 field = value
                 seatInfoChangeSubject.onNext(this)
             }
