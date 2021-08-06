@@ -2,11 +2,11 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils
+package cn.rongcloud.mvoiceroom.utils
 
 import android.util.Log
 import cn.rongcloud.rtc.api.RCRTCEngine
-import cn.rongcloud.voiceroomdemo.MyApp
+import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.extension.showToast
 
 /**
@@ -34,7 +34,7 @@ object AudioEffectManager {
                         getMusicAtmospherePathByName(name), index
                     ) { result ->
                         if (result == -1) {
-                            MyApp.context.showToast("音效文件加载失败")
+                            ModuleManager.applicationContext.showToast("音效文件加载失败")
                         }
                     }
             } catch (e: Exception) {

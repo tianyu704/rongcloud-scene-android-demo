@@ -9,13 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.mvoiceroom.utils.MUSIC_ATMOSPHERE_CHEER
+import cn.rongcloud.mvoiceroom.utils.MUSIC_ATMOSPHERE_CLAP
+import cn.rongcloud.mvoiceroom.utils.MUSIC_ATMOSPHERE_ENTER
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.ui.uimodel.UiMusicModel
 import com.rongcloud.common.ui.widget.ActionSnackBar
-import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CHEER
-import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_CLAP
-import cn.rongcloud.voiceroomdemo.utils.MUSIC_ATMOSPHERE_ENTER
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_setting.*
