@@ -11,10 +11,10 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.mvoiceroom.utils.AudioEffectManager
 import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.mvp.model.*
-import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel

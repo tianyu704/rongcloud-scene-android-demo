@@ -5,7 +5,6 @@
 package cn.rongcloud.voiceroomdemo.net
 
 import cn.rongcloud.voiceroomdemo.net.api.CommonApiService
-import cn.rongcloud.voiceroomdemo.net.api.VoiceRoomApiService
 import com.rongcloud.common.net.RetrofitManager
 
 /**

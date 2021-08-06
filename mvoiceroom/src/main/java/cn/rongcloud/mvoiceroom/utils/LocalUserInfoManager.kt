@@ -2,11 +2,11 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.utils
+package cn.rongcloud.mvoiceroom.utils
 
 import android.net.Uri
 import android.util.LruCache
-import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
+import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.mvoiceroom.net.bean.respond.Member
 import cn.rongcloud.mvoiceroom.net.bean.respond.UserIdList

@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.model
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.mvoiceroom.net.bean.request.*
 import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.mvoiceroom.ui.uimodel.*
@@ -22,9 +23,8 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
-import cn.rongcloud.voiceroomdemo.utils.LocalUserInfoManager
+import cn.rongcloud.mvoiceroom.utils.LocalUserInfoManager
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.net.ApiConstant

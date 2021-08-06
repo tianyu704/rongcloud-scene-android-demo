@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.net.api
+package cn.rongcloud.mvoiceroom.net.api
 
 import cn.rongcloud.mvoiceroom.net.bean.request.AddMusicRequest
 import cn.rongcloud.mvoiceroom.net.bean.request.DeleteMusicRequest

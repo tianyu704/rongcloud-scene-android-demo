@@ -2,12 +2,11 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.net
+package cn.rongcloud.mvoiceroom.net
 
-import cn.rongcloud.voiceroomdemo.net.api.CommonApiService
-import cn.rongcloud.voiceroomdemo.net.api.GiftApiService
-import cn.rongcloud.voiceroomdemo.net.api.MusicApiService
-import cn.rongcloud.voiceroomdemo.net.api.VoiceRoomApiService
+import cn.rongcloud.mvoiceroom.net.api.GiftApiService
+import cn.rongcloud.mvoiceroom.net.api.MusicApiService
+import cn.rongcloud.mvoiceroom.net.api.VoiceRoomApiService
 import com.rongcloud.common.net.RetrofitManager
 
 /**

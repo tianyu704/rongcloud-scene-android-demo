@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.net.CommonNetManager
-import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore

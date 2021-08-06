@@ -7,9 +7,9 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.Fragment
+import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
-import cn.rongcloud.voiceroomdemo.net.VoiceRoomNetManager
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.mvoiceroom.net.bean.request.CreateRoomRequestBean
 import cn.rongcloud.mvoiceroom.net.bean.request.Kv
