@@ -101,10 +101,11 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        super.onCreate(intent?.extras)
-    }
+    // 处理通知栏点击事件
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        super.onCreate(intent?.extras)
+//    }
 
     private lateinit var currentRole: Role
 
