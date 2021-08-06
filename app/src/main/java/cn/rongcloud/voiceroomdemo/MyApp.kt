@@ -13,11 +13,9 @@ import com.rongcloud.common.ActivityManager
 import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.base.IBaseView
-import com.rongcloud.common.init.ModuleInit
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
-import javax.inject.Named
 import kotlin.properties.Delegates
 
 /**
@@ -49,11 +47,10 @@ class MyApp : MultiDexApplication() {
         )
 
         // 初始化所有模块，通话参数可修改初始化优先级，获取初始化总的模块数和初始进度
-        moduleManager.init(this,{ name, priority ->
+        moduleManager.init(this, { name, priority ->
             Log.d(TAG, "initModule: $name")
             priority
         })
-
         // 退出或者账号被挤下线的流程
         AccountStore.obLogoutSubject().subscribe {
             try {

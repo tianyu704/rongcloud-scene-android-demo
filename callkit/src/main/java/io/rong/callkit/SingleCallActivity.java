@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
+import cn.rong.combusis.userprovide.UserProvider;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
 import io.rong.callkit.util.DefaultPushConfig;
@@ -292,7 +293,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         View callMuteV = findViewById(R.id.rc_voip_call_mute);
         if (null != handFreeV) handFreeV.setSelected(handFree);
         if (null != callMuteV) handFreeV.setSelected(muted);
-        refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+        UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
                 TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
@@ -309,58 +310,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             }
         });
         createPickupDetector();
-    }
-
-    /**
-     * 处理：因异步导致第一次获取头像失败问题
-     *
-     * @param userId
-     * @param resultBack
-     */
-    private void getUserInfoFromManager(String userId, final IResultBack<UserInfo> resultBack) {
-        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(userId);
-        if (userInfo != null) {
-            if (null != resultBack) resultBack.onResult(userInfo);
-            return;
-        }
-        userDataObserver = new RongUserInfoManager.UserDataObserver() {
-            @Override
-            public void onUserUpdate(UserInfo userInfo) {
-                if (null != resultBack) resultBack.onResult(userInfo);
-            }
-
-            @Override
-            public void onGroupUpdate(Group group) {
-            }
-
-            @Override
-            public void onGroupUserInfoUpdate(GroupUserInfo groupUserInfo) {
-            }
-        };
-        RongUserInfoManager.getInstance().addUserDataObserver(userDataObserver);
-    }
-
-    private RongUserInfoManager.UserDataObserver userDataObserver;
-
-    private void refreshUserInfo(String userId, final IResultBack<UserInfo> resultBack) {
-        if (TextUtils.isEmpty(userId)) return;
-        getUserInfoFromManager(userId, new IResultBack<UserInfo>() {
-            @Override
-            public void onResult(final UserInfo userInfo) {
-                if (null != userDataObserver) {
-                    RongUserInfoManager.getInstance().removeUserDataObserver(userDataObserver);
-                    userDataObserver = null;
-                }
-                if (null != mButtonContainer) {
-                    mUserInfoContainer.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (resultBack != null) resultBack.onResult(userInfo);
-                        }
-                    });
-                }
-            }
-        });
     }
 
     private void starCall(RongCallCommon.CallMediaType mediaType, boolean needCall) {
@@ -521,8 +470,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             // 二人视频通话接通后 mUserInfoContainer 中更换为无头像的布局
             mUserInfoContainer.removeAllViews();
             inflater.inflate(R.layout.rc_voip_video_call_user_info, mUserInfoContainer);
-//            UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
-            refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+            UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
                 @Override
                 public void onResult(UserInfo userInfo) {
                     if (userInfo != null) {
@@ -578,10 +526,6 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         // 统计打分
         if (!CallFloatBoxView.isCallFloatBoxShown()) {
             FeedbackHelper.getHelper().statistics();
-        }
-        if (null != userDataObserver) {
-            RongUserInfoManager.getInstance().removeUserDataObserver(userDataObserver);
-            userDataObserver = null;
         }
         super.onDestroy();
     }
@@ -657,10 +601,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         mSPreviewContainer.addView(toView);
                         if (null != fromView.getTag()
                                 && !TextUtils.isEmpty(fromView.getTag().toString())) {
-//                            UserInfo userInfo =
-//                                    RongUserInfoManager.getInstance().getUserInfo(
-//                                            fromView.getTag().toString());
-                            refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+                            UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
                                 @Override
                                 public void onResult(UserInfo userInfo) {
                                     if (null != userInfo) {
@@ -763,8 +704,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         mUserInfoContainer.removeAllViews();
         mUserInfoContainer.addView(userInfoView);
-//        UserInfo userInfo = RongUserInfoManager.getInstance().getUserInfo(targetId);
-        refreshUserInfo(targetId, new IResultBack<UserInfo>() {
+        UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
                 if (userInfo != null) {
