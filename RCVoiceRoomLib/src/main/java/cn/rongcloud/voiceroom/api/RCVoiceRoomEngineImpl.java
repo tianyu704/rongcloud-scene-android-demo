@@ -94,6 +94,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private final VoiceStatusReportListener mVoiceStatusReportListener = new VoiceStatusReportListener();
 
+    private Application mApplication;
+
     /**
      * 采用 map 和 list 双集合保存，map 用于记录在座位上的人，用于快速查询，list 用于记录位置信息
      */
@@ -155,6 +157,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
+                mApplication = context;
                 clientDelegate.initWithAppKey(context, appKey);
                 clientDelegate.registerMessageTypes(RCVoiceRoomInviteMessage.class, RCVoiceRoomRefreshMessage.class);
                 clientDelegate.setReceiveMessageDelegate(RCVoiceRoomEngineImpl.this);
@@ -174,6 +177,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         RCRTCEngine.getInstance().init(context, build);
     }
 
+    private void unInitRCRTCEngine(){
+        RCRTCEngine.getInstance().unInit();
+    }
+
     @Override
     public void connectWithToken(final Application context, String appToken, final RCVoiceRoomCallback callback) {
         clientDelegate.connectWithToken(appToken, new RCVoiceRoomClientDelegate.ConnectCallback() {
@@ -181,7 +188,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             public void onSuccess(String userId) {
                 Log.d(TAG, "onSuccess: userId = " + userId);
                 mCurrentUserId = userId;
-                initRCRTCEngine(context);
                 onSuccessWithCheck(callback);
             }
 
@@ -343,6 +349,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             public void onSuccess() {
                 clearAll();
                 onSuccessWithCheck(callback);
+                unInitRCRTCEngine();
             }
 
             @Override
@@ -1523,6 +1530,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    unInitRCRTCEngine();
                     Log.d(TAG, "switchRole: role = " + role.getType());
                     joinRTCRoom(mRoomId, role, callback);
                 }
@@ -1540,6 +1548,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomUserIdIsEmpty);
             return;
         }
+        initRCRTCEngine(mApplication);
         RCRTCRoomConfig config = RCRTCRoomConfig
                 .Builder
                 .create()
