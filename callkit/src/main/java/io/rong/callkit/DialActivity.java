@@ -164,6 +164,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                 });
             }
         });
+        //默认显示弹框
+        showDialpadFragment("");
     }
 
     private void onRecordItemClick(String phone) {
