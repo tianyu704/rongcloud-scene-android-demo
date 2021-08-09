@@ -67,6 +67,7 @@ const val EVENT_REQUEST_SEAT_REFUSE = "EVENT_REQUEST_SEAT_REFUSE"
 const val EVENT_REQUEST_SEAT_AGREE = "EVENT_REQUEST_SEAT_AGREE"
 
 const val EVENT_REQUEST_SEAT_CANCEL = "EVENT_REQUEST_SEAT_CANCEL"
+const val EVENT_USER_LEFT_SEAT = "EVENT_USER_LEFT_SEAT"
 
 
 const val EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM"
@@ -583,6 +584,7 @@ class VoiceRoomModel @Inject constructor(
 //                    model.userId = null
                     model.member = null
                 }
+            memberListChangeSubject.onNext(roomMemberInfoList)
         }
 
     }
@@ -612,7 +614,6 @@ class VoiceRoomModel @Inject constructor(
         doOnDataScheduler {
             Log.d(TAG, "onAudienceEnter: userId = $userId")
 //            refreshAllMemberInfoList()
-
             getOnLineUsersCount()
         }
     }

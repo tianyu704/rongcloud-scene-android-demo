@@ -101,7 +101,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
      */
     private final Map<String, RCVoiceSeatInfo> mUserOnSeatMap;
     private final List<RCVoiceSeatInfo> mSeatInfoList;
-
+    private final Map<String, Integer> leftMaps;//记录离开桌位的信息 userid：index
     private RCVoiceRoomClientDelegate clientDelegate;
 
     private final Handler mainThreadHandler;
@@ -109,6 +109,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
     private RCVoiceRoomEngineImpl() {
         mMessageReceiveListenerList = new CopyOnWriteArrayList<>();
         mUserOnSeatMap = new ConcurrentHashMap<>();
+        leftMaps = new ConcurrentHashMap<>();
         mSeatInfoList = new CopyOnWriteArrayList<>();
         mVREventListener = new IRCRTCVoiceRoomEventsListener();
         mainThreadHandler = new Handler(Looper.myLooper());
@@ -1296,6 +1297,16 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         initSeatInfoListIfNeeded(mRoomInfo.getSeatCount());
         updateSeatInfoFromEntry(chatRoomKvMap);
         handleRequestSeatKvUpdated(chatRoomKvMap);
+        if (null != mSeatInfoList) {
+            for (int i = 0; i < mSeatInfoList.size(); i++) {
+                RCVoiceSeatInfo info = mSeatInfoList.get(i);
+                if (!TextUtils.isEmpty(info.getUserId())) {
+                    leftMaps.remove(info.getUserId());
+                    leftMaps.put(info.getUserId(), i);
+                }
+            }
+
+        }
     }
 
     private void handleRequestSeatKvUpdated(Map<String, String> chatRoomKvMap) {
@@ -1361,6 +1372,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             for (int i = 0; i < maxCount; i++) {
                 RCVoiceSeatInfo newInfo = getSeatInfoByIndex(latestInfoList, i);
                 RCVoiceSeatInfo oldInfo = getSeatInfoByIndex(oldInfoList, i);
+//                Log.d(TAG, "updateSeatInfoFromEntry: old status = " + oldInfo.getStatus());
+//                Log.d(TAG, "updateSeatInfoFromEntry: new status = " + newInfo.getStatus());
                 if (oldInfo.getStatus() != newInfo.getStatus()) {
                     switch (newInfo.getStatus()) {
                         case RCSeatStatusEmpty:
@@ -1382,7 +1395,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                                     String userId = oldInfo.getUserId();
                                     oldInfo.setUserId(null);
                                     if (listener != null) {
+                                        Log.d(TAG, "updateSeatInfoFromEntry#onUserLeaveSeat: " + "index = " + i);
                                         listener.onUserLeaveSeat(i, userId);
+                                        leftMaps.remove(userId);
+                                        leftMaps.put(userId, i);
                                     }
                                 }
 
@@ -1455,6 +1471,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void onChatRoomKVRemove(String roomId, Map<String, String> chatRoomKvMap) {
+        Log.d(TAG, "onChatRoomKVRemove: roomId = " + chatRoomKvMap);
         handleRequestSeatCancelled(chatRoomKvMap);
     }
 
@@ -1465,9 +1482,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                 if (listener != null) {
                     listener.onRequestSeatListChanged();
                 }
-            }
-
-            if (key.startsWith(RC_SEAT_INFO_USER_PART_PREFIX_KEY)) {
+            } else if (key.startsWith(RC_SEAT_INFO_USER_PART_PREFIX_KEY)) {
                 String[] keyInfoArray = key.split("_");
                 if (keyInfoArray.length > 1) {
                     try {
@@ -1887,16 +1902,20 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         @Override
         public void onUserJoined(RCRTCRemoteUser remoteUser) {
             Log.d(TAG, "onUserJoined : " + "remoteUser = " + remoteUser);
+            handleJoinRoom(remoteUser.getUserId());
         }
 
         @Override
         public void onUserLeft(RCRTCRemoteUser remoteUser) {
             Log.d(TAG, "onUserLeft : " + "remoteUser = " + remoteUser);
+            handleLeaveRoom(remoteUser.getUserId());
         }
 
         @Override
         public void onUserOffline(final RCRTCRemoteUser remoteUser) {
             Log.d(TAG, "onUserOffline : " + "remoteUser = " + remoteUser.getUserId());
+            // 离线当做离开处理
+            handleLeaveRoom(remoteUser.getUserId());
         }
 
         @Override
@@ -1924,6 +1943,37 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         @Override
         public void onLeaveRoom(int reasonCode) {
             Log.d(TAG, "onLeaveRoom : " + "reasonCode = " + reasonCode);
+        }
+
+        private void handleLeaveRoom(String userId) {
+            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
+            int index = getSeatIndexByUserId(userId);
+            Log.d(TAG, "handleLeaveRoom : " + "index = " + index);
+            if (index > -1) {
+                RCVoiceSeatInfo left = mSeatInfoList.get(index);
+                userLeaveSeat(userId, left);
+                listener.onUserLeaveSeat(index, userId);
+                listener.onSeatInfoUpdate(mSeatInfoList);
+                leftMaps.remove(userId);
+                leftMaps.put(userId, index);
+            }
+        }
+
+        private void handleJoinRoom(String userId) {
+            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
+            if (null != listener && null != leftMaps) {
+                int index;
+                if (leftMaps.containsKey(userId)) {
+                    index = leftMaps.get(userId);
+                } else {//第一个进来的 房主 todo
+                    index = 0;
+                }
+                Log.d(TAG, "handleJoinRoom : " + "index = " + index);
+                RCVoiceSeatInfo enter = mSeatInfoList.get(index);
+                userEnterSeat(enter, userId);
+                listener.onUserEnterSeat(index, userId);
+                listener.onSeatInfoUpdate(mSeatInfoList);
+            }
         }
     }
 
