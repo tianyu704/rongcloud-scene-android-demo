@@ -177,7 +177,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         RCRTCEngine.getInstance().init(context, build);
     }
 
-    private void unInitRCRTCEngine(){
+    private void unInitRCRTCEngine() {
         RCRTCEngine.getInstance().unInit();
     }
 
@@ -1291,6 +1291,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void onChatRoomKVUpdate(String roomId, Map<String, String> chatRoomKvMap) {
+        Log.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + " chatRoomKvMap = " + chatRoomKvMap);
         updateRoomInfoFromEntry(chatRoomKvMap);
         initSeatInfoListIfNeeded(mRoomInfo.getSeatCount());
         updateSeatInfoFromEntry(chatRoomKvMap);

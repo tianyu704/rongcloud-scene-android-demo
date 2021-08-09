@@ -557,6 +557,7 @@ class VoiceRoomModel @Inject constructor(
                 uiSeatModel.member = getMemberInfoByUserIdOnlyLocal(uiSeatModel.userId)
                 return@mapIndexed uiSeatModel
             }
+            Log.d(TAG, "onSeatInfoUpdate list : $list")
             currentUISeatInfoList.clear()
             currentUISeatInfoList.addAll(list)
             seatListChangeSubject.onNext(currentUISeatInfoList)
