@@ -305,14 +305,16 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         Log.d(TAG, "leaveRoom: ");
         int index = getSeatIndexByUserId(mCurrentUserId);
         if (index >= 0) {
-            leaveSeat(new RCVoiceRoomCallback() {
+            leaveSeat(true, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
+                    Log.d(TAG, "leaveRoom: onSuccess");
                     afterLeaveSeat(callback);
                 }
 
                 @Override
                 public void onError(int code, String message) {
+                    Log.d(TAG, "leaveRoom: onError");
                     afterLeaveSeat(callback);
                 }
             });
@@ -322,6 +324,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
     }
 
     private void afterLeaveSeat(final RCVoiceRoomCallback callback) {
+        Log.d(TAG, "afterLeaveSeat:");
         notifyVoiceRoom(RC_AUDIENCE_LEAVE_ROOM, mCurrentUserId);
         if (TextUtils.isEmpty(mRoomId)) {
             onSuccessWithCheck(callback);
@@ -330,13 +333,13 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         RongChatRoomClient.getInstance().quitChatRoom(mRoomId, new IRongCoreCallback.OperationCallback() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "onSuccess: ");
+                Log.d(TAG, "leaveRoom:onSuccess: ");
                 leaveRTCRoom(callback);
             }
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                Log.d(TAG, "onError : " + "coreErrorCode = " + coreErrorCode.code);
+                Log.d(TAG, "leaveRoom:onError : " + "coreErrorCode = " + coreErrorCode.code);
                 leaveRTCRoom(null);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
             }
@@ -411,12 +414,22 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     @Override
     public void leaveSeat(final RCVoiceRoomCallback callback) {
+        leaveSeat(false, callback);
+    }
+
+    /**
+     * @param fromLeftRoom true:来自退出房间 不需要切换角色 false:切换角色
+     * @param callback
+     */
+    private void leaveSeat(final boolean fromLeftRoom, final RCVoiceRoomCallback callback) {
+        Log.d(TAG, "leaveSeat: = " + fromLeftRoom);
         final int seatIndex = getSeatIndexByUserId(mCurrentUserId);
         if (!seatIndexInRange(seatIndex)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
         }
         final RCVoiceSeatInfo info = mSeatInfoList.get(seatIndex);
+        Log.d(TAG, "leaveSeat: = " + (null == info ? "" : JsonUtils.toJson(info)));
         if (info != null) {
             final String userId = info.getUserId();
             final RCVoiceSeatInfo seatClone = info.clone();
@@ -425,20 +438,28 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             updateKvSeatInfo(seatClone, seatIndex, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
+                    Log.d(TAG, "leaveSeat: onSuccess");
                     userLeaveSeat(userId, info);
                     RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
                     if (currentRoomEventListener != null) {
                         currentRoomEventListener.onUserLeaveSeat(seatIndex, mCurrentUserId);
                         currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
                     }
-                    switchRole(RCRTCLiveRole.AUDIENCE, callback);
+                    if (!fromLeftRoom) {
+                        switchRole(RCRTCLiveRole.AUDIENCE, callback);
+                    } else {
+                        onSuccessWithCheck(callback);
+                    }
                 }
 
                 @Override
                 public void onError(int code, String message) {
+                    Log.d(TAG, "leaveSeat: onError");
                     onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
                 }
             });
+        } else {
+            onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
         }
     }
 
@@ -1301,7 +1322,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             for (int i = 0; i < mSeatInfoList.size(); i++) {
                 RCVoiceSeatInfo info = mSeatInfoList.get(i);
                 if (!TextUtils.isEmpty(info.getUserId())) {
-                    leftMaps.remove(info.getUserId());
                     leftMaps.put(info.getUserId(), i);
                 }
             }
@@ -1397,7 +1417,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                                     if (listener != null) {
                                         Log.d(TAG, "updateSeatInfoFromEntry#onUserLeaveSeat: " + "index = " + i);
                                         listener.onUserLeaveSeat(i, userId);
-                                        leftMaps.remove(userId);
                                         leftMaps.put(userId, i);
                                     }
                                 }
@@ -1411,10 +1430,16 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                             }
                             break;
                         case RCSeatStatusLocking:
-                            oldInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking);
                             if (listener != null) {
+                                oldInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking);
+                                if (TextUtils.equals(oldInfo.getUserId(), mCurrentUserId)) {//锁座要踢人
+                                    switchRole(RCRTCLiveRole.AUDIENCE, null);
+                                    listener.onKickSeatReceived(i);
+                                }
                                 listener.onSeatLock(i, true);
                             }
+                            oldInfo.setUserId(null);
+                            newInfo.setUserId(null);
                             break;
                     }
                 }
@@ -1651,15 +1676,17 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private void updateKvSeatInfo(final RCVoiceSeatInfo info, final int seatIndex, final RCVoiceRoomCallback callback) {
         final AtomicBoolean isSuccess = new AtomicBoolean(true);
-
+        Log.d(TAG, "updateKvSeatInfo: ");
         updateSeatInfoSeatPart(info, seatIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
+                Log.d(TAG, "updateKvSeatInfo#updateSeatInfoSeatPart: onSuccess");
                 updateSeatInfoUserPart(info, seatIndex, isSuccess, callback);
             }
 
             @Override
             public void onError(int code, String message) {
+                Log.d(TAG, "updateKvSeatInfo#updateSeatInfoSeatPart: onError");
                 isSuccess.set(false);
                 updateSeatInfoUserPart(info, seatIndex, isSuccess, callback);
             }
@@ -1667,9 +1694,11 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
     }
 
     private void updateSeatInfoUserPart(RCVoiceSeatInfo info, int seatIndex, final AtomicBoolean isSuccess, final RCVoiceRoomCallback callback) {
+        Log.d(TAG, "updateSeatInfoUserPart");
         RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, seatInfoUserPartKvKey(seatIndex), info.toJson(), false, true, "", new IRongCoreCallback.OperationCallback() {
             @Override
             public void onSuccess() {
+                Log.d(TAG, "updateSeatInfoUserPart:onSuccess");
                 if (isSuccess.get()) {
                     onSuccessWithCheck(callback);
                 } else {
@@ -1679,6 +1708,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                Log.d(TAG, "updateSeatInfoUserPart:onError");
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncSeatInfoFailed);
             }
         });
@@ -1828,7 +1858,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                         newInfo = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
                     }
                     if (newInfo == null) {
-                        newInfo = getSeatInfoByIndex(i).clone();
+                        newInfo = getSeatInfoByIndex(i);
                     }
                     list.add(newInfo);
                 }
@@ -1943,7 +1973,6 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                 userLeaveSeat(userId, left);
                 listener.onUserLeaveSeat(index, userId);
                 listener.onSeatInfoUpdate(mSeatInfoList);
-                leftMaps.remove(userId);
                 leftMaps.put(userId, index);
             }
         }

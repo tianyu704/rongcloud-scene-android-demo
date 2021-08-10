@@ -409,23 +409,6 @@ class VoiceRoomPresenter @Inject constructor(
 
     fun leaveRoom() {
         roomModel.onLeaveRoom()
-        val index = roomModel.isInSeat(currentUserId)
-        if (index > -1) {
-            RCVoiceRoomEngine.getInstance().leaveSeat(object : RCVoiceRoomCallback {
-                override fun onError(code: Int, message: String?) {
-                    leaveRTCRoom()
-                }
-
-                override fun onSuccess() {
-                    leaveRTCRoom()
-                }
-            })
-        } else {
-            leaveRTCRoom()
-        }
-    }
-
-    private fun leaveRTCRoom() {
         RCVoiceRoomEngine.getInstance().leaveRoom(object : RCVoiceRoomCallback {
             override fun onError(code: Int, message: String?) {
                 view.showError(code, message)
