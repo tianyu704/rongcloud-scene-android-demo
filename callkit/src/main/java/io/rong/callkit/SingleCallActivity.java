@@ -282,7 +282,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             mediaType = callSession.getMediaType();
         }
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {
-            handFree = true;
+            handFree = false;
             muted = false;
 
         } else if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {

@@ -827,6 +827,7 @@ class VoiceRoomModel @Inject constructor(
     }
 
     fun refreshGift() {
+        Log.e(TAG, "refreshGift")
         addDisposable(VoiceRoomNetManager
             .giftService
             .getGiftList(roomId)

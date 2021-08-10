@@ -24,7 +24,7 @@ class MuteAllSeatFunction(val roomModel: VoiceRoomModel, val view: IRoomSettingV
                     addDisposable(
                         roomModel.setAllSeatMute(false).observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                view.showMessage("设置成功")
+                                view.showMessage("已解锁全麦")
                             }, {
                                 view.showError("设置失败")
                             })
@@ -35,7 +35,7 @@ class MuteAllSeatFunction(val roomModel: VoiceRoomModel, val view: IRoomSettingV
                     addDisposable(
                         roomModel.setAllSeatMute(true).observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                view.showMessage("设置成功")
+                                view.showMessage("全部麦位已静音")
                             }, {
                                 view.showError("设置失败")
                             })
