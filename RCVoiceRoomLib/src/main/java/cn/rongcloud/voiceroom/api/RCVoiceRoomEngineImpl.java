@@ -1372,8 +1372,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             for (int i = 0; i < maxCount; i++) {
                 RCVoiceSeatInfo newInfo = getSeatInfoByIndex(latestInfoList, i);
                 RCVoiceSeatInfo oldInfo = getSeatInfoByIndex(oldInfoList, i);
-//                Log.d(TAG, "updateSeatInfoFromEntry: old status = " + oldInfo.getStatus());
-//                Log.d(TAG, "updateSeatInfoFromEntry: new status = " + newInfo.getStatus());
+                Log.d(TAG, "updateSeatInfoFromEntry: index = " + i + " new = " + newInfo.getStatus() + "  old = " + oldInfo.getStatus());
                 if (oldInfo.getStatus() != newInfo.getStatus()) {
                     switch (newInfo.getStatus()) {
                         case RCSeatStatusEmpty:
@@ -1383,7 +1382,8 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                                     listener.onSeatLock(i, false);
                                 }
                             }
-                            if (oldInfo.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing && !TextUtils.isEmpty(oldInfo.getUserId())) {
+                            if (oldInfo.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing
+                                    && !TextUtils.isEmpty(oldInfo.getUserId())) {
                                 if (TextUtils.equals(oldInfo.getUserId(), mCurrentUserId)) {
                                     oldInfo.setUserId(null);
                                     if (listener != null) {
@@ -1822,24 +1822,13 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                 List<RCVoiceSeatInfo> list = new ArrayList<>();
                 for (int i = 0; i < mRoomInfo.getSeatCount(); i++) {
                     String seatKey = seatInfoSeatPartKvKey(i);
-                    String userKey = seatInfoUserPartKvKey(i);
+//                    String userKey = seatInfoUserPartKvKey(i);
                     RCVoiceSeatInfo newInfo = null;
                     if (map.containsKey(seatKey)) {
-                        newInfo = new RCVoiceSeatInfo();
-                        RCVoiceSeatInfo temp = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
-                        newInfo.setMute(temp.isMute());
-                        newInfo.setExtra(temp.getExtra());
-                        if (temp.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
-                            newInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking);
-                        }
+                        newInfo = JsonUtils.fromJson(map.get(seatKey), RCVoiceSeatInfo.class);
                     }
                     if (newInfo == null) {
-                        newInfo = getSeatInfoByIndex(i);
-                    }
-                    if (map.containsKey(userKey) && newInfo != null) {
-                        RCVoiceSeatInfo temp = JsonUtils.fromJson(map.get(userKey), RCVoiceSeatInfo.class);
-                        newInfo.setStatus(temp.getStatus());
-                        newInfo.setUserId(temp.getUserId());
+                        newInfo = getSeatInfoByIndex(i).clone();
                     }
                     list.add(newInfo);
                 }
