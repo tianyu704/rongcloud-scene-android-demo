@@ -926,6 +926,11 @@ class VoiceRoomModel @Inject constructor(
                             roomMemberInfoList.firstOrNull { member ->
                                 member.userId == entry.key
                             }?.giftCount = entry.value
+                            //统一 处理首次进来不刷新的问题 giftcount
+                            var seat = currentUISeatInfoList.firstOrNull {
+                                it.userId == entry.key
+                            }
+                            seatInfoChangeSubject.onNext(seat)
                         }
                     }
                 }
