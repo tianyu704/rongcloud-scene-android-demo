@@ -157,12 +157,16 @@ class VoiceRoomPresenter @Inject constructor(
             .obMemberInfoChange()
             .subscribe {
                 Log.d(TAG, "onCreate: obMemberInfoChange")
-                roomModel.getSeatInfoByUserId(it.userId)?.member = it
-                if (it.userId == AccountStore.getUserId()) {
-                    // 监听当前用户是否为管理员
-                    if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId != AccountStore.getUserId()) {
-                        view.switchToAdminRole(it.isAdmin, roomModel.currentUIRoomInfo)
+                roomModel.getSeatInfoByUserId(it.userId)?.let { seatModel ->
+                    seatModel?.member = it
+                    if (it.userId == AccountStore.getUserId()) {
+                        // 监听当前用户是否为管理员
+                        if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId != AccountStore.getUserId()) {
+                            view.switchToAdminRole(it.isAdmin, roomModel.currentUIRoomInfo)
+                        }
                     }
+                    //同步修改麦位上的管理员角色
+                    view.onSeatInfoChange(seatModel.index, seatModel)
                 }
             })
 
