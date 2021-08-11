@@ -840,9 +840,16 @@ class VoiceRoomModel @Inject constructor(
                             roomMemberInfoList.firstOrNull { member ->
                                 member.userId == entry.key
                             }?.giftCount = entry.value
+                            // 刷新gifcount
+                            var seat = currentUISeatInfoList.firstOrNull {
+                                it.userId == entry.key
+                            }
+                            seatInfoChangeSubject.onNext(seat)
                         }
                     }
                 }
+
+
             })
     }
 
