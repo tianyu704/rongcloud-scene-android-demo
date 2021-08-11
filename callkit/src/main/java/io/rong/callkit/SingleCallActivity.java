@@ -839,8 +839,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
      */
     public void onHandFreeButtonClick(View view) {
         CallKitUtils.speakerphoneState = !view.isSelected();
-        RongCallClient.getInstance()
-                .setEnableSpeakerphone(!view.isSelected()); // true:打开免提 false:关闭免提
+        RongCallClient.getInstance().setEnableSpeakerphone(!view.isSelected()); // true:打开免提 false:关闭免提
         view.setSelected(!view.isSelected());
         handFree = view.isSelected();
     }

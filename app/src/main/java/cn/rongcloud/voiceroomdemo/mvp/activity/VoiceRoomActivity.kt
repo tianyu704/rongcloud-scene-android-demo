@@ -594,18 +594,19 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
             }
         }
     }
+
     ///////////////////////////////////////////////////////////////////////////
     // 以下为不同角色的状态类
     ///////////////////////////////////////////////////////////////////////////
+    var lastOnlineCount: Int = 0//记录上次 处理切换角色的默认0的问题
 
     abstract inner class Role(val view: View) {
-        lateinit var roomInfo: UiRoomModel
         open fun initView(roomInfo: UiRoomModel) {
             this.roomInfo = roomInfo
-            with(view) {
-                setOnlineUsersNumber(0)
-            }
+            setOnlineUsersNumber(lastOnlineCount)
         }
+
+        lateinit var roomInfo: UiRoomModel
 
         open fun initListener() {
             with(view) {
@@ -646,6 +647,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         open fun setOnlineUsersNumber(number: Int) {
             with(view) {
                 tv_room_members_count.text = "在线 $number"
+                lastOnlineCount = number
             }
         }
 
