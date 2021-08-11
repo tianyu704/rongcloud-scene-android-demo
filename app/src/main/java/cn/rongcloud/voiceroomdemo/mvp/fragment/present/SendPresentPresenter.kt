@@ -21,14 +21,13 @@ import javax.inject.Named
 
 class SendPresentPresenter @Inject constructor(
     val view: ISendPresentView,
-    @Named("selectedIds") private val selectedIds: List<String>,
     private val roomModel: VoiceRoomModel,
     fragment: Fragment
 ) :
     BaseLifeCyclePresenter(fragment) {
 
 
-    fun initeialObserve() {
+    fun initeialObserve(selectedIds: List<String>) {
         view.onPresentInited(roomModel.presents)
         currentPresent = roomModel.presents.first()
         addDisposable(roomModel

@@ -79,6 +79,7 @@ class MemberSettingPresenter @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     view.fragmentDismiss()
+                    view.showMessage("座位已关闭")
                 }, {
                     view.showError(it.message)
                 })
@@ -92,6 +93,13 @@ class MemberSettingPresenter @Inject constructor(
                     .setSeatMuteByUserId(member.userId, !isMute)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
+                        view.showMessage(
+                            if (isMute) {
+                                "已取消闭麦"
+                            } else {
+                                "此麦位已闭麦"
+                            }
+                        )
                         view.fragmentDismiss()
                     }, {
                         view.showError(it.message)

@@ -47,15 +47,13 @@ class SendPresentFragment(
     @Inject
     lateinit var presenter: SendPresentPresenter
 
-
-
     @Inject
     lateinit var roomModel: VoiceRoomModel
 
     var members: List<UiMemberModel> = ArrayList()
 
 
-    public fun getSelectedIds() = selectedIds
+    fun getSelectedIds() = selectedIds
 
     override fun initListener() {
         btn_selectall.setOnClickListener {
@@ -95,7 +93,7 @@ class SendPresentFragment(
 
 
     override fun initData() {
-        presenter.initeialObserve()
+        presenter.initeialObserve(selectedIds)
     }
 
     @SuppressLint("SetTextI18n")

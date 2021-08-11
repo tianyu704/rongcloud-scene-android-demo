@@ -54,12 +54,17 @@ class EmptySeatPresenter @Inject constructor(
             roomModel.setSeatLock(
                 uiSeatModel.index,
                 uiSeatModel.seatStatus != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking
-            )
-                .subscribe({
-
-                }, {
-                    view.showError(it.message)
-                })
+            ).subscribe({
+                view.showMessage(
+                    if (uiSeatModel.seatStatus != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+                        "座位已开启"
+                    } else {
+                        "座位已关闭"
+                    }
+                )
+            }, {
+                view.showError(it.message)
+            })
         )
     }
 
