@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.IRCVoiceRoomEngine;
 
 /**
  * @author gusd
@@ -19,14 +19,14 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
  */
 public class RCVoiceRoomEngineHandler extends HandlerThread implements InvocationHandler {
     private static final String TAG = "RCVoiceRoomEngineHandler";
-    private RCVoiceRoomEngine mRcVoiceRoomEngine;
+    private IRCVoiceRoomEngine mRcVoiceRoomEngine;
     private Handler mHandler;
 
     private RCVoiceRoomEngineHandler() {
         super(TAG);
     }
 
-    public void start(RCVoiceRoomEngine rcVoiceRoomEngine) {
+    public void start(IRCVoiceRoomEngine rcVoiceRoomEngine) {
         mRcVoiceRoomEngine = rcVoiceRoomEngine;
         start();
         mHandler = new Handler(getLooper());
