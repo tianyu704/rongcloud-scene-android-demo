@@ -62,7 +62,7 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
 
     private fun requestRoomList() {
         VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .getRoomList(page, pageSize)
             .observeOn(loadSchedulers)
             .subscribeOn(loadSchedulers)
@@ -116,7 +116,7 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
 
     fun queryRoomInfoFromServer(roomId: String): Single<VoiceRoomInfoBean> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .getVoiceRoomInfo(roomId)
             .observeOn(loadSchedulers)
             .subscribeOn(loadSchedulers)

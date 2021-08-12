@@ -16,6 +16,69 @@ public class CallReasonUtil {
         return UIKit.getResources().getString(id);
     }
 
+    /**
+     * switch (reason) {
+     * case RCCallDisconnectReasonCancel:
+     * [self showToast:@"已取消"];
+     * break;
+     * case RCCallDisconnectReasonReject:
+     * [self showToast:@"已拒绝"];
+     * break;
+     * case RCCallDisconnectReasonHangup:
+     * case RCCallDisconnectReasonRemoteHangup:
+     * [self showToast:@"通话结束"];
+     * break;
+     * case RCCallDisconnectReasonBusyLine:
+     * [self showToast:@"忙碌中"];
+     * break;
+     * case RCCallDisconnectReasonNoResponse:
+     * [self showToast:@"未接听"];
+     * break;
+     * case RCCallDisconnectReasonEngineUnsupported:
+     * [self showToast:@"不支持当前引擎"];
+     * break;
+     * case RCCallDisconnectReasonNetworkError:
+     * [self showToast:@"网络出错"];
+     * break;
+     * case RCCallDisconnectReasonRemoteCancel:
+     * [self showToast:@"对方已取消"];
+     * break;
+     * case RCCallDisconnectReasonRemoteReject:
+     * [self showToast:@"对方已拒绝"];
+     * break;
+     * case RCCallDisconnectReasonRemoteBusyLine:
+     * [self showToast:@"对方忙碌中"];
+     * break;
+     * case RCCallDisconnectReasonRemoteNoResponse:
+     * [self showToast:@"对方未接听"];
+     * break;
+     * case RCCallDisconnectReasonRemoteEngineUnsupported:
+     * [self showToast:@"对方不支持当前引擎"];
+     * break;
+     * case RCCallDisconnectReasonRemoteNetworkError:
+     * [self showToast:@"对方网络出错"];
+     * break;
+     * case RCCallDisconnectReasonAcceptByOtherClient:
+     * [self showToast:@"其它端已接听"];
+     * break;
+     * case RCCallDisconnectReasonAddToBlackList:
+     * [self showToast:@"您已被加入黑名单"];
+     * break;
+     * case RCCallDisconnectReasonDegrade:
+     * [self showToast:@"您已被降级为观察者"];
+     * break;
+     * case RCCallDisconnectReasonKickedByServer:
+     * [self showToast:@"禁止通话"];
+     * break;
+     * case RCCallDisconnectReasonMediaServerClosed:
+     * [self showToast:@"音视频服务已关闭"];
+     * break;
+     * default:
+     * break;
+     * }
+     *
+     * @param reason
+     */
     public static void showToastByReason(RongCallCommon.CallDisconnectedReason reason) {
         String text = null;
         switch (reason) {
@@ -26,8 +89,10 @@ public class CallReasonUtil {
                 text = getString(R.string.rc_voip_mo_reject);
                 break;
             case NO_RESPONSE:
-            case BUSY_LINE:
                 text = getString(R.string.rc_voip_mo_no_response);
+                break;
+            case BUSY_LINE:
+                text = getString(R.string.rc_voip_mo_business_line);
                 break;
             case REMOTE_BUSY_LINE:
                 text = getString(R.string.rc_voip_mt_busy_toast);

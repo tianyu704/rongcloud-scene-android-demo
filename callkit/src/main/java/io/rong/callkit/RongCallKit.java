@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
+
 import io.rong.callkit.util.CallKitBuildVar;
 import io.rong.calllib.RongCallClient;
 import io.rong.calllib.RongCallCommon;
@@ -17,6 +18,7 @@ import io.rong.calllib.RongCallSession;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
+
 import java.util.ArrayList;
 
 public class RongCallKit {
@@ -37,8 +39,8 @@ public class RongCallKit {
     /**
      * 发起单人通话。
      *
-     * @param context 上下文
-     * @param targetId 目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
+     * @param context   上下文
+     * @param targetId  目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
      * @param mediaType 会话媒体类型
      */
     public static void startSingleCall(Context context, String targetId, CallMediaType mediaType) {
@@ -64,11 +66,11 @@ public class RongCallKit {
     /**
      * 发起多人通话
      *
-     * @param context 上下文
+     * @param context          上下文
      * @param conversationType 会话类型
-     * @param targetId 目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
-     * @param mediaType 会话媒体类型
-     * @param userIds 参与者 id 列表
+     * @param targetId         目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
+     * @param mediaType        会话媒体类型
+     * @param userIds          参与者 id 列表
      */
     public static void startMultiCall(
             Context context,
@@ -100,10 +102,10 @@ public class RongCallKit {
      * 开始多人通话。 返回当前会话用户列表提供者对象，用户拿到该对象后，异步从服务器取出当前会话用户列表后， 调用提供者中的 onGotUserList 方法，填充
      * ArrayList<String> userIds 后，就会自动发起多人通话。
      *
-     * @param context 上下文
+     * @param context          上下文
      * @param conversationType 会话类型
-     * @param targetId 目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
-     * @param mediaType 通话的媒体类型：CALL_MEDIA_TYPE_AUDIO， CALL_MEDIA_TYPE_VIDEO
+     * @param targetId         目标会话 id ，单人通话为对方 UserId ,群组通话为 GroupId ，如果实现的是不基于群组的通话，那此参数无意义，传 null 即可
+     * @param mediaType        通话的媒体类型：CALL_MEDIA_TYPE_AUDIO， CALL_MEDIA_TYPE_VIDEO
      * @return 返回当前会话用户列表提供者对象
      */
     public static ICallUsersProvider startMultiCall(
@@ -137,7 +139,7 @@ public class RongCallKit {
      * 发起的多人通话，不依赖群、讨论组等
      *
      * @param context
-     * @param userIds 邀请的成员
+     * @param userIds    邀请的成员
      * @param oberverIds 邀请的以观察者身份加入房间的成员
      * @param mediaType
      */
@@ -195,7 +197,7 @@ public class RongCallKit {
     /**
      * 检查应用音视频授权信息 检查网络连接状态 检查是否在通话中
      *
-     * @param context 启动的 activity
+     * @param context   启动的 activity
      * @param mediaType 启动音视频的媒体类型
      * @return 是否允许启动通话界面
      */
@@ -203,10 +205,10 @@ public class RongCallKit {
         if (context instanceof Activity) {
             String[] permissions;
             if (mediaType.equals(CallMediaType.CALL_MEDIA_TYPE_AUDIO)) {
-                permissions = new String[] {Manifest.permission.RECORD_AUDIO};
+                permissions = new String[]{Manifest.permission.RECORD_AUDIO};
             } else {
                 permissions =
-                        new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+                        new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
             }
             if (!PermissionCheckUtil.requestPermissions((Activity) context, permissions)) {
                 return false;
@@ -220,9 +222,9 @@ public class RongCallKit {
                 .getCurrentConnectionStatus()
                 .equals(RongIMClient.ConnectionStatusListener.ConnectionStatus.CONNECTED)) {
             Toast.makeText(
-                            context,
-                            context.getResources().getString(R.string.rc_voip_call_network_error),
-                            Toast.LENGTH_SHORT)
+                    context,
+                    context.getResources().getString(R.string.rc_voip_call_network_error),
+                    Toast.LENGTH_SHORT)
                     .show();
             return false;
         }
@@ -239,33 +241,37 @@ public class RongCallKit {
         RongCallSession callSession = RongCallClient.getInstance().getCallSession();
         if (callSession != null && callSession.getStartTime() > 0) {
             Toast.makeText(
-                            context,
-                            callSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO
-                                    ? context.getResources()
-                                            .getString(R.string.rc_voip_call_audio_start_fail)
-                                    : context.getResources()
-                                            .getString(R.string.rc_voip_call_video_start_fail),
-                            Toast.LENGTH_SHORT)
+                    context,
+                    callSession.getMediaType() == RongCallCommon.CallMediaType.AUDIO
+                            ? context.getResources()
+                            .getString(R.string.rc_voip_call_audio_start_fail)
+                            : context.getResources()
+                            .getString(R.string.rc_voip_call_video_start_fail),
+                    Toast.LENGTH_SHORT)
                     .show();
             return true;
         }
         return false;
     }
 
-    /** 群组成员提供者。 CallKit 本身不保存群组成员，如果在聊天中需要使用群组成员，CallKit 将调用此 Provider 获取群组成员。 */
+    /**
+     * 群组成员提供者。 CallKit 本身不保存群组成员，如果在聊天中需要使用群组成员，CallKit 将调用此 Provider 获取群组成员。
+     */
     public interface GroupMembersProvider {
         /**
          * 获取群组成员列表，用户根据groupId返回对应的群组成员列表。
          *
          * @param groupId 群组id
-         * @param result getMemberList可以同步返回，也可以异步返回。 同步返回的情况下，直接返回成员列表。 异步返回的情况下，需要在异步返回的时候调用{@link
-         *     OnGroupMembersResult#onGotMemberList(ArrayList)} 来通知CallKit刷新列表。
+         * @param result  getMemberList可以同步返回，也可以异步返回。 同步返回的情况下，直接返回成员列表。 异步返回的情况下，需要在异步返回的时候调用{@link
+         *                OnGroupMembersResult#onGotMemberList(ArrayList)} 来通知CallKit刷新列表。
          * @return 同步返回的时候返回列表，异步返回直接返回null。
          */
         ArrayList<String> getMemberList(String groupId, OnGroupMembersResult result);
     }
 
-    /** 群组成员提供者的异步回调接口。 */
+    /**
+     * 群组成员提供者的异步回调接口。
+     */
     public interface OnGroupMembersResult {
         /**
          * 群组成员提供者的异步回调接口。
@@ -311,7 +317,9 @@ public class RongCallKit {
         customerHandlerListener = callCustomerHandlerListener;
     }
 
-    /** 通话过程中用户自定义操作。 */
+    /**
+     * 通话过程中用户自定义操作。
+     */
     public static RongCallCustomerHandlerListener getCustomerHandlerListener() {
         return customerHandlerListener;
     }

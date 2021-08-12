@@ -72,27 +72,25 @@ final class RCIMKitReceiver implements RCVoiceRoomClientDelegate {
 
     @Override
     public void sendMessage(String targetId, MessageContent content, final SendMessageCallback callback) {
-        RongIM
-                .getInstance()
-                .sendMessage(Conversation.ConversationType.CHATROOM
-                        , targetId
-                        , content
-                        , ""
-                        , ""
-                        , new IRongCallback.ISendMessageCallback() {
-                            @Override
-                            public void onAttached(Message message) {
-                            }
+        RongIM.getInstance().sendMessage(Conversation.ConversationType.CHATROOM
+                , targetId
+                , content
+                , ""
+                , ""
+                , new IRongCallback.ISendMessageCallback() {
+                    @Override
+                    public void onAttached(Message message) {
+                    }
 
-                            @Override
-                            public void onSuccess(Message message) {
-                                callback.onSuccess(message);
-                            }
+                    @Override
+                    public void onSuccess(Message message) {
+                        callback.onSuccess(message);
+                    }
 
-                            @Override
-                            public void onError(Message message, RongIMClient.ErrorCode errorCode) {
-                                callback.onError(message, errorCode.getValue(), errorCode.getMessage());
-                            }
-                        });
+                    @Override
+                    public void onError(Message message, RongIMClient.ErrorCode errorCode) {
+                        callback.onError(message, errorCode.getValue(), errorCode.getMessage());
+                    }
+                });
     }
 }

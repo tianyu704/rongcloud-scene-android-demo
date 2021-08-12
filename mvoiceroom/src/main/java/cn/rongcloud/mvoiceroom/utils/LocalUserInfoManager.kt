@@ -56,7 +56,7 @@ object LocalUserInfoManager : AtomicReference<Disposable>(), Disposable {
             .flatMapSingle {
                 val list = ArrayList<String>(it)
                 it.clear()
-                return@flatMapSingle VoiceRoomNetManager.voiceRoomService.getUserInfoList(UserIdList(list))
+                return@flatMapSingle VoiceRoomNetManager.aRoomApi.getUserInfoList(UserIdList(list))
             }
             .subscribe { bean ->
                 bean.data?.forEach {

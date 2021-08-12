@@ -46,6 +46,7 @@
     <string name="rc_voip_mo_cancel">已取消</string>
     <string name="rc_voip_mo_reject">已拒绝</string>
     <string name="rc_voip_mo_no_response">未接听</string>
+    <string name="rc_voip_mo_business_line" translatable="false">忙碌中</string>
     <string name="rc_voip_mt_cancel">对方已取消</string>
     <string name="rc_voip_mt_reject">对方已拒绝</string>
     <string name="rc_voip_mt_no_response">对方未接听</string>

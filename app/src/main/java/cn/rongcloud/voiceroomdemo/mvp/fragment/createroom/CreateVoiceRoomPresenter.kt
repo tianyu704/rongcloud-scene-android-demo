@@ -48,7 +48,7 @@ class CreateVoiceRoomPresenter @Inject constructor(
                 )
                 .flatMap {
                     return@flatMap VoiceRoomNetManager
-                        .voiceRoomService
+                        .aRoomApi
                         .createVoiceRoom(
                             CreateRoomRequestBean(
                                 intPrivate,
@@ -80,7 +80,7 @@ class CreateVoiceRoomPresenter @Inject constructor(
         } else {
             addDisposable(
                 VoiceRoomNetManager
-                    .voiceRoomService
+                    .aRoomApi
                     .createVoiceRoom(
                         CreateRoomRequestBean(
                             isPrivate = intPrivate,

@@ -287,7 +287,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         } else if (mediaType.equals(RongCallCommon.CallMediaType.VIDEO)) {
             handFree = true;
-            muted = true;
+            muted = false;
         }
         View handFreeV = findViewById(R.id.rc_voip_handfree);
         View callMuteV = findViewById(R.id.rc_voip_call_mute);

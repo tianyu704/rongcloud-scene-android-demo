@@ -4,9 +4,9 @@
 
 package cn.rongcloud.mvoiceroom.net
 
+import cn.rongcloud.mvoiceroom.net.api.ARoomApi
 import cn.rongcloud.mvoiceroom.net.api.GiftApiService
 import cn.rongcloud.mvoiceroom.net.api.MusicApiService
-import cn.rongcloud.mvoiceroom.net.api.VoiceRoomApiService
 import com.rongcloud.common.net.RetrofitManager
 
 /**
@@ -17,8 +17,8 @@ private const val TAG = "RetrofitManager"
 
 object VoiceRoomNetManager {
 
-    val voiceRoomService: VoiceRoomApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
-        RetrofitManager.getRetrofit().create(VoiceRoomApiService::class.java)
+    val aRoomApi: ARoomApi by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        RetrofitManager.getRetrofit().create(ARoomApi::class.java)
     }
 
     val musicService: MusicApiService by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {

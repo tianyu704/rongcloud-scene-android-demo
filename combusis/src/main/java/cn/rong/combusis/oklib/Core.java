@@ -88,6 +88,16 @@ public class Core {
     /**
      * @param url      请求地址
      * @param params   参数
+     *                 key：String value：object（Ibody）
+     * @param callBack 回调
+     */
+    public <T> void put(Object tag, String url, Map<String, Object> params, IOBack<T> callBack) {
+        put(tag, url, Transform.param2Body(params), callBack);
+    }
+
+    /**
+     * @param url      请求地址
+     * @param params   参数
      * @param callBack 回调
      */
     public <T> void get(Object tag, String url, Map<String, Object> params, IOBack<T> callBack) {
@@ -97,6 +107,18 @@ public class Core {
                 .tag(tag);
         callBack.onBefore(builder);
         request(builder.build(), callBack);
+    }
+
+    public <T> void post(Object tag, String url, Object params, IOBack<T> callBack) {
+        post(tag, url, Transform.param2Body(params), callBack);
+    }
+
+    public <T> void delete(Object tag, String url, Object params, IOBack<T> callBack) {
+        delete(tag, url, Transform.param2Body(params), callBack);
+    }
+
+    public <T> void put(Object tag, String url, Object params, IOBack<T> callBack) {
+        put(tag, url, Transform.param2Body(params), callBack);
     }
 
     /**
@@ -125,6 +147,16 @@ public class Core {
                 .addHeader("Authorization", AccountStore.INSTANCE.getAuthorization())
                 .tag(tag)
                 .delete(body);
+        callBack.onBefore(builder);
+        request(builder.build(), callBack);
+    }
+
+    protected <T> void put(Object tag, String url, RequestBody body, IOBack<T> callBack) {
+        Request.Builder builder = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", AccountStore.INSTANCE.getAuthorization())
+                .tag(tag)
+                .put(body);
         callBack.onBefore(builder);
         request(builder.build(), callBack);
     }

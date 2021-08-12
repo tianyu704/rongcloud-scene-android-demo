@@ -64,6 +64,7 @@ import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
+import io.rong.callkit.RongCallKit
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.MessageContent
@@ -195,6 +196,8 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     override fun getContentView(): Int = R.layout.activity_voice_room
 
     override fun initView() {
+        // 忽略来电
+        RongCallKit.ignoreIncomingCall(true)
         detector = GestureDetector(this, simpleGestureListener).apply {
             this.setIsLongpressEnabled(false)
             this.setOnDoubleTapListener(simpleGestureListener)
@@ -511,6 +514,8 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         super.onDestroy()
         // 统计打分
         FeedbackHelper.getHelper().statistics()
+        // 取消 忽略来电
+        RongCallKit.ignoreIncomingCall(false)
         favAnimation.let {
             it.release()
         }

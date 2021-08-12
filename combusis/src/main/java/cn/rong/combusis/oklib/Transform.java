@@ -27,6 +27,11 @@ public class Transform {
         return RequestBody.create(json, jsonParams);
     }
 
+    public static RequestBody param2Body(Object params) {
+        String jsonParams = GsonUtil.obj2Json(params);
+        Log.e("Transform", "params : " + jsonParams);
+        return RequestBody.create(json, jsonParams);
+    }
 
     /**
      * get请求时：在url上拼接参数

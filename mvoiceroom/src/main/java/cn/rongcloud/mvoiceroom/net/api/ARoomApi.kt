@@ -14,8 +14,7 @@ import retrofit2.http.*
  * @author gusd
  * @Date 2021/08/06
  */
-interface VoiceRoomApiService {
-
+interface ARoomApi {
     @GET("/mic/room/list")
     fun getRoomList(@Query("page") page: Int, @Query("size") size: Int): Single<VoiceRoomListBean>
 

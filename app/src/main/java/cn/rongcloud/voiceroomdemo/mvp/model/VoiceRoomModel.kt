@@ -324,7 +324,7 @@ class VoiceRoomModel @Inject constructor(
 
     fun setAdmin(userId: String, isAdmin: Boolean): Single<Boolean> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .setAdmin(SettingAdminRequest(roomId, userId, isAdmin))
             .observeOn(dataModifyScheduler)
             .map {
@@ -348,7 +348,7 @@ class VoiceRoomModel @Inject constructor(
 
     fun setRoomLock(lock: Boolean, password: String?): Single<Boolean> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .setRoomPasswordRequest(
                 RoomPasswordRequest(if (lock) 1 else 0, password, roomId)
             )
@@ -361,7 +361,7 @@ class VoiceRoomModel @Inject constructor(
 
     fun setRoomBackground(backgroundUrl: String): Single<Boolean> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .setRoomBackgroundRequest(
                 RoomBackgroundRequest(
                     backgroundUrl,
@@ -378,7 +378,7 @@ class VoiceRoomModel @Inject constructor(
 
     fun setRoomName(newName: String): Single<Boolean> {
         return VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .setRoomName(RoomNameRequest(newName, roomId))
             .doOnSuccess {
                 refreshRoomInfo()
@@ -780,7 +780,7 @@ class VoiceRoomModel @Inject constructor(
 
     private fun queryRoomInfoFromServer() {
         addDisposable(VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .getVoiceRoomInfo(roomId)
             .subscribe { bean ->
                 currentUIRoomInfo.roomBean = bean.room
@@ -804,14 +804,14 @@ class VoiceRoomModel @Inject constructor(
         )
         addDisposable(
             VoiceRoomNetManager
-                .voiceRoomService
+                .aRoomApi
                 .setRoomSetting(setting).subscribe()
         )
     }
 
     fun refreshAdminList() {
         addDisposable(VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .getAdminList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -871,7 +871,7 @@ class VoiceRoomModel @Inject constructor(
     ) {
         Log.d(TAG, "queryAllUserInfo: ")
         addDisposable(VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .getMembersList(roomId)
             .observeOn(dataModifyScheduler)
             .subscribeOn(Schedulers.io())
@@ -906,7 +906,7 @@ class VoiceRoomModel @Inject constructor(
                 memberListChangeSubject.onNext(roomMemberInfoList)
                 return@map roomId
             }.flatMap {
-                return@flatMap VoiceRoomNetManager.voiceRoomService.getAdminList(it)
+                return@flatMap VoiceRoomNetManager.aRoomApi.getAdminList(it)
             }.map {
                 it.data?.let { adminList ->
                     roomMemberInfoList.forEach { member ->

@@ -429,7 +429,7 @@ class VoiceRoomPresenter @Inject constructor(
         view.showWaitingDialog()
         RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "")
         VoiceRoomNetManager
-            .voiceRoomService
+            .aRoomApi
             .deleteRoom(roomId)
             .delay(2, TimeUnit.SECONDS)
             .subscribe({ result ->

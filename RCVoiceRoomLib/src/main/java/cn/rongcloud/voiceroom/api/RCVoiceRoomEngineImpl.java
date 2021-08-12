@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroom.api;
 
 import android.app.Application;
+import android.app.SearchableInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -1874,14 +1875,15 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
 
     private void clearAll() {
         mRoom.unregisterRoomListener();
-        RCRTCEngine.
-                getInstance().unregisterStatusReportListener();
+        RCRTCEngine.getInstance().unregisterStatusReportListener();
         mRoomId = null;
         mRoomInfo = null;
-        mSeatInfoList.clear();
-        mUserOnSeatMap.clear();
+        if (null != mSeatInfoList) mSeatInfoList.clear();
+        if (null != mUserOnSeatMap) mUserOnSeatMap.clear();
         mRoom = null;
-        mRoomEventListener.clear();
+        if (null != mRoomEventListener) {
+            mRoomEventListener.clear();
+        }
         mRoomEventListener = null;
     }
 
@@ -1978,6 +1980,10 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                 listener.onUserLeaveSeat(index, userId);
                 listener.onSeatInfoUpdate(mSeatInfoList);
                 leftMaps.put(userId, index);
+                //目前只有房主和主播可以监听到 获取第一个麦位可用的主播更新kv
+                if (getCurrentUserId().equals(getFirstInSeatUserId(userId))) {
+                    updateKvSeatInfo(left, index, null);
+                }
             }
         }
 
@@ -1987,13 +1993,34 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
             if (null != listener && null != leftMaps && leftMaps.containsKey(userId)) {
                 int index = leftMaps.get(userId);
                 Log.d(TAG, "handleJoinRoom : " + "index = " + index);
-                if (index == 0) {//只自加房主 其他主播断网后不在重加
-                    RCVoiceSeatInfo enter = mSeatInfoList.get(index);
-                    userEnterSeat(enter, userId);
-                    listener.onUserEnterSeat(index, userId);
-                    listener.onSeatInfoUpdate(mSeatInfoList);
+                RCVoiceSeatInfo enter = mSeatInfoList.get(index);
+                userEnterSeat(enter, userId);
+                listener.onUserEnterSeat(index, userId);
+                listener.onSeatInfoUpdate(mSeatInfoList);
+                if (getCurrentUserId().equals(getFirstInSeatUserId(userId))) {
+                    updateKvSeatInfo(enter, index, null);
                 }
             }
+        }
+
+        /**
+         * 根据座位 获取第一个可用 切非当前麦位上的User的userId
+         *
+         * @return
+         */
+        private String getFirstInSeatUserId(String leftId) {
+            String firstUserId = "";
+            int size = null == mSeatInfoList ? 0 : mSeatInfoList.size();
+            for (int i = 0; i < size; i++) {
+                RCVoiceSeatInfo seatInfo = mSeatInfoList.get(i);
+                String tempId = seatInfo.getUserId();
+                if (seatInfo.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing// 可用状态
+                        && !TextUtils.equals(leftId, tempId)) { // 去除离开的麦位
+                    firstUserId = seatInfo.getUserId();
+                    break;
+                }
+            }
+            return firstUserId;
         }
     }
 
@@ -2026,6 +2053,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                 }
             }
         }
+
     }
 
     private void packHandlerThread() {
