@@ -4,18 +4,8 @@
 
 package cn.rongcloud.voiceroom.model;
 
-import cn.rongcloud.rtc.base.RCRTCParamsType;
-
-/**
- * @author gusd
- * @Date 2021/07/15
- */
 /**
  * 音频模式
- *
- * <p>
- *
- * @group 音频配置
  */
 public enum AudioScenario {
     /**

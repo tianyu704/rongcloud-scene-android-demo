@@ -8,15 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author gusd
- * @Date 2021/06/02
+ * 语聊房错误枚举
  */
 public enum VoiceRoomErrorCode {
     Unknown_Error(-1, "Unknown error"),
     /**
      * 操作成功
      */
-    RCVoiceRoomSuccess(70000, "操作成功"),
+    RCVoiceRoomSuccess(70000, "Success"),
     /**
      * 连接服务器失败
      */
@@ -84,7 +83,7 @@ public enum VoiceRoomErrorCode {
     /**
      * 同意排麦请求发送失败
      */
-    RCVoiceRoomAcceptRequestSeatFailed(70017, "同意排麦请求发送失败"),
+    RCVoiceRoomAcceptRequestSeatFailed(70017, "Accept request seat failed"),
     /**
      * 拒绝排麦请求发送失败
      */
@@ -162,16 +161,16 @@ public enum VoiceRoomErrorCode {
     /**
      * 获取错误码
      *
-     * @return
+     * @return 状态码
      */
     public int getCode() {
         return code;
     }
 
     /**
-     * 获取提示信息
+     * 获取错误描述信息
      *
-     * @return
+     * @return 描述信息
      */
     public String getMessage() {
         return message;

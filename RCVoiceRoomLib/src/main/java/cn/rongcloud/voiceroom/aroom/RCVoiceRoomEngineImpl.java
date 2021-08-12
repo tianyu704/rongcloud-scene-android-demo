@@ -65,9 +65,6 @@ import io.rong.imlib.model.MessageContent;
 
 /**
  * 语聊房的控制
- *
- * @author gusd
- * @Date 2021/06/01
  */
 public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEngine, IRongCoreListener.OnReceiveMessageListener, RongChatRoomClient.KVStatusListener {
     private static final String TAG = "RCVoiceRoomEngineImpl";

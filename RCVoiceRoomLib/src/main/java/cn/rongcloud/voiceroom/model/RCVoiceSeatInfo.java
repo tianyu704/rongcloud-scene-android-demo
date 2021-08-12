@@ -10,12 +10,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * 麦位信息
- *
- * @author gusd
- * @Date 2021/05/31
+ * 语聊房麦位封装实体
  */
-public class RCVoiceSeatInfo extends BaseInfo implements Parcelable,Cloneable {
+public class RCVoiceSeatInfo extends BaseInfo implements Parcelable, Cloneable {
 
     public RCVoiceSeatInfo() {
     }
@@ -138,7 +135,6 @@ public class RCVoiceSeatInfo extends BaseInfo implements Parcelable,Cloneable {
     }
 
 
-
     protected RCVoiceSeatInfo(Parcel in) {
         int tmpMStatus = in.readInt();
         this.mStatus = tmpMStatus == -1 ? null : RCSeatStatus.values()[tmpMStatus];
@@ -161,7 +157,7 @@ public class RCVoiceSeatInfo extends BaseInfo implements Parcelable,Cloneable {
     };
 
     // 浅拷贝即可
-    public RCVoiceSeatInfo clone(){
+    public RCVoiceSeatInfo clone() {
         try {
             return (RCVoiceSeatInfo) super.clone();
         } catch (CloneNotSupportedException e) {

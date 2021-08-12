@@ -6,10 +6,6 @@ package cn.rongcloud.voiceroom.utils;
 
 import com.google.gson.Gson;
 
-/**
- * @author gusd
- * @Date 2021/06/04
- */
 public class JsonUtils {
     private static final Gson gson;
 

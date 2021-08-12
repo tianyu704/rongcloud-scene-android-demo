@@ -16,10 +16,6 @@ import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 
-/**
- * @author gusd
- * @Date 2021/07/02
- */
 public final class RCIMKitReceiver implements RCVoiceRoomClientDelegate {
     private static final String TAG = "RCIMKitReceiver";
 

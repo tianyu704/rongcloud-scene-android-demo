@@ -4,25 +4,10 @@
 
 package cn.rongcloud.voiceroom.api;
 
-import android.app.Application;
-
-import java.util.List;
-
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
-import cn.rongcloud.voiceroom.model.AudioQuality;
-import cn.rongcloud.voiceroom.model.AudioScenario;
-import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.utils.BuildVersion;
-import io.rong.imlib.IRongCoreListener;
-import io.rong.imlib.model.MessageContent;
 
 /**
  * 语聊房对外提供的功能类接口
- *
- * @author gusd
- * @Date 2021/05/31
  */
 public abstract class RCVoiceRoomEngine implements IRCVoiceRoomEngine {
 

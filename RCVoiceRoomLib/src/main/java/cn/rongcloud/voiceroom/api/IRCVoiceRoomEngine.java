@@ -20,8 +20,7 @@ import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.MessageContent;
 
 /**
- * @author gusd
- * @Date 2021/07/30
+ * 语聊房引擎接口
  */
 public interface IRCVoiceRoomEngine {
     /**

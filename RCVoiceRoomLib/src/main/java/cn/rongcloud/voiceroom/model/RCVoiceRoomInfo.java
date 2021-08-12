@@ -12,8 +12,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 
 /**
- * @author gusd
- * @Date 2021/05/31
+ * 语聊房封装实体
  */
 public class RCVoiceRoomInfo extends BaseInfo implements Parcelable, Cloneable {
 

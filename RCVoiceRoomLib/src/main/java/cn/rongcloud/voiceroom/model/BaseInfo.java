@@ -7,8 +7,7 @@ package cn.rongcloud.voiceroom.model;
 import cn.rongcloud.voiceroom.utils.JsonUtils;
 
 /**
- * @author gusd
- * @Date 2021/06/03
+ * 实体基类
  */
 public abstract class BaseInfo {
 

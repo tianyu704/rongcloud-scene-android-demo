@@ -14,8 +14,7 @@ import java.lang.reflect.Method;
 import cn.rongcloud.voiceroom.api.IRCVoiceRoomEngine;
 
 /**
- * @author gusd
- * @Date 2021/07/30
+ * api执行线程
  */
 public class RCVoiceRoomEngineHandler extends HandlerThread implements InvocationHandler {
     private static final String TAG = "RCVoiceRoomEngineHandler";

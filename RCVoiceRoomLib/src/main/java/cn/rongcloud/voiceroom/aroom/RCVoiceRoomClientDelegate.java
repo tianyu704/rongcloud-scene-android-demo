@@ -11,8 +11,7 @@ import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 
 /**
- * @author gusd
- * @Date 2021/07/02
+ * IM 信令代理接口
  */
 public interface RCVoiceRoomClientDelegate {
     void initWithAppKey(Application context, String appKey);
