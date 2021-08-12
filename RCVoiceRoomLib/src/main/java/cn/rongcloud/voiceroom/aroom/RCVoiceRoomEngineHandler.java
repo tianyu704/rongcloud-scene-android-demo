@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.api;
+package cn.rongcloud.voiceroom.aroom;
 
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -10,6 +10,8 @@ import android.os.HandlerThread;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 
 /**
  * @author gusd

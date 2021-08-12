@@ -2,10 +2,9 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.api;
+package cn.rongcloud.voiceroom.aroom;
 
 import android.app.Application;
-import android.app.SearchableInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -41,6 +40,8 @@ import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.rtc.base.RCRTCRoomType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
+import cn.rongcloud.voiceroom.api.IRCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomBaseCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -68,21 +69,12 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/06/01
  */
-class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEngine, IRongCoreListener.OnReceiveMessageListener, RongChatRoomClient.KVStatusListener {
-
+public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEngine, IRongCoreListener.OnReceiveMessageListener, RongChatRoomClient.KVStatusListener {
     private static final String TAG = "RCVoiceRoomEngineImpl";
-
-
     private static final int MAX_MIC_QUEUE_NUMBER = 20;
-
     private static volatile RCVoiceRoomEngine instance;
     private WeakReference<RCVoiceRoomEventListener> mRoomEventListener;
     private final List<IRongCoreListener.OnReceiveMessageListener> mMessageReceiveListenerList;
-
-    /**
-     * 当前的用户 ID
-     */
-//    private String mCurrentUserId;
 
     private RCRTCRoom mRoom;
 
@@ -222,6 +214,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                     public void onSuccess() {
                         changeUserRoleIfNeeded();
                         onSuccessWithCheck(callback);
+                        leftMaps.clear();
                     }
 
                     @Override
@@ -255,6 +248,7 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
                         joinRTCRoom(roomId, mCurrentRole, new RCVoiceRoomCallback() {
                             @Override
                             public void onSuccess() {
+                                leftMaps.clear();
                                 initSeatInfoListIfNeeded(roomInfo.getSeatCount());
                                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                                 onSuccessWithCheck(callback);
@@ -1214,6 +1208,22 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
     @Override
     public void disConnect() {
         clientDelegate.disconnect(true);
+    }
+
+    @Override
+    public void getLatestSeatInfo(final RCVoiceRoomResultCallback<List<RCVoiceSeatInfo>> resultCallback) {
+        RongChatRoomClient.getInstance().getAllChatRoomEntries(mRoomId, new IRongCoreCallback.ResultCallback<Map<String, String>>() {
+            @Override
+            public void onSuccess(Map<String, String> chatRoomKvMap) {
+                List<RCVoiceSeatInfo> last = latestMicInfoListFromEntry(chatRoomKvMap);
+                onSuccessWithCheck(resultCallback, last);
+            }
+
+            @Override
+            public void onError(IRongCoreEnum.CoreErrorCode e) {
+                onErrorWithCheck(resultCallback, VoiceRoomErrorCode.RCVoiceRoomGetRequestListFailed);
+            }
+        });
     }
 
     private RCVoiceRoomEventListener getCurrentRoomEventListener() {

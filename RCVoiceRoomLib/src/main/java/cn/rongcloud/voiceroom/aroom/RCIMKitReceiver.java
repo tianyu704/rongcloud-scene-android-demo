@@ -2,10 +2,9 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.api;
+package cn.rongcloud.voiceroom.aroom;
 
 import android.app.Application;
-import android.util.Log;
 
 import java.util.Arrays;
 
@@ -21,7 +20,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/07/02
  */
-final class RCIMKitReceiver implements RCVoiceRoomClientDelegate {
+public final class RCIMKitReceiver implements RCVoiceRoomClientDelegate {
     private static final String TAG = "RCIMKitReceiver";
 
     public void initWithAppKey(Application context, String appKey) {

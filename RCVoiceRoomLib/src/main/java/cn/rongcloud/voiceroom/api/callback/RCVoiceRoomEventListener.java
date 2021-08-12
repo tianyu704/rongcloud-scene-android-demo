@@ -10,35 +10,31 @@ import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.model.Message;
 
-
 /**
- * @author gusd
- * @Date 2021/05/31
+ * 语聊房事件监听
  */
 public interface RCVoiceRoomEventListener {
     /**
-     * 房间准备就绪
+     * 房间KV准备就绪
      */
     void onRoomKVReady();
 
-    // TODO: 2021/6/29 房间异常回调
-
     /**
-     * 房间信息变更回调
+     * 房间信息变更
      *
      * @param roomInfo 房间信息 {@link RCVoiceRoomInfo}
      */
     void onRoomInfoUpdate(RCVoiceRoomInfo roomInfo);
 
     /**
-     * 房间座位变更回调，包括自身上麦或下麦也会触发此回调
+     * 房间座位变更，注意：自身上麦或下麦也会触发此回调
      *
      * @param seatInfoList 座位列表信息 {@link RCVoiceRoomInfo}
      */
     void onSeatInfoUpdate(List<RCVoiceSeatInfo> seatInfoList);
 
     /**
-     * 某个主播上麦回调，包含自己上麦也会触发此回调
+     * 主播上麦，注意：自己上麦也会触发此回调
      *
      * @param seatIndex 麦位号
      * @param userId    用户Id
@@ -46,7 +42,7 @@ public interface RCVoiceRoomEventListener {
     void onUserEnterSeat(int seatIndex, String userId);
 
     /**
-     * 某个主播下麦回调，包含自己下麦也会触发此回调
+     * 主播下麦，注意：自己下麦也会触发此回调
      *
      * @param seatIndex 麦位号
      * @param userId    用户Id
@@ -62,7 +58,7 @@ public interface RCVoiceRoomEventListener {
     void onSeatMute(int index, boolean isMute);
 
     /**
-     * 座位关闭回调
+     * 座位锁定状态回调
      *
      * @param index  座位号
      * @param isLock 是否关闭
@@ -102,22 +98,22 @@ public interface RCVoiceRoomEventListener {
      * 房间通知回调
      *
      * @param name    名称
-     * @param content 内容
+     * @param content 通知内容
      */
     void onRoomNotificationReceived(String name, String content);
 
     /**
-     * 自己被抱上麦通知
+     * 用户被抱上麦
      */
     void onPickSeatReceivedFrom(String userId);
 
     /**
-     * 自己被下麦通知
+     * 自主播被下麦
      */
     void onKickSeatReceived(int index);
 
     /**
-     * 发送的排麦请求得到房主或管理员同意
+     * 房主或管理员 接受同意 用户的排麦申请
      */
     void onRequestSeatAccepted();
 
@@ -132,40 +128,40 @@ public interface RCVoiceRoomEventListener {
     void onRequestSeatListChanged();
 
     /**
-     * 收到邀请回调
+     * 收到上麦邀请
      *
-     * @param invitationId 邀请的 Id
-     * @param userId       发送邀请的用户
-     * @param content      邀请内容，用户可以自定义
+     * @param invitationId 邀请标识 Id
+     * @param userId       发送邀请用户的标识
+     * @param content      邀请内容 （用户可以自定义）
      */
     void onInvitationReceived(String invitationId, String userId, String content);
 
     /**
-     * 邀请被接受回调
+     * 邀请被接受通知
      *
-     * @param invitationId 邀请 Id
+     * @param invitationId 邀请标识 Id
      */
     void onInvitationAccepted(String invitationId);
 
     /**
      * 邀请被拒绝回调
      *
-     * @param invitationId 邀请 Id
+     * @param invitationId 邀请标识 Id
      */
     void onInvitationRejected(String invitationId);
 
     /**
      * 邀请被取消回调
      *
-     * @param invitationId 邀请 Id
+     * @param invitationId 邀请标识 Id
      */
     void onInvitationCancelled(String invitationId);
 
     /**
      * 被踢出房间回调
      *
-     * @param targetId 被踢人 Id
-     * @param userId   发起人 Id
+     * @param targetId 被踢用户的标识
+     * @param userId   发起踢人用户的标识
      */
     void onUserReceiveKickOutRoom(String targetId, String userId);
 

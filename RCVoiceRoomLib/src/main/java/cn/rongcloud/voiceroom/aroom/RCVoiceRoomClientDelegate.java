@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.api;
+package cn.rongcloud.voiceroom.aroom;
 
 import android.app.Application;
 
@@ -14,7 +14,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gusd
  * @Date 2021/07/02
  */
-interface RCVoiceRoomClientDelegate {
+public interface RCVoiceRoomClientDelegate {
     void initWithAppKey(Application context, String appKey);
 
     void connectWithToken(String token, ConnectCallback callback);

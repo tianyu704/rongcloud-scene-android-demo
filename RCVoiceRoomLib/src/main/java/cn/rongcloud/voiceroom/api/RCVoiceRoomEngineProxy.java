@@ -6,12 +6,13 @@ package cn.rongcloud.voiceroom.api;
 
 import java.lang.reflect.Proxy;
 
+import cn.rongcloud.voiceroom.aroom.RCVoiceRoomEngineHandler;
+import cn.rongcloud.voiceroom.aroom.RCVoiceRoomEngineImpl;
+
 /**
- * @author gusd
- * @Date 2021/07/30
+ * RCVoiceRoomEngine的到来对象
  */
 public class RCVoiceRoomEngineProxy {
-    private static final String TAG = "RCVoiceRoomEngineProxy";
 
     private RCVoiceRoomEngineProxy() {
     }

@@ -69,5 +69,8 @@
 -keep class cn.rongcloud.rtc.proxy.message.** {*;}
 -keep class cn.rongcloud.rtc.RongRTCExtensionModule {*;}
 -keep class cn.rongcloud.rtc.RongRTCMessageRouter {*;}
-
+# 保留api相关保
+-keep class cn.rongcloud.voiceroom.api.** {*;}
+-keep class cn.rongcloud.voiceroom.model.** {*;}
+-keep class cn.rongcloud.voiceroom.utils.** {*;}
 

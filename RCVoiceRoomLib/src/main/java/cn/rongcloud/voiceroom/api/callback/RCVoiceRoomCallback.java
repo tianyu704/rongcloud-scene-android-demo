@@ -5,10 +5,15 @@
 package cn.rongcloud.voiceroom.api.callback;
 
 /**
- * @author gusd
- * @Date 2021/06/02
+ * 无返回结果的回调
  */
 public interface RCVoiceRoomCallback extends RCVoiceRoomBaseCallback {
 
-     void onSuccess();
+    /**
+     * 成功会滴
+     */
+    void onSuccess();
+
+    @Override
+    void onError(int code, String message);
 }
