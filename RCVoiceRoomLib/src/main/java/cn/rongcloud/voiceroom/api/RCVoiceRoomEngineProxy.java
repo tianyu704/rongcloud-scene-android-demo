@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroom.api;
 import java.lang.reflect.Proxy;
 
 import cn.rongcloud.voiceroom.aroom.RCVoiceRoomEngineHandler;
+import cn.rongcloud.voiceroom.aroom.RCVoiceRoomEngineImpl;
 
 /**
  * RCVoiceRoomEngine的代理对象
@@ -22,7 +23,7 @@ public class RCVoiceRoomEngineProxy {
         if (INSTANCE == null) {
             synchronized (RCVoiceRoomEngineProxy.class) {
                 if (INSTANCE == null) {
-                    IRCVoiceRoomEngine rcVoiceRoomEngine = RCVoiceRoomEngine.getInstance();
+                    IRCVoiceRoomEngine rcVoiceRoomEngine = RCVoiceRoomEngineImpl.getInstance();
                     ClassLoader classLoader = rcVoiceRoomEngine.getClass().getClassLoader();
                     Class<?>[] interfaces = rcVoiceRoomEngine.getClass().getInterfaces();
                     RCVoiceRoomEngineHandler handler = RCVoiceRoomEngineHandler.getInstance();

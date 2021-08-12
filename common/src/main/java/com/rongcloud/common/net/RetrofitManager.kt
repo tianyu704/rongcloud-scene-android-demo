@@ -5,12 +5,14 @@
 package com.rongcloud.common.net
 
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.NetUtil
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 /**
@@ -18,9 +20,7 @@ import java.util.concurrent.TimeUnit
  * @Date 2021/08/02
  */
 object RetrofitManager {
-
-
-    public fun getDownloadRetrofit(): Retrofit {
+    fun getDownloadRetrofit(): Retrofit {
         return Retrofit.Builder().baseUrl("http://127.0.0.1").client(getOkHttpClient())
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create()).build()
     }
@@ -44,6 +44,7 @@ object RetrofitManager {
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
+            .addInterceptor(netCheckInterceptor()) // 网络检查
             .addInterceptor(addHeaderInterceptor()) // token过滤
             .addInterceptor(httpLoggingInterceptor) //日志,所有的请求响应度看到
             .connectTimeout(10L, TimeUnit.SECONDS)
@@ -67,6 +68,19 @@ object RetrofitManager {
             }
             val request = requestBuilder.build()
             chain.proceed(request)
+        }
+    }
+
+    /**
+     * 网络检查
+     */
+    private fun netCheckInterceptor(): Interceptor {
+        return Interceptor { chain ->
+            if (NetUtil.isNetworkAvailable()) {
+                chain.proceed(chain.request())
+            } else {
+                throw IOException("网络未链接")
+            }
         }
     }
 }
