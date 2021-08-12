@@ -5,6 +5,8 @@
 package cn.rongcloud.voiceroom.aroom;
 
 import android.app.Application;
+import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -160,11 +162,18 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
     }
 
     private void initRCRTCEngine(Application context) {
+        String manufacturer = Build.MANUFACTURER.trim();
+        int audioSource = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
+        // 使用耳返功能，华为和 vivo 需使用 mic 采集声音
+        if (manufacturer.contains("HUAWEI") || manufacturer.contains("vivo")) {
+            audioSource = MediaRecorder.AudioSource.MIC;
+        }
         RCRTCConfig build = RCRTCConfig
                 .Builder
                 .create()
                 .enableHardwareDecoder(true)
                 .enableHardwareEncoder(true)
+                .setAudioSource(audioSource)
                 .build();
         RCRTCEngine.getInstance().init(context, build);
     }
