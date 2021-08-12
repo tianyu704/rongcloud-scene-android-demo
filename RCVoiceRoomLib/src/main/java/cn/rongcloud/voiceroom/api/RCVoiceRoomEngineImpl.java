@@ -1982,20 +1982,18 @@ class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoiceRoomEng
         }
 
         private void handleJoinRoom(String userId) {
-//            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-//            if (null != listener && null != leftMaps) {
-//                int index;
-//                if (leftMaps.containsKey(userId)) {
-//                    index = leftMaps.get(userId);
-//                } else {//第一个进来的 房主 todo
-//                    index = 0;
-//                }
-//                Log.d(TAG, "handleJoinRoom : " + "index = " + index);
-//                RCVoiceSeatInfo enter = mSeatInfoList.get(index);
-//                userEnterSeat(enter, userId);
-//                listener.onUserEnterSeat(index, userId);
-//                listener.onSeatInfoUpdate(mSeatInfoList);
-//            }
+            Log.d(TAG, "handleJoinRoom : " + "userId = " + userId);
+            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
+            if (null != listener && null != leftMaps && leftMaps.containsKey(userId)) {
+                int index = leftMaps.get(userId);
+                Log.d(TAG, "handleJoinRoom : " + "index = " + index);
+                if (index == 0) {//只自加房主 其他主播断网后不在重加
+                    RCVoiceSeatInfo enter = mSeatInfoList.get(index);
+                    userEnterSeat(enter, userId);
+                    listener.onUserEnterSeat(index, userId);
+                    listener.onSeatInfoUpdate(mSeatInfoList);
+                }
+            }
         }
     }
 
