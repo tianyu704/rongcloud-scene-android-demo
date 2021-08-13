@@ -4,6 +4,7 @@
 
 package cn.rongcloud.mvoiceroom.ui.uimodel
 
+import android.util.Log
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 
@@ -24,6 +25,13 @@ class UiSeatModel constructor(
 
     var member: UiMemberModel? = null
         set(value) {
+            // giftCount处理被重置
+            var temp = field?.giftCount ?: 0
+            value?.let {
+                if (it.giftCount < 1) {
+                    it.giftCount = temp
+                }
+            }
             if (value != field || value == null) {
                 field = value
                 seatInfoChangeSubject.onNext(this)

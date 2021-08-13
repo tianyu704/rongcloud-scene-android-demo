@@ -162,20 +162,21 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
     }
 
     private void initRCRTCEngine(Application context) {
-        String manufacturer = Build.MANUFACTURER.trim();
-        int audioSource = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
-        // 使用耳返功能，华为和 vivo 需使用 mic 采集声音
-        if (manufacturer.contains("HUAWEI") || manufacturer.contains("vivo")) {
-            audioSource = MediaRecorder.AudioSource.MIC;
-        }
-        RCRTCConfig build = RCRTCConfig
+        RCRTCConfig.Builder builder = RCRTCConfig
                 .Builder
                 .create()
                 .enableHardwareDecoder(true)
-                .enableHardwareEncoder(true)
-                .setAudioSource(audioSource)
-                .build();
-        RCRTCEngine.getInstance().init(context, build);
+                .enableHardwareEncoder(true);
+        String manufacturer = Build.MANUFACTURER.trim();
+        // 使用耳返功能，华为和 vivo 需使用 mic 采集声音
+        if (manufacturer.contains("HUAWEI") || manufacturer.contains("vivo")) {
+            builder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        } else {
+            builder.setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+                    .enableLowLatencyRecording(true);
+        }
+        RCRTCConfig config = builder.build();
+        RCRTCEngine.getInstance().init(context, config);
     }
 
     public String getCurrentUserId() {

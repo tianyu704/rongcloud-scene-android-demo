@@ -328,7 +328,6 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
     @SuppressLint("SetTextI18n")
     override fun refreshRoomInfo(roomInfo: UiRoomModel) {
-        Log.d(TAG, "refreshRoomInfo: $roomInfo")
         currentRole.refreshRoomInfo(roomInfo)
         roomInfo.roomBean?.backgroundUrl?.let {
             iv_background.loadImageView(it, R.drawable.default_room_background)
@@ -338,6 +337,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     }
 
     override fun onSeatInfoChange(index: Int, uiSeatModel: UiSeatModel) {
+        Log.d(TAG, "onSeatInfoChange: $index  giftCount = ${uiSeatModel.giftCount}")
         if (index == 0) {
             refreshRoomOwner(uiSeatModel)
         } else {

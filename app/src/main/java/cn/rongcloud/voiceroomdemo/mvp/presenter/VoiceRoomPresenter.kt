@@ -113,6 +113,7 @@ class VoiceRoomPresenter @Inject constructor(
         addDisposable(roomModel
             .obSeatInfoChange()
             .subscribe { info ->
+                Log.d(TAG, "onCreate: obSeatInfoChange")
                 if ((info.member?.member == null) && !info.userId.isNullOrEmpty()) {
                     val memberInfo =
                         roomModel.getMemberInfoByUserIdOnlyLocal(info.userId)
