@@ -39,8 +39,6 @@ class RongCouldInit @Inject constructor() : ModuleInit {
                 AccountStore.logout()
             }
         }
-
     }
-
 
 }

@@ -71,7 +71,6 @@ object AccountStore {
 
     // 登出
     fun logout() {
-
         saveAccountInfo(EMPTY_ACCOUNT)
     }
 

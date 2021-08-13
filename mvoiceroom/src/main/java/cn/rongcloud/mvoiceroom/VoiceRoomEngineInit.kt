@@ -6,6 +6,7 @@ package cn.rongcloud.mvoiceroom
 
 import android.app.Application
 import android.content.Context
+import android.os.Looper
 import android.util.Log
 import cn.rongcloud.annotation.AutoInit
 import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
@@ -27,7 +28,7 @@ private const val TAG = "VoiceRoomEngineInit"
 @AutoInit
 class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
     override fun getPriority(): Int {
-        return 10
+        return 1000
     }
 
     override fun getName(context: Context): String = "VoiceRoomEngineInit"
@@ -37,25 +38,27 @@ class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
         try {
             RCVoiceRoomEngine.getInstance().initWithAppKey(application, AppConfig.APP_KEY)
         } catch (e: Exception) {
-            Log.e(TAG, "onInit: ", e)
+            Log.e(TAG, "onInit: e = " + e)
         }
         RCChatRoomMessageManager.registerMessageTypes()
-
         if (!AccountStore.getImToken().isNullOrEmpty()) {
-            RCVoiceRoomEngine.getInstance().connectWithToken(
-                application,
-                AccountStore.getImToken(),
-                object : RCVoiceRoomCallback {
-                    override fun onError(code: Int, message: String?) {
-                        application.showToast("RTC 服务器连接失败,请重新登录")
-                        AccountStore.logout()
-                    }
+            android.os.Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
+                override fun run() {
+                    RCVoiceRoomEngine.getInstance().connectWithToken(
+                        application,
+                        AccountStore.getImToken(),
+                        object : RCVoiceRoomCallback {
+                            override fun onError(code: Int, message: String?) {
+                                application.showToast("RTC 服务器连接失败,请重新登录")
+                                AccountStore.logout()
+                            }
 
-                    override fun onSuccess() {
+                            override fun onSuccess() {
+                            }
 
-                    }
-
-                })
+                        })
+                }
+            }, 200)
         }
     }
 }

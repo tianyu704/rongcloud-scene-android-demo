@@ -350,6 +350,23 @@ class VoiceRoomPresenter @Inject constructor(
         Log.d(TAG, "joinRoom: ${roomId}")
         if (isCreate) {
             currentRoomInfo?.roomBean?.let { roomBean ->
+//                val info = RCVoiceRoomInfo().apply {
+//                    roomName = roomBean.roomName
+//                    seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT
+//                    isFreeEnterSeat = false
+//                    isLockAll = false
+//                    isMuteAll = false
+//                }
+//                RCVoiceRoomEngine.getInstance()
+//                    .createAndJoinRoom(roomId, info, object : RCVoiceRoomCallback {
+//                        override fun onError(code: Int, message: String?) {
+//                            view.showError(code, message)
+//                        }
+//
+//                        override fun onSuccess() {
+//                            afterJoinRoomSuccess()
+//                        }
+//                    })
                 val info = RCVoiceRoomInfo().apply {
                     roomName = roomBean.roomName
                     seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT

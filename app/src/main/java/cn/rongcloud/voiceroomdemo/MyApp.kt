@@ -14,6 +14,7 @@ import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.base.IBaseView
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.UIKit
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -26,7 +27,6 @@ private const val TAG = "MyApp"
 
 @HiltAndroidApp
 class MyApp : MultiDexApplication() {
-
 
     @Inject
     lateinit var moduleManager: ModuleManager
@@ -46,6 +46,12 @@ class MyApp : MultiDexApplication() {
             BuildConfig.BASE_SERVER_ADDRES
         )
 
+        var process = UIKit.getCurrentProcessName()
+        Log.d(TAG, "process : $process")
+        if (applicationContext.packageName != process) {
+            // 避免过度初始化
+            return
+        }
         // 初始化所有模块，通话参数可修改初始化优先级，获取初始化总的模块数和初始进度
         moduleManager.init(this, { name, priority ->
             Log.d(TAG, "initModule: $name")
