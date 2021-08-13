@@ -306,7 +306,7 @@ class VoiceRoomModel @Inject constructor(
                         }
                     }
                     RCRTCAudioMixer.MixingState.STOPPED -> {
-                        currentPlayMusic = null
+//                        currentPlayMusic = null
                         userMusicList.forEach {
                             it.isPlaying = false
                         }
