@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import android.util.Log
+import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import cn.rongcloud.annotation.HiltBinding
@@ -44,12 +45,12 @@ class MusicControlFragment(view: IMusicControlView) :
             "${RCRTCAudioMixer.getInstance().mixingVolume}"
         sb_remote_audio_setting.progress = RCRTCAudioMixer.getInstance().mixingVolume
         // 默认关闭耳返
-        sw_checked.setChecked(false)
-        RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(false)
-        sw_checked.setOnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
-            Log.e("MusicControlFragment","checked = "+checked);
-            RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(checked)//耳返
-        }
+//        sw_checked.setChecked(false)
+//        RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(false)
+//        sw_checked.setOnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
+//            Log.e("MusicControlFragment","checked = "+checked);
+//            RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(checked)//耳返
+//        }
     }
 
 

@@ -6,7 +6,16 @@ package cn.rongcloud.voiceroomdemo.mvp.activity
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.os.Binder
 import android.os.CountDownTimer
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.TextPaint
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.util.Log
+import android.view.View
 import androidx.core.widget.addTextChangedListener
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
@@ -14,7 +23,9 @@ import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.showToast
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
+import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb
 import com.rongcloud.common.extension.ui
+import com.rongcloud.common.utils.UIKit
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_login.*
 import javax.inject.Inject
@@ -24,6 +35,7 @@ private const val TAG = "LoginActivity"
 @HiltBinding(value = ILoginView::class)
 @AndroidEntryPoint
 class LoginActivity : BaseActivity(), ILoginView {
+    var accept = false
 
     companion object {
         fun startActivity(context: Context) {
@@ -59,7 +71,23 @@ class LoginActivity : BaseActivity(), ILoginView {
     }
 
     override fun initData() {
-
+        var style = SpannableStringBuilder()
+        style.append("且表示同意《注册条款》")
+        style.setSpan(
+            ForegroundColorSpan(Color.parseColor("#0099FF")), 5, 11,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        bottom_info.text = style
+        bottom_info.setOnClickListener { view ->
+            //注册条款
+            Log.e(TAG, "注册条款")
+            ActCommentWeb.openCommentWeb(
+                this@LoginActivity,
+                "file:///android_asset/agreement_zh.html", "注册条款"
+            )
+        }
+        var vs = UIKit.getVerName()
+        bottom_version.text = "融云 RTC ${vs}"
     }
 
     override fun setNextVerificationDuring(time: Long) {

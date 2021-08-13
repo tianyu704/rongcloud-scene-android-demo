@@ -111,4 +111,14 @@ public class UIKit {
         }
         return processName;
     }
+
+    public static String getVerName() {
+        String verName = "";
+        try {
+            verName = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return verName;
+    }
 }
