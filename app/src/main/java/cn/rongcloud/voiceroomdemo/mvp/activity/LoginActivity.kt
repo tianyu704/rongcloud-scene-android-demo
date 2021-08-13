@@ -35,7 +35,6 @@ private const val TAG = "LoginActivity"
 @HiltBinding(value = ILoginView::class)
 @AndroidEntryPoint
 class LoginActivity : BaseActivity(), ILoginView {
-    var accept = false
 
     companion object {
         fun startActivity(context: Context) {

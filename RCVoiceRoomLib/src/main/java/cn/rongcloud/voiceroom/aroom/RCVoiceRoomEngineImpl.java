@@ -916,6 +916,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
             @Override
             public void onSuccess() {
                 mRoomInfo = roomInfo;
+                if (null != leftMaps) leftMaps.clear();
                 if (mRoomInfo.getSeatCount() != mSeatInfoList.size()) {
                     resetListExceptOwnerSeat(roomInfo.getSeatCount());
                     for (int i = 0; i < mSeatInfoList.size(); i++) {
@@ -2006,19 +2007,19 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
         }
 
         private void handleJoinRoom(String userId) {
-            Log.d(TAG, "handleJoinRoom : " + "userId = " + userId);
-            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-            if (null != listener && null != leftMaps && leftMaps.containsKey(userId)) {
-                int index = leftMaps.get(userId);
-                Log.d(TAG, "handleJoinRoom : " + "index = " + index);
-                RCVoiceSeatInfo enter = mSeatInfoList.get(index);
-                userEnterSeat(enter, userId);
-                listener.onUserEnterSeat(index, userId);
-                listener.onSeatInfoUpdate(mSeatInfoList);
-                if (getCurrentUserId().equals(getFirstInSeatUserId(userId))) {
-                    updateKvSeatInfo(enter, index, null);
-                }
-            }
+//            Log.d(TAG, "handleJoinRoom : " + "userId = " + userId);
+//            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
+//            if (null != listener && null != leftMaps && leftMaps.containsKey(userId)) {
+//                int index = leftMaps.get(userId);
+//                Log.d(TAG, "handleJoinRoom : " + "index = " + index);
+//                RCVoiceSeatInfo enter = mSeatInfoList.get(index);
+//                userEnterSeat(enter, userId);
+//                listener.onUserEnterSeat(index, userId);
+//                listener.onSeatInfoUpdate(mSeatInfoList);
+//                if (getCurrentUserId().equals(getFirstInSeatUserId(userId))) {
+//                    updateKvSeatInfo(enter, index, null);
+//                }
+//            }
         }
 
         /**
