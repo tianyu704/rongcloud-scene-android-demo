@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import cn.rong.combusis.umeng.RcUmEvent
+import cn.rong.combusis.umeng.UmengHelper
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
@@ -61,13 +63,16 @@ class HomeActivity : BaseActivity(), IHomeView,
 
     override fun initView() {
         iv_voice_room.setOnClickListener {
+            UmengHelper.get().event(RcUmEvent.VoiceRoom)
             VoiceRoomListActivity.startActivity(this)
         }
 
         iv_video_call.setOnClickListener {
+            UmengHelper.get().event(RcUmEvent.VideoCall)
             DialActivity.openDilapadPage(this, true)
         }
         iv_audio_call.setOnClickListener {
+            UmengHelper.get().event(RcUmEvent.AudioCall)
             DialActivity.openDilapadPage(this, false)
         }
     }

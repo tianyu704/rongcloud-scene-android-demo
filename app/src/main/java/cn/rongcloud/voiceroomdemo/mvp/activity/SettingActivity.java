@@ -20,6 +20,8 @@ import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import javax.inject.Inject;
 
+import cn.rong.combusis.umeng.RcUmEvent;
+import cn.rong.combusis.umeng.UmengHelper;
 import cn.rongcloud.annotation.HiltBinding;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView;
@@ -94,21 +96,27 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
                 showEditeInfoDialog();
                 break;
             case R.id.ad_first:
+                UmengHelper.get().event(RcUmEvent.SettingBanner);
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/activity/rtc20", "套餐方案");//banner
                 break;
             case R.id.ad_second:
+                UmengHelper.get().event(RcUmEvent.SettingPackage);
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/activity/rtc20", "套餐方案");
                 break;
             case R.id.ad_third:
+                UmengHelper.get().event(RcUmEvent.SettingDemoDownload);
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/downloads/demo", "Demo 下载");
                 break;
             case R.id.ad_fourth:
+                UmengHelper.get().event(RcUmEvent.SettingCS);
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/cs", "在线客服");
                 break;
             case R.id.ad_fivth:
+                UmengHelper.get().event(RcUmEvent.SettingAboutUs);
                 ActCommentWeb.openCommentWeb(this, "https://m.rongcloud.cn/about", "关于我们");
                 break;
             case R.id.customer_dial:
+                UmengHelper.get().event(RcUmEvent.SettingCallCM);
                 Intent intent = new Intent(Intent.ACTION_DIAL);
                 Uri data = Uri.parse("tel:13161856839");
                 intent.setData(data);

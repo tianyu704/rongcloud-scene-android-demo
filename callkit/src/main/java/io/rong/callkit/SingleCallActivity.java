@@ -380,9 +380,9 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             button.setEnabled(false);
             buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.VISIBLE);
             // TODO: 2021/7/26 视频通话，暂时屏蔽 不能切换 mediaType 和语音通话共用一个btn id
-            if (!audio) {
-                buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.GONE);
-            }
+//            if (!audio) {
+//                buttonLayout.findViewById(R.id.rc_voip_handfree).setVisibility(View.GONE);
+//            }
         }
 
         if (mediaType.equals(RongCallCommon.CallMediaType.AUDIO)) {

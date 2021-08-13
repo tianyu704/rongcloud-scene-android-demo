@@ -29,6 +29,8 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.oklib.WrapperCallBack;
 import cn.rong.combusis.oklib.Core;
 import cn.rong.combusis.oklib.Wrapper;
+import cn.rong.combusis.umeng.RcUmEvent;
+import cn.rong.combusis.umeng.UmengHelper;
 
 public class FeedbackHelper implements IFeedback {
     private final static String TAG = "FeedbackHelper";
@@ -169,6 +171,7 @@ public class FeedbackHelper implements IFeedback {
         view.findViewById(R.id.cl_up).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                UmengHelper.get().event(RcUmEvent.AppraisalBanner);
                 sendFovLikes();
             }
         });
