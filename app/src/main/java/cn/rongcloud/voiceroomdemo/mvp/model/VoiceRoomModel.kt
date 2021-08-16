@@ -234,9 +234,11 @@ class VoiceRoomModel @Inject constructor(
         voiceRoomListModel
             .getRoomInfo(roomId)
             .subscribe({
+                Log.e(TAG, "getRoomInfo success: ")
                 currentUIRoomInfo.roomBean = it
+                roomInfoSubject.onNext(currentUIRoomInfo)
             }, {
-                Log.e(TAG, "getRoomInfoError: ")
+                Log.e(TAG, "getRoomInfo Error: ")
                 roomInfoSubject.onError(it)
             })
 
@@ -538,11 +540,11 @@ class VoiceRoomModel @Inject constructor(
     override fun onRoomInfoUpdate(rcRoomInfo: RCVoiceRoomInfo) {
         Log.d(TAG, "onRoomInfoChanged: $rcRoomInfo")
         currentUIRoomInfo.rcRoomInfo = rcRoomInfo
-        if (!isInitRoomSetting) {
-            isInitRoomSetting = true
+//        if (!isInitRoomSetting) {
+//            isInitRoomSetting = true
             refreshRoomInfo()
 //            refreshRoomSetting()
-        }
+//        }
     }
 
     override fun onSeatInfoUpdate(seatInfoList: MutableList<RCVoiceSeatInfo>) {
@@ -783,7 +785,9 @@ class VoiceRoomModel @Inject constructor(
             .aRoomApi
             .getVoiceRoomInfo(roomId)
             .subscribe { bean ->
+                Log.e(TAG, "queryRoomInfoFromServer :")
                 currentUIRoomInfo.roomBean = bean.room
+                roomInfoSubject.onNext(currentUIRoomInfo)
             })
     }
 
