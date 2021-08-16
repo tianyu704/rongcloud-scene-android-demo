@@ -29,6 +29,7 @@ class SendPresentPresenter @Inject constructor(
 
     fun initeialObserve(selectedIds: List<String>) {
         view.onPresentInited(roomModel.presents)
+        // 礼物信息：图标 名称和 价值
         currentPresent = roomModel.presents.first()
         addDisposable(roomModel
             .obMemberListChange()
@@ -39,18 +40,32 @@ class SendPresentPresenter @Inject constructor(
                 return@map it
             }.observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                //移出已下麦
-                var filts = selects.filter { mem ->
-                    !it.contains(mem)
+//                //移出已下麦
+//                var filts = selects.filter { mem ->
+//                    !it.contains(mem)
+//                }
+//                selects.clear()
+//                selects.addAll(filts)
+//                // 处理默认选中
+//                it.forEach {
+//                    if (selectedIds.contains(it.userId)) {
+//                        selects.add(it)
+//                    }
+//                }
+                var filts: List<UiMemberModel>
+                if (!selectedIds.isEmpty()) {
+                    //个人设置过来 只过滤选中的人 其实只有一个
+                    filts = it.filter { mem ->
+                        selectedIds.contains(mem.userId)
+                    }
+                } else {
+                    //移出已下麦
+                    filts = selects.filter { mem ->
+                        !it.contains(mem)
+                    }
                 }
                 selects.clear()
                 selects.addAll(filts)
-                // 处理默认选中
-                it.forEach {
-                    if (selectedIds.contains(it.userId)) {
-                        selects.add(it)
-                    }
-                }
                 view.onMemberModify(it)
                 checkEnableSend()
             })
