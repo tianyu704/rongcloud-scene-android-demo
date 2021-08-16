@@ -841,10 +841,11 @@ class VoiceRoomModel @Inject constructor(
                                 member.userId == entry.key
                             }?.giftCount = entry.value
                             // 刷新gifcount
-                            var seat = currentUISeatInfoList.firstOrNull {
+                            currentUISeatInfoList.firstOrNull {
                                 it.userId == entry.key
+                            }?.let { seat ->
+                                seatInfoChangeSubject.onNext(seat)
                             }
-                            seatInfoChangeSubject.onNext(seat)
                         }
                     }
                 }
@@ -926,6 +927,12 @@ class VoiceRoomModel @Inject constructor(
                             roomMemberInfoList.firstOrNull { member ->
                                 member.userId == entry.key
                             }?.giftCount = entry.value
+                            // 刷新gifcount
+                            currentUISeatInfoList.firstOrNull {
+                                it.userId == entry.key
+                            }?.let { seat ->
+                                seatInfoChangeSubject.onNext(seat)
+                            }
                         }
                     }
                 }
