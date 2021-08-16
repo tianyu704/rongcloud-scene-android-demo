@@ -54,19 +54,22 @@ class SendPresentPresenter @Inject constructor(
 //                }
                 var filts: List<UiMemberModel>
                 if (!selectedIds.isEmpty()) {
-                    //个人设置过来 只过滤选中的人 其实只有一个
+                    // 个人设置过来 只过滤选中的人
                     filts = it.filter { mem ->
                         selectedIds.contains(mem.userId)
                     }
+                    selects.clear()
+                    selects.addAll(filts)
+                    // 只显示 选中人
+                    view.onMemberModify(filts)
                 } else {
-                    //移出已下麦
                     filts = selects.filter { mem ->
                         !it.contains(mem)
                     }
+                    selects.clear()
+                    selects.addAll(filts)
+                    view.onMemberModify(it)
                 }
-                selects.clear()
-                selects.addAll(filts)
-                view.onMemberModify(it)
                 checkEnableSend()
             })
     }
