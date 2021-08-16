@@ -97,9 +97,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="45dp"
+        android:layout_marginEnd="35dp"
         android:visibility="gone">
-
+        <!--       android:layout_marginEnd="45dp"  -> 40dp 因为文字过长导致调整 10dp-->
         <ImageView
             android:id="@+id/rc_voip_handfree_btn"
             android:layout_width="wrap_content"

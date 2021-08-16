@@ -39,7 +39,7 @@
     <string name="rc_voip_camera">摄像头</string>
     <string name="rc_voip_handfree">免提</string>
     <string name="rc_voip_switch_audio" translatable="false">切换语音通话</string>
-    <string name="rc_voip_switch_camera" translatable="false">切换奇幻摄像头</string>
+    <string name="rc_voip_switch_camera" translatable="false">切换摄像头</string>
     <string name="rc_voip_disable_camera">关闭摄像头</string>
     <string name="rc_voip_enable_camera">开启摄像头</string>
     <string name="rc_voip_participant_users">群聊成员</string>
