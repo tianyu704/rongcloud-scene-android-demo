@@ -169,7 +169,8 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 .enableHardwareEncoder(true);
         String manufacturer = Build.MANUFACTURER.trim();
         // 使用耳返功能，华为和 vivo 需使用 mic 采集声音
-        if (manufacturer.contains("HUAWEI") || manufacturer.contains("vivo")) {
+//        if (manufacturer.contains("HUAWEI") || manufacturer.contains("vivo")) {
+        if (manufacturer.contains("vivo")) {
             builder.setAudioSource(MediaRecorder.AudioSource.MIC);
         } else {
             builder.setAudioSource(MediaRecorder.AudioSource.VOICE_COMMUNICATION)

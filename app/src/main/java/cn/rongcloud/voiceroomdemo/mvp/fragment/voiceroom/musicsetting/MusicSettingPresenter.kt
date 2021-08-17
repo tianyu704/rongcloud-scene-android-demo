@@ -30,6 +30,10 @@ class MusicSettingPresenter @Inject constructor(
         return AudioEffectManager.getMusicAtmosphereIndexByName(name)
     }
 
+    fun getRoomId(): String {
+        return roomModel.roomId;
+    }
+
     override fun onCreate() {
         super.onCreate()
         roomModel.refreshMusicList()

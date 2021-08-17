@@ -39,7 +39,7 @@ class MusicSettingFragment(view: IMusicSettingView) :
         arrayListOf<Fragment>(
             MusicListFragment(this),
             MusicAddFragment(this),
-            MusicControlFragment(this)
+            MusicControlFragment(presenter.getRoomId(), this)
         )
     }
 
@@ -94,7 +94,6 @@ class MusicSettingFragment(view: IMusicSettingView) :
         }
         presenter.playMusicAtmosphere(name)
     }
-
 
 
     override fun initView() {

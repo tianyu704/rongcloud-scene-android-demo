@@ -25,11 +25,14 @@ import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.mvoiceroom.utils.LocalUserInfoManager
+import cn.rongcloud.rtc.api.RCRTCEngine
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.EAR_MONITORING
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.AudioManagerUtil
+import com.rongcloud.common.utils.SharedPreferUtil
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
@@ -542,7 +545,7 @@ class VoiceRoomModel @Inject constructor(
         currentUIRoomInfo.rcRoomInfo = rcRoomInfo
 //        if (!isInitRoomSetting) {
 //            isInitRoomSetting = true
-            refreshRoomInfo()
+        refreshRoomInfo()
 //            refreshRoomSetting()
 //        }
     }
@@ -1191,6 +1194,13 @@ class VoiceRoomModel @Inject constructor(
                     emitter.onComplete()
                 }
             })
+            //主播禁麦自己
+            if (isMute) {//关闭耳返
+                RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(false)
+            } else {//根据缓存状态恢复耳返
+                var enable = SharedPreferUtil.getBoolean(EAR_MONITORING + roomId)
+                RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(enable)
+            }
         }
     }
 

@@ -5,7 +5,6 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import android.util.Log
-import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import cn.rongcloud.annotation.HiltBinding
@@ -13,9 +12,13 @@ import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseFragment
+import com.rongcloud.common.utils.SharedPreferUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_control.*
 import javax.inject.Inject
+
+// 耳返sp缓存key
+val EAR_MONITORING = "key_earMonitoring_"
 
 /**
  * @author gusd
@@ -23,7 +26,10 @@ import javax.inject.Inject
  */
 @HiltBinding(value = IMusicControlView::class)
 @AndroidEntryPoint
-class MusicControlFragment(view: IMusicControlView) :
+class MusicControlFragment(
+    private val roomId: String,
+    view: IMusicControlView
+) :
     BaseFragment(
         R.layout.fragment_music_control
     ), IMusicControlView by view, SeekBar.OnSeekBarChangeListener {
@@ -44,15 +50,23 @@ class MusicControlFragment(view: IMusicControlView) :
         tv_remote_audio_value.text =
             "${RCRTCAudioMixer.getInstance().mixingVolume}"
         sb_remote_audio_setting.progress = RCRTCAudioMixer.getInstance().mixingVolume
-        // 默认关闭耳返
-//        sw_checked.setChecked(false)
-//        RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(false)
-//        sw_checked.setOnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
-//            Log.e("MusicControlFragment","checked = "+checked);
-//            RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(checked)//耳返
-//        }
+        // 获取缓存的
+        var enable = SharedPreferUtil.getBoolean(EAR_MONITORING + roomId)
+        setEarMonitoringAndCache(enable)
+        sw_checked.isChecked = enable
+        sw_checked.setOnCheckedChangeListener { compoundButton: CompoundButton, checked: Boolean ->
+            setEarMonitoringAndCache(checked)
+        }
     }
 
+    /**
+     * 设置耳返
+     */
+    fun setEarMonitoringAndCache(enable: Boolean) {
+        Log.e("setEarMonitoring", "enable = " + enable)
+        RCRTCEngine.getInstance().defaultAudioStream.enableEarMonitoring(enable)//耳返
+        SharedPreferUtil.set(EAR_MONITORING + roomId, enable)
+    }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
         when (seekBar) {
