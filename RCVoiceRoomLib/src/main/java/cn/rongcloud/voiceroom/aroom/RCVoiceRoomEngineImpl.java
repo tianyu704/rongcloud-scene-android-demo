@@ -56,10 +56,10 @@ import cn.rongcloud.voiceroom.model.VoiceRoomErrorCode;
 import cn.rongcloud.voiceroom.model.messagemodel.RCVoiceRoomInviteMessage;
 import cn.rongcloud.voiceroom.model.messagemodel.RCVoiceRoomRefreshMessage;
 import cn.rongcloud.voiceroom.utils.JsonUtils;
-import io.rong.imkit.RongIM;
 import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
+import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.chatroom.base.RongChatRoomClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
@@ -180,7 +180,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
     }
 
     public String getCurrentUserId() {
-        return RongIM.getInstance().getCurrentUserId();
+        return RongCoreClient.getInstance().getCurrentUserId();
     }
 
     private void unInitRCRTCEngine() {
