@@ -303,4 +303,11 @@ public interface IRCVoiceRoomEngine {
      * @param resultCallback
      */
     void getLatestSeatInfo(final RCVoiceRoomResultCallback<List<RCVoiceSeatInfo>> resultCallback);
+
+    /**
+     * 更新指定麦位信息中的extra字段
+     * @param index
+     * @param extra
+     */
+    void updateSeatInfo(int index,String extra,RCVoiceRoomCallback callback);
 }

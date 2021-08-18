@@ -1235,6 +1235,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
         });
     }
 
+
     private RCVoiceRoomEventListener getCurrentRoomEventListener() {
         if (mRoomEventListener == null) {
             return null;
@@ -1683,6 +1684,22 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomCreateRoomFailed);
             }
         });
+    }
+
+    @Override
+    public void updateSeatInfo(int index, String extra, RCVoiceRoomCallback callback) {
+        if (!seatIndexInRange(index)) {
+            onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
+            return;
+        }
+        RCVoiceSeatInfo temp = getSeatInfoByIndex(index);
+        if (null != temp) {
+            RCVoiceSeatInfo seatInfo = temp.clone();
+            seatInfo.setExtra(extra);
+            updateKvSeatInfo(seatInfo, index, callback);
+        } else {
+            onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
+        }
     }
 
     private void updateKvRoomInfo(RCVoiceRoomInfo roomInfo, final RCVoiceRoomCallback callback) {
