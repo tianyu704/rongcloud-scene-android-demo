@@ -89,32 +89,37 @@
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         android:gravity="center"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:orientation="horizontal"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_version">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="新登录用户即注册开通融云开发者账号"
-            android:textSize="12sp" />
+        <ImageView
+            android:id="@+id/iv_checked"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/shape_checkbox_outter"
+            android:padding="2.5dp"
+            android:src="@drawable/shape_checkbox_inner" />
 
         <TextView
             android:id="@+id/bottom_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="且表示同意《注册条款》"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/bottom_version"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1.0.0"
-            android:textSize="12sp" />
+            android:text="《注册条款》"
+            android:textSize="11sp" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/bottom_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:text="1.0.0"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

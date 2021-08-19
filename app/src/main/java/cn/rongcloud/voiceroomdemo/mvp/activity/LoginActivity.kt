@@ -36,6 +36,8 @@ private const val TAG = "LoginActivity"
 @AndroidEntryPoint
 class LoginActivity : BaseActivity(), ILoginView {
 
+    var checked: Boolean = false
+
     companion object {
         fun startActivity(context: Context) {
             val intent = Intent(context, LoginActivity::class.java)
@@ -58,6 +60,10 @@ class LoginActivity : BaseActivity(), ILoginView {
                 showToast(R.string.please_input_phone_number)
                 return@setOnClickListener
             }
+            if (!checked) {
+                showToast("请勾选同意注册条款")
+                return@setOnClickListener
+            }
             presenter.getVerificationCode(et_phone_number.text.toString())
         }
         et_verification_code.addTextChangedListener {
@@ -65,15 +71,24 @@ class LoginActivity : BaseActivity(), ILoginView {
                 !it.isNullOrBlank() && it.length >= 6 && !et_phone_number.text.isNullOrBlank()
         }
         btn_login.setOnClickListener {
+            if (!checked) {
+                showToast("请勾选同意注册条款")
+                return@setOnClickListener
+            }
             presenter.login(et_phone_number.text.toString(), et_verification_code.text.toString())
         }
     }
 
     override fun initData() {
+        iv_checked.isSelected = checked;
+        iv_checked.setOnClickListener { view ->
+            view.isSelected = !view.isSelected
+            checked = view.isSelected
+        }
         var style = SpannableStringBuilder()
-        style.append("且表示同意《注册条款》")
+        style.append("同意《注册条款》并新登录即注册开通融云开发者账号")
         style.setSpan(
-            ForegroundColorSpan(Color.parseColor("#0099FF")), 5, 11,
+            ForegroundColorSpan(Color.parseColor("#0099FF")), 2, 8,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
         bottom_info.text = style
