@@ -16,7 +16,7 @@ import retrofit2.http.*
  */
 interface ARoomApi {
     @GET("/mic/room/list")
-    fun getRoomList(@Query("page") page: Int, @Query("size") size: Int): Single<VoiceRoomListBean>
+    fun getRoomList(@Query("type")type:Int,@Query("page") page: Int, @Query("size") size: Int): Single<VoiceRoomListBean>
 
     @POST("/mic/room/create")
     fun createVoiceRoom(@Body createRoomRequestBean: CreateRoomRequestBean): Single<CreateRoomRespondBean>

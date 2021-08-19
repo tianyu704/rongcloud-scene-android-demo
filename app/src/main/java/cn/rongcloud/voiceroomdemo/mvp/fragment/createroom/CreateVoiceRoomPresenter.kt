@@ -56,7 +56,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
                                 password,
                                 "${ApiConstant.FILE_URL}$it",
                                 roomBackground,
-                                kvList
+                                kvList,
+                                1
                             )
                         )
                 }.subscribe({ respond ->
@@ -87,7 +88,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
                             kv = kvList,
                             name = roomName,
                             password = password,
-                            backgroundUrl = roomBackground
+                            backgroundUrl = roomBackground,
+                            roomType = 1
                         )
                     ).subscribe({ respond ->
                         view.hideWaitingDialog()

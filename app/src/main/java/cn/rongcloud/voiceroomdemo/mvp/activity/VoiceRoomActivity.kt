@@ -56,6 +56,7 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
@@ -782,6 +783,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
                         } else {
                             presenter.roomOwnerEnterSeat()
                         }
+                        RCVoiceRoomEngine.getInstance().updateSeatInfo(1,"update",null)
                     }
                 }
             }

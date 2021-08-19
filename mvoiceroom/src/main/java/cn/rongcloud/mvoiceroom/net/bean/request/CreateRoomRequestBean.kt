@@ -24,6 +24,8 @@ data class CreateRoomRequestBean(
     val backgroundUrl: String? = "",
     @SerializedName("kv")
     val kv: List<Kv>? = null,
+    @SerializedName("roomType")
+    val roomType: Int = 1,
 )
 
 data class Kv(

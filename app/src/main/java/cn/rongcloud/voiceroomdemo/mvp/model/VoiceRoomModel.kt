@@ -552,6 +552,7 @@ class VoiceRoomModel @Inject constructor(
 
     override fun onSeatInfoUpdate(seatInfoList: MutableList<RCVoiceSeatInfo>) {
         doOnDataScheduler {
+            Log.d(TAG, "onSeatInfoUpdate: size = ${seatInfoList.size}")
             Log.d(TAG, "onSeatInfoUpdate: $seatInfoList")
 
             val list = seatInfoList.mapIndexed { index, rcVoiceSeatInfo ->

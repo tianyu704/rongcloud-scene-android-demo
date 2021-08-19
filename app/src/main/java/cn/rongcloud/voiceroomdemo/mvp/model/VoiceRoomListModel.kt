@@ -63,7 +63,7 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
     private fun requestRoomList() {
         VoiceRoomNetManager
             .aRoomApi
-            .getRoomList(page, pageSize)
+            .getRoomList(1,page, pageSize)//1 聊天室(默认) 2 电台
             .observeOn(loadSchedulers)
             .subscribeOn(loadSchedulers)
             .subscribe({ bean ->
