@@ -1339,7 +1339,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
     @Override
     public void onChatRoomKVUpdate(String roomId, Map<String, String> chatRoomKvMap) {
-        Log.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
+        Log.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + "size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
         updateRoomInfoFromEntry(chatRoomKvMap);
         initSeatInfoListIfNeeded(mRoomInfo.getSeatCount());
         updateSeatInfoFromEntry(chatRoomKvMap);
@@ -1351,7 +1351,6 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                     leftMaps.put(info.getUserId(), i);
                 }
             }
-
         }
     }
 
@@ -1687,16 +1686,30 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
     }
 
     @Override
-    public void updateSeatInfo(int index, String extra, RCVoiceRoomCallback callback) {
+    public void updateSeatInfo(int index, String extra, final RCVoiceRoomCallback callback) {
         if (!seatIndexInRange(index)) {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
         }
-        RCVoiceSeatInfo temp = getSeatInfoByIndex(index);
+        final RCVoiceSeatInfo temp = getSeatInfoByIndex(index);
         if (null != temp) {
-            RCVoiceSeatInfo seatInfo = temp.clone();
+            final RCVoiceSeatInfo seatInfo = temp.clone();
             seatInfo.setExtra(extra);
-            updateKvSeatInfo(seatInfo, index, callback);
+            updateKvSeatInfo(seatInfo, index, new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+                    temp.setExtra(seatInfo.getExtra());
+                    onSuccessWithCheck(callback);
+                    if (null != getCurrentRoomEventListener()) {
+                        getCurrentRoomEventListener().onSeatInfoUpdate(mSeatInfoList);
+                    }
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
+                }
+            });
         } else {
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
         }
