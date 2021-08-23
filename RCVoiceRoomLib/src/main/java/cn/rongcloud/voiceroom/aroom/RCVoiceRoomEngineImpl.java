@@ -538,11 +538,6 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                         onErrorWithCheck(callback, VoiceRoomErrorCode.valueOf(code));
                         if (isLeaveSeatSuccess.get()) {
                             userLeaveSeat(userId, preSeatInfo);
-                            RCVoiceRoomEventListener currentRoomEventListener = getCurrentRoomEventListener();
-                            if (currentRoomEventListener != null) {
-                                currentRoomEventListener.onUserLeaveSeat(seatIndex, getCurrentUserId());
-                                currentRoomEventListener.onSeatInfoUpdate(mSeatInfoList);
-                            }
                         }
                     }
                 });
@@ -698,18 +693,16 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatIndexOutOfRange);
             return;
         }
-        if (seatInfo.getStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing || seatInfo.getUserId() != null) {
-            onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSeatNotEmpty);
-            return;
-        }
-
+        // 锁麦自动下麦
         final RCVoiceSeatInfo seatInfoClone = seatInfo.clone();
         seatInfoClone.setStatus(isLocked ? RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking : RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+        seatInfoClone.setUserId(null);
         updateKvSeatInfo(seatInfoClone, seatIndex, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
                 unParkHandlerThread();
                 seatInfo.setStatus(seatInfoClone.getStatus());
+                seatInfo.setUserId(seatInfoClone.getUserId());
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
                 if (listener != null) {
                     listener.onSeatLock(seatIndex, isLocked);
@@ -810,11 +803,6 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 public void onError(int code, String message) {
                     if (requestingCount.decrementAndGet() == 0) {
                         unParkHandlerThread();
-                        RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-                        if (listener != null) {
-                            listener.onSeatInfoUpdate(mSeatInfoList);
-                            listener.onRoomInfoUpdate(mRoomInfo);
-                        }
                     }
                 }
             });
@@ -874,11 +862,6 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 public void onError(int code, String message) {
                     if (atomicInteger.decrementAndGet() == 0) {
                         unParkHandlerThread();
-                        RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-                        if (listener != null) {
-                            listener.onSeatInfoUpdate(mSeatInfoList);
-                            listener.onRoomInfoUpdate(mRoomInfo);
-                        }
                     }
                 }
             });
