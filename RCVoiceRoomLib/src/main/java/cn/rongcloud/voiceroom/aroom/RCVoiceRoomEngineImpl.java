@@ -750,6 +750,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                     listener.onSeatMute(seatIndex, isMute);
                     listener.onSeatInfoUpdate(mSeatInfoList);
                 }
+                muteSelfIfNeed();//判断是否静音自己
                 onSuccessWithCheck(callback);
             }
 
@@ -1533,29 +1534,6 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                     listener.onRequestSeatListChanged();
                 }
             }
-//            else if (key.startsWith(RC_SEAT_INFO_USER_PART_PREFIX_KEY)) {
-//                String[] keyInfoArray = key.split("_");
-//                if (keyInfoArray.length > 1) {
-//                    try {
-//                        int index = Integer.parseInt(keyInfoArray[keyInfoArray.length - 1]);
-//                        if (seatIndexInRange(index)) {
-//                            RCVoiceSeatInfo info = getSeatInfoByIndex(index);
-//                            if (info != null) {
-//                                if (info.getStatus() != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
-//                                    info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
-//                                }
-//                                info.setUserId(null);
-//                            }
-//                            RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
-//                            if (listener != null) {
-//                                listener.onSeatInfoUpdate(mSeatInfoList);
-//                            }
-//                        }
-//                    } catch (NumberFormatException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
         }
     }
 

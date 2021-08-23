@@ -351,7 +351,7 @@ public class RongCallKit {
         RongCallModule.setMainPageActivity(className);
     }
 
-    public static String getVersion() {
-        return CallKitBuildVar.SDK_VERSION;
-    }
+//    public static String getVersion() {
+//        return CallKitBuildVar.SDK_VERSION;
+//    }
 }

@@ -15,7 +15,6 @@ import cn.rongcloud.voiceroom.model.AudioQuality;
 import cn.rongcloud.voiceroom.model.AudioScenario;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import cn.rongcloud.voiceroom.utils.BuildVersion;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.MessageContent;
 
