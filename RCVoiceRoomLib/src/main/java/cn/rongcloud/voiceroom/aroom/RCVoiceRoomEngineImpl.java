@@ -1234,7 +1234,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
     @Override
     public boolean onReceived(Message message, int left) {
-        VMLog.d(TAG, "message = " + JsonUtils.toJson(message));
+        VMLog.d(TAG, "onReceived：message = " + JsonUtils.toJson(message));
         if (ifCouldTransfer(message)) {
             for (IRongCoreListener.OnReceiveMessageListener onReceiveMessageListener : mMessageReceiveListenerList) {
                 onReceiveMessageListener.onReceived(message, left);

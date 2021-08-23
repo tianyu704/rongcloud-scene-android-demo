@@ -543,11 +543,7 @@ class VoiceRoomModel @Inject constructor(
     override fun onRoomInfoUpdate(rcRoomInfo: RCVoiceRoomInfo) {
         Log.d(TAG, "onRoomInfoChanged: $rcRoomInfo")
         currentUIRoomInfo.rcRoomInfo = rcRoomInfo
-//        if (!isInitRoomSetting) {
-//            isInitRoomSetting = true
         refreshRoomInfo()
-//            refreshRoomSetting()
-//        }
     }
 
     override fun onSeatInfoUpdate(seatInfoList: MutableList<RCVoiceSeatInfo>) {
