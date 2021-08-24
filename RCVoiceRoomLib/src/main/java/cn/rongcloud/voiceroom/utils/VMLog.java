@@ -12,6 +12,10 @@ public class VMLog {
         VMLog.debug = debug;
     }
 
+    public static void v(String TAG, String message) {
+        if (debug) Log.v(TAG, message);
+    }
+
     public static void d(String TAG, String message) {
         if (debug) Log.d(TAG, message);
     }
