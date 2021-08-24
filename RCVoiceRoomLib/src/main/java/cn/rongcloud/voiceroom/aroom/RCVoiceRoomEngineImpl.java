@@ -193,12 +193,13 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
         clientDelegate.connectWithToken(appToken, new RCVoiceRoomClientDelegate.ConnectCallback() {
             @Override
             public void onSuccess(String userId) {
-                VMLog.d(TAG, "onSuccess: userId = " + userId);
+                VMLog.d(TAG, "connectWithToken#onSuccess: userId = " + userId);
                 onSuccessWithCheck(callback);
             }
 
             @Override
             public void onError(int code) {
+                VMLog.d(TAG, "connectWithToken#onError: 【code】 = " + code);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomConnectTokenFailed);
             }
 
@@ -346,7 +347,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                VMLog.e(TAG, "leaveRoom:onError",coreErrorCode);
+                VMLog.e(TAG, "leaveRoom:onError", coreErrorCode);
                 leaveRTCRoom(null);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
             }
@@ -365,7 +366,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onFailed(RTCErrorCode errorCode) {
-                VMLog.e(TAG,"leaveRTCRoom#leaveRoom",errorCode);
+                VMLog.e(TAG, "leaveRTCRoom#leaveRoom", errorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
             }
         });
@@ -1119,7 +1120,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                     @Override
                     public void onError(Message message, int code, String reason) {
-                        VMLog.e(TAG,"rejectInvitation#sendMessage: 【code】"+code + " reason = "+reason);
+                        VMLog.e(TAG, "rejectInvitation#sendMessage: 【code】" + code + " reason = " + reason);
                         onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomRejectInvitationFailed);
                     }
                 }
@@ -1149,7 +1150,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                     @Override
                     public void onError(Message message, int code, String reason) {
-                        VMLog.e(TAG,"acceptInvitation#sendMessage: 【code】"+code + " reason = "+reason);
+                        VMLog.e(TAG, "acceptInvitation#sendMessage: 【code】" + code + " reason = " + reason);
                         onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomAcceptInvitationFailed);
                     }
                 }
@@ -1178,7 +1179,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                     @Override
                     public void onError(Message message, int code, String reason) {
-                        VMLog.e(TAG,"cancelInvitation#sendMessage: 【code】"+code + " reason = "+reason);
+                        VMLog.e(TAG, "cancelInvitation#sendMessage: 【code】" + code + " reason = " + reason);
                         onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomCancelInvitationFailed);
                     }
                 });
@@ -1197,7 +1198,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(int code, String message) {
-                VMLog.e(TAG,"notifyVoiceRoom#sendMessage: 【code】"+code + " reason = "+message);
+                VMLog.e(TAG, "notifyVoiceRoom#sendMessage: 【code】" + code + " reason = " + message);
             }
         });
     }
@@ -1218,7 +1219,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode e) {
-                VMLog.e(TAG,"getLatestSeatInfo#onError: 【code】"+e.code + " reason = "+e.msg);
+                VMLog.e(TAG, "getLatestSeatInfo#onError: 【code】" + e.code + " reason = " + e.msg);
                 onErrorWithCheck(resultCallback, VoiceRoomErrorCode.RCVoiceRoomGetRequestListFailed);
             }
         });
@@ -1389,7 +1390,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode e) {
-                VMLog.e(TAG,"forceRemoveKey#onError: 【code】"+e.code + " reason = "+e.msg);
+                VMLog.e(TAG, "forceRemoveKey#onError: 【code】" + e.code + " reason = " + e.msg);
             }
         });
     }
@@ -1569,13 +1570,12 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                 @Override
                 public void onFailed(RTCErrorCode errorCode) {
-                    VMLog.e(TAG,"switchRole#leaveRoom", errorCode);
+                    VMLog.e(TAG, "switchRole#leaveRoom", errorCode);
                     onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomLeaveRoomFailed);
                 }
             });
         }
     }
-
 
 
     private void joinRTCRoom(String roomId, final RCRTCLiveRole role, final RCVoiceRoomCallback callback) {
@@ -1606,7 +1606,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                         @Override
                         public void onFailed(RTCErrorCode errorCode) {
-                            VMLog.e(TAG,"joinRTCRoom#joinRoom#publishDefaultStreams", errorCode);
+                            VMLog.e(TAG, "joinRTCRoom#joinRoom#publishDefaultStreams", errorCode);
                             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomJoinRoomFailed);
                         }
                     });
@@ -1614,6 +1614,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                     for (RCRTCRemoteUser remoteUser : data.getRemoteUsers()) {
                         list.addAll(remoteUser.getStreams());
                     }
+                    VMLog.d(TAG, "subscribeStreams:remote streams = " + list.size());
                     if (list.size() > 0) {
                         data.getLocalUser().subscribeStreams(list, new IRCRTCResultCallback() {
                             @Override
@@ -1623,32 +1624,38 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                             @Override
                             public void onFailed(RTCErrorCode errorCode) {
-                                VMLog.e(TAG,"joinRTCRoom#joinRoom#subscribeStreams", errorCode);
+                                VMLog.e(TAG, "joinRTCRoom#joinRoom#subscribeStreams", errorCode);
                             }
                         });
                     }
                     muteSelfIfNeed();
                 } else {
-                    data.getLocalUser().subscribeStreams(data.getLiveStreams(), new IRCRTCResultCallback() {
-                        @Override
-                        public void onSuccess() {
-                            VMLog.d(TAG, "subscribeStreams:onSuccess: ");
-                        }
+                    List<RCRTCInputStream> streams = data.getLiveStreams();
+                    int count = null == streams ? 0 : streams.size();
+                    VMLog.d(TAG, "subscribeStreams:live streams = " + count);
+                    if (count > 0) {
+                        data.getLocalUser().subscribeStreams(data.getLiveStreams(), new IRCRTCResultCallback() {
+                            @Override
+                            public void onSuccess() {
+                                VMLog.d(TAG, "subscribeStreams:onSuccess: ");
+                            }
 
-                        @Override
-                        public void onFailed(RTCErrorCode errorCode) {
-                            VMLog.e(TAG,"joinRTCRoom#joinRoom#subscribeStreams", errorCode);
-                        }
-                    });
+                            @Override
+                            public void onFailed(RTCErrorCode errorCode) {
+                                VMLog.e(TAG, "joinRTCRoom#joinRoom#subscribeStreams", errorCode);
+                            }
+                        });
+                    }
                     enableSpeaker(true);
                     setAudioQuality(AudioQuality.MUSIC, AudioScenario.MUSIC_CHATROOM);
+
                 }
                 onSuccessWithCheck(callback);
             }
 
             @Override
             public void onFailed(RTCErrorCode errorCode) {
-                VMLog.e(TAG,"joinRTCRoom#joinRoom#onFailed", errorCode);
+                VMLog.e(TAG, "joinRTCRoom#joinRoom#onFailed", errorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomCreateRoomFailed);
             }
         });
@@ -1922,7 +1929,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                     @Override
                     public void onFailed(RTCErrorCode errorCode) {
-                        VMLog.e(TAG,"IRCRTCVoiceRoomEventsListener#onRemoteUserPublishResource#subscribeStreams", errorCode);
+                        VMLog.e(TAG, "IRCRTCVoiceRoomEventsListener#onRemoteUserPublishResource#subscribeStreams", errorCode);
                     }
                 });
             }
@@ -1973,7 +1980,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
                     @Override
                     public void onFailed(RTCErrorCode errorCode) {
-                        VMLog.e(TAG,"IRCRTCVoiceRoomEventsListener#onPublishLiveStreams#subscribeStreams", errorCode);
+                        VMLog.e(TAG, "IRCRTCVoiceRoomEventsListener#onPublishLiveStreams#subscribeStreams", errorCode);
                     }
                 });
             }
