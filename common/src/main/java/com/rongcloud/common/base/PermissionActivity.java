@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.rongcloud.common.net.IResultBack;
 import com.rongcloud.common.utils.PermissionUtil;
 
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +21,30 @@ import pub.devrel.easypermissions.AppSettingsDialog;
 
 
 public abstract class PermissionActivity extends AppCompatActivity {
-
-    protected final static String[] PERMISSIONS = new String[]{
+    // 处理小米上线权限问题
+//    protected final static String[] PERMISSIONS = new String[]{
+//            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+//            android.Manifest.permission.RECORD_AUDIO,
+//            //音视需要频权限
+//            Manifest.permission.CAMERA,
+//            Manifest.permission.INTERNET,
+//            Manifest.permission.MODIFY_AUDIO_SETTINGS,
+//            Manifest.permission.BLUETOOTH,
+//            Manifest.permission.BLUETOOTH_ADMIN,
+//            Manifest.permission.READ_PHONE_STATE,
+//    };
+    // 启动页权限
+    protected final static String[] LAUNCHER_PERMISSIONS = new String[]{
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
+    };
+
+    protected final static String[] VOICE_PERMISSIONS = new String[]{
             android.Manifest.permission.RECORD_AUDIO,
-            //音视需要频权限
+    };
+
+    protected final static String[] CALL_PERMISSIONS = new String[]{
             Manifest.permission.CAMERA,
             Manifest.permission.INTERNET,
             Manifest.permission.MODIFY_AUDIO_SETTINGS,
@@ -39,8 +58,23 @@ public abstract class PermissionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // chen permeissions
         String[] permissions = onSetPermissions();
-        if (null != permissions && PermissionUtil.checkPermissions(this, permissions)) {
-            onAccept(true);
+        checkAndRequestPermissions(permissions, null);
+
+    }
+
+    private IResultBack resultBack;
+
+
+    /**
+     * 检查并申请权限
+     *
+     * @param permissions 权限数组
+     * @param resultBack  结果回调,若为null会回调onAccept
+     */
+    protected void checkAndRequestPermissions(String[] permissions, IResultBack<Boolean> resultBack) {
+        this.resultBack = resultBack;
+        if (null == permissions || PermissionUtil.checkPermissions(this, permissions)) {
+            handlePermissionResult(true);
         }
     }
 
@@ -50,7 +84,7 @@ public abstract class PermissionActivity extends AppCompatActivity {
         if (PermissionUtil.REQUEST_CODE == requestCode) {
             String[] d = PermissionUtil.getDeniedPermissions(this, permissions);
             if (d == null || 0 == d.length) {
-                onAccept(true);
+                handlePermissionResult(true);
             } else {
                 new AppSettingsDialog.Builder(this).build().show();
             }
@@ -67,15 +101,26 @@ public abstract class PermissionActivity extends AppCompatActivity {
                 return;
             }
             boolean accept = PermissionUtil.hasPermissions(this, ps);
-            onAccept(accept);
+            handlePermissionResult(accept);
         }
     }
 
     /**
-     * 权限申请结果回调
+     * 处理权限申请结果
      *
      * @param accept true：赋予所有权限  false 未全部授权
      */
+    protected void handlePermissionResult(@NonNull boolean accept) {
+        // 优先处理resultBack
+        // 1.系统调用 checkAndRequestPermissions() 会执行onAccept回调
+        // 2.用户调用，会执行resultBack
+        if (null != resultBack) {
+            resultBack.onResult(accept);
+        } else {
+            onAccept(accept);
+        }
+    }
+
     protected abstract void onAccept(@NonNull boolean accept);
 
     /**

@@ -20,8 +20,8 @@ class LauncherActivity : PermissionActivity() {
         setContentView(R.layout.activity_launcher)
     }
 
-    override fun onSetPermissions(): Array<String> {
-        return PERMISSIONS
+    override fun onSetPermissions(): Array<String>? {
+        return LAUNCHER_PERMISSIONS
     }
 
     override fun onAccept(accept: Boolean) {
@@ -29,7 +29,6 @@ class LauncherActivity : PermissionActivity() {
             turnToActivity()
         } else {
             showToast("请赋予必要权限！")
-            finish()
         }
     }
 
