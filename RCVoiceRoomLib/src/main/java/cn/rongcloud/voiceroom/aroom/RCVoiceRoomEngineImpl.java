@@ -253,6 +253,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 updateKvRoomInfo(roomInfo, new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
+                        mRoomInfo = roomInfo;
                         joinRTCRoom(roomId, mCurrentRole, new RCVoiceRoomCallback() {
                             @Override
                             public void onSuccess() {
