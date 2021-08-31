@@ -338,7 +338,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     }
 
     override fun onSeatInfoChange(index: Int, uiSeatModel: UiSeatModel) {
-        Log.d(TAG, "onSeatInfoChange: $index  giftCount = ${uiSeatModel.giftCount}")
+        Log.d(TAG, "onSeatInfoChange: $index  mute = ${uiSeatModel.isMute} userId = ${uiSeatModel.userId}")
         if (index == 0) {
             refreshRoomOwner(uiSeatModel)
         } else {

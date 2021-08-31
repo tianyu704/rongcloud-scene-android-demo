@@ -1722,6 +1722,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                VMLog.e(TAG, "updateKvRoomInfo#forceSetChatRoomEntry",coreErrorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncRoomInfoFailed);
             }
         });
