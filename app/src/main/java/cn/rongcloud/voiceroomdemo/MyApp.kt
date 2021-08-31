@@ -93,5 +93,4 @@ class MyApp : MultiDexApplication() {
 
         var instance: MyApp by Delegates.notNull()
     }
-
 }
