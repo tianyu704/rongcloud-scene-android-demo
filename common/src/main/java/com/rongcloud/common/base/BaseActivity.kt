@@ -55,8 +55,8 @@ abstract class BaseActivity : PermissionActivity(),
         //initData()
     }
 
-    override fun onSetPermissions(): Array<String> {
-        return PERMISSIONS
+    override fun onSetPermissions(): Array<String>? {
+        return null
     }
 
     override fun onAccept(accept: Boolean) {

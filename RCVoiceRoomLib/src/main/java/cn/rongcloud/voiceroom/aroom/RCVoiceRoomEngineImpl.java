@@ -36,6 +36,7 @@ import cn.rongcloud.rtc.api.callback.IRCRTCStatusReportListener;
 import cn.rongcloud.rtc.api.report.StatusBean;
 import cn.rongcloud.rtc.api.report.StatusReport;
 import cn.rongcloud.rtc.api.stream.RCRTCInputStream;
+import cn.rongcloud.rtc.api.stream.RCRTCLiveInfo;
 import cn.rongcloud.rtc.base.RCRTCLiveRole;
 import cn.rongcloud.rtc.base.RCRTCMediaType;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
@@ -235,6 +236,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                VMLog.e(TAG, "joinRoom#joinChatRoom", coreErrorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomJoinRoomFailed);
             }
         });
@@ -254,6 +256,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 updateKvRoomInfo(roomInfo, new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
+                        mRoomInfo = roomInfo;
                         joinRTCRoom(roomId, mCurrentRole, new RCVoiceRoomCallback() {
                             @Override
                             public void onSuccess() {
@@ -284,6 +287,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                VMLog.e(TAG, "createAndJoinRoom#joinChatRoom", coreErrorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomCreateRoomFailed);
             }
         });
@@ -703,6 +707,8 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
             @Override
             public void onSuccess() {
                 unParkHandlerThread();
+                //移除
+                mUserOnSeatMap.remove(seatInfo.getUserId());
                 seatInfo.setStatus(seatInfoClone.getStatus());
                 seatInfo.setUserId(seatInfoClone.getUserId());
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
@@ -1329,7 +1335,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
     @Override
     public void onChatRoomKVUpdate(String roomId, Map<String, String> chatRoomKvMap) {
-        VMLog.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + "size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
+        VMLog.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + " size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
         updateRoomInfoFromEntry(chatRoomKvMap);
         initSeatInfoListIfNeeded(mRoomInfo.getSeatCount());
         updateSeatInfoFromEntry(chatRoomKvMap);
@@ -1597,16 +1603,16 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
                 data.registerRoomListener(mVREventListener);
                 VMLog.d(TAG, "joinRTCRoom: role = " + role.getType());
                 if (RCRTCLiveRole.BROADCASTER.equals(role)) {
-                    data.getLocalUser().publishDefaultStreams(new IRCRTCResultCallback() {
+                    data.getLocalUser().publishDefaultLiveStreams(new IRCRTCResultDataCallback<RCRTCLiveInfo>() {
                         @Override
-                        public void onSuccess() {
+                        public void onSuccess(RCRTCLiveInfo rcrtcLiveInfo) {
                             VMLog.d(TAG, "publishDefaultStreams:onSuccess: ");
                             RCRTCEngine.getInstance().registerStatusReportListener(mVoiceStatusReportListener);
                         }
 
                         @Override
-                        public void onFailed(RTCErrorCode errorCode) {
-                            VMLog.e(TAG, "joinRTCRoom#joinRoom#publishDefaultStreams", errorCode);
+                        public void onFailed(RTCErrorCode rtcErrorCode) {
+                            VMLog.e(TAG, "joinRTCRoom#joinRoom#publishDefaultStreams", rtcErrorCode);
                             onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomJoinRoomFailed);
                         }
                     });
@@ -1692,6 +1698,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
     }
 
     private void updateKvRoomInfo(RCVoiceRoomInfo roomInfo, final RCVoiceRoomCallback callback) {
+        VMLog.d(TAG, "updateKvRoomInfo: ");
         RongChatRoomClient.getInstance().forceSetChatRoomEntry(mRoomId, RC_ROOM_INFO_KEY, roomInfo.toJson(), false, false, "", new IRongCoreCallback.OperationCallback() {
             @Override
             public void onSuccess() {
@@ -1700,6 +1707,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                VMLog.e(TAG, "updateKvRoomInfo#forceSetChatRoomEntry",coreErrorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomSyncRoomInfoFailed);
             }
         });

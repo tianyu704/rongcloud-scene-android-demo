@@ -42,6 +42,7 @@ class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
         }
         RCChatRoomMessageManager.registerMessageTypes()
         if (!AccountStore.getImToken().isNullOrEmpty()) {
+            Log.e(TAG, "onInit: mToken= " + AccountStore.getImToken())
             android.os.Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
                 override fun run() {
                     RCVoiceRoomEngine.getInstance().connectWithToken(

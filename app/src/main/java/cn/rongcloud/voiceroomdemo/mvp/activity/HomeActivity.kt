@@ -22,6 +22,7 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadPortrait
+import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,17 +64,35 @@ class HomeActivity : BaseActivity(), IHomeView,
 
     override fun initView() {
         iv_voice_room.setOnClickListener {
-            UmengHelper.get().event(RcUmEvent.VoiceRoom)
-            VoiceRoomListActivity.startActivity(this)
+            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
+                if (accept) {
+                    UmengHelper.get().event(RcUmEvent.VoiceRoom)
+                    VoiceRoomListActivity.startActivity(this)
+                } else {
+                    showToast("请赋予必要权限！")
+                }
+            }
         }
 
         iv_video_call.setOnClickListener {
-            UmengHelper.get().event(RcUmEvent.VideoCall)
-            DialActivity.openDilapadPage(this, true)
+            checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
+                if (accept) {
+                    UmengHelper.get().event(RcUmEvent.VideoCall)
+                    DialActivity.openDilapadPage(this, true)
+                } else {
+                    showToast("请赋予必要权限！")
+                }
+            }
         }
         iv_audio_call.setOnClickListener {
-            UmengHelper.get().event(RcUmEvent.AudioCall)
-            DialActivity.openDilapadPage(this, false)
+            checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
+                if (accept) {
+                    UmengHelper.get().event(RcUmEvent.AudioCall)
+                    DialActivity.openDilapadPage(this, false)
+                } else {
+                    showToast("请赋予必要权限！")
+                }
+            }
         }
     }
 
