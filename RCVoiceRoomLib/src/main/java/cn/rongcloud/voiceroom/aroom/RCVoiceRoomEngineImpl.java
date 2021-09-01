@@ -235,6 +235,7 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
 
             @Override
             public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                VMLog.e(TAG, "joinRoom#joinChatRoom", coreErrorCode);
                 onErrorWithCheck(callback, VoiceRoomErrorCode.RCVoiceRoomJoinRoomFailed);
             }
         });
