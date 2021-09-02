@@ -11,9 +11,9 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.IEmpty
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.ISelfSettingView
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

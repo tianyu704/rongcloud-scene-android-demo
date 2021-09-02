@@ -6,12 +6,12 @@ package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import cn.rongcloud.mvoiceroom.message.*
-import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
-import cn.rongcloud.mvoiceroom.net.bean.request.*
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.mvoiceroom.ui.uimodel.*
-import cn.rongcloud.mvoiceroom.utils.RCChatRoomMessageManager
+import cn.rongcloud.voiceroom.message.*
+import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
+import cn.rongcloud.voiceroom.net.bean.request.*
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.ui.uimodel.*
+import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -24,7 +24,7 @@ import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
-import cn.rongcloud.mvoiceroom.utils.LocalUserInfoManager
+import cn.rongcloud.voiceroom.utils.LocalUserInfoManager
 import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.EAR_MONITORING
 import com.rongcloud.common.base.BaseLifeCycleModel

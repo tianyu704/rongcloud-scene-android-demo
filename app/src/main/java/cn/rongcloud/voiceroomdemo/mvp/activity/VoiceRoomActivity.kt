@@ -51,11 +51,11 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomPresenter
 import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.TipDialog
-import cn.rongcloud.mvoiceroom.ui.popup.ExitRoomPopupWindow
+import cn.rongcloud.voiceroom.ui.popup.ExitRoomPopupWindow
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiRoomModel
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView

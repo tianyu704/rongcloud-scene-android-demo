@@ -15,9 +15,9 @@ import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseFragment
-import cn.rongcloud.mvoiceroom.ui.uimodel.MUSIC_FROM_TYPE_SYSTEM
-import cn.rongcloud.mvoiceroom.ui.uimodel.MUSIC_FUNCTION_LOCAL_ADD
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMusicModel
+import cn.rongcloud.voiceroom.ui.uimodel.MUSIC_FROM_TYPE_SYSTEM
+import cn.rongcloud.voiceroom.ui.uimodel.MUSIC_FUNCTION_LOCAL_ADD
+import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel
 import com.rongcloud.common.extension.ui
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_add.*

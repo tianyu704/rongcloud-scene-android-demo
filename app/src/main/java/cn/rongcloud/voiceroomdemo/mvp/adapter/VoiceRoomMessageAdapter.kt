@@ -19,7 +19,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.mvoiceroom.message.*
+import cn.rongcloud.voiceroom.message.*
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 

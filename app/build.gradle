@@ -11,13 +11,17 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileOptions {
+        sourceCompatibility rootProject.ext.sourceCompatibility
+        targetCompatibility rootProject.ext.targetCompatibility
+    }
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 1
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 2
         versionName "1.5.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -59,10 +63,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -120,10 +121,10 @@ dependencies {
 
     implementation project(path: ':annotation')
     implementation project(path: ':processor')
-    implementation project(path: ':callkit')
+    implementation project(path: ':avcall')
     implementation project(path: ':common')
     implementation project(path: ':combusis')
-    implementation project(path: ':mvoiceroom')
+    implementation project(path: ':voiceroom')
 
     api "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"

@@ -9,10 +9,9 @@ import androidx.fragment.app.Fragment
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
-import javax.inject.Named
 
 /**
  * @author gusd

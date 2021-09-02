@@ -11,7 +11,7 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import com.rongcloud.common.base.BaseFragment
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_viewpage_list.*

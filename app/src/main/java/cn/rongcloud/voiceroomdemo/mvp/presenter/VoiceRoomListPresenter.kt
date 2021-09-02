@@ -10,7 +10,7 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped

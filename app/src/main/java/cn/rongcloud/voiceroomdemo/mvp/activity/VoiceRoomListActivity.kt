@@ -19,7 +19,7 @@ import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomListAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.CreateVoiceRoomDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.createroom.ICreateVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomListPresenter
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.InputPasswordDialog
 import com.rongcloud.common.base.BaseActivity

@@ -10,8 +10,8 @@ import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_member_list.*

@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting
 
 import com.rongcloud.common.base.IBaseView
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 
 /**
  * @author gusd

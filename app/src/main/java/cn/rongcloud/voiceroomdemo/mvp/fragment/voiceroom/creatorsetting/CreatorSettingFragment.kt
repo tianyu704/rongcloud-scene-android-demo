@@ -7,7 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore

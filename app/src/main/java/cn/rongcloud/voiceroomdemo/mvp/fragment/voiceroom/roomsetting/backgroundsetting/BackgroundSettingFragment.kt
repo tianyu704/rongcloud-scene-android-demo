@@ -10,7 +10,7 @@ import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers

@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.mvoiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import com.rongcloud.common.extension.loadPortrait
 import kotlinx.android.synthetic.main.layout_member_list_item.view.*
 import java.util.*

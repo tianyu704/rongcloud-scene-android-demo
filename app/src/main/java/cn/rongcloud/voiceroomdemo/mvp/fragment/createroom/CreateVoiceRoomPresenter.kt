@@ -7,12 +7,12 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.Fragment
-import cn.rongcloud.mvoiceroom.net.VoiceRoomNetManager
+import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import com.rongcloud.common.net.ApiConstant
-import cn.rongcloud.mvoiceroom.net.bean.request.CreateRoomRequestBean
-import cn.rongcloud.mvoiceroom.net.bean.request.Kv
+import cn.rongcloud.voiceroom.net.bean.request.CreateRoomRequestBean
+import cn.rongcloud.voiceroom.net.bean.request.Kv
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject

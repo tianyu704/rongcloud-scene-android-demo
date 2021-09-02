@@ -5,7 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.activity.iview
 
 import com.rongcloud.common.base.IBaseView
-import cn.rongcloud.mvoiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 
 /**
  * @author gusd
