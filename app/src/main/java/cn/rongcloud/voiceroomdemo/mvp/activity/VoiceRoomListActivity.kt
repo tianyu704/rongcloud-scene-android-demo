@@ -79,7 +79,7 @@ class VoiceRoomListActivity : BaseActivity(),
 
 
     private fun gotoVoiceRoomActivity(bean: VoiceRoomBean, isCreate: Boolean = false) {
-        presenter.gotoVoiceRoomActivity(this, bean.roomId, isCreate)
+        presenter.gotoVoiceRoomActivity(this, bean.roomId, isCreate,mAdapter?.data?: arrayListOf())
     }
 
     override fun showInputPasswordDialog(bean: VoiceRoomBean) {
@@ -90,7 +90,7 @@ class VoiceRoomListActivity : BaseActivity(),
             }
             if (password == bean.password) {
                 passwordDialog?.dismiss()
-                presenter.turnToRoom(this, bean)
+                presenter.turnToRoom(this, bean,mAdapter?.data?: arrayListOf())
             } else {
                 showToast(R.string.password_error)
             }

@@ -27,7 +27,7 @@ class VoiceRoomListAdapter(
     private val listener: ((View, VoiceRoomBean) -> Unit)? = null
 ) : RecyclerView.Adapter<VoiceRoomListViewHolder>() {
 
-    private var data: ArrayList<VoiceRoomBean> = arrayListOf()
+    val data: ArrayList<VoiceRoomBean> = arrayListOf()
 
     override fun onBindViewHolder(holder: VoiceRoomListViewHolder, position: Int) {
         data[position].let {
@@ -48,7 +48,6 @@ class VoiceRoomListAdapter(
         data.addAll(list)
         notifyDataSetChanged()
     }
-
 }
 
 // TODO: 2021/6/18  稍后添加上 DiffUtil

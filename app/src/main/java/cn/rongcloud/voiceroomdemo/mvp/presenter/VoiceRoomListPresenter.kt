@@ -11,6 +11,7 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
@@ -64,9 +65,15 @@ class VoiceRoomListPresenter @Inject constructor(
         voiceRoomListMode.loadMoreData()
     }
 
-    fun gotoVoiceRoomActivity(context: Context, roomId: String, isCreate: Boolean = false) {
+    fun gotoVoiceRoomActivity(
+        context: Context,
+        roomId: String,
+        isCreate: Boolean = false,
+        list: List<VoiceRoomBean>
+    ) {
         if (isCreate) {
-            VoiceRoomActivity.startActivity(context, roomId, AccountStore.getUserId()!!, isCreate)
+//            VoiceRoomActivity.startActivity(context, roomId, AccountStore.getUserId()!!, isCreate)
+            ScorlVoiceRoomActivity.startActivity(context, roomId, list, isCreate)
             return
         }
         view.showWaitingDialog()
@@ -84,7 +91,7 @@ class VoiceRoomListPresenter @Inject constructor(
                     if (info.room?.isPrivate == 1 && info.room?.createUser?.userId != AccountStore.getUserId()) {
                         view.showInputPasswordDialog(info.room!!)
                     } else {
-                        turnToRoom(context, info.room)
+                        turnToRoom(context, info.room,list)
                     }
                 }
             }, { t ->
@@ -93,9 +100,10 @@ class VoiceRoomListPresenter @Inject constructor(
 
     }
 
-    fun turnToRoom(context: Context, info: VoiceRoomBean?) {
+    fun turnToRoom(context: Context, info: VoiceRoomBean?, list: List<VoiceRoomBean>) {
         info?.createUser?.let {
-            VoiceRoomActivity.startActivity(context, info.roomId, it.userId)
+//            VoiceRoomActivity.startActivity(context, info.roomId, it.userId)
+            ScorlVoiceRoomActivity.startActivity(context, info.roomId, list)
         } ?: view.showError("房间数据错误")
     }
 

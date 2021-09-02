@@ -39,13 +39,24 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.VoiceRoomActivityTheme"
-            android:windowSoftInputMode="adjustResize" >
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="io.rong.intent.action.voice_room" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.VoiceRoomActivityTheme"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="io.rong.intent.action.voice_room" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomListActivity"
             android:screenOrientation="portrait" />
@@ -56,7 +67,7 @@
         <activity
             android:name="cn.rongcloud.voiceroomdemo.webview.ActCommentWeb"
             android:screenOrientation="portrait"
-            android:theme="@style/BasisTheme" >
+            android:theme="@style/BasisTheme">
             <intent-filter>
                 <action android:name="io.rong.intent.action.commonwebpage" />
                 <category android:name="android.intent.category.DEFAULT" />
