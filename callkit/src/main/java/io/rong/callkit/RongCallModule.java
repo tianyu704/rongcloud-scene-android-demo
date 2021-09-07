@@ -306,6 +306,10 @@ public class RongCallModule implements IExtensionModule {
         ignoreIncomingCall = ignore;
     }
 
+    public static boolean isIgnoreIncomingCall() {
+        return ignoreIncomingCall;
+    }
+
     @Override
     public void onInit(Context context, String appKey) {
         RLog.d(TAG, "onInit");

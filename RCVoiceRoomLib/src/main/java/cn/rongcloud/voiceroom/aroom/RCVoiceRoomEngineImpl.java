@@ -708,7 +708,9 @@ public class RCVoiceRoomEngineImpl extends RCVoiceRoomEngine implements IRCVoice
             public void onSuccess() {
                 unParkHandlerThread();
                 //移除
-                mUserOnSeatMap.remove(seatInfo.getUserId());
+                if (!TextUtils.isEmpty(seatInfo.getUserId())){
+                    mUserOnSeatMap.remove(seatInfo.getUserId());
+                }
                 seatInfo.setStatus(seatInfoClone.getStatus());
                 seatInfo.setUserId(seatInfoClone.getUserId());
                 RCVoiceRoomEventListener listener = getCurrentRoomEventListener();
