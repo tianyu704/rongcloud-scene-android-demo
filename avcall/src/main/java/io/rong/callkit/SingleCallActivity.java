@@ -29,6 +29,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.rongcloud.common.net.IResultBack;
+import com.rongcloud.common.utils.UIKit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +96,11 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.rc_voip_activity_single_call);
         getSupportActionBar().hide();
+        if (RongCallModule.isIgnoreIncomingCall()) {//忽略来电也要屏蔽呼出
+            Toast.makeText(UIKit.getContext(), "忙碌中...", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         Log.i(
                 "AudioPlugin",
                 "savedInstanceState != null="
