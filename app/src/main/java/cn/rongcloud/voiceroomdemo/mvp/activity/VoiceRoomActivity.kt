@@ -57,6 +57,8 @@ import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import cn.rongcloud.voiceroom2.VoiceRoomFragmentPresenter
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
@@ -130,9 +132,8 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
 
     private var roomSettingFragment: RoomSettingFragment? = null
 
-    @Inject
+//    @Inject
     lateinit var presenter: VoiceRoomPresenter
-
 
     fun getVoiceRoomModel(): VoiceRoomModel {
         return presenter.roomModel

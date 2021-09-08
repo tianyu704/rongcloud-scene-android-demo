@@ -14,7 +14,6 @@ import android.util.Log
 import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
@@ -72,7 +71,6 @@ import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_voice_room.*
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
 import javax.inject.Inject
-import javax.inject.Named
 
 
 private const val TAG = "VoiceRoomFragment"
@@ -86,7 +84,6 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
     IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, ISendPresentView,
     IMusicSettingView {
-
 
     companion object {
         fun newInstance(
@@ -106,9 +103,15 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     private lateinit var currentRole: Role
 
-    private lateinit var roomId: String
-    private lateinit var creatorId: String
-    private var isCreate: Boolean = false
+    val roomId by lazy {
+        return@lazy arguments?.getString(KEY_ROOM_ID)!!
+    }
+    val creatorId by lazy {
+        return@lazy arguments?.getString(KEY_CREATOR_ID)!!
+    }
+    val isCreate by lazy {
+        return@lazy arguments?.getBoolean(KEY_IS_CREATE, false)!!
+    }
 
     private var memberSettingFragment: MemberSettingFragment? = null
 
@@ -131,21 +134,13 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     private var roomSettingFragment: RoomSettingFragment? = null
 
-    val presenter by lazy {
-        return@lazy ScrolVoiceRoomFragmentPresenter(
-            this, roomId, isCreate,
-            VoiceRoomModel(roomId, VoiceRoomListModel(), mActivity as AppCompatActivity),
-            mActivity as AppCompatActivity
-        )
-    }
+    @Inject
+    lateinit var presenter: VoiceRoomFragmentPresenter
+
 
     fun getVoiceRoomModel(): VoiceRoomModel {
         return presenter.roomModel
     }
-
-    fun getRoomId(): String = roomId
-
-    fun isCreate(): Boolean = isCreate
 
     val favAnimation: FavAnimation by lazy {
         return@lazy FavAnimation(mActivity).apply {
@@ -195,16 +190,16 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     private var detector: GestureDetector? = null
 
-    fun beforeInitView() {
-        roomId = arguments?.getString(KEY_ROOM_ID)!!
-        creatorId = arguments?.getString(KEY_CREATOR_ID)!!
-        isCreate = arguments?.getBoolean(KEY_IS_CREATE, false)!!
-    }
+//    fun beforeInitView() {
+//        roomId = arguments?.getString(KEY_ROOM_ID)!!
+//        creatorId = arguments?.getString(KEY_CREATOR_ID)!!
+//        isCreate = arguments?.getBoolean(KEY_IS_CREATE, false)!!
+//    }
 
     override fun initView() {
         // 忽略来电
         RongCallKit.ignoreIncomingCall(true)
-        beforeInitView()
+//        beforeInitView()
         detector = GestureDetector(mActivity, simpleGestureListener).apply {
             this.setIsLongpressEnabled(false)
             this.setOnDoubleTapListener(simpleGestureListener)
@@ -245,6 +240,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                 cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
             )
         )
+//        presenter.onCreate()
     }
 
     override fun onMemberInfoChange() {
@@ -275,19 +271,19 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         cl_member_list.setOnClickListener {
             roomInfo.roomBean?.let {
                 memberListFragment = MemberListFragment(this, this, it).apply {
-                    show(childFragmentManager)
+                    show(this@VoiceRoomFragment.childFragmentManager)
                 }
             }
         }
         iv_room_setting.setOnClickListener {
             roomInfo.roomBean?.let {
                 roomSettingFragment = RoomSettingFragment(this)
-                roomSettingFragment?.show(childFragmentManager)
+                roomSettingFragment?.show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
         btn_seat_order.setOnClickListener {
             roomInfo.roomBean?.let {
-                SeatOrderOperationFragment(this).show(childFragmentManager)
+                SeatOrderOperationFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
 
@@ -300,7 +296,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         }
         iv_send_gift.setOnClickListener {
             roomInfo.roomBean?.let {
-                SendPresentFragment(this).show(childFragmentManager)
+                SendPresentFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
     }
@@ -407,7 +403,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     override fun showInviteUserView() {
         presenter.getCurrentRoomInfo().roomBean?.let {
-            SeatOrderOperationFragment(this, 1).show(childFragmentManager)
+            SeatOrderOperationFragment(this, 1).show(this@VoiceRoomFragment.childFragmentManager)
         }
     }
 
@@ -529,6 +525,8 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                 cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
             )
         )
+//        presenter.onDestroy()
+
     }
 
     override fun onJoinRoomSuccess() {
@@ -560,7 +558,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            BackgroundSettingFragment(this).show(childFragmentManager)
+            BackgroundSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
         }
     }
 
@@ -568,7 +566,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         roomSettingFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            MusicSettingFragment(this).show(childFragmentManager)
+            MusicSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
         }
     }
 
@@ -584,7 +582,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
     override fun sendGift(userId: String) {
         memberSettingFragment?.dismiss()
         memberListFragment?.dismiss()
-        SendPresentFragment(this, arrayListOf<String>(userId)).show(childFragmentManager)
+        SendPresentFragment(this, arrayListOf<String>(userId)).show(this@VoiceRoomFragment.childFragmentManager)
     }
 
 
@@ -595,7 +593,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
             }
             STATUS_WAIT_FOR_SEAT -> {
                 RevokeSeatRequestFragment(this).show(
-                    childFragmentManager
+                    this@VoiceRoomFragment.childFragmentManager
                 )
             }
             STATUS_NOT_ON_SEAT -> {
@@ -715,7 +713,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                 if (seatModel.userId == AccountStore.getUserId()) {
                     // 点击自己头像
                     SelfSettingFragment(this@VoiceRoomFragment, seatModel, roomId).show(
-                        childFragmentManager
+                        this@VoiceRoomFragment.childFragmentManager
                     )
                 } else {
                     // 点击别人头像
@@ -725,7 +723,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                                 this@VoiceRoomFragment,
                                 roomInfo,
                                 memberInfo
-                            ).show(childFragmentManager)
+                            ).show(this@VoiceRoomFragment.childFragmentManager)
                         }
                     }
                 }
@@ -745,7 +743,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                 roomBean,
                 member
             ).apply {
-                show(childFragmentManager)
+                show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
     }
@@ -809,7 +807,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                             seatModel,
                             roomBean.roomId
                         ).apply {
-                            show(childFragmentManager)
+                            show(this@VoiceRoomFragment.childFragmentManager)
                         }
                     }
                 }
@@ -821,7 +819,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                                 roomBean,
                                 member
                             ).apply {
-                                show(childFragmentManager)
+                                show(this@VoiceRoomFragment.childFragmentManager)
                             }
                         }
                     }
@@ -880,7 +878,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing -> {
                     if (seatModel.userId == AccountStore.getUserId()) {
                         SelfSettingFragment(this@VoiceRoomFragment, seatModel, roomId).show(
-                            childFragmentManager
+                            this@VoiceRoomFragment.childFragmentManager
                         )
                     } else {
                         roomInfo.roomBean?.let { roomBean ->
@@ -890,7 +888,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
                                     roomBean,
                                     member
                                 ).apply {
-                                    show(childFragmentManager)
+                                    show(this@VoiceRoomFragment.childFragmentManager)
                                 }
                             }
                         }

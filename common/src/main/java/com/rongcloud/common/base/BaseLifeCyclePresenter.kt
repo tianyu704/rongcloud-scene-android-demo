@@ -15,9 +15,11 @@ import javax.inject.Inject
  * @author gusd
  * @Date 2021/06/04
  */
+
 abstract class BaseLifeCyclePresenter(
     val lifecycleOwner: LifecycleOwner
 ) : BasePresenter(), LifecycleObserver, BaseLifeCycleObserver {
+    val TAG: String = javaClass.simpleName
 
     @Inject
     public fun initLifecycle() {
@@ -27,23 +29,24 @@ abstract class BaseLifeCyclePresenter(
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreate() {
-
+        Log.d(TAG, "LifeCycle:onCreate")
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "LifeCycle:onDestroy")
         compositeDisposable.dispose()
     }
 
     override fun onStart() {
-
+        Log.d(TAG, "LifeCycle:onStart")
     }
 
     override fun onStop() {
-
+        Log.d(TAG, "LifeCycle:onStop")
     }
 
     override fun onResume() {
-
+        Log.d(TAG, "LifeCycle:onResume")
     }
 
     fun addDisposable(vararg disposable: Disposable) {

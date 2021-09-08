@@ -4,6 +4,7 @@
 
 package com.rongcloud.common.base
 
+import android.util.Log
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -16,6 +17,7 @@ import javax.inject.Inject
  */
 abstract class BaseLifeCycleModel(val lifecycleOwner: LifecycleOwner) : BaseModel,
     BaseLifeCycleObserver, LifecycleObserver {
+    val TAG: String = javaClass.simpleName
     @Inject
     public fun initLifecycle() {
         lifecycleOwner.lifecycle.addObserver(this)
@@ -28,23 +30,24 @@ abstract class BaseLifeCycleModel(val lifecycleOwner: LifecycleOwner) : BaseMode
     }
 
     override fun onCreate() {
-
+        Log.d(TAG, "LifeCycle:onCreate")
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "LifeCycle:onDestroy")
         compositeDisposable.dispose()
     }
 
     override fun onStart() {
-
+        Log.d(TAG, "LifeCycle:onStart")
     }
 
     override fun onStop() {
-
+        Log.d(TAG, "LifeCycle:onStop")
     }
 
     override fun onResume() {
-
+        Log.d(TAG, "LifeCycle:onResume")
     }
 
 }

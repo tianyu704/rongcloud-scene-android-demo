@@ -23,7 +23,6 @@ import java.io.Serializable
 private const val TAG = "ScorlVoiceRoomActivity"
 private const val KEY_INDEX = "KEY_INDEX"
 private const val KEY_ROOMS = "KEY_ROOMS"
-private const val KEY_IS_CREATE = "KEY_IS_CREATE"
 
 @HiltBinding(value = IScrolVoiceRoomView::class)
 @AndroidEntryPoint
@@ -33,6 +32,7 @@ class ScorlVoiceRoomActivity : BaseActivity() {
     class RoomInfo : Serializable {
         var roomId: String = ""
         var createrId: String = ""
+        var isCreate: Boolean = false
     }
 
     companion object {
@@ -49,16 +49,16 @@ class ScorlVoiceRoomActivity : BaseActivity() {
                 list.add(RoomInfo().apply {
                     this.roomId = vr.roomId
                     this.createrId = vr.createUser?.userId ?: ""
+                    if (currentRoomId == vr.roomId) {
+                        index = i
+                        this.isCreate = isCreate
+                    }
                 })
-                if (currentRoomId == vr.roomId) {
-                    index = i
-                }
                 i++
             }
             Intent(context, ScorlVoiceRoomActivity::class.java).apply {
                 putExtra(KEY_INDEX, index)
                 putExtra(KEY_ROOMS, list)
-                putExtra(KEY_IS_CREATE, isCreate)
                 context.startActivity(this)
             }
         }
@@ -111,7 +111,7 @@ class ScorlVoiceRoomActivity : BaseActivity() {
         override fun createFragment(position: Int): Fragment {
             Log.d(TAG, "createFragment position = " + position)
             var room = datas.get(position)
-            return VoiceRoomFragment.newInstance(room.roomId, room.createrId)
+            return VoiceRoomFragment.newInstance(room.roomId, room.createrId, room.isCreate)
         }
 
     }

@@ -90,7 +90,7 @@ class VoiceRoomListActivity : BaseActivity(),
             }
             if (password == bean.password) {
                 passwordDialog?.dismiss()
-                presenter.turnToRoom(this, bean,mAdapter?.data?: arrayListOf())
+                presenter.turnToRoom(this, bean,mAdapter?.data?: arrayListOf(),false)
             } else {
                 showToast(R.string.password_error)
             }

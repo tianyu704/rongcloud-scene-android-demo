@@ -5,25 +5,26 @@
 package cn.rongcloud.voiceroom2
 
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroom.message.*
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
-import cn.rongcloud.voiceroom.utils.AudioEffectManager
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
-import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
-import com.rongcloud.common.utils.AudioManagerUtil
+import cn.rongcloud.voiceroom.utils.AudioEffectManager
+import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
+import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.AudioManagerUtil
+import com.rongcloud.common.utils.JsonUtils
+import dagger.hilt.android.scopes.FragmentScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.model.Message
@@ -45,14 +46,14 @@ const val STATUS_ON_SEAT = 0
 const val STATUS_NOT_ON_SEAT = 1
 const val STATUS_WAIT_FOR_SEAT = 2
 
-class ScrolVoiceRoomFragmentPresenter @Inject constructor(
+@FragmentScoped
+class VoiceRoomFragmentPresenter @Inject constructor(
     val view: IScrolVoiceRoomItemView,
     @Named("roomId") private val roomId: String,
     @Named("isCreate") private val isCreate: Boolean,
     val roomModel: VoiceRoomModel,
-    activity: AppCompatActivity
-) :
-    BaseLifeCyclePresenter(activity), IRongCoreListener.OnReceiveMessageListener {
+    fragment: Fragment
+) : BaseLifeCyclePresenter(fragment), IRongCoreListener.OnReceiveMessageListener {
 
     var currentStatus = STATUS_NOT_ON_SEAT
 
@@ -70,6 +71,7 @@ class ScrolVoiceRoomFragmentPresenter @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { roomInfo ->
+                    Log.e(TAG, "obRoomInfoChange:" + JsonUtils.toJson(roomInfo))
                     currentRoomInfo = roomInfo
                     if (!hasInit) {
                         hasInit = true
@@ -94,13 +96,13 @@ class ScrolVoiceRoomFragmentPresenter @Inject constructor(
         addDisposable(roomModel
             .obSeatListChange()
             .subscribe { list ->
+                Log.v(TAG, "obSeatListChange:" + JsonUtils.toJson(list))
                 view.onSeatListChange(list)
                 list.forEach {
                     if (it.userId.isNotNullOrEmpty() && (it.member?.member == null)) {
                         val memberInfo =
                             roomModel.getMemberInfoByUserIdOnlyLocal(it.userId)
                         if (memberInfo?.member == null) {
-                            Log.d(TAG, "obSeatListChange: member is null")
                             roomModel.refreshAllMemberInfoList()
                         } else {
                             it.member = memberInfo
@@ -146,7 +148,7 @@ class ScrolVoiceRoomFragmentPresenter @Inject constructor(
             // 因为开销较大，防止过快调用
             .debounce(10, TimeUnit.MILLISECONDS)
             .subscribe {
-                Log.d(TAG, "obMemberListChange: ")
+                Log.d(TAG, "obMemberListChange: " + JsonUtils.toJson(it))
                 it.forEach { member ->
                     roomModel.getSeatInfoByUserId(member.userId)?.member = member
                 }
@@ -182,6 +184,7 @@ class ScrolVoiceRoomFragmentPresenter @Inject constructor(
                 return@map inSeat
             }
             .subscribe {
+                Log.d(TAG, "onCreate: obSeatInfoChange")
                 if (it) {
                     if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                         RCVoiceRoomEngine.getInstance()
@@ -348,26 +351,9 @@ class ScrolVoiceRoomFragmentPresenter @Inject constructor(
     }
 
     fun joinRoom() {
-        Log.d(TAG, "joinRoom: ${roomId}")
+        Log.d(TAG, "joinRoom: ${roomId} isCreat:$isCreate")
         if (isCreate) {
             currentRoomInfo?.roomBean?.let { roomBean ->
-//                val info = RCVoiceRoomInfo().apply {
-//                    roomName = roomBean.roomName
-//                    seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT
-//                    isFreeEnterSeat = false
-//                    isLockAll = false
-//                    isMuteAll = false
-//                }
-//                RCVoiceRoomEngine.getInstance()
-//                    .createAndJoinRoom(roomId, info, object : RCVoiceRoomCallback {
-//                        override fun onError(code: Int, message: String?) {
-//                            view.showError(code, message)
-//                        }
-//
-//                        override fun onSuccess() {
-//                            afterJoinRoomSuccess()
-//                        }
-//                    })
                 val info = RCVoiceRoomInfo().apply {
                     roomName = roomBean.roomName
                     seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT

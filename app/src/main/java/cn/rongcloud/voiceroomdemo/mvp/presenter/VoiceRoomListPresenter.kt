@@ -72,7 +72,6 @@ class VoiceRoomListPresenter @Inject constructor(
         list: List<VoiceRoomBean>
     ) {
         if (isCreate) {
-//            VoiceRoomActivity.startActivity(context, roomId, AccountStore.getUserId()!!, isCreate)
             ScorlVoiceRoomActivity.startActivity(context, roomId, list, isCreate)
             return
         }
@@ -91,7 +90,7 @@ class VoiceRoomListPresenter @Inject constructor(
                     if (info.room?.isPrivate == 1 && info.room?.createUser?.userId != AccountStore.getUserId()) {
                         view.showInputPasswordDialog(info.room!!)
                     } else {
-                        turnToRoom(context, info.room,list)
+                        turnToRoom(context, info.room, list,isCreate)
                     }
                 }
             }, { t ->
@@ -100,10 +99,9 @@ class VoiceRoomListPresenter @Inject constructor(
 
     }
 
-    fun turnToRoom(context: Context, info: VoiceRoomBean?, list: List<VoiceRoomBean>) {
+    fun turnToRoom(context: Context, info: VoiceRoomBean?, list: List<VoiceRoomBean>,isCreate: Boolean) {
         info?.createUser?.let {
-//            VoiceRoomActivity.startActivity(context, info.roomId, it.userId)
-            ScorlVoiceRoomActivity.startActivity(context, info.roomId, list)
+            ScorlVoiceRoomActivity.startActivity(context, info.roomId, arrayListOf(info),isCreate)
         } ?: view.showError("房间数据错误")
     }
 

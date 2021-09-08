@@ -14,6 +14,9 @@ import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroom2.VoiceRoomFragment
+import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,7 +43,6 @@ class HiltFragmentModule {
         return view.getUiSeatModel()!!
     }
 
-
     @Provides
     fun provideRoomInfoBean(roomModel: VoiceRoomModel): VoiceRoomBean {
         return roomModel.currentUIRoomInfo.roomBean!!
@@ -58,5 +60,23 @@ class HiltFragmentModule {
             fragment.getSelectedIds()
         }
         return emptyList()
+    }
+
+    @Named("isCreate")
+    @Provides
+    fun provideVoiceRoomIsCreate(fragment: Fragment): Boolean {
+        if (fragment is VoiceRoomFragment) {
+            return fragment.isCreate
+        }
+        return false
+    }
+
+    @Named("roomId")
+    @Provides
+    fun provideVoiceRoomId(fragment: Fragment): String {
+        if (fragment is VoiceRoomFragment) {
+            return fragment.roomId
+        }
+        return ""
     }
 }
