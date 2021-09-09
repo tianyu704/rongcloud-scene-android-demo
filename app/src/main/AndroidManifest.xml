@@ -50,8 +50,7 @@
             android:name="cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.VoiceRoomActivityTheme"
-            android:windowSoftInputMode="adjustResize">
+            android:theme="@style/Theme.ScrolVRoomThem">
             <intent-filter>
                 <action android:name="io.rong.intent.action.voice_room" />
                 <category android:name="android.intent.category.DEFAULT" />

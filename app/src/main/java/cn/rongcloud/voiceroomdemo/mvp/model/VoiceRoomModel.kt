@@ -5,34 +5,38 @@
 package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import cn.rongcloud.voiceroom.message.*
+import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
+import cn.rongcloud.voiceroom.net.bean.request.*
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.ui.uimodel.*
+import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
-import cn.rongcloud.rtc.api.RCRTCEngine
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback
-import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
-import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
-import cn.rongcloud.voiceroom.net.bean.request.*
-import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroom.ui.uimodel.*
-import cn.rongcloud.voiceroom.utils.LocalUserInfoManager
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.EAR_MONITORING
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
+import cn.rongcloud.voiceroom.utils.LocalUserInfoManager
+import cn.rongcloud.rtc.api.RCRTCEngine
+import cn.rongcloud.voiceroom.model.RCPKInfo
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.EAR_MONITORING
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.AudioManagerUtil
 import com.rongcloud.common.utils.SharedPreferUtil
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
@@ -234,7 +238,7 @@ class VoiceRoomModel @Inject constructor(
 
 
     init {
-        Log.v(TAG,"init")
+        Log.v(TAG, "init:roomId = $roomId")
         voiceRoomListModel
             .getRoomInfo(roomId)
             .subscribe({
@@ -759,6 +763,24 @@ class VoiceRoomModel @Inject constructor(
             roomEventSubject.onNext(Pair(EVENT_KICKED_OUT_OF_ROOM, arrayListOf(userId, targetId)))
         }
 
+    }
+
+    override fun onNetworkStatus(p0: Int) {
+    }
+
+    override fun onPKgoing(p0: RCPKInfo) {
+    }
+
+    override fun onPKFinish() {
+    }
+
+    override fun onReveivePKInvitation(p0: String?, p1: String?) {
+    }
+
+    override fun onPKInvitationCanceled(p0: String?, p1: String?) {
+    }
+
+    override fun onPKInvitationRejected(p0: String?, p1: String?) {
     }
 
 

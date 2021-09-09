@@ -7,11 +7,13 @@ package cn.rongcloud.voiceroom2
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import android.view.MotionEvent
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseActivity
@@ -68,6 +70,7 @@ class ScorlVoiceRoomActivity : BaseActivity() {
         return false
     }
 
+
     override fun getContentView(): Int {
         return R.layout.activity_voice_room_scoll
     }
@@ -77,24 +80,42 @@ class ScorlVoiceRoomActivity : BaseActivity() {
     override fun beforeInitView() {
         pageIndex = intent.getIntExtra(KEY_INDEX, 0)
         list = intent.getSerializableExtra(KEY_ROOMS) as List<RoomInfo>
-        Log.d(TAG, "beforeInitView pageIndex = " + pageIndex)
-        Log.d(TAG, "beforeInitView list = " + (list?.size ?: 0))
     }
 
     override fun initView() {
         scrol_vpager.orientation = ViewPager2.ORIENTATION_VERTICAL
-        scrol_vpager.adapter = ScorlPageAdapter(this).apply {
-            this.initData(list)
-        }
+        scrol_vpager.adapter = sAdapter
         scrol_vpager.setCurrentItem(pageIndex, false)
+//        scrol_vpager.offscreenPageLimit = 3
     }
 
     override fun initData() {
+        RCVoiceRoomEngine.getInstance().initEngine()
+//        enableScroll(false)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // TODO: 2021/9/8 悬浮框需修改
+        RCVoiceRoomEngine.getInstance().unInitEngine()
     }
 
     fun enableScroll(canScroll: Boolean) {
         // 是否禁止用户滑动页面
         scrol_vpager.isUserInputEnabled = canScroll
+    }
+
+    val sAdapter by lazy {
+        return@lazy ScorlPageAdapter(this).apply {
+            this.initData(list)
+        }
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (sAdapter.getCurrentFragment().dispatchTouchEvent(ev)) {
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     class ScorlPageAdapter(fragmentActivity: FragmentActivity) :
@@ -106,12 +127,18 @@ class ScorlVoiceRoomActivity : BaseActivity() {
             Log.d(TAG, "initData list = " + datas.size)
         }
 
+        private lateinit var current: VoiceRoomFragment
+        fun getCurrentFragment(): VoiceRoomFragment {
+            return current
+        }
+
         override fun getItemCount(): Int = datas.size
 
         override fun createFragment(position: Int): Fragment {
             Log.d(TAG, "createFragment position = " + position)
             var room = datas.get(position)
-            return VoiceRoomFragment.newInstance(room.roomId, room.createrId, room.isCreate)
+            current = VoiceRoomFragment.newInstance(room.roomId, room.createrId, room.isCreate)
+            return current
         }
 
     }

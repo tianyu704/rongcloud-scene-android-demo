@@ -24,6 +24,7 @@ import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.AudioManagerUtil
 import com.rongcloud.common.utils.JsonUtils
+import com.rongcloud.common.utils.UIKit
 import dagger.hilt.android.scopes.FragmentScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
@@ -40,15 +41,13 @@ import javax.inject.Named
  * @author gusd
  * @Date 2021/06/10
  */
-private const val TAG = "ScrolVoiceRoomPresenter"
-
 const val STATUS_ON_SEAT = 0
 const val STATUS_NOT_ON_SEAT = 1
 const val STATUS_WAIT_FOR_SEAT = 2
 
 @FragmentScoped
 class VoiceRoomFragmentPresenter @Inject constructor(
-    val view: IScrolVoiceRoomItemView,
+    val view: IVoiceRoomFragmentView,
     @Named("roomId") private val roomId: String,
     @Named("isCreate") private val isCreate: Boolean,
     val roomModel: VoiceRoomModel,
@@ -63,8 +62,29 @@ class VoiceRoomFragmentPresenter @Inject constructor(
     private var hasInit = false
     private var currentRoomInfo: UiRoomModel? = null
 
+    override fun onDestroy() {
+        Log.d(TAG, "LifeCycle:onDestroy roomId = $roomId")
+        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null)
+        RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
+        AudioManagerUtil.dispose()
+    }
+
+    override fun onResume() {
+        Log.d(TAG, "LifeCycle:onResume roomId = $roomId")
+        roomModel.noticeRefreshUnreadMessageCount()
+    }
+
+    override fun onStart() {
+        Log.d(TAG, "LifeCycle:onStart roomId = $roomId")
+    }
+
+    override fun onStop() {
+        Log.d(TAG, "LifeCycle:onStop roomId = $roomId")
+    }
+
+
     override fun onCreate() {
-        super.onCreate()
+        Log.d(TAG, "LifeCycle:onCreate roomId = $roomId")
         // 监听房间信息变化
         addDisposable(roomModel
             .obRoomInfoChange()
@@ -329,13 +349,6 @@ class VoiceRoomFragmentPresenter @Inject constructor(
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null)
-        RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
-        AudioManagerUtil.dispose()
-    }
-
     fun getCurrentRoomInfo(): UiRoomModel {
         return roomModel.currentUIRoomInfo
     }
@@ -351,38 +364,44 @@ class VoiceRoomFragmentPresenter @Inject constructor(
     }
 
     fun joinRoom() {
-        Log.d(TAG, "joinRoom: ${roomId} isCreat:$isCreate")
-        if (isCreate) {
-            currentRoomInfo?.roomBean?.let { roomBean ->
-                val info = RCVoiceRoomInfo().apply {
-                    roomName = roomBean.roomName
-                    seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT
-                    isFreeEnterSeat = false
-                    isLockAll = false
-                    isMuteAll = false
-                }
-                RCVoiceRoomEngine.getInstance()
-                    .createAndJoinRoom(roomId, info, object : RCVoiceRoomCallback {
-                        override fun onError(code: Int, message: String?) {
-                            view.showError(code, message)
-                        }
+        Log.d(TAG, "joinRoom: ${roomId} isCreat:$isCreate roomId = $roomId")
+        //先退上个房间
+        leaveRoom(true)
+        UIKit.postDelayed({
+            if (isCreate) {
+                currentRoomInfo?.roomBean?.let { roomBean ->
+                    val info = RCVoiceRoomInfo().apply {
+                        roomName = roomBean.roomName
+                        seatCount = DefaultConfigConstant.DEFAULT_SEAT_COUNT
+                        isFreeEnterSeat = false
+                        isLockAll = false
+                        isMuteAll = false
+                    }
+                    RCVoiceRoomEngine.getInstance()
+                        .createAndJoinRoom(roomId, info, object : RCVoiceRoomCallback {
+                            override fun onError(code: Int, message: String?) {
+                                view.showError(code, message)
+                                view.onJoinNextRoom(false)
+                            }
 
-                        override fun onSuccess() {
-                            afterJoinRoomSuccess()
-                        }
-                    })
+                            override fun onSuccess() {
+                                afterJoinRoomSuccess()
+                            }
+                        })
+                }
+            } else {
+                RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {
+                    override fun onError(code: Int, message: String?) {
+                        view.showError(code, message)
+                        view.onJoinNextRoom(false)
+                    }
+
+                    override fun onSuccess() {
+                        afterJoinRoomSuccess()
+                    }
+                })
             }
-        } else {
-            RCVoiceRoomEngine.getInstance().joinRoom(roomId, object : RCVoiceRoomCallback {
-                override fun onError(code: Int, message: String?) {
-                    view.showError(code, message)
-                }
-
-                override fun onSuccess() {
-                    afterJoinRoomSuccess()
-                }
-            })
-        }
+        }, 300)
     }
 
     private fun afterJoinRoomSuccess() {
@@ -416,15 +435,25 @@ class VoiceRoomFragmentPresenter @Inject constructor(
     }
 
     fun leaveRoom() {
+        leaveRoom(false)
+    }
+
+    private fun leaveRoom(joinNext: Boolean) {
         roomModel.onLeaveRoom()
         RCVoiceRoomEngine.getInstance().leaveRoom(object : RCVoiceRoomCallback {
             override fun onError(code: Int, message: String?) {
                 view.showError(code, message)
-                view.leaveRoomSuccess()
+                if (joinNext)
+                    view.onJoinNextRoom(true)
+                else
+                    view.leaveRoomSuccess()
             }
 
             override fun onSuccess() {
-                view.leaveRoomSuccess()
+                if (joinNext)
+                    view.onJoinNextRoom(true)
+                else
+                    view.leaveRoomSuccess()
             }
         })
     }
@@ -584,10 +613,5 @@ class VoiceRoomFragmentPresenter @Inject constructor(
         } else {
             view.showError("当前没有空余的麦位")
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        roomModel.noticeRefreshUnreadMessageCount()
     }
 }

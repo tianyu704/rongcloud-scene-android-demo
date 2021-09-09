@@ -10,12 +10,13 @@ import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import com.rongcloud.common.base.IBaseView
 import io.rong.imlib.model.MessageContent
 
-interface IScrolVoiceRoomItemView : IBaseView {
+interface IVoiceRoomFragmentView : IBaseView {
     fun onJoinRoomSuccess()
     fun initRoleView(roomInfo: UiRoomModel)
 
 
     fun leaveRoomSuccess()
+    fun onJoinNextRoom(start: Boolean)
     fun enterSeatSuccess()
 
 

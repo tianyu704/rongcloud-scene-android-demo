@@ -50,7 +50,6 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.IViewPage
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.SeatOrderOperationFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.ISelfSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.SelfSettingFragment
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
@@ -78,9 +77,9 @@ private const val KEY_ROOM_ID = "KEY_ROOM_INFO_BEAN"
 private const val KEY_CREATOR_ID = "KEY_CREATOR_ID"
 private const val KEY_IS_CREATE = "KEY_IS_CREATE"
 
-@HiltBinding(value = IScrolVoiceRoomItemView::class)
+@HiltBinding(value = IVoiceRoomFragmentView::class)
 @AndroidEntryPoint
-class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoiceRoomItemView,
+class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoomFragmentView,
     IMemberListView, IRoomSettingView, IBackgroundSettingView, IViewPageListView, ICreatorView,
     IMemberSettingView, IEmptySeatView, ISelfSettingView, IRevokeSeatView, ISendPresentView,
     IMusicSettingView {
@@ -159,6 +158,21 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        Log.e(TAG, "LifeCycle:onStart")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.e(TAG, "LifeCycle:onStop")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.e(TAG, "LifeCycle:onPause")
+    }
+
     private val simpleGestureListener: GestureDetector.SimpleOnGestureListener by lazy {
         return@lazy object : GestureDetector.SimpleOnGestureListener() {
             override fun onDoubleTap(e: MotionEvent?): Boolean {
@@ -190,16 +204,9 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     private var detector: GestureDetector? = null
 
-//    fun beforeInitView() {
-//        roomId = arguments?.getString(KEY_ROOM_ID)!!
-//        creatorId = arguments?.getString(KEY_CREATOR_ID)!!
-//        isCreate = arguments?.getBoolean(KEY_IS_CREATE, false)!!
-//    }
-
     override fun initView() {
         // 忽略来电
         RongCallKit.ignoreIncomingCall(true)
-//        beforeInitView()
         detector = GestureDetector(mActivity, simpleGestureListener).apply {
             this.setIsLongpressEnabled(false)
             this.setOnDoubleTapListener(simpleGestureListener)
@@ -313,6 +320,14 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
         }
     }
 
+    override fun onJoinNextRoom(start: Boolean) {
+        if (start) {
+            showWaitingDialog()
+        } else {
+            hideWaitingDialog()
+        }
+    }
+
     override fun enterSeatSuccess() {
         ui {
             showMessage("上麦成功")
@@ -406,7 +421,6 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
             SeatOrderOperationFragment(this, 1).show(this@VoiceRoomFragment.childFragmentManager)
         }
     }
-
 
     override fun sendTextMessageSuccess(message: String) {
         if (et_message.text.toString() == message) {
@@ -531,17 +545,18 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
 
     override fun onJoinRoomSuccess() {
         currentRole.onJoinRoomSuccess()
+        hideWaitingDialog()
     }
 
-//    override fun onBackPressed() {
-//        currentRole.onTopRightButtonPress()
-//    }
+    fun onBackPressed() {
+        currentRole.onTopRightButtonPress()
+    }
 
     fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (ev?.action == KeyEvent.ACTION_DOWN && cl_input_bar.isVisible) {
+        if (null != cl_input_bar && cl_input_bar.isVisible) {
             val rect = Rect()
             cl_input_bar.getGlobalVisibleRect(rect)
-            if (!rect.contains(ev.rawX.toInt(), ev.rawY.toInt())) {
+            if (!rect.contains(ev?.rawX?.toInt() ?: 0, ev?.rawY?.toInt() ?: 0)) {
                 cl_input_bar.isVisible = false
                 return true
             }
@@ -582,7 +597,10 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IScrolVoic
     override fun sendGift(userId: String) {
         memberSettingFragment?.dismiss()
         memberListFragment?.dismiss()
-        SendPresentFragment(this, arrayListOf<String>(userId)).show(this@VoiceRoomFragment.childFragmentManager)
+        SendPresentFragment(
+            this,
+            arrayListOf<String>(userId)
+        ).show(this@VoiceRoomFragment.childFragmentManager)
     }
 
 
