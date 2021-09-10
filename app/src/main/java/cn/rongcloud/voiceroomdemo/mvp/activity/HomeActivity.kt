@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import cn.rong.combusis.provider.user.UserProvider
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider
 import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
 import cn.rongcloud.annotation.HiltBinding
@@ -36,6 +38,7 @@ import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
+import kotlinx.android.synthetic.main.layout_present_member_item.view.*
 import javax.inject.Inject
 
 private const val CODE_SETTING_REQUEST = 10000

@@ -1,4 +1,4 @@
-package cn.rong.combusis.userprovide;
+package cn.rong.combusis.provider.user;
 
 import android.net.Uri;
 import android.text.TextUtils;
@@ -7,12 +7,18 @@ import com.rongcloud.common.net.ApiConstant;
 
 import java.io.Serializable;
 
+import cn.rong.combusis.provider.wrapper.Provide;
 import io.rong.imlib.model.UserInfo;
 
-public class User implements Serializable {
+public class User implements Serializable, Provide {
     private String userId;
     private String userName;
     private String portrait;
+
+    @Override
+    public String getKey() {
+        return userId;
+    }
 
     public String getUserId() {
         return userId;
