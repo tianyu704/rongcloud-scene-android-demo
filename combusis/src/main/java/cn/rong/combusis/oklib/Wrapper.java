@@ -24,7 +24,7 @@ public class Wrapper implements Serializable {
     public Wrapper(Response response) {
         try {
             String string = response.body().string();
-            Log.e("Wrapper", "string = " + string);
+            Log.i("Wrapper", "string = " + string);
             if (!TextUtils.isEmpty(string)) {
                 JsonObject result = JsonParser.parseString(string).getAsJsonObject();
                 if (null != result) {
@@ -70,6 +70,22 @@ public class Wrapper implements Serializable {
     public <T> List<T> getList(Class<T> tClass) {
         if (null != data && !data.isJsonNull() && null != tClass) {
             return GsonUtil.json2List(data, tClass);
+        }
+        return null;
+    }
+
+    @Nullable
+    public <T> T get(String key, Class<T> tClass) {
+        if (null != data && null != tClass && data.isJsonObject() && data.getAsJsonObject().has(key)) {
+            return GsonUtil.json2Obj(data.getAsJsonObject().get(key), tClass);
+        }
+        return null;
+    }
+
+    @Nullable
+    public <T> List<T> getList(String key, Class<T> tClass) {
+        if (null != data && null != tClass && data.isJsonObject() && data.getAsJsonObject().has(key)) {
+            return GsonUtil.json2List(data.getAsJsonObject().get(key), tClass);
         }
         return null;
     }

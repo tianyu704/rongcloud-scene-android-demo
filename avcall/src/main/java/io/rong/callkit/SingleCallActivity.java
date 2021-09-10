@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Locale;
 
 import cn.rong.combusis.feedback.FeedbackHelper;
-import cn.rong.combusis.userprovide.UserProvider;
+import cn.rong.combusis.provider.user.UserProvider;
 import io.rong.callkit.util.BluetoothUtil;
 import io.rong.callkit.util.CallKitUtils;
 import io.rong.callkit.util.DefaultPushConfig;
@@ -50,11 +50,9 @@ import io.rong.calllib.message.CallSTerminateMessage;
 import io.rong.common.RLog;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.userinfo.RongUserInfoManager;
-import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.Conversation;
-import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
 public class SingleCallActivity extends BaseCallActivity implements Handler.Callback {
@@ -299,7 +297,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
         View callMuteV = findViewById(R.id.rc_voip_call_mute);
         if (null != handFreeV) handFreeV.setSelected(handFree);
         if (null != callMuteV) handFreeV.setSelected(muted);
-        UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
+        UserProvider.provider().getAsyn(targetId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
                 TextView userName = mUserInfoContainer.findViewById(R.id.rc_voip_user_name);
@@ -476,7 +474,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
             // 二人视频通话接通后 mUserInfoContainer 中更换为无头像的布局
             mUserInfoContainer.removeAllViews();
             inflater.inflate(R.layout.rc_voip_video_call_user_info, mUserInfoContainer);
-            UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
+            UserProvider.provider().getAsyn(targetId, new IResultBack<UserInfo>() {
                 @Override
                 public void onResult(UserInfo userInfo) {
                     if (userInfo != null) {
@@ -607,7 +605,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
                         mSPreviewContainer.addView(toView);
                         if (null != fromView.getTag()
                                 && !TextUtils.isEmpty(fromView.getTag().toString())) {
-                            UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
+                            UserProvider.provider().getAsyn(targetId, new IResultBack<UserInfo>() {
                                 @Override
                                 public void onResult(UserInfo userInfo) {
                                     if (null != userInfo) {
@@ -710,7 +708,7 @@ public class SingleCallActivity extends BaseCallActivity implements Handler.Call
 
         mUserInfoContainer.removeAllViews();
         mUserInfoContainer.addView(userInfoView);
-        UserProvider.provider().getUserAsyn(targetId, new IResultBack<UserInfo>() {
+        UserProvider.provider().getAsyn(targetId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
                 if (userInfo != null) {

@@ -1,4 +1,4 @@
-package cn.rong.combusis.userprovide;
+package cn.rong.combusis.provider.user;
 
 import com.rongcloud.common.net.IResultBack;
 
@@ -7,7 +7,7 @@ import io.rong.imkit.userinfo.model.GroupUserInfo;
 import io.rong.imlib.model.Group;
 import io.rong.imlib.model.UserInfo;
 
-public class UserObserver implements RongUserInfoManager.UserDataObserver {
+class UserObserver implements RongUserInfoManager.UserDataObserver {
     private IResultBack<UserInfo> resultBack;
 
     UserObserver(IResultBack<UserInfo> resultBack) {
