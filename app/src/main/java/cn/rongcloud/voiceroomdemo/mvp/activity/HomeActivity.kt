@@ -70,7 +70,8 @@ class HomeActivity : BaseActivity(), IHomeView,
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VoiceRoom)
-                    VoiceRoomListActivity.startActivity(this)
+//                    VoiceRoomListActivity.startActivity(this)
+                    VoiceRoomListActivity2.startActivity(this)
                 } else {
                     showToast("请赋予必要权限！")
                 }

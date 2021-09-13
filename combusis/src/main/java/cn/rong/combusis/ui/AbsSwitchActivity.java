@@ -5,39 +5,28 @@
 package cn.rong.combusis.ui;
 
 
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.rongcloud.common.base.PermissionActivity;
+import com.basis.ui.BaseActivity;
 
 import java.util.Arrays;
 
 import cn.rong.combusis.R;
 
-public class AbsSwitchActivity extends PermissionActivity implements View.OnClickListener {
+public class AbsSwitchActivity extends BaseActivity implements View.OnClickListener {
+
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_abs_switch);
+    public int setLayoutId() {
+        return R.layout.activity_abs_switch;
     }
 
     @Override
-    protected void onAccept(@NonNull boolean accept) {
-        if (accept) {
-            initView();
-        }
-    }
-
-    @Nullable
-    @Override
-    protected String[] onSetPermissions() {
-        return new String[0];
+    public void init() {
+        initView();
     }
 
     private ViewPager2 viewPager;
@@ -48,14 +37,19 @@ public class AbsSwitchActivity extends PermissionActivity implements View.OnClic
         viewPager = findViewById(R.id.switch_vpage);
         sw_left = findViewById(R.id.sw_left);
         sw_right = findViewById(R.id.sw_right);
+
         viewPager.setCurrentItem(currentIndex);
-        viewPager.setAdapter(new SampleVPAdapter(this, Arrays.asList(onCreateLeftFragment(), onCreateLeftFragment())));
+        viewPager.setAdapter(new SampleVPAdapter(this, Arrays.asList(onCreateLeftFragment(), onCreateRightFragment())));
         sw_left.setOnClickListener(this);
+        sw_right.setOnClickListener(this);
+        getView(R.id.fl_back).setOnClickListener(this);
         String[] titles = onSetSwitchTitle();
         if (null != titles && titles.length == 2) {
             sw_left.setText(titles[0]);
             sw_right.setText(titles[1]);
         }
+        getWrapBar().setHide(true).work();
+
     }
 
 
@@ -65,11 +59,12 @@ public class AbsSwitchActivity extends PermissionActivity implements View.OnClic
         if (R.id.sw_left == id) {
             currentIndex = 0;
             refreshSwitchState();
-        } else if (R.id.sw_left == id) {
+        } else if (R.id.sw_right == id) {
             currentIndex = 1;
             refreshSwitchState();
+        } else if (R.id.fl_back == id) {
+            onBackCode();
         }
-
     }
 
     private void refreshSwitchState() {

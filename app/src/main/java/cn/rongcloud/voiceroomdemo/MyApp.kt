@@ -9,6 +9,8 @@ import android.util.Log
 import androidx.multidex.MultiDexApplication
 import cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
+import com.basis.BasisHelper
+import com.bcq.net.net.Page
 import com.rongcloud.common.ActivityManager
 import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
@@ -81,6 +83,25 @@ class MyApp : MultiDexApplication() {
                 Log.e(TAG, "obLogoutSubject: ", e)
             }
         }
+
+        //
+        BasisHelper.setDefaultPage(object :Page{
+            override fun getFirstIndex(): Int {
+                return 1
+            }
+
+            override fun geSize(): Int {
+                return 10
+            }
+
+            override fun getKeyPage(): String {
+                return "page"
+            }
+
+            override fun getKeySize(): String {
+                return "size"
+            }
+        })
     }
 
 

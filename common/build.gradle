@@ -111,7 +111,7 @@ dependencies {
     api  'com.umeng.umsdk:abtest:1.0.0'//使用U-App中ABTest能力，可选
 
     //adapter
-    api 'com.github.lbasis:adapter:1.0.1'
+    api 'com.github.lbasis:basis:1.0.3'
 
     // rongcloud
     api "cn.rongcloud.sdk:im_lib:$rongcloudSdkVersion"

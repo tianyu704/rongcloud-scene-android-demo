@@ -91,6 +91,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LoginStyle" />
 
+        <activity
+            android:name=".mvp.activity.VoiceRoomListActivity2"
+            android:screenOrientation="portrait" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.FileProvider"
