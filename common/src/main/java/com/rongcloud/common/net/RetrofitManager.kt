@@ -8,7 +8,6 @@ import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.NetUtil
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -39,14 +38,14 @@ object RetrofitManager {
 
     private fun getOkHttpClient(): OkHttpClient {
         //添加一个log拦截器,打印所有的log
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        //可以设置请求过滤的水平,body,basic,headers
-        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+//        val httpLoggingInterceptor = HttpLoggingInterceptor()
+//        //可以设置请求过滤的水平,body,basic,headers
+//        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
         return OkHttpClient.Builder()
             .addInterceptor(netCheckInterceptor()) // 网络检查
             .addInterceptor(addHeaderInterceptor()) // token过滤
-            .addInterceptor(httpLoggingInterceptor) //日志,所有的请求响应度看到
+//            .addInterceptor(httpLoggingInterceptor) //日志,所有的请求响应度看到
             .connectTimeout(10L, TimeUnit.SECONDS)
             .readTimeout(60L, TimeUnit.SECONDS)
             .writeTimeout(60L, TimeUnit.SECONDS)

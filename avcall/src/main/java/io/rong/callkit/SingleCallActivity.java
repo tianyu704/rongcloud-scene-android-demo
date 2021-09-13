@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.UIKit;
 
 import java.util.ArrayList;

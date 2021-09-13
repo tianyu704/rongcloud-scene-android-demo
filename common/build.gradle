@@ -81,7 +81,7 @@ dependencies {
     // 权限相关
     api 'pub.devrel:easypermissions:3.0.0'
     // okhttp
-    api 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+//    api 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     // datastore
     api("androidx.datastore:datastore-preferences:1.0.0-beta01")
     api("androidx.datastore:datastore-preferences-rxjava3:1.0.0-beta01")

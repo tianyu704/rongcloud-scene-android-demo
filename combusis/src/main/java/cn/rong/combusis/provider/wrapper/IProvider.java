@@ -3,10 +3,9 @@ package cn.rong.combusis.provider.wrapper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * 实体provider的接口

@@ -1,6 +1,6 @@
 package cn.rong.combusis.provider.user;
 
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.userinfo.model.GroupUserInfo;

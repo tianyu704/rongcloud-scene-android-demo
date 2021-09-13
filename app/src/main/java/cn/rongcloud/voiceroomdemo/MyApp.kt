@@ -6,7 +6,7 @@ package cn.rongcloud.voiceroomdemo
 
 import android.content.Context
 import android.util.Log
-import androidx.multidex.MultiDexApplication
+import cn.rong.combusis.ComApplication
 import cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import com.basis.BasisHelper
@@ -28,7 +28,7 @@ import kotlin.properties.Delegates
 private const val TAG = "MyApp"
 
 @HiltAndroidApp
-class MyApp : MultiDexApplication() {
+class MyApp : ComApplication() {
 
     @Inject
     lateinit var moduleManager: ModuleManager
