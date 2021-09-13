@@ -1,6 +1,6 @@
 package cn.rong.combusis.provider.wrapper;
 
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 
 import java.util.List;
 

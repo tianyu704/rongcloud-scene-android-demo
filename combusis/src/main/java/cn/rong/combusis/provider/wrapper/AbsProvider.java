@@ -7,7 +7,7 @@ import android.util.LruCache;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 
 import java.util.ArrayList;
 import java.util.Arrays;

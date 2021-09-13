@@ -6,7 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.rongcloud.common.net.ApiConstant;
-import com.rongcloud.common.net.IResultBack;
+import com.kit.wapper.IResultBack;
 
 import org.jetbrains.annotations.Nullable;
 

@@ -20,6 +20,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.rong.imlib.MD5
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import top.zibin.luban.Luban
@@ -43,7 +44,7 @@ object FileModel {
             }
             .first(File(imagePath))
             .flatMap {
-                val requestBody = RequestBody.create(MediaType.parse("image/*"), it)
+                val requestBody = RequestBody.create("image/*".toMediaTypeOrNull(), it)
                 val part = MultipartBody.Part.createFormData("file", it.name, requestBody)
                 return@flatMap CommonNetManager
                     .commonService
@@ -139,7 +140,7 @@ object FileModel {
         return Flowable.just(path)
             .observeOn(Schedulers.io())
             .flatMapSingle {
-                val requestBody = RequestBody.create(MediaType.parse("audio/*"), File(it))
+                val requestBody = RequestBody.create("audio/*".toMediaTypeOrNull(), File(it))
                 val part =
                     MultipartBody.Part.createFormData(
                         "file",
