@@ -15,8 +15,8 @@ include ':combusis'
 
 //公共模块 依赖
 include ':common'
+include ':basis'
 
 //编译插件
 include ':processor'
 include ':annotation'
-

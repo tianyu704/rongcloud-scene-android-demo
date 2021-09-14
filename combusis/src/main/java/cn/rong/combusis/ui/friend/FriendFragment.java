@@ -22,11 +22,13 @@ public class FriendFragment extends BaseFragment {
 
     @Override
     public void init() {
-        RadioGroup radioGroup = getLayout().findViewById(R.id.rg_friend);
-
+        RadioGroup radioGroup = getView(R.id.rg_friend);
+        // 粉丝列表
         Fragment followerFragment = FriendListFragment.getInstance(2);
+        // 关注列表
         Fragment followFragment = FriendListFragment.getInstance(1);
         Fragment[] fragments = {followerFragment, followFragment};
+        FragmentUtils.INSTANCE.switchFragment(getChildFragmentManager(), R.id.fl_content, followerFragment, fragments, 0, 0);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_follower) {
                 FragmentUtils.INSTANCE.switchFragment(getChildFragmentManager(), R.id.fl_content, followerFragment, fragments, 0, 0);

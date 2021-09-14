@@ -24,6 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
             android:ellipsize="end"
             android:maxLines="1"
@@ -32,12 +33,12 @@
             tools:text="用户名" />
 
         <CheckBox
-            android:id="@+id/cb_follow"
+            android:id="@+id/btn_follow"
             android:layout_width="84dp"
             android:layout_height="32dp"
             android:background="@drawable/selector_follow_button"
-            android:button="@null"
             android:gravity="center"
+            android:button="@null"
             android:text="关注"
             android:textColor="@color/selector_follow_button"
             android:textSize="@dimen/basis_14sp" />

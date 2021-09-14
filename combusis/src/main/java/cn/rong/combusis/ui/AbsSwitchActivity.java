@@ -86,7 +86,6 @@ public class AbsSwitchActivity extends BaseActivity implements View.OnClickListe
         return null;
     }
 
-
 }
 
 
