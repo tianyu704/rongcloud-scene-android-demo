@@ -20,3 +20,4 @@ include ':basis'
 //编译插件
 include ':processor'
 include ':annotation'
+include ':radioroom'

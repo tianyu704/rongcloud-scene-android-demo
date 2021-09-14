@@ -11,11 +11,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
-import cn.rong.combusis.provider.user.UserProvider
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider
 import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.radioroom.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.R
@@ -70,8 +69,17 @@ class HomeActivity : BaseActivity(), IHomeView,
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VoiceRoom)
-//                    VoiceRoomListActivity.startActivity(this)
-                    VoiceRoomListActivity2.startActivity(this)
+                    VoiceRoomListActivity.startActivity(this)
+                } else {
+                    showToast("请赋予必要权限！")
+                }
+            }
+        }
+
+        fl_radio.setOnClickListener {
+            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
+                if (accept) {
+                    RadioRoomListActivity.startActivity(this)
                 } else {
                     showToast("请赋予必要权限！")
                 }

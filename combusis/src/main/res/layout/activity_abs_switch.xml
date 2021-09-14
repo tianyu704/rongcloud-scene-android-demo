@@ -4,7 +4,6 @@
 
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -24,22 +23,28 @@
             android:scaleType="centerInside"
             android:src="@drawable/rc_title_bar_back" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/sw_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
-            tools:text="语聊房" />
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/sw_right"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:textSize="13sp"
-            tools:text="好友" />
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_switch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1.8"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+            app:tabIndicatorColor="#03003A"
+            app:tabIndicatorFullWidth="false"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="#03003A"
+            app:tabTextAppearance="@style/TabTheme"
+            app:tabTextColor="#03003A" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <FrameLayout
             android:id="@+id/fl_right_button"
@@ -49,15 +54,21 @@
             android:padding="10dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/switch_vpage"
+    <!--    <androidx.viewpager2.widget.ViewPager2-->
+    <!--        android:id="@+id/switch_vpage"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"-->
+    <!--        android:layout_margin="5dp"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        android:background="#efeff4"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/title_bar"-->
+    <!--        app:layout_constraintVertical_weight="1"-->
+    <!--        tools:layout_editor_absoluteX="4dp" />-->
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/vp_switch"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:layout_marginTop="16dp"
-        android:background="#efeff4"
-        android:orientation="horizontal"
-        app:layout_constraintTop_toTopOf="@+id/title_bar"
-        app:layout_constraintVertical_weight="1"
-        tools:layout_editor_absoluteX="4dp" />
+        android:layout_height="match_parent" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>

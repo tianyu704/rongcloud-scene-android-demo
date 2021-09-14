@@ -16,5 +16,9 @@
         <!--是否模糊-->
         <item name="android:backgroundDimEnabled">true</item>
     </style>
+
+    <style name="TabTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:textSize">17sp</item>
+    </style>
 </resources>
 
