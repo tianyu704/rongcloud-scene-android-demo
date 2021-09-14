@@ -11,8 +11,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
+import cn.rongcloud.voiceroom.model.FileModel
 import com.rongcloud.common.base.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.MUSIC_FROM_TYPE_LOCAL
 import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel

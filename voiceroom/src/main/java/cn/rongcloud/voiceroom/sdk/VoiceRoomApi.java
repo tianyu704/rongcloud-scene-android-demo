@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.sdk;
 import android.text.TextUtils;
 
 import com.kit.utils.KToast;
+import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
@@ -234,6 +235,30 @@ public class VoiceRoomApi implements Api {
         updateRoomInfo(roomInfo, resultBack);
     }
 
+    @Override
+    public void setSeatMode(Boolean isFreeEnterSeat, IResultBack<Boolean> resultBack) {
+        Logger.e(TAG, "setSeatMode:" + isFreeEnterSeat);
+        roomInfo.setFreeEnterSeat(isFreeEnterSeat);
+        updateRoomInfo(roomInfo, resultBack);
+    }
+
+    @Override
+    public void kickSeat(String userId, IResultBack<Boolean> resultBack) {
+        Logger.e(TAG, "kickSeat:" + userId);
+        RCVoiceRoomEngine.getInstance().kickUserFromSeat(userId,
+                new DefaultRoomCallback(
+                        "kickSeat",
+                        "剔除用户",
+                        resultBack));
+    }
+
+    @Override
+    public void setSeatCount(int seatCount, IResultBack<Boolean> resultBack) {
+        Logger.e(TAG, "setSeatCount:" + seatCount);
+        roomInfo.setSeatCount(seatCount);
+        updateRoomInfo(roomInfo, resultBack);
+    }
+
     /**
      * 为避免重置未修改属性，建议跟新和创建时传入相同的对象，
      *
@@ -241,7 +266,11 @@ public class VoiceRoomApi implements Api {
      * @param resultBack
      */
     private void updateRoomInfo(RCVoiceRoomInfo roomInfo, IResultBack<Boolean> resultBack) {
-        RCVoiceRoomEngine.getInstance().setRoomInfo(roomInfo, new DefaultRoomCallback("updateRoomInfo", resultBack));
+        RCVoiceRoomEngine.getInstance().setRoomInfo(roomInfo,
+                new DefaultRoomCallback(
+                        "updateRoomInfo",
+                        "修改房间信息",
+                        resultBack));
     }
 
 }

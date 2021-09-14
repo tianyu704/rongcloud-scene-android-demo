@@ -50,6 +50,7 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
     @Override
     public void onBackPressed() {
         if (needModefy) setResult(Activity.RESULT_OK);
+        if (null != dialog)dialog.dismiss();
         super.onBackPressed();
     }
 

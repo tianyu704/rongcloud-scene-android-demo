@@ -22,11 +22,6 @@ interface CommonApiService {
     @POST("/user/login")
     fun login(@Body loginRequestBean: LoginRequestBean): Single<LoginRespondBean>
 
-
-    @POST("/file/upload")
-    @Multipart
-    fun fileUpload(@Part body: MultipartBody.Part): Single<FileUploadRespond>
-
     @POST("/user/update")
     fun updateUserInfo(@Body updateUserInfoRequestBean: UpdateUserInfoRequestBean): Single<UpdateUserInfoRespond>
 

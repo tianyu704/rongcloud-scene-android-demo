@@ -2,24 +2,23 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model
+package cn.rongcloud.voiceroom.model
 
 import android.content.Context
 import android.os.Environment
 import android.util.Log
-import cn.rongcloud.voiceroomdemo.MyApp
-import cn.rongcloud.voiceroomdemo.net.CommonNetManager
-import com.rongcloud.common.extension.showToast
+import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
+import com.kit.utils.KToast
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.net.FileDownloadNetManager
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.FileUtil
+import com.rongcloud.common.utils.UIKit
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.rong.imlib.MD5
-import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,8 +45,8 @@ object FileModel {
             .flatMap {
                 val requestBody = RequestBody.create("image/*".toMediaTypeOrNull(), it)
                 val part = MultipartBody.Part.createFormData("file", it.name, requestBody)
-                return@flatMap CommonNetManager
-                    .commonService
+                return@flatMap VoiceRoomNetManager
+                    .musicService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${shortUrl.data}"
@@ -58,7 +57,6 @@ object FileModel {
     private var isDownloading = false
 
     fun downloadMusic(
-        context: Context,
         url: String,
         displayName: String,
         fileName: String,
@@ -66,10 +64,10 @@ object FileModel {
     ): Completable {
         if (isDownloading) {
             // 正在下载中
-            context.showToast("正在下载中")
+            KToast.show("正在下载中")
             return Completable.never()
         }
-        MyApp.context.showToast("开始下载: $displayName")
+        KToast.show("开始下载: $displayName")
         isDownloading = true
         return Completable.create { emitter ->
             FileDownloadNetManager
@@ -91,7 +89,7 @@ object FileModel {
                     emitter.onError(it)
                 }, {
                     isDownloading = false
-                    MyApp.context.showToast("下载完成: $displayName")
+                    KToast.show("下载完成: $displayName")
                     emitter.onComplete()
                 })
         }
@@ -111,7 +109,6 @@ object FileModel {
         return Completable.create { emitter ->
             if (!FileUtil.exists(getCompleteMusicPathByName(getNameFromUrl(url) ?: ""))) {
                 this@FileModel.downloadMusic(
-                    MyApp.context,
                     url,
                     name,
                     getNameFromUrl(url) ?: "",
@@ -131,7 +128,7 @@ object FileModel {
     }
 
     fun getCompleteMusicPathByName(name: String): String {
-        return "${MyApp.context.getExternalFilesDir(Environment.DIRECTORY_MUSIC)}${File.separator}${
+        return "${UIKit.getContext().getExternalFilesDir(Environment.DIRECTORY_MUSIC)}${File.separator}${
             name.replace(" ", "_")
         }"
     }
@@ -147,8 +144,8 @@ object FileModel {
                         getUploadNameByUrl(url = it),
                         requestBody
                     )
-                return@flatMapSingle CommonNetManager
-                    .commonService
+                return@flatMapSingle VoiceRoomNetManager
+                    .musicService
                     .fileUpload(part)
                     .map { shortUrl ->
                         return@map "${ApiConstant.FILE_URL}${shortUrl.data}"

@@ -1,38 +1,45 @@
 package cn.rongcloud.voiceroom.event.wrapper;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.oklib.GsonUtil;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
-import cn.rongcloud.voiceroom.event.listener.NetStatusListener;
+import cn.rongcloud.voiceroom.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.event.listener.RoomListener;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import cn.rongcloud.voiceroom.sdk.Api;
 import cn.rongcloud.voiceroom.sdk.VoiceRoomApi;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 
 public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListener {
     protected final String TAG = this.getClass().getSimpleName();
     protected final static Object obj = new Object();
     protected List<RoomListener> listeners;//房间监听
-    protected List<NetStatusListener> statusListeners;//网络状态监听
+    protected List<StatusListener> statusListeners;//网络状态监听
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
 
     protected abstract void onShowTipDialog(String userId, TipType type, IResultBack<Boolean> resultBack);
 
-    protected void init() {
+    protected String roomId;
+
+    protected void init(String roomId) {
+        this.roomId = roomId;
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(this);
         if (null == mSeatInfos) mSeatInfos = new ArrayList<>();
         if (null == listeners) listeners = new ArrayList<>();
@@ -45,6 +52,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         listeners.clear();
         statusListeners.clear();
         roomInfo = null;
+        roomId = null;
     }
 
     @Override
@@ -85,9 +93,13 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             mSeatInfos.clear();
             mSeatInfos.addAll(list);
         }
+        refreshSeatInfos();
+    }
+
+    private void refreshSeatInfos() {
         if (null != listeners) {
             for (RoomListener l : listeners) {
-                l.onSeatList(list);
+                l.onSeatList(mSeatInfos);
             }
         }
     }
@@ -96,12 +108,25 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onUserEnterSeat(int index, String userId) {
         Log.d(TAG, "onUserEnterSeat: index = " + index + " userId = " + userId);
+        RCVoiceSeatInfo info = getSeatInfo(index);
+        if (null != info) {
+            info.setUserId(userId);
+            info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
+        }
+        refreshSeatInfos();
     }
 
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onUserLeaveSeat(int index, String userId) {
         Log.d(TAG, "onUserLeaveSeat: index = " + index + " userId = " + userId);
+        RCVoiceSeatInfo info = getSeatInfo(index);
+        if (null != info) {
+            info.setUserId(null);
+            // 可能是锁定导致的
+            // info.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty);
+        }
+        refreshSeatInfos();
     }
 
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
@@ -124,6 +149,16 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onAudienceEnter(String userId) {
         Log.d(TAG, "onAudienceEnter: userId = " + userId);
+        if (null != listeners) {
+            getOnLineUserIds(roomId, new IResultBack<List<String>>() {
+                @Override
+                public void onResult(List<String> strings) {
+                    for (RoomListener l : listeners) {
+                        l.onOnLineUserIds(strings);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -134,6 +169,16 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onAudienceExit(String userId) {
         Log.d(TAG, "onAudienceExit: userId = " + userId);
+        if (null != listeners) {
+            getOnLineUserIds(roomId, new IResultBack<List<String>>() {
+                @Override
+                public void onResult(List<String> strings) {
+                    for (RoomListener l : listeners) {
+                        l.onOnLineUserIds(strings);
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -144,12 +189,30 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSpeakingStateChanged(int index, boolean speaking) {
-//        Log.d(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
+//        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
+        if (null != statusListeners) {
+            for (StatusListener l : statusListeners) {
+                l.onSpeaking(index, speaking);
+            }
+        }
     }
 
     @Override
     public void onMessageReceived(Message message) {
-//        Log.v(TAG, "onMessageReceived: " + GsonUtil.obj2Json(message));
+        if (message.getConversationType() == Conversation.ConversationType.PRIVATE) {
+            if (null != statusListeners) {
+                if (!TextUtils.isEmpty(roomId)) {
+                    getUnReadMegCount(roomId, new IResultBack<Integer>() {
+                        @Override
+                        public void onResult(Integer integer) {
+                            for (StatusListener l : statusListeners) {
+                                l.onReceive(integer);
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
     /**
@@ -181,7 +244,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             public void onResult(Boolean result) {
                 if (result) {
                     //同意
-//                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(Api.EVENT_AGREE_PICK, AccoutManager.getCurrentId());
+                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
                     //获取可用麦位索引
                     int availableIndex = getAvailableSeatIndex();
                     if (availableIndex > -1) {
@@ -190,7 +253,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                         EToast.showToast("当前没有空余的麦位");
                     }
                 } else {//拒绝
-//                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(Api.EVENT_REJECT_PICK, AccoutManager.getCurrentId());
+                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
                 }
             }
         });
@@ -213,7 +276,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onRequestSeatAccepted() {
         Log.d(TAG, "onRequestSeatAccepted: ");
-//        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(Api.EVENT_AGREE_PICK, AccoutManager.getCurrentId());
+        VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
         //获取可用麦位索引
         int availableIndex = getAvailableSeatIndex();
         if (availableIndex > -1) {
@@ -343,7 +406,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onNetworkStatus(int i) {
         if (null != statusListeners) {
-            for (NetStatusListener l : statusListeners) {
+            for (StatusListener l : statusListeners) {
                 l.onStatus(i);
             }
         }

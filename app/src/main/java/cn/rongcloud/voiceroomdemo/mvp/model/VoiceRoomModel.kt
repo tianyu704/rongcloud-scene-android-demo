@@ -28,6 +28,7 @@ import cn.rongcloud.voiceroomdemo.mvp.bean.Present
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import cn.rongcloud.voiceroom.utils.LocalUserInfoManager
 import cn.rongcloud.rtc.api.RCRTCEngine
+import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroom.model.RCPKInfo
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.EAR_MONITORING
 import com.rongcloud.common.base.BaseLifeCycleModel
@@ -64,8 +65,8 @@ val EMPTY_ROOM_INFO: VoiceRoomBean = VoiceRoomBean(roomId = "")
 private const val TAG = "VoiceRoomModel"
 
 const val EVENT_ROOM_CLOSE = "VoiceRoomClosed"
-const val EVENT_BACKGROUND_CHANGE = "VoiceRoomBackgroundChanged"
-const val EVENT_MANAGER_LIST_CHANGE = "VoiceRoomNeedRefreshManagerList"
+const val EVENT_BACKGROUND_CHANGE = "VoiceRoomBackgroundChanged"//房间背景变化
+const val EVENT_MANAGER_LIST_CHANGE = "VoiceRoomNeedRefreshManagerList"//管理员变化
 const val EVENT_REJECT_MANAGE_PICK = "VoiceRoomRejectManagePick" // 拒绝上麦
 const val EVENT_AGREE_MANAGE_PICK = "VoiceRoomAgreeManagePick" // 同意上麦
 

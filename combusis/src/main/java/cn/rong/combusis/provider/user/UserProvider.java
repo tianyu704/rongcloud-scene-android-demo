@@ -5,22 +5,20 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.rongcloud.common.net.ApiConstant;
+import com.bcq.net.OkApi;
+import com.bcq.net.WrapperCallBack;
+import com.bcq.net.wrapper.Wrapper;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.net.ApiConstant;
 
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.GsonUtil;
-import cn.rong.combusis.oklib.Wrapper;
-import cn.rong.combusis.oklib.WrapperCallBack;
 import cn.rong.combusis.provider.wrapper.IProvider;
 import io.rong.imkit.userinfo.RongUserInfoManager;
 import io.rong.imkit.userinfo.UserDataProvider;
@@ -95,6 +93,15 @@ public class UserProvider implements IProvider<UserInfo> {
     @Override
     public void batchGetAsyn(@NonNull List<String> keys, @NonNull IResultBack<List<UserInfo>> resultBack) {
         Log.e(TAG, "NO implements: batchGetAsyn");
+        int count = null != keys ? keys.size() : 0;
+        List<UserInfo> userInfoList = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            String id = keys.get(i);
+            UserInfo user = RongUserInfoManager.getInstance().getUserInfo(id);
+            if (null != user) {
+                userInfoList.size();
+            }
+        }
     }
 
     @Override
@@ -123,7 +130,13 @@ public class UserProvider implements IProvider<UserInfo> {
         }
         Map<String, Object> params = new HashMap<>(2);
         params.put("userIds", ids);
-        Core.core().post(null, API_BATCH, params, new WrapperCallBack() {
+        OkApi.post(API_BATCH, params, new WrapperCallBack() {
+            @Override
+            public void onError(int code, String msg) {
+                Log.e(TAG, "provideFromService#onError code  = " + code + " message = " + msg);
+                if (null != resultBack) resultBack.onResult(null);
+            }
+
             @Override
             public void onResult(Wrapper result) {
                 List<User> users = result.getList(User.class);

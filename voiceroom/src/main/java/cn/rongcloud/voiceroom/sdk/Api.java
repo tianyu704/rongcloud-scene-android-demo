@@ -25,14 +25,43 @@ public interface Api {
 
     String EVENT_KICKED_OUT_OF_ROOM = "EVENT_KICKED_OUT_OF_ROOM";
 
+    /**
+     * 获取房间实例 跟新使用同一实例
+     *
+     * @return
+     */
     RCVoiceRoomInfo getRoomInfo();
 
+    /**
+     * 通知房间
+     *
+     * @param name
+     * @param content
+     */
     void notifyRoom(String name, String content);
 
+    /**
+     * 创建并加入房间
+     *
+     * @param roomId
+     * @param roomInfo   getRoomInfo获取的实例
+     * @param resultBack
+     */
     void createAndJoin(String roomId, RCVoiceRoomInfo roomInfo, IResultBack<Boolean> resultBack);
 
+    /**
+     * 加入房间
+     *
+     * @param roomId
+     * @param resultBack
+     */
     void joinRoom(String roomId, IResultBack<Boolean> resultBack);
 
+    /**
+     * 离开房间
+     *
+     * @param resultBack
+     */
     void leaveRoom(IResultBack<Boolean> resultBack);
 
     /**
@@ -40,6 +69,13 @@ public interface Api {
      */
     void lockAll(boolean locked);
 
+    /**
+     * 锁定指定麦位
+     *
+     * @param index
+     * @param locked
+     * @param resultBack
+     */
     void lockSeat(int index, boolean locked, IResultBack<Boolean> resultBack);
 
     /**
@@ -48,20 +84,67 @@ public interface Api {
     void muteAll(boolean mute);
 
 
+    /**
+     * 静音指定麦位
+     *
+     * @param index
+     * @param mute
+     * @param resultBack
+     */
     void muteSeat(int index, boolean mute, IResultBack<Boolean> resultBack);
 
+    /**
+     * 下麦
+     *
+     * @param resultBack
+     */
     void leaveSeat(IResultBack<Boolean> resultBack);
 
+    /**
+     * 上麦
+     *
+     * @param index
+     * @param resultBack
+     */
     void enterSeat(int index, IResultBack<Boolean> resultBack);
 
+    /**
+     * 申请上麦
+     *
+     * @param resultBack
+     */
     void requestSeat(IResultBack<Boolean> resultBack);
 
+    /**
+     * 取消上麦申请
+     *
+     * @param resultBack
+     */
     void cancelRequestSeat(IResultBack<Boolean> resultBack);
 
+    /**
+     * 同意上麦
+     *
+     * @param userId
+     * @param resultBack
+     */
     void acceptRequestSeat(String userId, IResultBack<Boolean> resultBack);
 
+    /**
+     * 拒绝上麦
+     *
+     * @param userId
+     * @param resultBack
+     */
     void rejectRequestSeat(String userId, IResultBack<Boolean> resultBack);
 
+    /**
+     * 跟新麦位extra字段
+     *
+     * @param seatIndex
+     * @param extra
+     * @param resultBack
+     */
     void updateSeatExtra(int seatIndex, String extra, IResultBack<Boolean> resultBack);
 
     /**
@@ -80,4 +163,27 @@ public interface Api {
      */
     void updateRoomName(String name, IResultBack<Boolean> resultBack);
 
+    /**
+     * 修改麦位上麦模式 setRoomInfo
+     *
+     * @param isFreeEnterSeat 是否自由上麦：ture 自由上麦，fasle 申请上麦
+     * @param resultBack
+     */
+    void setSeatMode(Boolean isFreeEnterSeat, IResultBack<Boolean> resultBack);
+
+    /**
+     * 剔除默认 kickUserFromSeat
+     *
+     * @param userId     被踢的人id
+     * @param resultBack
+     */
+    void kickSeat(String userId, IResultBack<Boolean> resultBack);
+
+    /**
+     * 设置麦位数 setRoomInfo
+     *
+     * @param seatCount  麦位数
+     * @param resultBack
+     */
+    void setSeatCount(int seatCount, IResultBack<Boolean> resultBack);
 }

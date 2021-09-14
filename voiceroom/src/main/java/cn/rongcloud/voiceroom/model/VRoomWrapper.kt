@@ -2,49 +2,39 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.model
+package cn.rongcloud.voiceroom.model
 
 import android.app.Activity
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider
+import cn.rongcloud.voiceroom.R
 import cn.rongcloud.voiceroom.event.EventHelper
-import cn.rongcloud.voiceroom.event.listener.NetStatusListener
+import cn.rongcloud.voiceroom.event.listener.StatusListener
 import cn.rongcloud.voiceroom.event.listener.RoomListener
 import cn.rongcloud.voiceroom.message.*
-import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
-import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroom.net.bean.request.*
 import cn.rongcloud.voiceroom.ui.uimodel.*
-import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.mvp.bean.Present
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
 import io.reactivex.rxjava3.core.*
-import io.rong.imlib.model.UserInfo
 import kotlinx.coroutines.*
 
 private const val TAG = "VRoomWrapper"
 
 
-class VRoomWrapper(activity: Activity, val roomId: String,) : RoomListener, NetStatusListener {
+class VRoomWrapper(activity: Activity?, val roomId: String) : RoomListener,
+    StatusListener {
     // service room info
-    private lateinit var netRoomInfo: VoiceRoomBean
+    lateinit var netRoomInfo: VoiceRoomBean
 
     // SDK room info
-    private var rcRoomInfo: RCVoiceRoomInfo? = null
+    var rcRoomInfo: RCVoiceRoomInfo? = null
 
     //member list
-    private val members = arrayListOf<UserInfo>()
+    val members = arrayListOf<Member>()
 
     // 房间麦序
-    private val seatInfos = arrayListOf<UiMusicModel>()
+    val seatInfos = arrayListOf<UiMusicModel>()
 
-    // music list
-    private val musics = arrayListOf<UiMusicModel>()
-
-    // 内置音乐列表
-    private val systemMusics = arrayListOf<UiMusicModel>()
-
-    private val gifts = mapOf<String, Int>()
+    val gifts = mapOf<String, Int>()
 
     // 礼物数据
     val presents by lazy {
@@ -66,7 +56,7 @@ class VRoomWrapper(activity: Activity, val roomId: String,) : RoomListener, NetS
         VoiceRoomProvider.provider().observeSingle(roomId) { roomBean ->
             netRoomInfo = roomBean
         }
-        EventHelper.helper().regeister(activity)
+        EventHelper.helper().regeister(activity,roomId)
         EventHelper.helper().addRoomListener(this)
         EventHelper.helper().addStatusListener(this)
     }
@@ -86,6 +76,15 @@ class VRoomWrapper(activity: Activity, val roomId: String,) : RoomListener, NetS
     override fun onNotify(code: String?, content: String?) {
     }
 
+    override fun onOnLineUserIds(userIds: MutableList<String>?) {
+    }
+
     override fun onStatus(delay: Int) {
+    }
+
+    override fun onReceive(unReadCount: Int) {
+    }
+
+    override fun onSpeaking(index: Int, speaking: Boolean) {
     }
 }

@@ -7,9 +7,9 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.Fragment
+import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import com.rongcloud.common.base.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
 import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroom.net.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroom.net.bean.request.Kv
@@ -41,7 +41,8 @@ class CreateVoiceRoomPresenter @Inject constructor(
 
         val kvList = ArrayList<Kv>()
         if (roomCover != null) {
-            addDisposable(FileModel
+            addDisposable(
+                FileModel
                 .imageUpload(
                     RealPathFromUriUtils.getRealPathFromUri(context, roomCover),
                     context
