@@ -7,12 +7,12 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.createroom
 import android.content.Context
 import android.net.Uri
 import androidx.fragment.app.Fragment
+import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
-import com.rongcloud.common.base.BaseLifeCyclePresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.FileModel
-import com.rongcloud.common.net.ApiConstant
 import cn.rongcloud.voiceroom.net.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroom.net.bean.request.Kv
+import com.rongcloud.common.base.BaseLifeCyclePresenter
+import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import javax.inject.Inject
@@ -41,37 +41,38 @@ class CreateVoiceRoomPresenter @Inject constructor(
 
         val kvList = ArrayList<Kv>()
         if (roomCover != null) {
-            addDisposable(FileModel
-                .imageUpload(
-                    RealPathFromUriUtils.getRealPathFromUri(context, roomCover),
-                    context
-                )
-                .flatMap {
-                    return@flatMap VoiceRoomNetManager
-                        .aRoomApi
-                        .createVoiceRoom(
-                            CreateRoomRequestBean(
-                                intPrivate,
-                                roomName,
-                                password,
-                                "${ApiConstant.FILE_URL}$it",
-                                roomBackground,
-                                kvList,
-                                1
+            addDisposable(
+                FileModel
+                    .imageUpload(
+                        RealPathFromUriUtils.getRealPathFromUri(context, roomCover),
+                        context
+                    )
+                    .flatMap {
+                        return@flatMap VoiceRoomNetManager
+                            .aRoomApi
+                            .createVoiceRoom(
+                                CreateRoomRequestBean(
+                                    intPrivate,
+                                    roomName,
+                                    password,
+                                    "${ApiConstant.FILE_URL}$it",
+                                    roomBackground,
+                                    kvList,
+                                    1
+                                )
                             )
-                        )
-                }.subscribe({ respond ->
-                    view.hideWaitingDialog()
-                    when (respond.code) {
-                        10000 -> {
-                            view.onCreateRoomSuccess(respond.data)
-                        }
-                        30016 -> {
-                            view.onCreateRoomExist(respond.data)
-                        }
-                        else -> {
-                            view.showError(respond.code ?: -1, respond.msg)
-                        }
+                    }.subscribe({ respond ->
+                        view.hideWaitingDialog()
+                        when (respond.code) {
+                            10000 -> {
+                                view.onCreateRoomSuccess(respond.data)
+                            }
+                            30016 -> {
+                                view.onCreateRoomExist(respond.data)
+                            }
+                            else -> {
+                                view.showError(respond.code ?: -1, respond.msg)
+                            }
                     }
                 }, { t ->
                     view.hideWaitingDialog()

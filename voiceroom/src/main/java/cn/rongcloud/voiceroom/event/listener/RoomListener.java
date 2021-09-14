@@ -1,6 +1,7 @@
 package cn.rongcloud.voiceroom.event.listener;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.List;
 
@@ -32,4 +33,11 @@ public interface RoomListener {
      * @param content
      */
     void onNotify(String code, String content);
+
+    /**
+     * 在线人ID回调
+     *
+     * @param userIds
+     */
+    void onOnLineUserIds(@Nullable List<String> userIds);
 }

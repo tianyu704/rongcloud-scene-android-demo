@@ -51,19 +51,6 @@ public interface IProvider<T> {
      */
     void removeSingleObserver(String key);
 
-//    /**
-//     * 监听所有
-//     *
-//     * @param resultBack
-//     */
-//    void observeAll(@NonNull IResultBack<List<T>> resultBack);
-//
-//    /**
-//     * 移除全量监听器
-//     *
-//     * @param resultBack
-//     */
-//    void removeAllObserver(@NonNull IResultBack<List<T>> resultBack);
 
     /**
      * 远端获取实例

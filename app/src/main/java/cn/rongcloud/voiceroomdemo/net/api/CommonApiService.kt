@@ -4,11 +4,15 @@
 
 package cn.rongcloud.voiceroomdemo.net.api
 
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.*
-import cn.rongcloud.voiceroomdemo.net.api.bean.respond.*
+import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCode
+import cn.rongcloud.voiceroomdemo.net.api.bean.request.LoginRequestBean
+import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
+import cn.rongcloud.voiceroomdemo.net.api.bean.respond.LoginRespondBean
+import cn.rongcloud.voiceroomdemo.net.api.bean.respond.UpdateUserInfoRespond
+import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VerificationCodeRespondBean
 import io.reactivex.rxjava3.core.Single
-import okhttp3.MultipartBody
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 /**
  * @author gusd
@@ -21,11 +25,6 @@ interface CommonApiService {
 
     @POST("/user/login")
     fun login(@Body loginRequestBean: LoginRequestBean): Single<LoginRespondBean>
-
-
-    @POST("/file/upload")
-    @Multipart
-    fun fileUpload(@Part body: MultipartBody.Part): Single<FileUploadRespond>
 
     @POST("/user/update")
     fun updateUserInfo(@Body updateUserInfoRequestBean: UpdateUserInfoRequestBean): Single<UpdateUserInfoRespond>

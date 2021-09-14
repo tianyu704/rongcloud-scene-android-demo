@@ -5,18 +5,18 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.rongcloud.common.net.ApiConstant;
+import com.bcq.net.OkApi;
+import com.bcq.net.WrapperCallBack;
+import com.bcq.net.wrapper.Wrapper;
+import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.net.ApiConstant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.GsonUtil;
-import cn.rong.combusis.oklib.Wrapper;
-import cn.rong.combusis.oklib.WrapperCallBack;
 import cn.rong.combusis.provider.wrapper.AbsProvider;
 import cn.rong.combusis.provider.wrapper.IListProvider;
 
@@ -41,13 +41,18 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
             return;
         }
         String roomId = ids.get(0);
-        Core.core().get(null, API_ROOM + roomId, null, new WrapperCallBack() {
+        OkApi.get(API_ROOM + roomId, null, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
                 Log.e(TAG, GsonUtil.obj2Json(result));
                 List<VoiceRoomBean> rooms = result.getList(VoiceRoomBean.class);
                 if (null != resultBack) resultBack.onResult(rooms);
 
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                if (null != resultBack) resultBack.onResult(null);
             }
         });
     }
@@ -63,7 +68,12 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
         params.put("page", page);
         params.put("size", PAGE_SIZE);
         params.put("type", 1);//1 聊天室(默认) 2 电台
-        Core.core().get(null, API_ROOMS, null, new WrapperCallBack() {
+        OkApi.get(API_ROOMS, null, new WrapperCallBack() {
+            @Override
+            public void onError(int code, String msg) {
+                if (null != resultBack) resultBack.onResult(null);
+            }
+
             @Override
             public void onResult(Wrapper wrapper) {
                 List<VoiceRoomBean> rooms = wrapper.getList("rooms", VoiceRoomBean.class);

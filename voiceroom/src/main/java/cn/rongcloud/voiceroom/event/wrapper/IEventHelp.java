@@ -2,8 +2,12 @@ package cn.rongcloud.voiceroom.event.wrapper;
 
 import android.app.Activity;
 
-import cn.rongcloud.voiceroom.event.listener.NetStatusListener;
+import com.kit.wapper.IResultBack;
+
+import java.util.List;
+
 import cn.rongcloud.voiceroom.event.listener.RoomListener;
+import cn.rongcloud.voiceroom.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 
 public interface IEventHelp {
@@ -20,7 +24,7 @@ public interface IEventHelp {
      *
      * @param activity
      */
-    void regeister(Activity activity);
+    void regeister(Activity activity, String roomId);
 
     /**
      * 取消房间事件注册 退出房间后调用
@@ -39,16 +43,46 @@ public interface IEventHelp {
      *
      * @param listener 网络监听
      */
-    void addStatusListener(NetStatusListener listener);
+    void addStatusListener(StatusListener listener);
 
     /**
      * 根据用户id获取麦位信息
      *
      * @param userId
-     *
      * @return 麦位信息
      */
     RCVoiceSeatInfo getSeatInfo(String userId);
+
+    /**
+     * 根据用户index获取麦位信息
+     *
+     * @param index 索引
+     * @return
+     */
+    RCVoiceSeatInfo getSeatInfo(int index);
+
+    /**
+     * 获取房间在线用户id集合
+     *
+     * @param roomId     房间
+     * @param resultBack
+     */
+    void getOnLineUserIds(String roomId, IResultBack<List<String>> resultBack);
+
+    /**
+     * 获取未读消息数据
+     *
+     * @param roomId
+     * @param resultBack
+     */
+    void getUnReadMegCount(String roomId, IResultBack<Integer> resultBack);
+
+    /**
+     * 获取申请麦位用户id
+     *
+     * @param resultBack
+     */
+    void getRequestSeatUserIds(IResultBack<List<String>> resultBack);
 
     /**
      * 获取可用麦位索引

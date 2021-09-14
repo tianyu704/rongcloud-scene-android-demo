@@ -40,8 +40,9 @@ dependencies {
     implementation 'androidx.core:core:1.6.0'
 
     api 'com.github.lbasis:kit:1.0.0'
-    api 'com.github.lbasis:oklib:1.0.1'
     api 'com.github.lbasis:refresh:1.0.1'
     api 'com.github.lbasis:photo:1.0.0'
     api 'com.github.lbasis:adapter:1.0.1'
+
+    api project(path: ':oklib')
 }

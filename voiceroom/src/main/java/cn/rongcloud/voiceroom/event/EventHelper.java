@@ -2,19 +2,26 @@ package cn.rongcloud.voiceroom.event;
 
 import android.app.Activity;
 
+import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.rong.combusis.provider.user.UserProvider;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
+import cn.rongcloud.voiceroom.event.listener.RoomListener;
+import cn.rongcloud.voiceroom.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.event.wrapper.AbsEvenHelper;
 import cn.rongcloud.voiceroom.event.wrapper.EventDialogHelper;
 import cn.rongcloud.voiceroom.event.wrapper.IEventHelp;
-import cn.rongcloud.voiceroom.event.listener.NetStatusListener;
-import cn.rongcloud.voiceroom.event.listener.RoomListener;
 import cn.rongcloud.voiceroom.event.wrapper.TipType;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.ChatRoomInfo;
+import io.rong.imlib.model.ChatRoomMemberInfo;
 import io.rong.imlib.model.UserInfo;
 
 public class EventHelper extends AbsEvenHelper {
@@ -33,9 +40,9 @@ public class EventHelper extends AbsEvenHelper {
         return null != activity && null != activity.get();
     }
 
-    public void regeister(Activity activity) {
+    public void regeister(Activity activity, String roomId) {
         this.activity = new WeakReference<>(activity);
-        init();
+        init(roomId);
     }
 
     @Override
@@ -54,7 +61,7 @@ public class EventHelper extends AbsEvenHelper {
     }
 
     @Override
-    public void addStatusListener(NetStatusListener listener) {
+    public void addStatusListener(StatusListener listener) {
         if (null == statusListeners) statusListeners = new ArrayList<>();
         statusListeners.add(listener);
     }
@@ -77,6 +84,90 @@ public class EventHelper extends AbsEvenHelper {
             }
             return null;
         }
+    }
+
+    /**
+     * @param index 索引
+     * @return 麦位信息
+     */
+    public RCVoiceSeatInfo getSeatInfo(int index) {
+        int count = null != mSeatInfos ? mSeatInfos.size() : 0;
+        if (index < count) {
+            synchronized (obj) {
+                mSeatInfos.get(index);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void getOnLineUserIds(String roomId, IResultBack<List<String>> resultBack) {
+        RongIMClient.getInstance()
+                .getChatRoomInfo(roomId,
+                        0,
+                        ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC,
+                        new RongIMClient.ResultCallback<ChatRoomInfo>() {
+                            @Override
+                            public void onSuccess(ChatRoomInfo chatRoomInfo) {
+                                if (null != resultBack && null != chatRoomInfo) {
+                                    List<ChatRoomMemberInfo> cs = chatRoomInfo.getMemberInfo();
+                                    int count = null == cs ? 0 : cs.size();
+                                    List<String> result = new ArrayList<>();
+                                    for (int i = 0; i < count; i++) {
+                                        result.add(cs.get(i).getUserId());
+                                    }
+                                    resultBack.onResult(result);
+                                }
+                            }
+
+                            @Override
+                            public void onError(RongIMClient.ErrorCode err) {
+                                Logger.e(TAG, "getOnLineUserIds#onError code = " + err.code + " msg = " + err.getMessage());
+                                if (null != resultBack) resultBack.onResult(new ArrayList<>());
+                            }
+                        }
+                );
+
+
+    }
+
+    @Override
+    public void getUnReadMegCount(String roomId, IResultBack<Integer> resultBack) {
+        RongIMClient.getInstance().getUnreadCount(new RongIMClient.ResultCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer integer) {
+                resultBack.onResult(integer);
+            }
+
+            @Override
+            public void onError(RongIMClient.ErrorCode err) {
+                Logger.e(TAG, "getUnReadMegCount#onError code = " + err.code + " msg = " + err.getMessage());
+                if (null != resultBack) resultBack.onResult(0);
+            }
+        });
+    }
+
+    @Override
+    public void getRequestSeatUserIds(IResultBack<List<String>> resultBack) {
+        RCVoiceRoomEngine.getInstance().getRequestSeatUserIds(new RCVoiceRoomResultCallback<List<String>>() {
+            @Override
+            public void onSuccess(List<String> strings) {
+                if (null != resultBack) {
+                    List<String> requestIds = new ArrayList<>();
+                    for (String id : strings) {
+                        if (null == getSeatInfo(id)) {//筛选 不再麦位上
+                            requestIds.add(id);
+                        }
+                    }
+                    resultBack.onResult(requestIds);
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                Logger.e(TAG, "getRequestSeatUserIds#onError code = " + i + " msg = " + s);
+            }
+        });
     }
 
     /**

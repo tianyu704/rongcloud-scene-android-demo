@@ -6,7 +6,10 @@ import android.os.Bundle;
 import com.basis.ui.ListFragment;
 import com.bcq.adapter.interfaces.IAdapte;
 import com.bcq.adapter.recycle.RcyHolder;
+import com.bcq.net.OkApi;
+import com.bcq.net.WrapperCallBack;
 import com.bcq.net.api.Method;
+import com.bcq.net.wrapper.Wrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,9 +20,6 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.model.Friend;
 import cn.rong.combusis.model.Response;
-import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.Wrapper;
-import cn.rong.combusis.oklib.WrapperCallBack;
 
 public class FriendListFragment extends ListFragment<Response, Friend, RcyHolder> implements FriendAdapter.OnFollowClickListener {
     // 1 我关注的 2 我的粉丝
@@ -86,7 +86,8 @@ public class FriendListFragment extends ListFragment<Response, Friend, RcyHolder
         Friend.FollowStatus status = friend.getFollowStatus(mType);
         friend.changeFollowStatus(mType);
         mAdapter.notifyDataSetChanged();
-        Core.core().get("", VRApi.followUrl(friend.getUid()), null, new WrapperCallBack() {
+
+        OkApi.get(VRApi.followUrl(friend.getUid()), null, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
                 if (!result.ok()) {
@@ -97,7 +98,6 @@ public class FriendListFragment extends ListFragment<Response, Friend, RcyHolder
 
             @Override
             public void onError(int code, String msg) {
-                super.onError(code, msg);
                 friend.setFollowStatus(status);
                 mAdapter.notifyDataSetChanged();
             }

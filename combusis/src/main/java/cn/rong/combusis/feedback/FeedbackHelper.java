@@ -14,6 +14,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.bcq.net.OkApi;
+import com.bcq.net.WrapperCallBack;
+import com.bcq.net.wrapper.Wrapper;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.net.IResultBack;
 import com.rongcloud.common.utils.SharedPreferUtil;
@@ -26,9 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.R;
-import cn.rong.combusis.oklib.WrapperCallBack;
-import cn.rong.combusis.oklib.Core;
-import cn.rong.combusis.oklib.Wrapper;
 import cn.rong.combusis.umeng.RcUmEvent;
 import cn.rong.combusis.umeng.UmengHelper;
 
@@ -191,7 +191,7 @@ public class FeedbackHelper implements IFeedback {
         reportFeedback(true, "", new IResultBack<Wrapper>() {
             @Override
             public void onResult(Wrapper feedResult) {
-                boolean success = null != feedResult && feedResult.ok();
+                boolean success = null != feedResult && feedResult.getCode() == 10000;
                 Toast.makeText(UIKit.getContext(), success ? "点赞成功" : "点赞是不", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 dismissDialog();
@@ -217,7 +217,7 @@ public class FeedbackHelper implements IFeedback {
         reportFeedback(false, releason, new IResultBack<Wrapper>() {
             @Override
             public void onResult(Wrapper feedResult) {
-                boolean success = null != feedResult && feedResult.ok();
+                boolean success = null != feedResult && feedResult.getCode() == 10000;
                 Toast.makeText(UIKit.getContext(), success ? "反馈成功" : "反馈失败", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 // 提交成功后显示推荐活动
@@ -323,11 +323,16 @@ public class FeedbackHelper implements IFeedback {
         params.put("isGoodFeedback", goodFeedback);
         params.put("reason", reason);
         String url = ApiConstant.INSTANCE.getBASE_URL() + "feedback/create";
-        Core.core().post(null, url, params, new WrapperCallBack() {
+        OkApi.post(url, params, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
                 Log.e(TAG, "code = " + result.getCode());
                 resultBack.onResult(result);
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                resultBack.onResult(null);
             }
         });
     }
