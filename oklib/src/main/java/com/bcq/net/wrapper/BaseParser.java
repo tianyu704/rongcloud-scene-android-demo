@@ -1,28 +1,43 @@
 package com.bcq.net.wrapper;
 
 import com.bcq.net.wrapper.interfaces.IParse;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+
 /**
- * @author: BaiCQ
- * @ClassName: DefauParser
- * @date: 2018/8/17
- * @Description: 默认解析器
+ * 默认解析器
  */
 public class BaseParser implements IParse<Wrapper> {
     @Override
     public Wrapper parse(int httpcode, String json) {
-        //{"code":1,"time":"2020-12-11 18:02:25","message":"success","data":{"access_token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.}
-        Wrapper info = null;
-        JsonObject resulObj = (JsonObject) JsonParser.parseString(json);
-        if (null != resulObj) {
-            info = new Wrapper().setCode(httpcode);
-            int code = resulObj.get("code").getAsInt();
-            OkUtil.e("DefauParser", "code = " + code);
-            info.setCode(code);
-            info.setMessage(resulObj.get("message").getAsString());
-            info.setBody(resulObj.get("data"));
+        Wrapper info = new Wrapper();
+        info.setCode(httpcode);
+        OkUtil.e("BaseParser", "json = " + json);
+        JsonElement result = JsonParser.parseString(json);
+        if (result instanceof JsonObject) {
+            JsonObject resulObj = (JsonObject) result;
+            info.setCode(resulObj.get("code").getAsInt());
+            info.setMessage(resulObj.get("msg").getAsString());
+            JsonElement data = resulObj.get("data");
+            if (data.isJsonObject()) {
+                JsonObject dataJson = (JsonObject) data;
+                if (dataJson.has("list")) {//列表数据 必有list
+                    if (dataJson.has("total")) { //设置page
+                        info.setPage(0, dataJson.get("total").getAsInt());
+                    } else {
+                        info.setPage(0, 1);
+                    }
+                    info.setBody(dataJson.get("list")); //body
+                } else {
+                    info.setBody(data);
+                }
+            } else if (data.isJsonArray()) {// data[]
+                info.setBody(resulObj.get("data"));
+            }
+            info.setPage(0, resulObj.get("page_count").getAsInt());
         }
         return info;
     }

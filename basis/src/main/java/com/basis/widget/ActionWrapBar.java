@@ -61,16 +61,6 @@ public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
         return result;
     }
 
-    public ActionWrapBar(AppCompatActivity activity) {
-        actionBar = activity.getSupportActionBar();
-        if (null == actionBar) {
-            actionBar = inflateDefaultActionBar((BaseActivity) activity);
-        }
-        if (null == actionBar) {
-            throw new IllegalArgumentException("No Support ActionBarWrapper For ActionBar is null ! ");
-        }
-    }
-
     @Override
     public ActionWrapBar setHide(boolean noneBar) {
         this.noneBar = noneBar;
