@@ -1,11 +1,11 @@
 package cn.rongcloud.voiceroom.event;
 
-import android.app.Activity;
+import android.text.TextUtils;
 
+import com.basis.UIStack;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,6 @@ import io.rong.imlib.model.UserInfo;
 public class EventHelper extends AbsEvenHelper {
 
     private final static IEventHelp _helper = new EventHelper();
-    private WeakReference<Activity> activity;
 
     private EventHelper() {
     }
@@ -36,21 +35,17 @@ public class EventHelper extends AbsEvenHelper {
         return _helper;
     }
 
+    @Override
     public boolean isInitlaized() {
-        return null != activity && null != activity.get();
+        return TextUtils.isEmpty(roomId);
     }
 
-    public void regeister(Activity activity, String roomId) {
-        this.activity = new WeakReference<>(activity);
+    public void regeister(String roomId) {
         init(roomId);
     }
 
     @Override
     public void unregeister() {
-        if (null != activity) {
-            activity.clear();
-        }
-        activity = null;
         unInit();
     }
 
@@ -88,6 +83,7 @@ public class EventHelper extends AbsEvenHelper {
 
     /**
      * @param index 索引
+     *
      * @return 麦位信息
      */
     public RCVoiceSeatInfo getSeatInfo(int index) {
@@ -189,13 +185,8 @@ public class EventHelper extends AbsEvenHelper {
         }
     }
 
-
     @Override
     protected void onShowTipDialog(String userId, TipType type, IResultBack<Boolean> resultBack) {
-        if (null == activity || null == activity.get()) {
-            if (null != resultBack) resultBack.onResult(false);
-            return;
-        }
         // 根据userId获取用户信息
         UserProvider.provider().getAsyn(userId, new IResultBack<UserInfo>() {
             @Override
@@ -209,7 +200,7 @@ public class EventHelper extends AbsEvenHelper {
                     } else {
                         message = userInfo.getName() + "邀请您进行PK，是否同意？";
                     }
-                    EventDialogHelper.helper().showTipDialog(activity.get(), type.getValue(), message, resultBack);
+                    EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
                 } else {
                     if (null != resultBack) resultBack.onResult(false);
                 }

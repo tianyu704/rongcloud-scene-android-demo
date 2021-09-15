@@ -42,8 +42,12 @@ public abstract class WrapperCallBack extends OCallBack<Wrapper> {//IOCallBack
                 JsonObject result = JsonParser.parseString(string).getAsJsonObject();
                 if (null != result) {
                     wrapper.setCode(result.get("code").getAsInt());
-                    wrapper.setMessage(result.get("msg").getAsString());
-                    wrapper.setBody(result.get("data"));
+                    if (result.has("msg")) {
+                        wrapper.setMessage(result.get("msg").getAsString());
+                    }
+                    if (result.has("data")) {
+                        wrapper.setBody(result.get("data"));
+                    }
                 }
             }
         } catch (IOException e) {

@@ -22,9 +22,9 @@ public interface IEventHelp {
     /**
      * 注册房间事件 加入房间前调用
      *
-     * @param activity
+     * @param roomId
      */
-    void regeister(Activity activity, String roomId);
+    void regeister(String roomId);
 
     /**
      * 取消房间事件注册 退出房间后调用
@@ -49,6 +49,7 @@ public interface IEventHelp {
      * 根据用户id获取麦位信息
      *
      * @param userId
+     *
      * @return 麦位信息
      */
     RCVoiceSeatInfo getSeatInfo(String userId);
@@ -57,6 +58,7 @@ public interface IEventHelp {
      * 根据用户index获取麦位信息
      *
      * @param index 索引
+     *
      * @return
      */
     RCVoiceSeatInfo getSeatInfo(int index);

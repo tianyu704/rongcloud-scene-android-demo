@@ -93,9 +93,8 @@ public class FeedbackHelper implements IFeedback {
      */
     private boolean enableScore() {
         //未打分 且次数大于limt
-        return
-                !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
-                        SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
+        return !SharedPreferUtil.getBoolean(KEY_SCORE_FLAG) &&
+                SharedPreferUtil.get(KEY_TIME, 0) >= LIMT;
     }
 
 
@@ -192,7 +191,7 @@ public class FeedbackHelper implements IFeedback {
             @Override
             public void onResult(Wrapper feedResult) {
                 boolean success = null != feedResult && feedResult.getCode() == 10000;
-                Toast.makeText(UIKit.getContext(), success ? "点赞成功" : "点赞是不", Toast.LENGTH_LONG).show();
+                Toast.makeText(UIKit.getContext(), success ? "点赞成功" : "点赞失败", Toast.LENGTH_LONG).show();
                 alreadyScore();
                 dismissDialog();
             }
