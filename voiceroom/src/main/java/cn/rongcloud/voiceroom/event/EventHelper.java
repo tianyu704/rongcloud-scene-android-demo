@@ -37,7 +37,7 @@ public class EventHelper extends AbsEvenHelper {
 
     @Override
     public boolean isInitlaized() {
-        return TextUtils.isEmpty(roomId);
+        return !TextUtils.isEmpty(roomId);
     }
 
     public void regeister(String roomId) {
