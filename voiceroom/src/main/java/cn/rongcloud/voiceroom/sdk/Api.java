@@ -2,6 +2,8 @@ package cn.rongcloud.voiceroom.sdk;
 
 import com.kit.wapper.IResultBack;
 
+import cn.rongcloud.voiceroom.api.PKState;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 /**
@@ -186,4 +188,45 @@ public interface Api {
      * @param resultBack
      */
     void setSeatCount(int seatCount, IResultBack<Boolean> resultBack);
+
+    /**
+     * 发送PK邀请
+     *
+     * @param inviteeRoomId 被邀请用户所在的房间id
+     * @param inviteeUserId 被邀请人的用户id
+     * @param resultBack      结果回调
+     */
+    void sendPKInvitation(String inviteeRoomId, String inviteeUserId, IResultBack<Boolean> resultBack);
+
+    /**
+     * 取消PK邀请
+     *
+     * @param inviteeRoomId 被邀请用户所在的房间id
+     * @param inviteeUserId 被邀请人的用户id
+     * @param resultBack      结果回调
+     */
+    void cancelPKInvitation(String inviteeRoomId, String inviteeUserId, IResultBack<Boolean> resultBack);
+
+    /**
+     * 回复邀请人是否接受邀请
+     *
+     * @param inviterRoomId 邀请人所在的房间id
+     * @param inviterUserId 邀请人的用户id
+     * @param pkState       pk邀请的响应状态
+     * @param resultBack      结果回调
+     */
+    void responsePKInvitation(String inviterRoomId, String inviterUserId, PKState pkState, IResultBack<Boolean> resultBack);
+
+    /**
+     * 屏蔽PK对象的语音
+     *
+     * @param isMute   是否静音
+     * @param resultBack 结果回调
+     */
+    void mutePKUser(boolean isMute, IResultBack<Boolean> resultBack);
+
+    /**
+     * 退出PK
+     */
+    void quitPK(IResultBack<Boolean> resultBack);
 }

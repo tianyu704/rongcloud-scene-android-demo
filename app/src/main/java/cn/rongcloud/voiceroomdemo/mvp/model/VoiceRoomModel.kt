@@ -781,6 +781,9 @@ class VoiceRoomModel @Inject constructor(
     override fun onPKInvitationRejected(p0: String?, p1: String?) {
     }
 
+    override fun onPKInvitationIgnored(p0: String?, p1: String?) {
+    }
+
 
     fun getOnLineUsersCount() {
         RongIMClient

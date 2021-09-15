@@ -2,6 +2,7 @@ package com.bcq.net;
 
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.bcq.net.api.OCallBack;
 import com.bcq.net.wrapper.OkHelper;
@@ -17,6 +18,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public abstract class WrapperCallBack extends OCallBack<Wrapper> {//IOCallBack
+    private final String TAG = this.getClass().getSimpleName();
 
     @Override
     public void onBefore(Request.Builder builder) {
@@ -56,11 +58,14 @@ public abstract class WrapperCallBack extends OCallBack<Wrapper> {//IOCallBack
 
     @Override
     public void onAfter() {
+        Log.e(TAG, "onAfter:");
     }
 
     @Override
     public abstract void onResult(Wrapper result);
 
     @Override
-    public abstract void onError(int code, String msg);
+    public void onError(int code, String msg) {
+        Log.e(TAG, "onError:[" + code + "] message = " + msg);
+    }
 }

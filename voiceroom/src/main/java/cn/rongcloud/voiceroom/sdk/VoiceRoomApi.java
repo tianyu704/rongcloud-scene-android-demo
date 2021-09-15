@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
+import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
@@ -270,6 +271,44 @@ public class VoiceRoomApi implements Api {
                         "updateRoomInfo",
                         "修改房间信息",
                         resultBack));
+    }
+
+    @Override
+    public void sendPKInvitation(String inviteeRoomId, String inviteeId, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().sendPKInvitation(
+                inviteeRoomId,
+                inviteeId,
+                new DefaultRoomCallback("sendPKInvitation", "发送PK邀请", resultBack));
+    }
+
+    @Override
+    public void cancelPKInvitation(String inviteeRoomId, String inviteeId, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().cancelPKInvitation(
+                inviteeRoomId,
+                inviteeId,
+                new DefaultRoomCallback("cancelPKInvitation", "取消PK邀请", resultBack));
+    }
+
+    @Override
+    public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKState pkState, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().responsePKInvitation(
+                inviterRoomId,
+                inviterUserId,
+                pkState,
+                new DefaultRoomCallback("responsePKInvitation", (pkState == PKState.accept ? "同意" : pkState == PKState.reject ? "拒绝" : "忽略") + "K邀请", resultBack));
+    }
+
+    @Override
+    public void mutePKUser(boolean isMute, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().mutePKUser(
+                isMute,
+                new DefaultRoomCallback("mutePKUser", "屏蔽PK对象音频", resultBack));
+    }
+
+    @Override
+    public void quitPK(IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().quitPK(
+                new DefaultRoomCallback("quitPK", "退出PK", resultBack));
     }
 
 }

@@ -18,6 +18,7 @@ import com.kit.utils.ScreenUtil;
 
 
 public class BottomDialog {
+    protected final String TAG = this.getClass().getSimpleName();
     protected Activity mActivity;
     private Dialog mDialog;
     private View contentView;

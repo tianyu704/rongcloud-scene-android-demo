@@ -12,6 +12,7 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -441,7 +442,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         onShowTipDialog(inviterRoomId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean result) {
-                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result, new RCVoiceRoomCallback() {
+                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
                         EToast.showToastWithLag(TAG, result ? "同意PK成功" : "拒绝PK成功");
@@ -476,6 +477,11 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPKInvitationRejected(String roomId, String userId) {
+
+    }
+
+    @Override
+    public void onPKInvitationIgnored(String s, String s1) {
 
     }
 }

@@ -11,7 +11,8 @@
     </style>
     <!--  ****************  bottom dialog  style  **************** -->
     <style name="Basis_Style_Bottom_Menu" parent="android:Theme.Dialog">
-        <item name="android:windowBackground">@android:color/white</item>
+<!--        <item name="android:windowBackground">@android:color/white</item>-->
+        <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowAnimationStyle">@style/Basis_Style_Bottom_Menu_Anim</item>
