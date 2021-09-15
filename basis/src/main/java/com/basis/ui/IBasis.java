@@ -19,7 +19,6 @@ public interface IBasis {
 
     /**
      * 刷新UI回调接口 供fragment刷数据使用
-     *
      * @param obj
      */
     void onRefresh(Object obj);

@@ -9,7 +9,10 @@ import com.basis.BasisHelper;
 import com.bcq.adapter.interfaces.DataObserver;
 import com.bcq.adapter.interfaces.IAdapte;
 import com.bcq.adapter.interfaces.IHolder;
+import com.bcq.net.net.NetRefresher;
 import com.bcq.net.net.Page;
+import com.bcq.net.wrapper.interfaces.IPage;
+import com.bcq.net.wrapper.interfaces.IResult;
 import com.bcq.refresh.IRefresh;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
@@ -21,10 +24,6 @@ import java.util.List;
  * @param <ND> 适配器数据类型
  * @param <AD> 接口数据类型
  * @param <VH> 接口数据类型
- * @author: BaiCQ
- * @createTime: 2017/1/13 11:38
- * @className: UIController
- * @Description: 供列表显示页面使用的控制器
  */
 public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> implements DataObserver {
     private final String TAG = "Controller";
@@ -33,6 +32,10 @@ public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> imp
     private List<AD> adapterList = new ArrayList<>();
     private IAdapte<AD, VH> mAdapter;
     private IRHolder holder;
+
+    protected RecyclerView.LayoutManager onSetLayoutManager() {
+        return new LinearLayoutManager(UIKit.getContext());
+    }
 
     public Controller(IRHolder holder, Class<ND> tclazz, IOperator<ND, AD, VH> operator) {
         this(holder, tclazz, operator, BasisHelper.getPage());
@@ -43,10 +46,6 @@ public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> imp
         this.holder = holder;
         this.operator = operator;
         initialize();
-    }
-
-    protected RecyclerView.LayoutManager onSetLayoutManager() {
-        return new LinearLayoutManager(UIKit.getContext());
     }
 
     private void initialize() {
@@ -76,6 +75,14 @@ public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> imp
                 requestAgain(true, operator);
             }
         });
+    }
+
+    @Override
+    public void onResult(IResult.ObjResult<List<ND>> result) {
+        super.onResult(result);
+        //处理enable load
+        IPage page = result.getExtra();
+        holder.getRefresh().enableLoad(page.getTotal() > current * this.page.geSize());
     }
 
     @Override
@@ -117,13 +124,5 @@ public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> imp
     public void onObserve(int length) {
         Logger.e(TAG, "onObserve: len = " + length);
         if (null != holder) holder.showType(length == 0 ? IRHolder.Type.none : IRHolder.Type.show);
-    }
-
-    protected void onEnableLoadMore(int total) {
-        if (current * page.geSize() < total) {
-            holder.getRefresh().enableLoad(true);
-        } else {
-            holder.getRefresh().enableLoad(false);
-        }
     }
 }

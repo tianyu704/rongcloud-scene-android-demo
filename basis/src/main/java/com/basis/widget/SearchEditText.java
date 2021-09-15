@@ -6,6 +6,8 @@ import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import androidx.appcompat.widget.AppCompatEditText;
+
 /**
  * 带键盘监听的search的编辑框
  */

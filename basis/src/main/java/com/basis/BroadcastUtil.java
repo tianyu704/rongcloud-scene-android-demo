@@ -9,6 +9,7 @@ import com.kit.UIKit;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: BaiCQ
@@ -20,7 +21,6 @@ public class BroadcastUtil {
 
     /**
      * 注册全局广播
-     *
      * @param receiver
      * @param actions
      */

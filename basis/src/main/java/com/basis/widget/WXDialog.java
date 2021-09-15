@@ -39,6 +39,10 @@ public class WXDialog implements IDialog<WXDialog> {
     private TextView confirm, cancel;//按钮
     private DialogInterface.OnDismissListener dismissListener;
 
+    public interface CustomBuilder {
+        View onBuild();
+    }
+
     public WXDialog() {
     }
 
@@ -52,45 +56,6 @@ public class WXDialog implements IDialog<WXDialog> {
         View contentView = LayoutInflater.from(context).inflate(R.layout.basis_layout_wx, null);
         wxstyle(contentView);
         initView();
-    }
-
-    /**
-     * @param activity Activity
-     * @param message  提示消息 cancel：知道了
-     */
-    public static void showCancelDialog(Activity activity, String message) {
-        new WXDialog(activity)
-                .setMessage(message)
-                .cancelStyle(true)
-                .show();
-    }
-
-    public static void showSureDialog(Activity activity, String message, View.OnClickListener sureClick) {
-        new WXDialog(activity)
-                .setMessage(message)
-                .sureStyle(true, sureClick)
-                .show();
-    }
-
-    public static void showDeleteDialog(Activity activity, String message, View.OnClickListener sureClick) {
-        new WXDialog(activity)
-                .setMessage(message)
-                .deleteStyle(false, sureClick)
-                .show();
-    }
-
-    public static void showDefaultDialog(Activity activity, String message, View.OnClickListener sureClick) {
-        new WXDialog(activity)
-                .setMessage(message)
-                .defalutStyle(true, sureClick)
-                .show();
-    }
-
-    public static void showCustomDialog(Activity activity, View custom, View.OnClickListener sureClick) {
-        new WXDialog(activity)
-                .defalutStyle(true, sureClick)
-                .addCustomContentView(custom)
-                .show();
     }
 
     public WXDialog setCustomBuilder(Activity activity, CustomBuilder builder) {
@@ -292,8 +257,6 @@ public class WXDialog implements IDialog<WXDialog> {
         return this;
     }
 
-    /********************* 封装的工具类 **************************/
-
     @Override
     public WXDialog defalutStyle(boolean title, View.OnClickListener sureClick) {
         return title ? setTitle(R.string.basis_tip)
@@ -326,7 +289,44 @@ public class WXDialog implements IDialog<WXDialog> {
                 .setSureButton(R.string.basis_delete, android.R.color.white, R.drawable.selector_red_solid, sureClick);
     }
 
-    public interface CustomBuilder {
-        View onBuild();
+    /********************* 封装的工具类 **************************/
+
+    /**
+     * @param activity Activity
+     * @param message  提示消息 cancel：知道了
+     */
+    public static void showCancelDialog(Activity activity, String message) {
+        new WXDialog(activity)
+                .setMessage(message)
+                .cancelStyle(true)
+                .show();
+    }
+
+    public static void showSureDialog(Activity activity, String message, View.OnClickListener sureClick) {
+        new WXDialog(activity)
+                .setMessage(message)
+                .sureStyle(true, sureClick)
+                .show();
+    }
+
+    public static void showDeleteDialog(Activity activity, String message, View.OnClickListener sureClick) {
+        new WXDialog(activity)
+                .setMessage(message)
+                .deleteStyle(false, sureClick)
+                .show();
+    }
+
+    public static void showDefaultDialog(Activity activity, String message, View.OnClickListener sureClick) {
+        new WXDialog(activity)
+                .setMessage(message)
+                .defalutStyle(true, sureClick)
+                .show();
+    }
+
+    public static void showCustomDialog(Activity activity, View custom, View.OnClickListener sureClick) {
+        new WXDialog(activity)
+                .defalutStyle(true, sureClick)
+                .addCustomContentView(custom)
+                .show();
     }
 }

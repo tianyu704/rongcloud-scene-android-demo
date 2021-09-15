@@ -55,8 +55,8 @@ public class LoadTag implements ILoadTag {
         });
     }
 
-    public ILoadTag processStyle(Style processStyle) {
-        if (null != progressBar) {
+    public ILoadTag processStyle(Style processStyle){
+        if (null != progressBar){
             progressBar.setStyle(processStyle);
         }
         return this;

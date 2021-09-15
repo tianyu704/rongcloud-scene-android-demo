@@ -1,5 +1,6 @@
 package com.basis.widget.interfaces;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.view.View;
 

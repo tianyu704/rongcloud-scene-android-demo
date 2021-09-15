@@ -35,6 +35,6 @@ public class BasisHelper {
     }
 
     public static void setCustomerReceiver(String[] cusActions, CustomerReceiver receiver) {
-        UIStack.getInstance().setCustomerReceiver(cusActions, receiver);
+        UIStack.getInstance().setCustomerReceiver(cusActions,receiver);
     }
 }

@@ -53,12 +53,22 @@ public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (null != activity) activity.onBackCode();
+                    if (null != activity)activity.onBackCode();
                 }
             });
             result = activity.getSupportActionBar();
         }
         return result;
+    }
+
+    public ActionWrapBar(AppCompatActivity activity) {
+        actionBar = activity.getSupportActionBar();
+        if (null == actionBar) {
+            actionBar = inflateDefaultActionBar((BaseActivity) activity);
+        }
+        if (null == actionBar) {
+            throw new IllegalArgumentException("No Support ActionBarWrapper For ActionBar is null ! ");
+        }
     }
 
     @Override
