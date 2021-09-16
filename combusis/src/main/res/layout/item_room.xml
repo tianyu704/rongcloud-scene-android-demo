@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright © 2021 RongCloud. All rights reserved.
-  -->
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="96dp"
     android:layout_marginStart="20dp"
-    android:layout_marginTop="10dp"
+    android:layout_marginTop="6dp"
     android:layout_marginEnd="20dp"
+    android:layout_marginBottom="6dp"
     android:background="@drawable/bg_room_list_item">
 
     <com.rongcloud.common.ui.widget.RadiusImageView
@@ -20,8 +17,7 @@
         android:layout_margin="16dp"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintStart_toStartOf="parent"
-        app:radius="8dp"
-        tools:src="@drawable/img_default_room_cover" />
+        app:radius="8dp" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_room_name"

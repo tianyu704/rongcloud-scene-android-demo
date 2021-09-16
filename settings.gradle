@@ -4,7 +4,7 @@
 rootProject.name = "RongRTCDemo"
 include ':app'
 
-//语聊房
+//语聊房SDK
 include ':voiceroom'
 
 //音视频呼叫
@@ -21,4 +21,6 @@ include ':oklib'
 //编译插件
 include ':processor'
 include ':annotation'
+
+//电台模块
 include ':radioroom'

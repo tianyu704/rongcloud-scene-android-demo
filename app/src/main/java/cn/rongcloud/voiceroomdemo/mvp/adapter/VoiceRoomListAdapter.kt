@@ -11,8 +11,8 @@ import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import kotlinx.android.synthetic.main.layout_voice_room_list_item.view.*
@@ -82,7 +82,7 @@ class VoiceRoomListViewHolder(
         with(itemView) {
             (iv_room_cover as ImageView).loadImageView(
                 bean.themePictureUrl ?: "",
-                R.drawable.default_room_cover
+                R.drawable.img_default_room_cover
             )
             tv_room_name.text = bean.roomName
             tv_room_creator_name.text = bean.createUser?.userName

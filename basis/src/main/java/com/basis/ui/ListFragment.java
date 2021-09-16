@@ -5,15 +5,14 @@ import android.text.TextUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcq.adapter.interfaces.IHolder;
 import com.basis.net.Controller;
 import com.basis.net.IOperator;
 import com.basis.net.LoadTag;
+import com.bcq.adapter.interfaces.IHolder;
+import com.bcq.net.api.Method;
 import com.bcq.net.wrapper.interfaces.ILoadTag;
 import com.bcq.net.wrapper.interfaces.IParse;
 import com.kit.utils.Logger;
-import com.kit.utils.ObjUtil;
-import com.bcq.net.api.Method;
 
 import java.util.List;
 import java.util.Map;

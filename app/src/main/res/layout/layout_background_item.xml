@@ -16,7 +16,7 @@
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintTop_toTopOf="parent"
         app:radius="15dp"
-        tools:src="@drawable/default_room_cover" />
+        tools:src="@drawable/img_default_room_cover" />
 
     <androidx.appcompat.widget.AppCompatRadioButton
         android:id="@+id/cb_is_selected"

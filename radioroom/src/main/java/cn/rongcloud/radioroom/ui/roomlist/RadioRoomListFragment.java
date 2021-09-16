@@ -1,32 +1,28 @@
 package cn.rongcloud.radioroom.ui.roomlist;
 
-import com.basis.ui.BaseFragment;
-import com.kit.wapper.IResultBack;
+import androidx.fragment.app.Fragment;
 
+import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.ui.roomlist.RoomListFragment;
 
 /**
  * @author gyn
  * @date 2021/9/14
  */
-public class RadioRoomListFragment extends BaseFragment {
-    @Override
-    public int setLayoutId() {
-        return 0;
+public class RadioRoomListFragment extends RoomListFragment {
+
+    public static Fragment getInstance() {
+        return new RadioRoomListFragment();
     }
 
     @Override
-    public void init() {
-        VoiceRoomProvider.provider().loadPage(1, voiceRoomBeans -> {
-        });
+    public void clickItem(VoiceRoomBean item, int position) {
 
-        VoiceRoomProvider.provider().getAsyn("", new IResultBack<VoiceRoomBean>() {
-            @Override
-            public void onResult(VoiceRoomBean voiceRoomBean) {
-
-            }
-        });
     }
 
+    @Override
+    public RoomType getRoomType() {
+        return RoomType.VOICE_ROOM;
+    }
 }

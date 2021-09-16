@@ -21,8 +21,8 @@ import cn.rong.combusis.provider.wrapper.AbsProvider;
 import cn.rong.combusis.provider.wrapper.IListProvider;
 
 public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements IListProvider<VoiceRoomBean> {
-    private final static String API_ROOM = ApiConstant.INSTANCE.getBASE_URL() + "/mic/room/";
-    private final static String API_ROOMS = ApiConstant.INSTANCE.getBASE_URL() + "/mic/room/list";
+    private final static String API_ROOM = ApiConstant.INSTANCE.getBASE_URL() + "mic/room/";
+    private final static String API_ROOMS = ApiConstant.INSTANCE.getBASE_URL() + "mic/room/list";
     private final static VoiceRoomProvider _provider = new VoiceRoomProvider();
     private List<String> bgImages = new ArrayList<>();
 
@@ -62,13 +62,13 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
     }
 
     @Override
-    public void loadPage(int page, IResultBack<List<VoiceRoomBean>> resultBack) {
+    public void loadPage(int page, RoomType roomType, IResultBack<List<VoiceRoomBean>> resultBack) {
         if (page < 1) page = 1;
         Map<String, Object> params = new HashMap<>();
         params.put("page", page);
         params.put("size", PAGE_SIZE);
-        params.put("type", 1);//1 聊天室(默认) 2 电台
-        OkApi.get(API_ROOMS, null, new WrapperCallBack() {
+        params.put("type", roomType.type);//1 聊天室(默认) 2 电台
+        OkApi.get(API_ROOMS, params, new WrapperCallBack() {
             @Override
             public void onError(int code, String msg) {
                 if (null != resultBack) resultBack.onResult(null);
@@ -88,4 +88,5 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
             }
         });
     }
+
 }

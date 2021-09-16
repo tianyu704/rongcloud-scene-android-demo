@@ -19,8 +19,7 @@
             android:id="@+id/fl_back"
             android:layout_width="56dp"
             android:layout_height="match_parent"
-            android:padding="10dp"
-            android:scaleType="centerInside"
+            android:padding="16dp"
             android:src="@drawable/rc_title_bar_back" />
 
         <Space
@@ -53,18 +52,6 @@
             android:layout_gravity="right"
             android:padding="10dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <!--    <androidx.viewpager2.widget.ViewPager2-->
-    <!--        android:id="@+id/switch_vpage"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent"-->
-    <!--        android:layout_margin="5dp"-->
-    <!--        android:layout_marginTop="16dp"-->
-    <!--        android:background="#efeff4"-->
-    <!--        android:orientation="horizontal"-->
-    <!--        app:layout_constraintTop_toTopOf="@+id/title_bar"-->
-    <!--        app:layout_constraintVertical_weight="1"-->
-    <!--        tools:layout_editor_absoluteX="4dp" />-->
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_switch"
