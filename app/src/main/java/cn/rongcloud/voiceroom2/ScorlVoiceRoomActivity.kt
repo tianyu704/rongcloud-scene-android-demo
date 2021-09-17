@@ -90,14 +90,12 @@ class ScorlVoiceRoomActivity : BaseActivity() {
     }
 
     override fun initData() {
-        RCVoiceRoomEngine.getInstance().initEngine()
 //        enableScroll(false)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         // TODO: 2021/9/8 悬浮框需修改
-        RCVoiceRoomEngine.getInstance().unInitEngine()
     }
 
     fun enableScroll(canScroll: Boolean) {

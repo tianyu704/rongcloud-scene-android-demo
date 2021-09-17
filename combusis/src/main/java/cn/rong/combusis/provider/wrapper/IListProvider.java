@@ -14,5 +14,12 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 public interface IListProvider<T> {
     int PAGE_SIZE = 10;
 
+    /**
+     * load by page
+     *
+     * @param page
+     * @param roomType
+     * @param resultBack
+     */
     void loadPage(int page, RoomType roomType, IResultBack<List<T>> resultBack);
 }

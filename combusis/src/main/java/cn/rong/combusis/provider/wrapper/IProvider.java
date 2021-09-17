@@ -22,6 +22,13 @@ public interface IProvider<T> {
     void update(T t);
 
     /**
+     * 批量跟新
+     *
+     * @param updates
+     */
+    void update(List<T> updates);
+
+    /**
      * 异步获取 缓存没有尝试从网络取
      *
      * @param key

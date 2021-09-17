@@ -25,6 +25,11 @@ public class VRApi {
     /**
      * 在线房主
      */
-    public static String online_creater = HOST + "/mic/room/online/created/list";
+    public static String ONLINE_CREATER = HOST + "/mic/room/online/created/list";
+
+    /**
+     * 更改用户所属房间
+     */
+    public static String USER_ROOM_CHANGE = HOST + "/user/change";
 
 }

@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.event;
 import android.text.TextUtils;
 
 import com.basis.UIStack;
+import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
@@ -186,21 +187,28 @@ public class EventHelper extends AbsEvenHelper {
     }
 
     @Override
-    protected void onShowTipDialog(String userId, TipType type, IResultBack<Boolean> resultBack) {
+    protected void onShowTipDialog(String roomId, String userId, TipType type, IResultBack<Boolean> resultBack) {
         // 根据userId获取用户信息
+        if (null == UIStack.getInstance().getTopActivity()) {
+            Logger.e(TAG, "onShowTipDialog:  topActivity is null");
+            return;
+        }
         UserProvider.provider().getAsyn(userId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
+                Logger.e(TAG, "onShowTipDialog: " + GsonUtil.obj2Json(userInfo));
                 String message = "";
                 if (null != userInfo) {
                     if (TipType.InvitedSeat == type) {
                         message = userInfo.getName() + "邀请您上麦，是否同意？";
+                        EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
                     } else if (TipType.RequestSeat == type) {
                         message = userInfo.getName() + "申请上麦，是否同意？";
+                        EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
                     } else {
-                        message = userInfo.getName() + "邀请您进行PK，是否同意？";
+                        EventDialogHelper.helper().showPKDialog(UIStack.getInstance().getTopActivity(), type.getValue(), roomId, userInfo, resultBack);
                     }
-                    EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
+
                 } else {
                     if (null != resultBack) resultBack.onResult(false);
                 }

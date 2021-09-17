@@ -1,9 +1,8 @@
-package cn.rongcloud.voiceroom.sdk;
+package cn.rong.combusis.sdk;
 
 import com.kit.wapper.IResultBack;
 
 import cn.rongcloud.voiceroom.api.PKState;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 /**

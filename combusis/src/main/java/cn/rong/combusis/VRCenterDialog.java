@@ -1,4 +1,4 @@
-package cn.rong.combusis.feedback;
+package cn.rong.combusis;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -21,9 +21,10 @@ import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 
-import cn.rong.combusis.R;
-
-public class FeedbackDialog extends Dialog {
+/**
+ * 中心弹出的提示框
+ */
+public class VRCenterDialog extends Dialog {
     private WeakReference<Activity> reference;
     private FrameLayout container;
     private View divider;
@@ -48,11 +49,11 @@ public class FeedbackDialog extends Dialog {
         return false;
     }
 
-    public FeedbackDialog(Activity activity, OnDismissListener onDismissListener) {
+    public VRCenterDialog(Activity activity, OnDismissListener onDismissListener) {
         super(activity, R.style.CustomDialog);
         setOnDismissListener(onDismissListener);
         reference = new WeakReference<>(activity);
-        View view = getLayoutInflater().inflate(R.layout.layout_score_dialog, null, false);
+        View view = getLayoutInflater().inflate(R.layout.layout_vrcenter_dialog, null, false);
         Point scPoint = new Point();
         WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         wm.getDefaultDisplay().getSize(scPoint);

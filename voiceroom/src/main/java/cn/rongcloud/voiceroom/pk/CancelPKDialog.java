@@ -29,19 +29,18 @@ import cn.rongcloud.voiceroom.R;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 
 /**
- * pk在线房主弹框
+ * 取消PK邀请弹框
  */
-public class RoomOwerDialog extends BottomDialog {
-    public RoomOwerDialog(Activity activity, IResultBack resultBack) {
+public class CancelPKDialog extends BottomDialog {
+    public CancelPKDialog(Activity activity) {
         super(activity);
-        setContentView(R.layout.layout_owner_dialog, 60);
+        setContentView(R.layout.layout_cancelpk_dialog, 20);
         initView();
         requestOwners();
     }
 
     private XRecyclerView rcyOwner;
     private IAdapte adapter;
-    private IResultBack resultBack;
 
     private void initView() {
         rcyOwner = UIKit.getView(getContentView(), R.id.rcy_owner);
@@ -60,14 +59,12 @@ public class RoomOwerDialog extends BottomDialog {
                     @Override
                     public void onClick(View view) {
                         dismiss();
-                        VoiceRoomApi.getApi().sendPKInvitation(item.getRoomId(), item.getCreateUser().getUserId(),
-                                new IResultBack<Boolean>() {
-                                    @Override
-                                    public void onResult(Boolean aBoolean) {
-                                        KToast.show(aBoolean ? "已邀请PK,等的对方接受" : "PK邀请失败");
-                                        if (null != resultBack) resultBack.onResult(aBoolean);
-                                    }
-                                });
+                        VoiceRoomApi.getApi().sendPKInvitation(item.getRoomId(), item.getCreateUser().getUserId(), new IResultBack<Boolean>() {
+                            @Override
+                            public void onResult(Boolean aBoolean) {
+                                KToast.show(aBoolean ? "PK邀请成功" : "PK邀请失败");
+                            }
+                        });
                     }
                 });
             }

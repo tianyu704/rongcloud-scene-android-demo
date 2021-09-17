@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.kit.cache.GsonUtil;
+import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 
@@ -22,8 +23,8 @@ import cn.rongcloud.voiceroom.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import cn.rongcloud.voiceroom.sdk.Api;
-import cn.rongcloud.voiceroom.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.Api;
+import cn.rong.combusis.sdk.VoiceRoomApi;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 
@@ -35,7 +36,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
 
-    protected abstract void onShowTipDialog(String userId, TipType type, IResultBack<Boolean> resultBack);
+    protected abstract void onShowTipDialog(String roomId,String userId, TipType type, IResultBack<Boolean> resultBack);
 
     protected String roomId;
 
@@ -240,7 +241,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onPickSeatReceivedFrom(String userId) {
         Log.d(TAG, "onPickSeatReceivedFrom: userId = " + userId);
-        onShowTipDialog(userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
+        onShowTipDialog("",userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
             @Override
             public void onResult(Boolean result) {
                 if (result) {
@@ -317,7 +318,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                 }
                 if (!requestIds.isEmpty()) {
                     String userId = requestIds.get(0);
-                    onShowTipDialog(userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
+                    onShowTipDialog("",userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
                         @Override
                         public void onResult(Boolean result) {
                             if (result) {
@@ -420,7 +421,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
-
+        Logger.e(TAG, "onPKgoing");
     }
 
     /**
@@ -428,7 +429,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPKFinish() {
-
+        Logger.e(TAG, "onPKFinish");
     }
 
     /**
@@ -439,7 +440,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onReveivePKInvitation(String inviterRoomId, String inviterUserId) {
-        onShowTipDialog(inviterRoomId, TipType.InvitedPK, new IResultBack<Boolean>() {
+        Logger.e(TAG, "onReveivePKInvitation");
+        onShowTipDialog(inviterRoomId,inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean result) {
                 RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
@@ -466,7 +468,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPKInvitationCanceled(String roomId, String userId) {
-
+        Logger.e(TAG, "onPKInvitationCanceled");
     }
 
     /**
@@ -477,11 +479,11 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPKInvitationRejected(String roomId, String userId) {
-
+        Logger.e(TAG, "onPKInvitationRejected");
     }
 
     @Override
     public void onPKInvitationIgnored(String s, String s1) {
-
+        Logger.e(TAG, "onPKInvitationIgnored");
     }
 }

@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.sdk;
+package cn.rong.combusis.sdk;
 
 import android.text.TextUtils;
 import android.util.Log;

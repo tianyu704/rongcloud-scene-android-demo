@@ -11,8 +11,8 @@ import cn.rongcloud.voiceroom.event.EventHelper
 import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroom.net.bean.request.*
-import cn.rongcloud.voiceroom.sdk.Api
-import cn.rongcloud.voiceroom.sdk.VoiceRoomApi
+import cn.rong.combusis.sdk.Api
+import cn.rong.combusis.sdk.VoiceRoomApi
 import cn.rongcloud.voiceroom.ui.uimodel.*
 import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import com.kit.wapper.IResultBack

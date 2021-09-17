@@ -8,8 +8,13 @@ import java.util.List;
 
 public class EventBus {
 
-    public final static String TAG_SPEACK = "voiceroom_speaking";
-    public final static String TAG_MUSIC_LIST = "music_play_list";
+    public class TAG {
+        public final static String SPEACK = "voiceroom_speaking";
+        public final static String MUSIC_LIST = "music_play_list";
+        public final static String PK_GOING = "pk_going";
+        public final static String PK_END = "pk_end";
+    }
+
     private final static EventBus _bus = new EventBus();
     private final LinkedHashMap<String, List<EventCallback>> events = new LinkedHashMap<>(16);
 

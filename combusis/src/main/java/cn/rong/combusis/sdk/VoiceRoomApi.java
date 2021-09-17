@@ -1,13 +1,13 @@
-package cn.rongcloud.voiceroom.sdk;
+package cn.rong.combusis.sdk;
 
 import android.text.TextUtils;
 
+import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class VoiceRoomApi implements Api {
@@ -54,7 +54,7 @@ public class VoiceRoomApi implements Api {
      * 创建并加入房间
      *
      * @param roomId     房间id
-     * @param roomInfo   房间实体
+     * @param roomInfo   房间实体 建议使用getRoomInfo获取的对象 否则需要维护RCVoiceRoomInfo，跟新房间设置时
      * @param resultBack 回调
      */
     @Override
@@ -99,13 +99,13 @@ public class VoiceRoomApi implements Api {
     @Override
     public void lockAll(boolean locked) {
         RCVoiceRoomEngine.getInstance().lockOtherSeats(locked);
-        EToast.showToastWithLag(TAG, locked ? "全麦锁定成功" : "全麦解锁成功");
+        KToast.show(locked ? "全麦锁定成功" : "全麦解锁成功");
     }
 
     @Override
     public void muteAll(boolean mute) {
         RCVoiceRoomEngine.getInstance().muteOtherSeats(mute);
-        EToast.showToastWithLag(TAG, mute ? "全麦静音成功" : "全麦取消静音成功");
+        KToast.show(mute ? "全麦静音成功" : "全麦取消静音成功");
     }
 
     /**
