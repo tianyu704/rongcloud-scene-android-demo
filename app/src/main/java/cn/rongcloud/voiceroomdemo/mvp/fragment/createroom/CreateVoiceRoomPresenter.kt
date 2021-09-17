@@ -11,6 +11,7 @@ import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroom.net.bean.request.CreateRoomRequestBean
 import cn.rongcloud.voiceroom.net.bean.request.Kv
+import com.kit.utils.Logger
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.RealPathFromUriUtils
@@ -80,18 +81,20 @@ class CreateVoiceRoomPresenter @Inject constructor(
                 })
             )
         } else {
+            val room = CreateRoomRequestBean(
+                isPrivate = intPrivate,
+                kv = kvList,
+                name = roomName,
+                password = password,
+                backgroundUrl = roomBackground,
+                roomType = 1
+            )
+            Logger.e(room)
             addDisposable(
                 VoiceRoomNetManager
                     .aRoomApi
                     .createVoiceRoom(
-                        CreateRoomRequestBean(
-                            isPrivate = intPrivate,
-                            kv = kvList,
-                            name = roomName,
-                            password = password,
-                            backgroundUrl = roomBackground,
-                            roomType = 1
-                        )
+                        room
                     ).subscribe({ respond ->
                         view.hideWaitingDialog()
                         when (respond.code) {

@@ -5,6 +5,7 @@
     <application>
         <activity
             android:name=".ui.roomlist.RadioRoomListActivity"
+            android:windowSoftInputMode="adjustPan|stateHidden"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

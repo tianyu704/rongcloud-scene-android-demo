@@ -1,28 +1,37 @@
 package cn.rong.combusis.ui.roomlist;
 
-import android.widget.ImageView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.basis.ui.ListFragment;
 import com.bcq.adapter.interfaces.IAdapte;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.refresh.XRecyclerView;
+import com.rongcloud.common.ui.dialog.ConfirmDialog;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickListener;
+import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author gyn
  * @date 2021/9/15
  */
-public abstract class RoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickListener<VoiceRoomBean> {
+public abstract class RoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
 
     private RoomListAdapter mAdapter;
     private int mCurrentPage = 1;
-    private ImageView mCreateButton;
     private XRecyclerView mRoomList;
+    private CreateRoomDialog mCreateRoomDialog;
+
+    private ActivityResultLauncher mLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result != null && result.getData() != null && result.getData().getData() != null && mCreateRoomDialog != null) {
+            mCreateRoomDialog.setCoverUri(result.getData().getData());
+        }
+    });
 
     @Override
     public IAdapte onSetAdapter() {
@@ -38,13 +47,12 @@ public abstract class RoomListFragment extends ListFragment<VoiceRoomBean, Voice
 
     @Override
     public void initView() {
-        mCreateButton = getView(R.id.iv_create_room);
         mRoomList = getView(R.id.xrv_room);
 
         loadRoomList(true);
 
-        mCreateButton.setOnClickListener(v -> {
-
+        getView(R.id.iv_create_room).setOnClickListener(v -> {
+            createRoom();
         });
     }
 
@@ -82,13 +90,23 @@ public abstract class RoomListFragment extends ListFragment<VoiceRoomBean, Voice
         });
     }
 
-    private void createRoom() {
-//        VoiceRoomNetManager.INSTANCE.getARoomApi().getRoomList()
+    @Override
+    public void onCreateSuccess(VoiceRoomBean voiceRoomBean) {
+        mCreateRoomDialog.dismiss();
     }
-//
-//
-//    private void showCreateVoiceRoomDialog() {
-//        createVoiceRoomDialogFragment = CreateVoiceRoomDialogFragment(this);
-//        createVoiceRoomDialogFragment?.show(supportFragmentManager, "CreateRoomDialog")
-//    }
+
+    @Override
+    public void onCreateExist(VoiceRoomBean voiceRoomBean) {
+        mCreateRoomDialog.dismiss();
+        new ConfirmDialog(requireContext(), getString(R.string.text_you_have_created_room), true, "确定", "取消", () -> null, () -> {
+            ToastUtils.s(requireContext(), voiceRoomBean.getRoomId());
+            return null;
+        }).show();
+    }
+
+    private void createRoom() {
+        mCreateRoomDialog = new CreateRoomDialog(requireActivity(), mLauncher, getRoomType(), this);
+        mCreateRoomDialog.show();
+    }
+
 }

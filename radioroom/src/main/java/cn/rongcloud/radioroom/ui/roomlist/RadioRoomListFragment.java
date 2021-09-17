@@ -23,6 +23,6 @@ public class RadioRoomListFragment extends RoomListFragment {
 
     @Override
     public RoomType getRoomType() {
-        return RoomType.VOICE_ROOM;
+        return RoomType.RADIO_ROOM;
     }
 }

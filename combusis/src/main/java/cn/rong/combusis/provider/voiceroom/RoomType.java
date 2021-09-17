@@ -20,4 +20,7 @@ public enum RoomType {
         this.type = type;
     }
 
+    public int getType() {
+        return type;
+    }
 }
