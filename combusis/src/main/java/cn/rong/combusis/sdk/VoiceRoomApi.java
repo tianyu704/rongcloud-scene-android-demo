@@ -6,6 +6,7 @@ import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
@@ -14,7 +15,7 @@ public class VoiceRoomApi implements Api {
     private final static String TAG = "VoiceRoomApi";
     private final static Api api = new VoiceRoomApi();
     private final RCVoiceRoomInfo roomInfo = new RCVoiceRoomInfo();
-
+    private IEventHelp.PKInvitee pkInvitee;
     private VoiceRoomApi() {
     }
 
@@ -273,8 +274,15 @@ public class VoiceRoomApi implements Api {
                         resultBack));
     }
 
+
+
     @Override
     public void sendPKInvitation(String inviteeRoomId, String inviteeId, IResultBack<Boolean> resultBack) {
+        //保存pk信息
+        pkInvitee = new IEventHelp.PKInvitee();
+        pkInvitee.inviteeRoomId = inviteeRoomId;
+        pkInvitee.inviteeId = inviteeId;
+        //邀请
         RCVoiceRoomEngine.getInstance().sendPKInvitation(
                 inviteeRoomId,
                 inviteeId,
@@ -282,10 +290,15 @@ public class VoiceRoomApi implements Api {
     }
 
     @Override
-    public void cancelPKInvitation(String inviteeRoomId, String inviteeId, IResultBack<Boolean> resultBack) {
+    public void cancelPKInvitation(IResultBack<Boolean> resultBack) {
+        if (null == pkInvitee) {
+            KToast.show("您还未发出PK邀请");
+            if (null != resultBack) resultBack.onResult(false);
+            return;
+        }
         RCVoiceRoomEngine.getInstance().cancelPKInvitation(
-                inviteeRoomId,
-                inviteeId,
+                pkInvitee.inviteeRoomId,
+                pkInvitee.inviteeId,
                 new DefaultRoomCallback("cancelPKInvitation", "取消PK邀请", resultBack));
     }
 
@@ -309,6 +322,11 @@ public class VoiceRoomApi implements Api {
     public void quitPK(IResultBack<Boolean> resultBack) {
         RCVoiceRoomEngine.getInstance().quitPK(
                 new DefaultRoomCallback("quitPK", "退出PK", resultBack));
+    }
+
+    @Override
+    public void releasePKInvitee() {
+        pkInvitee = null;
     }
 
 }

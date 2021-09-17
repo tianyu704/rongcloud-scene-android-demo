@@ -58,7 +58,6 @@ public class Transform {
 
     /**
      * @param params Map参数
-     *
      * @return RequestBody
      */
     public static RequestBody param2Body(Map<String, Object> params) {
@@ -79,7 +78,6 @@ public class Transform {
     /**
      * @param key   参数key
      * @param value 参数值
-     *
      * @return RequestBody
      */
     public static RequestBody param2Body(String key, Object value) {
@@ -91,14 +89,13 @@ public class Transform {
      *
      * @param url    原url
      * @param params 参数map
-     *
      * @return 拼接参数后的url
      */
     public static String urlAppendParam(String url, Map<String, Object> params) {
         if (null == url || null == params || params.isEmpty()) return url;
         Uri.Builder builder = Uri.parse(url).buildUpon();
         for (Map.Entry<String, Object> entry : params.entrySet()) {
-            String v = entry.getValue() == null ? "" : entry.getValue().toString();
+            String v = entry.getValue() == null?"":entry.getValue().toString();
             builder.appendQueryParameter(entry.getKey(), v);
         }
         return builder.build().toString();

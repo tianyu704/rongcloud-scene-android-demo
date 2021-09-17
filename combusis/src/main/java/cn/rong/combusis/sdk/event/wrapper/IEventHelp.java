@@ -1,13 +1,11 @@
-package cn.rongcloud.voiceroom.event.wrapper;
-
-import android.app.Activity;
+package cn.rong.combusis.sdk.event.wrapper;
 
 import com.kit.wapper.IResultBack;
 
 import java.util.List;
 
-import cn.rongcloud.voiceroom.event.listener.RoomListener;
-import cn.rongcloud.voiceroom.event.listener.StatusListener;
+import cn.rong.combusis.sdk.event.listener.RoomListener;
+import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 
 public interface IEventHelp {
@@ -93,4 +91,35 @@ public interface IEventHelp {
      */
     int getAvailableSeatIndex();
 
+    /**
+     * 获取当前pk邀请者的信息
+     */
+    PKInviter getPKInviter();
+
+    /**
+     * 释放PK邀请者
+     */
+    void releasePKInviter();
+
+    /**
+     * pk邀请者信息
+     * 1.接收到pk邀请保存
+     * 2.邀请被取消释放
+     * 3.响应pk邀请时释放（手动）
+     */
+    class PKInviter {
+        public String inviterRoomId;
+        public String inviterId;
+    }
+
+    /**
+     * pk中 被邀请者信息
+     * 1.发起邀请api是保存
+     * 2.取消邀请时释放（手动）
+     * 3.接收到邀请响应释放
+     */
+    class PKInvitee {
+        public String inviteeRoomId;
+        public String inviteeId;
+    }
 }

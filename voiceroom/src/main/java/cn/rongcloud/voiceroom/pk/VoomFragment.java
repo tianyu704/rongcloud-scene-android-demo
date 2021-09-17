@@ -17,6 +17,7 @@ public class VoomFragment extends BaseFragment {
 
     private BottomDialog dialog;
     TextView tvPk;
+
     @Override
     public void init() {
         tvPk = getView(R.id.tv_pk);
@@ -27,16 +28,26 @@ public class VoomFragment extends BaseFragment {
                 if (null != dialog) {
                     dialog.dismiss();
                 }
-                tvPk.setSelected(!tvPk.isSelected());
-                if (tvPk.isSelected()){//已邀请
-                    dialog = new RoomOwerDialog(activity, new IResultBack() {
+                if (!tvPk.isSelected()) {//未邀请
+                    dialog = new RoomOwerDialog(activity, new IResultBack<Boolean>() {
                         @Override
-                        public void onResult(Object o) {
-                            tvPk.setSelected(true);
+                        public void onResult(Boolean aBoolean) {
+                            if (aBoolean) {//邀请成功
+                                tvPk.setSelected(true);
+                                tvPk.setText("等待接收");
+                            }
                         }
                     });
-                }else {//撤销邀请
-                    dialog = new CancelPKDialog(activity);
+                } else {//已邀请 撤销邀请
+                    dialog = new CancelPKDialog(activity, new IResultBack<Boolean>() {
+                        @Override
+                        public void onResult(Boolean aBoolean) {
+                            if (aBoolean) {//撤销成功
+                                tvPk.setSelected(false);
+                                tvPk.setText("发起pk");
+                            }
+                        }
+                    });
                 }
                 dialog.show();
             }

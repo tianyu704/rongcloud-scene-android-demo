@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.event.wrapper;
+package cn.rong.combusis.sdk.event.wrapper;
 
 import android.app.Activity;
 import android.content.DialogInterface;

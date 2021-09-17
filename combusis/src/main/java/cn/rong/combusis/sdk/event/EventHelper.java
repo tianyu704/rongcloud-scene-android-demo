@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.event;
+package cn.rong.combusis.sdk.event;
 
 import android.text.TextUtils;
 
@@ -13,12 +13,12 @@ import java.util.List;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
-import cn.rongcloud.voiceroom.event.listener.RoomListener;
-import cn.rongcloud.voiceroom.event.listener.StatusListener;
-import cn.rongcloud.voiceroom.event.wrapper.AbsEvenHelper;
-import cn.rongcloud.voiceroom.event.wrapper.EventDialogHelper;
-import cn.rongcloud.voiceroom.event.wrapper.IEventHelp;
-import cn.rongcloud.voiceroom.event.wrapper.TipType;
+import cn.rong.combusis.sdk.event.listener.RoomListener;
+import cn.rong.combusis.sdk.event.listener.StatusListener;
+import cn.rong.combusis.sdk.event.wrapper.AbsEvenHelper;
+import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
+import cn.rong.combusis.sdk.event.wrapper.TipType;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.ChatRoomInfo;
@@ -184,6 +184,16 @@ public class EventHelper extends AbsEvenHelper {
             }
             return availableIndex;
         }
+    }
+
+    @Override
+    public PKInviter getPKInviter() {
+        return pkInviter;
+    }
+
+    @Override
+    public void releasePKInviter() {
+        pkInviter = null;
     }
 
     @Override

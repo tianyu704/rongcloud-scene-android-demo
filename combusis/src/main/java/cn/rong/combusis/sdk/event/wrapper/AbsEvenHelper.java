@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.event.wrapper;
+package cn.rong.combusis.sdk.event.wrapper;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,8 +18,8 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
-import cn.rongcloud.voiceroom.event.listener.RoomListener;
-import cn.rongcloud.voiceroom.event.listener.StatusListener;
+import cn.rong.combusis.sdk.event.listener.RoomListener;
+import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
@@ -35,8 +35,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<StatusListener> statusListeners;//网络状态监听
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
-
-    protected abstract void onShowTipDialog(String roomId,String userId, TipType type, IResultBack<Boolean> resultBack);
+    protected PKInviter pkInviter;
+    protected abstract void onShowTipDialog(String roomId, String userId, TipType type, IResultBack<Boolean> resultBack);
 
     protected String roomId;
 
@@ -241,7 +241,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onPickSeatReceivedFrom(String userId) {
         Log.d(TAG, "onPickSeatReceivedFrom: userId = " + userId);
-        onShowTipDialog("",userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
+        onShowTipDialog("", userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
             @Override
             public void onResult(Boolean result) {
                 if (result) {
@@ -318,7 +318,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                 }
                 if (!requestIds.isEmpty()) {
                     String userId = requestIds.get(0);
-                    onShowTipDialog("",userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
+                    onShowTipDialog("", userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
                         @Override
                         public void onResult(Boolean result) {
                             if (result) {
@@ -414,6 +414,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         }
     }
 
+
     /**
      * PK开启成功
      *
@@ -422,6 +423,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
         Logger.e(TAG, "onPKgoing");
+        //邀请同意 开始PK 释放被邀请信息
+        VoiceRoomApi.getApi().releasePKInvitee();
     }
 
     /**
@@ -441,7 +444,12 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onReveivePKInvitation(String inviterRoomId, String inviterUserId) {
         Logger.e(TAG, "onReveivePKInvitation");
-        onShowTipDialog(inviterRoomId,inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
+        //保存邀请者信息
+        pkInviter = new PKInviter();
+        pkInviter.inviterRoomId = inviterRoomId;
+        pkInviter.inviterId = inviterUserId;
+
+        onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean result) {
                 RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
@@ -460,6 +468,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     }
 
+
     /**
      * PK邀请被取消
      *
@@ -469,6 +478,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onPKInvitationCanceled(String roomId, String userId) {
         Logger.e(TAG, "onPKInvitationCanceled");
+        EventDialogHelper.helper().dismissDialog();
+        // 释放邀请者信息
+        pkInviter = null;
     }
 
     /**
@@ -480,10 +492,14 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     @Override
     public void onPKInvitationRejected(String roomId, String userId) {
         Logger.e(TAG, "onPKInvitationRejected");
+        //邀请被拒绝 释放被邀请信息
+        VoiceRoomApi.getApi().releasePKInvitee();
     }
 
     @Override
     public void onPKInvitationIgnored(String s, String s1) {
         Logger.e(TAG, "onPKInvitationIgnored");
+        //邀请被忽略 释放被邀请信息
+        VoiceRoomApi.getApi().releasePKInvitee();
     }
 }

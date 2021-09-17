@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.event.listener;
+package cn.rong.combusis.sdk.event.listener;
 
 public interface EventListener {
     void onEvent(int code, String extra);

@@ -32,8 +32,9 @@ import cn.rong.combusis.sdk.VoiceRoomApi;
  * pk在线房主弹框
  */
 public class RoomOwerDialog extends BottomDialog {
-    public RoomOwerDialog(Activity activity, IResultBack resultBack) {
+    public RoomOwerDialog(Activity activity, IResultBack<Boolean> resultBack) {
         super(activity);
+        this.resultBack = resultBack;
         setContentView(R.layout.layout_owner_dialog, 60);
         initView();
         requestOwners();

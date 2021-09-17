@@ -7,13 +7,12 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
-import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroom.pk.TestPkActivity
 import cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
+import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import com.kit.cache.GsonUtil
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore

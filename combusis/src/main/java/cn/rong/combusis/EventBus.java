@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.model;
+package cn.rong.combusis;
 
 import androidx.annotation.NonNull;
 
@@ -11,8 +11,7 @@ public class EventBus {
     public class TAG {
         public final static String SPEACK = "voiceroom_speaking";
         public final static String MUSIC_LIST = "music_play_list";
-        public final static String PK_GOING = "pk_going";
-        public final static String PK_END = "pk_end";
+        public final static String PK_STATE = "pk_state";
     }
 
     private final static EventBus _bus = new EventBus();
@@ -70,6 +69,6 @@ public class EventBus {
     }
 
     public interface EventCallback {
-        void onEvent(Object args);
+        void onEvent(Object... args);
     }
 }

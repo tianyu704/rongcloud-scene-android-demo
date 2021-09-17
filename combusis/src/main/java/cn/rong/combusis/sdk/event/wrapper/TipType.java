@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.event.wrapper;
+package cn.rong.combusis.sdk.event.wrapper;
 
 public enum TipType {
     InvitedSeat("上麦邀请"),
