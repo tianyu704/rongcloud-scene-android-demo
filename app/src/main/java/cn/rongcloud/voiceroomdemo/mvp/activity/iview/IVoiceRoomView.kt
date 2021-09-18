@@ -46,5 +46,6 @@ interface IVoiceRoomView : IBaseView {
     fun showRevokeSeatRequest()
     fun showRoomClose()
     fun onMemberInfoChange()
+    fun showSingalInfo(int: Int)
 
 }

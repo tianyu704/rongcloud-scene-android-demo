@@ -20,7 +20,8 @@ import kotlinx.android.synthetic.main.layout_exit_room_popup.view.*
 class ExitRoomPopupWindow(
     val context: Context,
     leaveRoomBlock: () -> Unit,
-    closeRoomBlock: () -> Unit
+    closeRoomBlock: () -> Unit,
+    packUpRoomBlock: () -> Unit
 ) : PopupWindow(
     LayoutInflater.from(context).inflate(R.layout.layout_exit_room_popup, null, false),
     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -35,6 +36,9 @@ class ExitRoomPopupWindow(
             }
             ll_leave_room.setOnClickListener {
                 leaveRoomBlock()
+            }
+            ll_pack_up_room.setOnClickListener{
+                packUpRoomBlock()
             }
         }
     }

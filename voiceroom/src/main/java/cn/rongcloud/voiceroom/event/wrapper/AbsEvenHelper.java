@@ -190,7 +190,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSpeakingStateChanged(int index, boolean speaking) {
-//        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
+        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
                 l.onSpeaking(index, speaking);

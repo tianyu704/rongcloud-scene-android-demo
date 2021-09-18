@@ -20,6 +20,7 @@ import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
+import com.rongcloud.common.extension.ui
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.AudioManagerUtil
@@ -272,7 +273,11 @@ class VoiceRoomFragmentPresenter @Inject constructor(
                     view.showUnreadMessage(it)
                 }
         )
-
+        //信号监听
+        addDisposable(roomModel.obOnNetworkStatusChange()
+            .subscribe{
+                view.showSingalInfo(it)
+            })
         addDisposable(roomModel
             .obRequestSeatListChange()
             .map {
@@ -437,7 +442,7 @@ class VoiceRoomFragmentPresenter @Inject constructor(
     fun leaveRoom() {
         leaveRoom(false)
     }
-
+    //离开房间
     private fun leaveRoom(joinNext: Boolean) {
         roomModel.onLeaveRoom()
         RCVoiceRoomEngine.getInstance().leaveRoom(object : RCVoiceRoomCallback {
@@ -457,7 +462,7 @@ class VoiceRoomFragmentPresenter @Inject constructor(
             }
         })
     }
-
+    //关闭房间
     fun closeRoom() {
         view.showWaitingDialog()
         RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "")
@@ -477,7 +482,10 @@ class VoiceRoomFragmentPresenter @Inject constructor(
                 view.showError(-1, t.message)
             })
     }
-
+    //收起房间，最小化
+    fun packUpRoom(){
+        view.packupRoom()
+    }
     fun roomOwnerEnterSeat() {
         RCVoiceRoomEngine.getInstance().enterSeat(0, object : RCVoiceRoomCallback {
             override fun onError(code: Int, message: String?) {

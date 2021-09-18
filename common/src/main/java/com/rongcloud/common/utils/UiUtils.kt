@@ -4,6 +4,7 @@
 
 package com.rongcloud.common.utils
 
+import android.app.Activity
 import android.content.Context
 
 /**
@@ -19,5 +20,19 @@ object UiUtils {
     fun px2Dp(context: Context, px: Float): Int {
         val scale = context.resources.displayMetrics.density
         return (px / scale + 0.5f).toInt()
+    }
+
+    /**
+     * 获取屏幕高度
+     */
+    fun getScreenHeight(activity:Activity):Int{
+        return activity.windowManager.defaultDisplay.height
+    }
+
+    /**
+     * 获取屏幕宽度
+     */
+    fun getScreenWidth(activity:Activity):Int{
+        return activity.windowManager.defaultDisplay.width
     }
 }

@@ -19,7 +19,7 @@ interface IVoiceRoomFragmentView : IBaseView {
     fun onJoinNextRoom(start: Boolean)
     fun enterSeatSuccess()
 
-
+    fun packupRoom()
     fun refreshOnlineUsersNumber(onlineUsersNumber: Int)
 
     /**
@@ -43,4 +43,5 @@ interface IVoiceRoomFragmentView : IBaseView {
     fun showRevokeSeatRequest()
     fun showRoomClose()
     fun onMemberInfoChange()
+    fun showSingalInfo(int: Int)
 }
