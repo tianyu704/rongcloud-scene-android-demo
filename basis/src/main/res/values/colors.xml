@@ -47,7 +47,8 @@
     <color name="basis_gray_dark">#616161</color>
     <color name="basis_blue_gray">#607D8B</color>
     <color name="basis_blue_gray_dark">#455A64</color>
-
+    <color name="basis_white_20">#33FFFFFF</color>
+    <color name="basis_white_25">#40FFFFFF</color>
     <!--    LoadTag 的文字和只是器颜色-->
     <color name="basis_color_loadtag">@android:color/white</color>
     <!--    svg图片颜色-->

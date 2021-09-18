@@ -55,7 +55,7 @@ public class BaseProcessor<IR extends IResult<R, E>, R, E, T> implements IProces
         if (null == clazz) {
             return (IR) new IResult.StatusResult(wrap.getCode(), wrap.getMessage());
         } else {//objResult
-            OkUtil.e("processResult", "clazz:" + clazz.getSimpleName());
+            OkUtil.e("processResult", "clazz:" + clazz.getSimpleName() + "  body:" + wrap.getBody());
             R result = null;
             JsonElement element = wrap.getBody();
             if (null != element) {

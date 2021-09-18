@@ -23,10 +23,10 @@ object ImageLoaderUtil {
     fun loadImage(
         context: Context,
         imageView: ImageView,
-        url: String,
+        url: String?,
         @DrawableRes resId: Int = 0
     ) {
-        if (url.isEmpty()) {
+        if (url.isNullOrEmpty()) {
             Glide.with(context).load(resId).into(imageView)
         } else {
             Glide.with(context).load(url).error(resId).placeholder(resId).centerCrop()

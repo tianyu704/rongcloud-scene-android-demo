@@ -110,7 +110,7 @@ public class Controller<ND, AD, VH extends IHolder> extends NetRefresher<ND> imp
         List<AD> temp = operator.onPreSetData(adapterList);
         if (null != temp && !temp.isEmpty()) {
             if (null != holder) holder.showType(IRHolder.Type.show);
-            mAdapter.setData(temp, isRefresh);
+            mAdapter.setData(temp, true);
         } else {
             if (null != holder) holder.showType(IRHolder.Type.none);
         }

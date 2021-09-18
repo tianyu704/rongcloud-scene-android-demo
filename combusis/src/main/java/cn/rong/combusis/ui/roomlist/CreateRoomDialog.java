@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 
+import com.basis.net.LoadTag;
 import com.basis.widget.BottomDialog;
 import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
@@ -54,6 +55,7 @@ public class CreateRoomDialog extends BottomDialog {
 
     private CreateRoomCallBack mCreateRoomCallBack;
     private InputPasswordDialog mInputPasswordDialog;
+    private LoadTag mLoading;
 
     public CreateRoomDialog(Activity activity, ActivityResultLauncher launcher, RoomType roomType, CreateRoomCallBack createRoomCallBack) {
         super(activity);
@@ -125,6 +127,8 @@ public class CreateRoomDialog extends BottomDialog {
 
         mRoomNameEditText = getContentView().findViewById(R.id.et_room_name);
         mPrivateButton = getContentView().findViewById(R.id.rb_private);
+
+        mLoading = new LoadTag(mActivity, mActivity.getString(R.string.text_creating_room));
     }
 
     /**
@@ -155,19 +159,29 @@ public class CreateRoomDialog extends BottomDialog {
         } else {
             // 选择本地图片后，先上传本地图片
             if (!TextUtils.isEmpty(mCoverUrl)) {
-                FileBody body = new FileBody("image/*", new File(mCoverUrl));
+                mLoading.show();
+                FileBody body = new FileBody("multipart/form-data", new File(mCoverUrl));
                 OkApi.file(VRApi.FILE_UPLOAD, "file", body, new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
-                        String url = result.get(String.class);
+                        String url = result.getBody().getAsString();
                         if (result.ok() && !TextUtils.isEmpty(url)) {
                             createRoom(roomName, VRApi.FILE_PATH + url);
                         } else {
                             ToastUtils.s(mActivity, result.getMessage());
+                            mLoading.dismiss();
                         }
+                    }
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        ToastUtils.s(mActivity, msg);
+                        mLoading.dismiss();
                     }
                 });
             } else {
+                mLoading.show();
                 createRoom(roomName, "");
             }
         }
@@ -201,6 +215,14 @@ public class CreateRoomDialog extends BottomDialog {
                         ToastUtils.s(mActivity, result.getMessage());
                     }
                 }
+                mLoading.dismiss();
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                ToastUtils.s(mActivity, msg);
+                mLoading.dismiss();
             }
         });
     }
