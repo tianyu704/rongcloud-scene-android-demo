@@ -384,7 +384,6 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         }
         //绑定出发的view
         recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
-
     }
 
 

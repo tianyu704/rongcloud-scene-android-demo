@@ -162,19 +162,19 @@ public class RecordVoicePopupWindow {
                 //判断当前是否有存储卡
                 if (!FileUtil.INSTANCE.isExistExternalStore()) {
                     ToastUtils.s(context, context.getString(R.string.media_ejected));
-                    return false;
+                    return true;
                 }
                 //判断存储空间
                 if (FileUtil.INSTANCE.getAvailaleSize() < 10) {
                     ToastUtils.s(context, context.getString(R.string.media_no_memory));
-                    return false;
+                    return true;
                 }
                 //判断当前事件是否是有效时间
                 long time = currentTimeMillis() - currentTimeMillis;
                 if (time <= 1000) {
                     Log.e(TAG, "Invalid click ");
                     currentTimeMillis = currentTimeMillis();
-                    return false;
+                    return true;
                 }
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -223,7 +223,7 @@ public class RecordVoicePopupWindow {
                         }
                         break;
                 }
-                return false;
+                return true;
             }
         });
     }
