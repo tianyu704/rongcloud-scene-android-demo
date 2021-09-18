@@ -12,7 +12,7 @@ public class FileBody implements IBody {
     private File body;
     private String mediaType;
 
-    public FileBody(String key, String mediaType, File body) {
+    public FileBody(String mediaType, File body) {
         this.mediaType = mediaType;
         this.body = body;
     }

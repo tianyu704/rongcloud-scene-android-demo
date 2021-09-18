@@ -6,7 +6,6 @@ package cn.rong.combusis.ui.roomlist;
 
 
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
@@ -43,25 +42,25 @@ public class AbsSwitchActivity extends BaseActivity implements View.OnClickListe
         vp_switch.setAdapter(new VPAdapter(getSupportFragmentManager(), Arrays.asList(onCreateLeftFragment(), onCreateRightFragment()), onSetSwitchTitle()));
 
         tab_switch.setupWithViewPager(vp_switch);
-        tab_switch.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                TextView textView = new TextView(AbsSwitchActivity.this);
-                textView.setText(tab.getText());
-                textView.setTextSize(19);
-                tab.setCustomView(textView);
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                tab.setCustomView(null);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+//        tab_switch.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+//            @Override
+//            public void onTabSelected(TabLayout.Tab tab) {
+//                TextView textView = new TextView(AbsSwitchActivity.this);
+//                textView.setText(tab.getText());
+//                textView.setTextSize(19);
+//                tab.setCustomView(textView);
+//            }
+//
+//            @Override
+//            public void onTabUnselected(TabLayout.Tab tab) {
+//                tab.setCustomView(null);
+//            }
+//
+//            @Override
+//            public void onTabReselected(TabLayout.Tab tab) {
+//
+//            }
+//        });
 
         getView(R.id.fl_back).setOnClickListener(this);
 

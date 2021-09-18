@@ -95,7 +95,8 @@ public class Transform {
         if (null == url || null == params || params.isEmpty()) return url;
         Uri.Builder builder = Uri.parse(url).buildUpon();
         for (Map.Entry<String, Object> entry : params.entrySet()) {
-            builder.appendQueryParameter(entry.getKey(), entry.getValue().toString());
+            String v = entry.getValue() == null?"":entry.getValue().toString();
+            builder.appendQueryParameter(entry.getKey(), v);
         }
         return builder.build().toString();
     }

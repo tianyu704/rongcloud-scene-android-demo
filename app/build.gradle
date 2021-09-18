@@ -36,7 +36,7 @@ android {
             annotationProcessorOptions {
                 includeCompileClasspath = true
                 // 此参数用于编译期生成相关代码的标识，请勿删除
-                arguments += [ isAppModule : 'true' ]
+                arguments += [isAppModule: 'true']
             }
         }
         renderscriptSupportModeEnabled true
@@ -84,20 +84,24 @@ android {
         abortOnError false
     }
     flavorDimensions("environment")
+    //线上地址：10.120.6.162    UCBJ2-RTC-Web-Prod-App-6-162
+    //测试地址：10.40.0.97         UCBJ2-RTC-Web-Test-App-0-97
     productFlavors {
         developerEnvironment {
             dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo.dev" // 配置不同的包名，确保切换环境时不会因为缓存导致出现问题
-            buildConfigField("String","APP_KEY","\"pvxdm17jpw7ar\"")
-            buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
-            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
+            buildConfigField("String", "APP_KEY", "\"pvxdm17jpw7ar\"")
+            buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
+//            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
+            buildConfigField("String","BASE_SERVER_ADDRES","\"http://10.40.0.97:8081/\"")
         }
         releaseEnvironment {
             dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo"
-            buildConfigField("String","APP_KEY","\"uwd1c0sxukso1\"")
-            buildConfigField("String","UM_APP_KEY","\"60c062bf8d6cd512500c78ed\"")
-            buildConfigField("String","BASE_SERVER_ADDRES","\"http://120.92.102.127:8081/\"")
+            buildConfigField("String", "APP_KEY", "\"uwd1c0sxukso1\"")
+            buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
+//            buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://120.92.102.127:8081/\"")
+            buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://10.120.6.162:8081/\"")
         }
     }
 }

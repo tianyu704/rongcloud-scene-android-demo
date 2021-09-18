@@ -10,6 +10,7 @@ import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.dao.api.UserInfoDao;
 import com.rongcloud.common.net.ApiConstant;
 
 import java.util.ArrayList;
@@ -17,8 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.wrapper.AbsProvider;
 import cn.rong.combusis.provider.wrapper.IListProvider;
+import io.rong.imlib.model.UserInfo;
 
 public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements IListProvider<VoiceRoomBean> {
     private final static String API_ROOM = ApiConstant.INSTANCE.getBASE_URL() + "mic/room/";
@@ -55,6 +59,16 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
                 if (null != resultBack) resultBack.onResult(null);
             }
         });
+    }
+
+    @Override
+    protected void onUpdateComplete(List<VoiceRoomBean> voiceRoomBeans) {
+        List<UserInfo> users = new ArrayList<>();
+        int count = voiceRoomBeans.size();
+        for (int i = 0; i < count; i++) {
+            users.add(voiceRoomBeans.get(i).getCreateUser().toUserInfo());
+        }
+        UserProvider.provider().update(users);
     }
 
     public List<String> getImages() {

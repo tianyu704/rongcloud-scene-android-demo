@@ -6,9 +6,10 @@ package cn.rongcloud.voiceroom.model
 
 import android.util.Log
 import androidx.fragment.app.Fragment
+import cn.rong.combusis.EventBus
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
-import cn.rongcloud.voiceroom.event.EventHelper
+import cn.rong.combusis.sdk.event.EventHelper
 import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroom.model.*
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
@@ -74,7 +75,7 @@ class VRMusicWrapper constructor(
                     }
                 }
 //                userMusicListSubject.onNext(userMusicList)
-                EventBus.get().emit(EventBus.TAG_MUSIC_LIST, musics)
+                EventBus.get().emit(EventBus.TAG.MUSIC_LIST, musics)
             }
 
             override fun onReportPlayingProgress(p0: Float) {
@@ -131,7 +132,7 @@ class VRMusicWrapper constructor(
                     systemMusics.addAll(systemList)
 //                    userMusicListSubject.onNext(customList)
 //                    systemMusicListSubject.onNext(systemList)
-                    EventBus.get().emit(EventBus.TAG_MUSIC_LIST, musics, systemMusics)
+                    EventBus.get().emit(EventBus.TAG.MUSIC_LIST, musics, systemMusics)
                     return@BiFunction emptyList<UiMusicModel>()
                 }).subscribe {
                 onComplete?.invoke()
@@ -310,7 +311,7 @@ class VRMusicWrapper constructor(
             currentPlayMusic = null
             // 及时通知上层音乐播放完成
 //            userMusicListSubject.onNext(musics)
-            EventBus.get().emit(EventBus.TAG_MUSIC_LIST, musics)
+            EventBus.get().emit(EventBus.TAG.MUSIC_LIST, musics)
             musics
                 .elementAtOrNull((index + 1) % musics.size)?.let {
                     Log.d(TAG, "playNextMusic: $it")

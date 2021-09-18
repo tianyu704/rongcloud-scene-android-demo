@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:left_top_radius="@dimen/create_voice_room_radius"
         app:right_top_radius="@dimen/create_voice_room_radius"
-        app:srcCompat="@drawable/test_background" />
+        app:srcCompat="@drawable/bg_create_room" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/iv_fold"
@@ -307,6 +307,7 @@
             android:drawableStart="@drawable/ic_create_voice_room_btn"
             android:text="@string/label_create_room"
             android:textColor="@color/white"
+            android:drawablePadding="10dp"
             android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

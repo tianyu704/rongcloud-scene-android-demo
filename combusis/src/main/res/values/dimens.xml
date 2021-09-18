@@ -4,4 +4,5 @@
     <dimen name="friend_item_left_padding">20dp</dimen>
     <dimen name="friend_item_right_padding">18dp</dimen>
     <dimen name="friend_item_height">64dp</dimen>
+    <dimen name="create_voice_room_radius">25dp</dimen>
 </resources>

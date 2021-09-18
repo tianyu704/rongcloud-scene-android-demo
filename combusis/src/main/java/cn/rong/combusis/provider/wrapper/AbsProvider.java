@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+
 public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
     private final static int MAX_MEMORY = 2 * 1024 * 1024;
     protected final String TAG = getClass().getSimpleName();
@@ -28,6 +30,12 @@ public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
     @Override
     public void update(T t) {
         updateCache(Collections.singletonList(t));
+    }
+
+
+    @Override
+    public void update(List<T> updates) {
+        updateCache(updates);
     }
 
     @Override
@@ -99,6 +107,16 @@ public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
                 if (null != singleBack) singleBack.onResult(temp);
             }
         }
+        if (count > 0) onUpdateComplete(ts);
+    }
+
+    /**
+     * 处理关联实体的跟新
+     * 比如 VoiceRoom的creater 关联着User， 在跟新VoiceRoom时 顺便跟新一个关联的User实体
+     *
+     * @param ts
+     */
+    protected void onUpdateComplete(List<T> ts) {
     }
 
     @Override

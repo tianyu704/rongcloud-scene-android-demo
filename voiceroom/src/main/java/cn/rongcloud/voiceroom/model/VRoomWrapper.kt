@@ -8,9 +8,9 @@ import android.app.Activity
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider
 import cn.rongcloud.voiceroom.R
-import cn.rongcloud.voiceroom.event.EventHelper
-import cn.rongcloud.voiceroom.event.listener.RoomListener
-import cn.rongcloud.voiceroom.event.listener.StatusListener
+import cn.rong.combusis.sdk.event.EventHelper
+import cn.rong.combusis.sdk.event.listener.RoomListener
+import cn.rong.combusis.sdk.event.listener.StatusListener
 import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroom.net.bean.request.*
 import cn.rongcloud.voiceroom.ui.uimodel.*

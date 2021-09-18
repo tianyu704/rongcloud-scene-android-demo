@@ -29,7 +29,7 @@
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_switch"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_weight="1.8"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"

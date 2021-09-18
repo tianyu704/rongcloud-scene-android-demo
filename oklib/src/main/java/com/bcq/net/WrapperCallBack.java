@@ -37,7 +37,7 @@ public abstract class WrapperCallBack extends OCallBack<Wrapper> {//IOCallBack
         wrapper.setCode(response.code());
         try {
             String string = response.body().string();
-            OkUtil.i("Wrapper", "string = " + string);
+            OkUtil.e("Wrapper", "string = " + string);
             if (!TextUtils.isEmpty(string)) {
                 JsonObject result = JsonParser.parseString(string).getAsJsonObject();
                 if (null != result) {

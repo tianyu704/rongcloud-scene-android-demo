@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.umeng.RcUmEvent;
 import cn.rong.combusis.umeng.UmengHelper;
 
@@ -113,24 +114,24 @@ public class FeedbackHelper implements IFeedback {
     }
 
     private void dismissDialog() {
-        if (null != feedbackDialog) {
-            feedbackDialog.dismiss();
+        if (null != VRCenterDialog) {
+            VRCenterDialog.dismiss();
         }
-        feedbackDialog = null;
+        VRCenterDialog = null;
     }
 
-    private FeedbackDialog feedbackDialog;
+    private cn.rong.combusis.VRCenterDialog VRCenterDialog;
 
     private void showFeedbackDialog(Activity activity) {
-        if (null == feedbackDialog || !feedbackDialog.enable()) {
-            feedbackDialog = new FeedbackDialog(activity, new DialogInterface.OnDismissListener() {
+        if (null == VRCenterDialog || !VRCenterDialog.enable()) {
+            VRCenterDialog = new VRCenterDialog(activity, new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    feedbackDialog = null;
+                    VRCenterDialog = null;
                 }
             });
         }
-        feedbackDialog.replaceContent("请留下您的使用感受吧",
+        VRCenterDialog.replaceContent("请留下您的使用感受吧",
                 "稍后再说", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -138,11 +139,11 @@ public class FeedbackHelper implements IFeedback {
                         clearStatistics();
                     }
                 }, "", null, initScoreView());
-        feedbackDialog.show();
+        VRCenterDialog.show();
     }
 
     private View initScoreView() {
-        View view = feedbackDialog.getLayoutInflater().inflate(R.layout.layout_score_tip, null);
+        View view = VRCenterDialog.getLayoutInflater().inflate(R.layout.layout_score_tip, null);
         View up_selected = view.findViewById(R.id.iv_up_selected);
         View down_selected = view.findViewById(R.id.iv_down_selected);
         view.findViewById(R.id.cl_up).setOnTouchListener(new View.OnTouchListener() {
@@ -229,8 +230,8 @@ public class FeedbackHelper implements IFeedback {
      * 显示吐槽弹框
      */
     private void shwoDownDialog() {
-        if (null == feedbackDialog) return;
-        feedbackDialog.replaceContent("请问哪个方面需要改进呢？",
+        if (null == VRCenterDialog) return;
+        VRCenterDialog.replaceContent("请问哪个方面需要改进呢？",
                 "提交反馈", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -249,7 +250,7 @@ public class FeedbackHelper implements IFeedback {
     private final List<Integer> selectedDowns = new ArrayList();
 
     private View initDownView() {
-        View view = feedbackDialog.getLayoutInflater().inflate(R.layout.layout_score_down, null);
+        View view = VRCenterDialog.getLayoutInflater().inflate(R.layout.layout_score_down, null);
         View[] views = new View[4];
         View[] selectVs = new View[4];
         views[0] = view.findViewById(R.id.cl_first);
@@ -285,8 +286,8 @@ public class FeedbackHelper implements IFeedback {
      * 显示最新活动
      */
     private void showLastPromotion() {
-        if (null == feedbackDialog) return;
-        feedbackDialog.replaceContent("融云最近活动，了解一下？",
+        if (null == VRCenterDialog) return;
+        VRCenterDialog.replaceContent("融云最近活动，了解一下？",
                 "我想了解", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -297,15 +298,15 @@ public class FeedbackHelper implements IFeedback {
                     public void onClick(View v) {
                         dismissDialog();
                     }
-                }, feedbackDialog.getLayoutInflater().inflate(R.layout.layout_promotion, null));
+                }, VRCenterDialog.getLayoutInflater().inflate(R.layout.layout_promotion, null));
     }
 
     private void jumpPromotionPage() {
-        if (null != feedbackDialog && feedbackDialog.enable()) {
+        if (null != VRCenterDialog && VRCenterDialog.enable()) {
             Intent intent = new Intent("io.rong.intent.action.commonwebpage");
             intent.putExtra("key_url", "https://m.rongcloud.cn/activity/rtc20");
             intent.putExtra("key_basic", "最近活动");
-            feedbackDialog.startActivty(intent);
+            VRCenterDialog.startActivty(intent);
         }
         dismissDialog();
     }

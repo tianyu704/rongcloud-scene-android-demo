@@ -4,16 +4,19 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
+import android.app.Activity
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
+import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroom.pk.TestPkActivity
+import cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomListView
 import cn.rongcloud.voiceroomdemo.mvp.model.EMPTY_ROOM_INFO
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
-import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity
+import com.kit.cache.GsonUtil
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.UIKit
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import javax.inject.Inject
@@ -108,6 +111,11 @@ class VoiceRoomListPresenter @Inject constructor(
     ) {
         info?.createUser?.let {
             ScorlVoiceRoomActivity.startActivity(context, info.roomId, list, isCreate)
+//            UIKit.startActivityByBasis(
+//                context as Activity,
+//                TestPkActivity::class.java,
+//                GsonUtil.obj2Json(info)
+//            )
         } ?: view.showError("房间数据错误")
     }
 

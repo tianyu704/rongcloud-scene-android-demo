@@ -79,6 +79,13 @@ public class UserProvider implements IProvider<UserInfo> {
     }
 
     @Override
+    public void update(List<UserInfo> updates) {
+        for (UserInfo u : updates) {
+            RongUserInfoManager.getInstance().refreshUserInfoCache(u);
+        }
+    }
+
+    @Override
     public void getAsyn(@NonNull String userId, @NonNull IResultBack<UserInfo> resultBack) {
         UserInfo info = RongUserInfoManager.getInstance().getUserInfo(userId);
         if (null != info) {
