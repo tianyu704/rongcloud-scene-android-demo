@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroom2
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
@@ -55,12 +57,12 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import cn.rongcloud.widget.RecordVoicePopupWindow
-import cn.rongcloud.widget.RecordVoicePopupWindow.RecordCallBack
 import cn.rongcloud.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
+import cn.rongcloud.voiceroom.manager.AudioRecordManager
 import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.TipDialog
 import com.rongcloud.common.utils.*
@@ -68,9 +70,13 @@ import com.rongcloud.common.utils.*
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
-import io.rong.imkit.picture.tools.ToastUtils
+import io.rong.imkit.manager.AudioPlayManager
+import io.rong.imkit.utils.PermissionCheckUtil
+import io.rong.imkit.utils.RongUtils
 import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.IMLibExtensionModuleManager
 import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.HardwareResource
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_voice_room.*
@@ -99,12 +105,8 @@ import kotlinx.android.synthetic.main.activity_voice_room.tv_unread_message_numb
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
 import kotlinx.android.synthetic.main.activity_voice_room.wv_creator_background
 import kotlinx.android.synthetic.main.fragment_voice_room.*
-import java.io.File
 import javax.inject.Inject
-import java.lang.System.currentTimeMillis
 import java.util.*
-import java.util.concurrent.TimeUnit
-import com.rongcloud.common.utils.AudioRecorderUtil.AudioRecordListener as AudioRecordListener1
 
 
 private const val TAG = "VoiceRoomFragment"
@@ -152,12 +154,6 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
     private var emptySeatFragment: EmptySeatFragment? = null
 
     private var memberListFragment: MemberListFragment? = null
-
-    private var currentTimeMillis: Long = 0;
-
-    private var isVoiceRecording: Boolean = false;
-
-    private var recordVoicePopupWindow: RecordVoicePopupWindow? = null
 
     private val emojiPopup by lazy {
         EmojiPopup
@@ -376,16 +372,72 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 SendPresentFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
-        if (recordVoicePopupWindow==null){
-            recordVoicePopupWindow = RecordVoicePopupWindow(activity) {
-                //发送音频文件
-                Log.e(TAG, "initRoleView: ")
-            }
-        }
-        //绑定出发的view
-        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
+//        if (recordVoicePopupWindow==null){
+//            recordVoicePopupWindow = RecordVoicePopupWindow(activity) {
+//                //发送音频文件
+//                Log.e(TAG, "initRoleView: ")
+//            }
+//        }
+//
+//        //绑定出发的view
+//        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
+        //直接使用imkit里面的代码
+        iv_send_voice_message_id.setOnTouchListener(mOnVoiceBtnTouchListener)
+        Log.e(TAG, "initRoleView: ", )
     }
 
+    private var mConversationType:Conversation.ConversationType=Conversation.ConversationType.PRIVATE;
+
+    private val mOnVoiceBtnTouchListener = OnTouchListener { v, event ->
+        val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
+        if (!PermissionCheckUtil.checkPermissions(
+                v.context,
+                permissions
+            ) && event.action == MotionEvent.ACTION_DOWN
+        ) {
+            PermissionCheckUtil.requestPermissions(
+                activity,
+                permissions,
+                PermissionCheckUtil.REQUEST_CODE_ASK_PERMISSIONS
+            )
+            return@OnTouchListener true
+        }
+        val location = IntArray(2)
+        iv_send_voice_message_id.getLocationOnScreen(location)
+        val x = location[0]
+        val y = location[1]
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            Log.e(TAG, ":ACTION_DOWN ")
+            //在这里拦截外部的滑动事件
+            v.getParent().requestDisallowInterceptTouchEvent(true)
+            if (AudioPlayManager.getInstance().isPlaying) {
+                AudioPlayManager.getInstance().stopPlay()
+            }
+            //判断正在视频通话和语音通话中不能进行语音消息发送
+            if (RongUtils.phoneIsInUse(v.context) || IMLibExtensionModuleManager.getInstance()
+                    .onRequestHardwareResource(HardwareResource.ResourceType.VIDEO)
+                || IMLibExtensionModuleManager.getInstance()
+                    .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO)
+            ) {
+                return@OnTouchListener true
+            }
+            AudioRecordManager.getInstance().startRecord(v.rootView, mConversationType, roomId)
+        } else if (event.action == MotionEvent.ACTION_MOVE) {
+            if (event.rawX<=0||event.rawX>x+v.width||event.rawY<y) {
+                AudioRecordManager.getInstance().willCancelRecord()
+            } else {
+                AudioRecordManager.getInstance().continueRecord()
+            }
+        } else if (event.action == MotionEvent.ACTION_UP||event.action==MotionEvent.ACTION_CANCEL ) {
+            Log.e(TAG, ":ACTION_UP ")
+            v.getParent().requestDisallowInterceptTouchEvent(false)
+            AudioRecordManager.getInstance().stopRecord()
+        }
+//        if (mConversationType == Conversation.ConversationType.PRIVATE) {
+//            RongIMClient.getInstance().sendTypingStatus(mConversationType, roomId, "RC:VcMsg")
+//        }
+        true
+    }
 
     private fun sendTextMessage(message: String?) {
         message?.let {

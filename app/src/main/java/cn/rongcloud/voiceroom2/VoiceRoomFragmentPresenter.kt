@@ -240,7 +240,7 @@ class VoiceRoomFragmentPresenter @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     when (it) {
-                        is RCChatroomLocationMessage, is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
+                        is RCChatroomVoice, is RCChatroomLocationMessage, is RCChatroomBarrage, is RCChatroomEnter, is RCChatroomKickOut, is RCChatroomGiftAll, is RCChatroomGift, is RCChatroomAdmin, is RCChatroomSeats -> {
                             view.showChatRoomMessage(it)
                             if (it is RCChatroomGiftAll || it is RCChatroomGift) {
                                 roomModel.refreshGift()

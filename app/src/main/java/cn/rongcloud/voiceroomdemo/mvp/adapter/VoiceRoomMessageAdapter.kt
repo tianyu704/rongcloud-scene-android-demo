@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.adapter
 
 import android.graphics.Color
+import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
@@ -17,11 +18,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import cn.rongcloud.voiceroom.manager.AudioPlayManager
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroom.message.*
+import io.rong.imkit.manager.IAudioPlayListener
 import io.rong.imlib.model.MessageContent
-import kotlinx.android.synthetic.main.layout_system_message_item.view.*
+import kotlinx.android.synthetic.main.layout_system_message_item.view.tv_message_content
+import kotlinx.android.synthetic.main.layout_voice_message_item.view.*
+import android.widget.ImageView
+
+import android.graphics.drawable.AnimationDrawable
+
+
+
 
 /**
  * @author gusd
@@ -30,6 +40,7 @@ import kotlinx.android.synthetic.main.layout_system_message_item.view.*
 
 private const val MESSAGE_TYPE_SYSTEM = 0
 private const val MESSAGE_TYPE_NORMAL = 1
+private const val MESSAGE_TYPE_VOICE = 2
 
 class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (String) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -38,15 +49,29 @@ class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (Stri
 
 
     override fun getItemViewType(position: Int): Int {
-        return if (data[position] is RCChatroomLocationMessage) MESSAGE_TYPE_SYSTEM else MESSAGE_TYPE_NORMAL
+        if (data[position] is RCChatroomLocationMessage) {
+            return MESSAGE_TYPE_SYSTEM;
+        } else if (data[position] is RCChatroomVoice) {
+            return MESSAGE_TYPE_VOICE;
+        } else {
+            return MESSAGE_TYPE_NORMAL
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return if (viewType == MESSAGE_TYPE_SYSTEM) SystemMessageViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                R.layout.layout_system_message_item, parent, false
+        if (viewType == MESSAGE_TYPE_SYSTEM) {
+            return SystemMessageViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.layout_system_message_item, parent, false
+                )
             )
-        ) else NormalMessageViewHolder(
+        } else if (viewType == MESSAGE_TYPE_VOICE) {
+            return VoiceMessageViewHolder(
+                LayoutInflater.from(parent.context).inflate(
+                    R.layout.layout_voice_message_item, parent, false
+                )
+            )
+        } else return NormalMessageViewHolder(
             LayoutInflater.from(parent.context)
                 .inflate(R.layout.layout_normal_message_item, parent, false)
         )
@@ -55,6 +80,8 @@ class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (Stri
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (getItemViewType(position) == MESSAGE_TYPE_SYSTEM) {
             (holder as SystemMessageViewHolder).bind(data[position] as RCChatroomLocationMessage)
+        } else if (getItemViewType(position) == MESSAGE_TYPE_VOICE) {
+            (holder as VoiceMessageViewHolder).bind(data[position] as RCChatroomVoice)
         } else {
             (holder as NormalMessageViewHolder).bind(data[position], roomModel, listener)
         }
@@ -78,27 +105,48 @@ class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (Stri
         }
     }
 
-    class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun updateRole(userId: String, view: TextView, roomModel: VoiceRoomModel) {
-            if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId == userId) {
-                view.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_creator,
-                    0,
-                    0,
-                    0
-                )
-                view.compoundDrawablePadding = 2
-            } else if (roomModel.getMemberInfoByUserIdOnlyLocal(userId)?.isAdmin == true
-            ) {
-                view.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_is_admin,
-                    0,
-                    0,
-                    0
-                )
-                view.compoundDrawablePadding = 2
+    inner class VoiceMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        fun bind(message: RCChatroomVoice) {
+            with(itemView) {
+                var list = ArrayList<MsgInfo>(4)
+                list.add(MsgInfo("${message.userName}: ", message.userId, true))
+                updateRole(message.userId, tv_message_content, roomModel)
+                tv_message_content.text = styleBuilder(list,listener)
+                tv_message_content.movementMethod = LinkMovementMethod.getInstance()
+                tv_voice_duration.text=message.duration+"''"
+                val animationDrawable = (iv_paly_voice_id as ImageView).drawable as AnimationDrawable
+                animationDrawable.stop()
+                ll_paly_voice_id.setOnClickListener{
+                    val animationDrawable = (iv_paly_voice_id as ImageView).drawable as AnimationDrawable
+                    if (AudioPlayManager.getInstance().isPlaying&&message.path.equals(AudioPlayManager.getInstance().playingUri.toString())) {
+                        //当前正在播放,并且点击的就是当前的
+                        AudioPlayManager.getInstance().stopPlay()
+                        return@setOnClickListener
+                    }
+
+                    AudioPlayManager.getInstance()
+                        .startPlay(context, Uri.parse(message.path), object : IAudioPlayListener {
+                            override fun onStart(uri: Uri) {
+                                //开始动画
+                                animationDrawable?.start()
+                            }
+                            override fun onStop(uri: Uri) {
+                                //音频被停止,停止动画
+                                animationDrawable?.stop()
+                                animationDrawable.selectDrawable(0)
+                            }
+                            override fun onComplete(uri: Uri) {
+                                //停止动画
+                                animationDrawable?.stop()
+                                animationDrawable.selectDrawable(0)
+                            }
+                        })
+                }
             }
         }
+    }
+
+   inner class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(message: MessageContent, roomModel: VoiceRoomModel, listener: (String) -> Unit) {
             with(itemView) {
@@ -154,45 +202,66 @@ class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (Stri
                     }
                     is RCChatroomLocationMessage -> {
                         list.add(MsgInfo(message.content, "", false))
-                        Log.e("LocationMessage","RCChatroomLocationMessage")
+                        Log.e("LocationMessage", "RCChatroomLocationMessage")
                     }
                 }
                 tv_message_content.text = styleBuilder(list, listener)
                 tv_message_content.movementMethod = LinkMovementMethod.getInstance()
             }
         }
+    }
 
-        fun styleBuilder(
-            infos: ArrayList<MsgInfo>,
-            listener: (String) -> Unit
-        ): SpannableStringBuilder {
-            var style = SpannableStringBuilder()
-            var start = 0
-            infos.forEach { info ->
-                info.start = start
-                start += info.content.length
-                info.end = start
-                style.append(info.content)
-                if (info.clicked) {
-                    style.setSpan(object : ClickableSpan() {
-                        override fun onClick(widget: View) {
-                            listener(info.clickId)
-                        }
-
-                        override fun updateDrawState(ds: TextPaint) {
-                            ds.isUnderlineText = false
-                        }
-                    }, info.start, info.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    style.setSpan(
-                        ForegroundColorSpan(Color.parseColor("#78FFFFFF")),
-                        info.start,
-                        info.end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-                }
-            }
-            return style
+    fun updateRole(userId: String, view: TextView, roomModel: VoiceRoomModel) {
+        if (roomModel.currentUIRoomInfo.roomBean?.createUser?.userId == userId) {
+            view.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_creator,
+                0,
+                0,
+                0
+            )
+            view.compoundDrawablePadding = 2
+        } else if (roomModel.getMemberInfoByUserIdOnlyLocal(userId)?.isAdmin == true
+        ) {
+            view.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_is_admin,
+                0,
+                0,
+                0
+            )
+            view.compoundDrawablePadding = 2
         }
+    }
+
+    fun styleBuilder(
+        infos: ArrayList<MsgInfo>,
+        listener: (String) -> Unit
+    ): SpannableStringBuilder {
+        var style = SpannableStringBuilder()
+        var start = 0
+        infos.forEach { info ->
+            info.start = start
+            start += info.content.length
+            info.end = start
+            style.append(info.content)
+            if (info.clicked) {
+                style.setSpan(object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        listener(info.clickId)
+                    }
+
+                    override fun updateDrawState(ds: TextPaint) {
+                        ds.isUnderlineText = false
+                    }
+                }, info.start, info.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                style.setSpan(
+                    ForegroundColorSpan(Color.parseColor("#78FFFFFF")),
+                    info.start,
+                    info.end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+        }
+        return style
     }
 
     data class MsgInfo(
