@@ -16,6 +16,7 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
@@ -383,10 +384,10 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
 //        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
         //直接使用imkit里面的代码
         iv_send_voice_message_id.setOnTouchListener(mOnVoiceBtnTouchListener)
-        Log.e(TAG, "initRoleView: ", )
     }
 
-    private var mConversationType:Conversation.ConversationType=Conversation.ConversationType.PRIVATE;
+    private var mConversationType: Conversation.ConversationType =
+        Conversation.ConversationType.PRIVATE;
 
     private val mOnVoiceBtnTouchListener = OnTouchListener { v, event ->
         val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
@@ -422,20 +423,20 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 return@OnTouchListener true
             }
             AudioRecordManager.getInstance().startRecord(v.rootView, mConversationType, roomId)
+            iv_send_voice_message_id.background =
+                activity?.resources?.getDrawable(R.drawable.rc_ext_voice_touched_button)
         } else if (event.action == MotionEvent.ACTION_MOVE) {
-            if (event.rawX<=0||event.rawX>x+v.width||event.rawY<y) {
+            if (event.rawX <= 0 || event.rawX > x + v.width || event.rawY < y) {
                 AudioRecordManager.getInstance().willCancelRecord()
             } else {
                 AudioRecordManager.getInstance().continueRecord()
             }
-        } else if (event.action == MotionEvent.ACTION_UP||event.action==MotionEvent.ACTION_CANCEL ) {
+        } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
             Log.e(TAG, ":ACTION_UP ")
             v.getParent().requestDisallowInterceptTouchEvent(false)
             AudioRecordManager.getInstance().stopRecord()
+            iv_send_voice_message_id.background = null
         }
-//        if (mConversationType == Conversation.ConversationType.PRIVATE) {
-//            RongIMClient.getInstance().sendTypingStatus(mConversationType, roomId, "RC:VcMsg")
-//        }
         true
     }
 
@@ -929,7 +930,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 iv_room_setting.isVisible = true
                 btn_seat_order.isVisible = true
                 tv_seat_order_operation_number.isVisible = true
-                iv_send_voice_message_id.isVisible=false
+                iv_send_voice_message_id.isVisible = false
             }
             initListener()
         }

@@ -213,30 +213,29 @@
                     android:id="@+id/rl_send_message_id"
                     android:layout_width="105dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/icon_edit_message_bg"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:layout_marginTop="7dp"
                     android:layout_marginStart="12dp"
-                    android:layout_marginBottom="7dp"
                     tools:ignore="MissingConstraints">
-
                     <androidx.appcompat.widget.AppCompatTextView
                         android:id="@+id/btn_open_send_message"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="40dp"
-                        android:gravity="center"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:gravity="center_vertical"
+                        android:layout_centerVertical="true"
                         android:text="聊聊吧..."
+                        android:paddingStart="40dp"
+                        android:background="@drawable/icon_edit_message_bg"
                         android:textColor="@color/whiteTextColor"
                         android:textSize="12sp" />
 
                     <ImageView
                         android:id="@+id/iv_send_voice_message_id"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
                         android:layout_centerVertical="true"
-                        android:layout_marginStart="13dp"
-                        android:src="@drawable/icon_voice">
+                        android:src="@drawable/icon_voice"
+                        android:scaleType="centerInside"
+                        >
 
                     </ImageView>
                 </RelativeLayout>
