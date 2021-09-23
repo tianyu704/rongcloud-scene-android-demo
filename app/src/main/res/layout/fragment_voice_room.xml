@@ -78,7 +78,18 @@
                         android:textSize="9sp"
                         app:layout_constraintStart_toEndOf="@+id/tv_room_id"
                         app:layout_constraintTop_toBottomOf="@+id/tv_room_name" />
-
+                    <TextView
+                        android:id="@+id/tv_room_signal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        tools:drawableStart="@drawable/icon_signal_strong"
+                        android:drawablePadding="3dp"
+                        android:textColor="@color/whiteTextColor"
+                        android:textSize="9sp"
+                        tools:text="30ms"
+                        app:layout_constraintStart_toEndOf="@+id/tv_room_members_count"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_room_name" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
@@ -198,20 +209,36 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 app:layout_constraintBottom_toBottomOf="parent">
-
-                <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/btn_open_send_message"
+                <RelativeLayout
+                    android:id="@+id/rl_send_message_id"
                     android:layout_width="105dp"
                     android:layout_height="match_parent"
+                    app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="12dp"
-                    android:layout_marginTop="7dp"
-                    android:layout_marginBottom="7dp"
-                    android:background="@drawable/bg_btn_open_send_message_window"
-                    android:gravity="center"
-                    android:text="聊聊吧..."
-                    android:textColor="@color/whiteTextColor"
-                    android:textSize="12sp"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    tools:ignore="MissingConstraints">
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/btn_open_send_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:gravity="center_vertical"
+                        android:layout_centerVertical="true"
+                        android:text="聊聊吧..."
+                        android:paddingStart="40dp"
+                        android:background="@drawable/icon_edit_message_bg"
+                        android:textColor="@color/whiteTextColor"
+                        android:textSize="12sp" />
+
+                    <ImageView
+                        android:id="@+id/iv_send_voice_message_id"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/icon_voice"
+                        android:scaleType="centerInside"
+                        >
+
+                    </ImageView>
+                </RelativeLayout>
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/btn_seat_order"
@@ -220,7 +247,7 @@
                     android:layout_marginStart="14dp"
                     android:layout_marginTop="7dp"
                     android:layout_marginBottom="7dp"
-                    app:layout_constraintStart_toEndOf="@id/btn_open_send_message"
+                    app:layout_constraintStart_toEndOf="@id/rl_send_message_id"
                     app:srcCompat="@drawable/ic_seat_order" />
 
                 <androidx.appcompat.widget.AppCompatTextView

@@ -6,7 +6,8 @@
     <!-- 这里嵌套一层是因为XRecyclerView的无数据状态是添加到其父布局上的，不嵌套会覆盖掉其他组件的事件响应-->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#F6F8F9">
 
         <com.bcq.refresh.XRecyclerView
             android:id="@+id/xrv_room"

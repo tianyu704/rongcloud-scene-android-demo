@@ -18,6 +18,10 @@ public class VRApi {
     }
 
     /**
+     * 房间列表
+     */
+    public static String ROOM_LIST = HOST + "mic/room/list";
+    /**
      * 创建房间
      */
     public final static String ROOM_CREATE = HOST + "mic/room/create";

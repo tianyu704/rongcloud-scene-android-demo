@@ -20,7 +20,7 @@ public class RadioRoomListActivity extends AbsSwitchActivity {
 
     @Override
     public Fragment onCreateLeftFragment() {
-        return RadioRoomListFragment.getInstance();
+        return RadioAbsRoomListFragment.getInstance();
     }
 
     @Override

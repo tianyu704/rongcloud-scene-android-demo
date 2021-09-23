@@ -1,10 +1,11 @@
 package com.bcq.net.wrapper;
 
 import com.bcq.net.wrapper.interfaces.IParse;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import org.json.JSONArray;
 
 
 /**
@@ -20,9 +21,11 @@ public class BaseParser implements IParse<Wrapper> {
         if (result instanceof JsonObject) {
             JsonObject resulObj = (JsonObject) result;
             info.setCode(resulObj.get("code").getAsInt());
-            info.setMessage(resulObj.get("msg").getAsString());
+            if (resulObj.has("msg")) {
+                info.setMessage(resulObj.get("msg").getAsString());
+            }
             JsonElement data = resulObj.get("data");
-            if (data.isJsonObject()) {
+            if (data != null && data.isJsonObject()) {
                 JsonObject dataJson = (JsonObject) data;
                 if (dataJson.has("list")) {//列表数据 必有list
                     if (dataJson.has("total")) { //设置page
@@ -34,16 +37,19 @@ public class BaseParser implements IParse<Wrapper> {
                 } else {
                     info.setBody(data);
                 }
-            } else if (data.isJsonArray()) {// data[]
+            } else if (data != null && data.isJsonArray()) {// data[]
                 info.setBody(resulObj.get("data"));
+            } else if (data != null) {
+                JSONArray jsonArray = new JSONArray();
+                jsonArray.put(data);
+                info.setBody(JsonParser.parseString(jsonArray.toString()));
             }
-            info.setPage(0, resulObj.get("page_count").getAsInt());
         }
         return info;
     }
 
     @Override
     public boolean ok(int code) {
-        return code == 200 || code == 1;
+        return code == 10000 || code == 200 || code == 201;
     }
 }

@@ -15,8 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-
 public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
     private final static int MAX_MEMORY = 2 * 1024 * 1024;
     protected final String TAG = getClass().getSimpleName();
@@ -108,6 +106,13 @@ public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
             }
         }
         if (count > 0) onUpdateComplete(ts);
+    }
+
+    /**
+     * 清除所有缓存数据
+     */
+    public void clear() {
+        lruCache.evictAll();
     }
 
     /**

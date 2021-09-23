@@ -249,6 +249,10 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         }
     }
 
+    override fun showSingalInfo(int: Int) {
+        TODO("Not yet implemented")
+    }
+
     private fun showSoftKeyBoard() {
         et_message.requestFocus()
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -840,14 +844,19 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
                         ConfirmDialog(context, "确定结束本次直播吗？", true) {
                             presenter.closeRoom()
                         }.show()
-                    })
+                    },packUpRoomBlock ={
+                        exitRoomPopupWindow?.dismiss()
+                        presenter.packUpRoom()
 
+                    })
+                    exitRoomPopupWindow?.setAnimationStyle(R.style.popup_window_anim_style);
                     exitRoomPopupWindow?.showAtLocation(
                         iv_background,
                         Gravity.TOP,
                         0,
                         0
                     )
+
                 }
             }
         }

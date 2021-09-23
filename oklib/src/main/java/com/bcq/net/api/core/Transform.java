@@ -61,6 +61,18 @@ public class Transform {
      * @return RequestBody
      */
     public static RequestBody param2Body(Map<String, Object> params) {
+        boolean hasBody = false;
+        if (null != params) {
+            for (Object v : params.values()) {
+                if (v instanceof IBody) {
+                    hasBody = true;
+                    break;
+                }
+            }
+        }
+        if (hasBody) {
+            return param2Builder(params).build();
+        }
         switch (formType) {
             case form:
                 return param2Builder(params).build();

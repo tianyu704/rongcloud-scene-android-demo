@@ -36,7 +36,8 @@ object RCChatRoomMessageManager {
                RCChatroomGiftAll::class.java,
                RCChatroomAdmin::class.java,
                RCChatroomSeats::class.java,
-               RCChatroomLike::class.java
+               RCChatroomLike::class.java,
+               RCChatroomVoice::class.java
             )
         )
     }

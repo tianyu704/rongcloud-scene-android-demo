@@ -77,7 +77,9 @@ class VoiceRoomListActivity : BaseActivity(),
         FeedbackHelper.getHelper().registeFeedbackObservice(this)
     }
 
-
+    /**
+     * 进入语聊房
+     */
     private fun gotoVoiceRoomActivity(bean: VoiceRoomBean, isCreate: Boolean = false) {
         var rooms = ArrayList<VoiceRoomBean>()
         if (isCreate) {

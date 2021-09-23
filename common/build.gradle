@@ -103,6 +103,8 @@ dependencies {
     // 表情
     api 'com.vanniktech:emoji-ios:0.7.0'
     api 'com.vdurmont:emoji-java:5.1.1'
+    //悬浮窗
+    api 'com.github.yhaolpz:FloatWindow:1.0.9'
 
     // 友盟统计相关
     api  'com.umeng.umsdk:common:9.4.0'// 必选

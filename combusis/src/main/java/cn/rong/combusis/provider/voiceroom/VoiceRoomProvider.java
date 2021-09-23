@@ -10,7 +10,6 @@ import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.dao.api.UserInfoDao;
 import com.rongcloud.common.net.ApiConstant;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.wrapper.AbsProvider;
 import cn.rong.combusis.provider.wrapper.IListProvider;
@@ -44,6 +42,7 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
             if (null != resultBack) resultBack.onResult(new ArrayList<>());
             return;
         }
+        // TODO
         String roomId = ids.get(0);
         OkApi.get(API_ROOM + roomId, null, new WrapperCallBack() {
             @Override
@@ -66,7 +65,9 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
         List<UserInfo> users = new ArrayList<>();
         int count = voiceRoomBeans.size();
         for (int i = 0; i < count; i++) {
-            users.add(voiceRoomBeans.get(i).getCreateUser().toUserInfo());
+            if (voiceRoomBeans.get(i).getCreateUser() != null) {
+                users.add(voiceRoomBeans.get(i).getCreateUser().toUserInfo());
+            }
         }
         UserProvider.provider().update(users);
     }

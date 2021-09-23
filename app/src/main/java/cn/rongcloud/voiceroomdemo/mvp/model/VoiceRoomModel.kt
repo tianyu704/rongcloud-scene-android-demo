@@ -42,6 +42,7 @@ import io.reactivex.rxjava3.functions.BiFunction
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.rong.common.dlog.LogEntity
 import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.ChatRoomInfo
 import io.rong.imlib.model.Conversation
@@ -143,6 +144,8 @@ class VoiceRoomModel @Inject constructor(
 
     private val privateMessageSubject = BehaviorSubject.create<Int>()
 
+    private val networkStatusSubject= BehaviorSubject.create<Int>()
+
     private val userMusicListSubject = BehaviorSubject.create<List<UiMusicModel>>()
 
     private val systemMusicListSubject = BehaviorSubject.create<List<UiMusicModel>>()
@@ -192,6 +195,11 @@ class VoiceRoomModel @Inject constructor(
 
     fun obOnlineUserCount(): Observable<Int> {
         return onlineUserCountSubject.observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(dataModifyScheduler)
+    }
+
+    fun obOnNetworkStatusChange(): Observable<Int> {
+        return networkStatusSubject.observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(dataModifyScheduler)
     }
 
@@ -764,6 +772,10 @@ class VoiceRoomModel @Inject constructor(
     }
 
     override fun onNetworkStatus(p0: Int) {
+        doOnDataScheduler {
+            Log.d(TAG,"signal:"+p0)
+            networkStatusSubject.onNext(p0)
+        }
     }
 
     override fun onPKgoing(p0: RCPKInfo) {

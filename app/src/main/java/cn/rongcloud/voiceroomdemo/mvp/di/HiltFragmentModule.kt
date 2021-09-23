@@ -42,10 +42,10 @@ class HiltFragmentModule {
     fun provideSelfSeatSettingBean(view: ISelfSettingView): UiSeatModel {
         return view.getUiSeatModel()!!
     }
-
+    //这里出现了闪退异常
     @Provides
     fun provideRoomInfoBean(roomModel: VoiceRoomModel): VoiceRoomBean {
-        return roomModel.currentUIRoomInfo.roomBean!!
+        return roomModel?.currentUIRoomInfo?.roomBean!!
     }
 
     @Provides

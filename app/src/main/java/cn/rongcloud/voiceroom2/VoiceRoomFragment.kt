@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroom2
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -12,8 +13,10 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rongcloud.annotation.HiltBinding
@@ -54,22 +57,57 @@ import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
+import cn.rongcloud.widget.RecordVoicePopupWindow
+import cn.rongcloud.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
+import cn.rongcloud.voiceroom.manager.AudioRecordManager
 import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.TipDialog
-import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.*
+
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
+import io.rong.imkit.manager.AudioPlayManager
+import io.rong.imkit.utils.PermissionCheckUtil
+import io.rong.imkit.utils.RongUtils
 import io.rong.imkit.utils.RouteUtils
+import io.rong.imlib.IMLibExtensionModuleManager
 import io.rong.imlib.model.Conversation
+import io.rong.imlib.model.HardwareResource
 import io.rong.imlib.model.MessageContent
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_voice_room.*
+import kotlinx.android.synthetic.main.activity_voice_room.btn_emoji_keyboard
+import kotlinx.android.synthetic.main.activity_voice_room.btn_open_send_message
+import kotlinx.android.synthetic.main.activity_voice_room.btn_seat_order
+import kotlinx.android.synthetic.main.activity_voice_room.cl_input_bar
+import kotlinx.android.synthetic.main.activity_voice_room.cl_member_list
+import kotlinx.android.synthetic.main.activity_voice_room.container
+import kotlinx.android.synthetic.main.activity_voice_room.et_message
+import kotlinx.android.synthetic.main.activity_voice_room.iv_background
+import kotlinx.android.synthetic.main.activity_voice_room.iv_is_mute
+import kotlinx.android.synthetic.main.activity_voice_room.iv_request_enter_seat
+import kotlinx.android.synthetic.main.activity_voice_room.iv_room_creator_portrait
+import kotlinx.android.synthetic.main.activity_voice_room.iv_room_setting
+import kotlinx.android.synthetic.main.activity_voice_room.iv_send_gift
+import kotlinx.android.synthetic.main.activity_voice_room.iv_send_message
+import kotlinx.android.synthetic.main.activity_voice_room.rv_message_list
+import kotlinx.android.synthetic.main.activity_voice_room.rv_seat_list
+import kotlinx.android.synthetic.main.activity_voice_room.tv_gift_count
+import kotlinx.android.synthetic.main.activity_voice_room.tv_room_creator_name
+import kotlinx.android.synthetic.main.activity_voice_room.tv_room_id
+import kotlinx.android.synthetic.main.activity_voice_room.tv_room_name
+import kotlinx.android.synthetic.main.activity_voice_room.tv_seat_order_operation_number
+import kotlinx.android.synthetic.main.activity_voice_room.tv_unread_message_number
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
+import kotlinx.android.synthetic.main.activity_voice_room.wv_creator_background
+import kotlinx.android.synthetic.main.fragment_voice_room.*
 import javax.inject.Inject
+import java.util.*
 
 
 private const val TAG = "VoiceRoomFragment"
@@ -257,6 +295,33 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         }
     }
 
+    override fun showSingalInfo(int: Int) {
+        Log.e(TAG, "showSingalInfo: " + int)
+        tv_room_signal.text = int.toString() + "ms";
+        if (int in 1..99) {
+            tv_room_signal.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.icon_signal_strong,
+                0,
+                0,
+                0
+            )
+        } else if (int in 100..299) {
+            tv_room_signal.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.icon_signal_medium,
+                0,
+                0,
+                0
+            )
+        } else if (int > 300) {
+            tv_room_signal.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.icon_signal_poor,
+                0,
+                0,
+                0
+            )
+        }
+    }
+
     private fun showSoftKeyBoard() {
         et_message.requestFocus()
         val imm = mActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -270,6 +335,8 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         imm.hideSoftInputFromWindow(et_message.windowToken, 0)
     }
 
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun initRoleView(roomInfo: UiRoomModel) {
         // 初始化角色相关的视图
         currentRole.initView(roomInfo)
@@ -306,6 +373,71 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 SendPresentFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
+//        if (recordVoicePopupWindow==null){
+//            recordVoicePopupWindow = RecordVoicePopupWindow(activity) {
+//                //发送音频文件
+//                Log.e(TAG, "initRoleView: ")
+//            }
+//        }
+//
+//        //绑定出发的view
+//        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
+        //直接使用imkit里面的代码
+        iv_send_voice_message_id.setOnTouchListener(mOnVoiceBtnTouchListener)
+    }
+
+    private var mConversationType: Conversation.ConversationType =
+        Conversation.ConversationType.PRIVATE;
+
+    private val mOnVoiceBtnTouchListener = OnTouchListener { v, event ->
+        val permissions = arrayOf(Manifest.permission.RECORD_AUDIO)
+        if (!PermissionCheckUtil.checkPermissions(
+                v.context,
+                permissions
+            ) && event.action == MotionEvent.ACTION_DOWN
+        ) {
+            PermissionCheckUtil.requestPermissions(
+                activity,
+                permissions,
+                PermissionCheckUtil.REQUEST_CODE_ASK_PERMISSIONS
+            )
+            return@OnTouchListener true
+        }
+        val location = IntArray(2)
+        iv_send_voice_message_id.getLocationOnScreen(location)
+        val x = location[0]
+        val y = location[1]
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            Log.e(TAG, ":ACTION_DOWN ")
+            //在这里拦截外部的滑动事件
+            v.getParent().requestDisallowInterceptTouchEvent(true)
+            if (AudioPlayManager.getInstance().isPlaying) {
+                AudioPlayManager.getInstance().stopPlay()
+            }
+            //判断正在视频通话和语音通话中不能进行语音消息发送
+            if (RongUtils.phoneIsInUse(v.context) || IMLibExtensionModuleManager.getInstance()
+                    .onRequestHardwareResource(HardwareResource.ResourceType.VIDEO)
+                || IMLibExtensionModuleManager.getInstance()
+                    .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO)
+            ) {
+                return@OnTouchListener true
+            }
+            AudioRecordManager.getInstance().startRecord(v.rootView, mConversationType, roomId)
+            iv_send_voice_message_id.background =
+                activity?.resources?.getDrawable(R.drawable.rc_ext_voice_touched_button)
+        } else if (event.action == MotionEvent.ACTION_MOVE) {
+            if (event.rawX <= 0 || event.rawX > x + v.width || event.rawY < y) {
+                AudioRecordManager.getInstance().willCancelRecord()
+            } else {
+                AudioRecordManager.getInstance().continueRecord()
+            }
+        } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
+            Log.e(TAG, ":ACTION_UP ")
+            v.getParent().requestDisallowInterceptTouchEvent(false)
+            AudioRecordManager.getInstance().stopRecord()
+            iv_send_voice_message_id.background = null
+        }
+        true
     }
 
     private fun sendTextMessage(message: String?) {
@@ -332,6 +464,19 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         ui {
             showMessage("上麦成功")
         }
+    }
+
+    override fun packupRoom() {
+        //先做悬浮窗
+        activity?.moveTaskToBack(true)
+        //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+        activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        //设置一下当前的封面图
+        VoiceRoomMiniManager.getInstance().init(activity, activity?.intent)
+        VoiceRoomMiniManager.getInstance().refreshRoomOwner(roomId)
+        VoiceRoomMiniManager.getInstance()
+            .setBackgroudPic(currentRole?.roomInfo.roomBean?.themePictureUrl, activity)
+        VoiceRoomMiniManager.getInstance().showMiniWindows()
     }
 
     override fun refreshOnlineUsersNumber(onlineUsersNumber: Int) {
@@ -510,6 +655,9 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         currentRole.showUnReadRequestNumber(number)
     }
 
+    /**
+     * 显示未读消息的数量
+     */
     override fun showUnreadMessage(count: Int) {
         tv_unread_message_number.isVisible = count > 0
         tv_unread_message_number.text = if (count < 99) {
@@ -782,6 +930,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 iv_room_setting.isVisible = true
                 btn_seat_order.isVisible = true
                 tv_seat_order_operation_number.isVisible = true
+                iv_send_voice_message_id.isVisible = false
             }
             initListener()
         }
@@ -857,8 +1006,12 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                         ConfirmDialog(context, "确定结束本次直播吗？", true) {
                             presenter.closeRoom()
                         }.show()
-                    })
+                    }, packUpRoomBlock = {
+                        exitRoomPopupWindow?.dismiss()
+                        presenter.packUpRoom()
 
+                    })
+                    exitRoomPopupWindow?.setAnimationStyle(R.style.popup_window_anim_style);
                     exitRoomPopupWindow?.showAtLocation(
                         iv_background,
                         Gravity.TOP,

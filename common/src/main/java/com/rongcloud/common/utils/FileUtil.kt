@@ -8,11 +8,15 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.FileUtils
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
+import io.rong.imkit.picture.tools.ToastUtils
 import java.io.*
 import java.util.*
+import java.io.File
+import android.os.StatFs
 
 
 /**
@@ -114,6 +118,24 @@ object FileUtil {
         fis.close()
         fos.close()
 
+    }
+
+    /**
+     * 判断存储卡是否存在
+     */
+    fun isExistExternalStore(): Boolean {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)
+    }
+
+    /**
+     * 获取本地可用的存储空间
+     */
+    fun getAvailaleSize(): Long {
+        val path = Environment.getExternalStorageDirectory() //取得sdcard文件路径
+        val stat = StatFs(path.path)
+        val blockSize = stat.blockSize.toLong()
+        val availableBlocks = stat.availableBlocks.toLong()
+        return availableBlocks * blockSize / 1024 / 1024 //  MIB单位
     }
 
 }

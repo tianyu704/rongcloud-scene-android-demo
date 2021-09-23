@@ -267,10 +267,18 @@ class VoiceRoomPresenter @Inject constructor(
             .subscribe { number ->
                 view.showUnReadRequestNumber(number)
             })
+        //信号监听
+        addDisposable(roomModel.obOnNetworkStatusChange()
+            .subscribe{
+                view.showSingalInfo(it)
+            })
         currentStatus = STATUS_NOT_ON_SEAT
         view.changeStatus(STATUS_NOT_ON_SEAT)
     }
 
+    /**
+     * 监听房间事件
+     */
     private fun handleRoomEvent(eventInfo: Pair<String, ArrayList<String>>) {
         when (eventInfo.first) {
             EVENT_ROOM_CLOSE -> {
@@ -470,7 +478,10 @@ class VoiceRoomPresenter @Inject constructor(
                 view.showError(-1, t.message)
             })
     }
-
+    //收起房间，最小化
+    fun packUpRoom(){
+//        view.packupRoom()
+    }
     fun roomOwnerEnterSeat() {
         RCVoiceRoomEngine.getInstance().enterSeat(0, object : RCVoiceRoomCallback {
             override fun onError(code: Int, message: String?) {
