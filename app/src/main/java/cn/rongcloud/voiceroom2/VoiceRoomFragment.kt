@@ -16,11 +16,12 @@ import android.view.*
 import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.TextView
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
+import cn.rong.combusis.ui.room.widget.like.FavAnimation
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import cn.rongcloud.voiceroom.manager.AudioRecordManager
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroom.ui.popup.ExitRoomPopupWindow
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
@@ -56,18 +57,14 @@ import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
-import cn.rongcloud.widget.RecordVoicePopupWindow
-import cn.rongcloud.widget.RecordVoicePopupWindow.RecordCallBack
 import cn.rongcloud.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
-import cn.rongcloud.voiceroom.manager.AudioRecordManager
 import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.ui.dialog.TipDialog
 import com.rongcloud.common.utils.*
-
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
@@ -106,12 +103,8 @@ import kotlinx.android.synthetic.main.activity_voice_room.tv_unread_message_numb
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
 import kotlinx.android.synthetic.main.activity_voice_room.wv_creator_background
 import kotlinx.android.synthetic.main.fragment_voice_room.*
-import java.io.File
-import javax.inject.Inject
-import java.lang.System.currentTimeMillis
 import java.util.*
-import java.util.concurrent.TimeUnit
-import com.rongcloud.common.utils.AudioRecorderUtil.AudioRecordListener as AudioRecordListener1
+import javax.inject.Inject
 
 
 private const val TAG = "VoiceRoomFragment"
@@ -184,9 +177,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
     }
 
     val favAnimation: FavAnimation by lazy {
-        return@lazy FavAnimation(
-            mActivity
-        ).apply {
+        return@lazy FavAnimation(mActivity).apply {
             this.addLikeImages(
                 R.drawable.ic_present_0,
                 R.drawable.ic_present_1,
@@ -390,6 +381,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
 //        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
         //直接使用imkit里面的代码
         iv_send_voice_message_id.setOnTouchListener(mOnVoiceBtnTouchListener)
+        Log.e(TAG, "initRoleView: ")
     }
 
     private var mConversationType: Conversation.ConversationType =
@@ -429,8 +421,6 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
                 return@OnTouchListener true
             }
             AudioRecordManager.getInstance().startRecord(v.rootView, mConversationType, roomId)
-            iv_send_voice_message_id.background =
-                activity?.resources?.getDrawable(R.drawable.rc_ext_voice_touched_button)
         } else if (event.action == MotionEvent.ACTION_MOVE) {
             if (event.rawX <= 0 || event.rawX > x + v.width || event.rawY < y) {
                 AudioRecordManager.getInstance().willCancelRecord()
@@ -441,12 +431,12 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
             Log.e(TAG, ":ACTION_UP ")
             v.getParent().requestDisallowInterceptTouchEvent(false)
             AudioRecordManager.getInstance().stopRecord()
-            iv_send_voice_message_id.background = null
         }
-        //绑定出发的view
-        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
+//        if (mConversationType == Conversation.ConversationType.PRIVATE) {
+//            RongIMClient.getInstance().sendTypingStatus(mConversationType, roomId, "RC:VcMsg")
+//        }
+        true
     }
-
 
     private fun sendTextMessage(message: String?) {
         message?.let {

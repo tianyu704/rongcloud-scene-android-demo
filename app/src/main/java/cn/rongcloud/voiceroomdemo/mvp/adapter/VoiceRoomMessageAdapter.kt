@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroomdemo.mvp.adapter
 
 import android.graphics.Color
+import android.graphics.drawable.AnimationDrawable
 import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -16,19 +17,18 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import cn.rong.combusis.message.*
+import cn.rongcloud.voiceroom.manager.AudioPlayManager
+import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroom.message.*
+import io.rong.imkit.manager.IAudioPlayListener
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.layout_system_message_item.view.tv_message_content
 import kotlinx.android.synthetic.main.layout_voice_message_item.view.*
-import android.widget.ImageView
-
-import android.graphics.drawable.AnimationDrawable
-
-
 
 
 /**
@@ -144,7 +144,7 @@ class VoiceRoomMessageAdapter(val roomModel: VoiceRoomModel, val listener: (Stri
         }
     }
 
-   inner class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class NormalMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         fun bind(message: MessageContent, roomModel: VoiceRoomModel, listener: (String) -> Unit) {
             with(itemView) {

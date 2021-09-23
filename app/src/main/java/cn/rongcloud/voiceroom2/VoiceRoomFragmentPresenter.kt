@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import cn.rong.combusis.message.*
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
+import cn.rongcloud.voiceroom.message.RCChatroomVoice
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel

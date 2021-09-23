@@ -25,32 +25,25 @@ import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
 import com.bcq.net.api.body.FileBody;
 import com.bcq.net.wrapper.Wrapper;
-import com.google.gson.JsonPrimitive;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.io.File;
 
 import cn.rong.combusis.api.VRApi;
-import cn.rongcloud.voiceroom.message.RCChatroomBarrage;
 import cn.rongcloud.voiceroom.message.RCChatroomVoice;
 import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager;
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManagerKt;
 import io.rong.common.RLog;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.R;
 import io.rong.imkit.config.RongConfigCenter;
-import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
-import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.common.SavePathUtils;
 import io.rong.imlib.model.Conversation;
-import io.rong.imlib.model.Message;
 import io.rong.imlib.typingmessage.TypingMessageManager;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
-import retrofit2.http.Url;
 
 
 public class AudioRecordManager implements Handler.Callback {
