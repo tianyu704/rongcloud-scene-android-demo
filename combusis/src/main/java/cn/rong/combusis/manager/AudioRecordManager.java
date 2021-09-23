@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.manager;
+package cn.rong.combusis.manager;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -30,8 +30,7 @@ import com.rongcloud.common.utils.AccountStore;
 import java.io.File;
 
 import cn.rong.combusis.api.VRApi;
-import cn.rongcloud.voiceroom.message.RCChatroomVoice;
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCChatroomVoice;
 import io.rong.common.RLog;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.R;
@@ -48,6 +47,9 @@ import kotlin.jvm.functions.Function2;
 
 public class AudioRecordManager implements Handler.Callback {
     private final static String TAG = "AudioRecordManager";
+    private static final int RC_SAMPLE_RATE_8000 = 8000;
+    private static final int RC_SAMPLE_RATE_16000 = 16000;
+    private static final String VOICE_PATH = "/voice/";
     private final int AUDIO_RECORD_EVENT_TRIGGER = 1;
     private final int AUDIO_RECORD_EVENT_SAMPLING = 2;
     private final int AUDIO_RECORD_EVENT_WILL_CANCEL = 3;
@@ -58,7 +60,11 @@ public class AudioRecordManager implements Handler.Callback {
     private final int AUDIO_RECORD_EVENT_TICKER = 8;
     private final int AUDIO_RECORD_EVENT_SEND_FILE = 9;
     private final int AUDIO_AA_ENCODING_BIT_RATE = 32000;
-
+    IAudioState idleState = new IdleState();
+    IAudioState recordState = new RecordState();
+    IAudioState sendingState = new SendingState();
+    IAudioState cancelState = new CancelState();
+    IAudioState timerState = new TimerState();
     private int RECORD_INTERVAL = 60;
     private SamplingRate mSampleRate = SamplingRate.RC_SAMPLE_RATE_8000;
     private IAudioState mCurAudioState;
@@ -66,31 +72,16 @@ public class AudioRecordManager implements Handler.Callback {
     private Context mContext;
     private Conversation.ConversationType mConversationType;
     private String mTargetId;
-
     private Handler mHandler;
-
     private AudioManager mAudioManager;
     private MediaRecorder mMediaRecorder;
     private Uri mAudioPath;
     private long smStartRecTime;
     private AudioManager.OnAudioFocusChangeListener mAfChangeListener;
-
     private PopupWindow mRecordWindow;
     private ImageView mStateIV;
     private TextView mStateTV;
     private TextView mTimerTV;
-
-    private static final int RC_SAMPLE_RATE_8000 = 8000;
-    private static final int RC_SAMPLE_RATE_16000 = 16000;
-    private static final String VOICE_PATH = "/voice/";
-
-    static class SingletonHolder {
-        static AudioRecordManager sInstance = new AudioRecordManager();
-    }
-
-    public static AudioRecordManager getInstance() {
-        return SingletonHolder.sInstance;
-    }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private AudioRecordManager() {
@@ -100,235 +91,8 @@ public class AudioRecordManager implements Handler.Callback {
         idleState.enter();
     }
 
-    IAudioState idleState = new IdleState();
-
-    class IdleState extends IAudioState {
-        public IdleState() {
-            RLog.d(TAG, "IdleState");
-        }
-
-        @Override
-        void enter() {
-            super.enter();
-            if (mHandler != null) {
-                mHandler.removeMessages(AUDIO_RECORD_EVENT_TIME_OUT);
-                mHandler.removeMessages(AUDIO_RECORD_EVENT_TICKER);
-                mHandler.removeMessages(AUDIO_RECORD_EVENT_SAMPLING);
-            }
-        }
-
-        @Override
-        void handleMessage(AudioStateMessage msg) {
-            RLog.d(TAG, "IdleState handleMessage : " + msg.what);
-            switch (msg.what) {
-                case AUDIO_RECORD_EVENT_TRIGGER:
-                    initView(mRootView);
-                    setRecordingView();
-                    startRec();
-                    setCallStateChangeListener();
-                    smStartRecTime = SystemClock.elapsedRealtime();
-                    mCurAudioState = recordState;
-                    sendEmptyMessage(AUDIO_RECORD_EVENT_SAMPLING);
-                    break;
-            }
-        }
-    }
-
-    IAudioState recordState = new RecordState();
-
-    class RecordState extends IAudioState {
-        @Override
-        void handleMessage(AudioStateMessage msg) {
-            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
-            switch (msg.what) {
-                case AUDIO_RECORD_EVENT_SAMPLING:
-                    audioDBChanged();
-                    mHandler.sendEmptyMessageDelayed(AUDIO_RECORD_EVENT_SAMPLING, 150);
-                    break;
-                case AUDIO_RECORD_EVENT_WILL_CANCEL:
-                    setCancelView();
-                    mCurAudioState = cancelState;
-                    break;
-                case AUDIO_RECORD_EVENT_RELEASE:
-                    final boolean checked = checkAudioTimeLength();
-                    boolean activityFinished = false;
-                    if (msg.obj != null) {
-                        activityFinished = (boolean) msg.obj;
-                    }
-                    if (checked && !activityFinished) {
-                        mStateIV.setImageResource(R.drawable.rc_voice_volume_warning);
-                        mStateTV.setText(R.string.rc_voice_short);
-                        mHandler.removeMessages(AUDIO_RECORD_EVENT_SAMPLING);
-                    }
-                    if (!activityFinished && mHandler != null) {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                AudioStateMessage message = new AudioStateMessage();
-                                message.what = AUDIO_RECORD_EVENT_SEND_FILE;
-                                message.obj = !checked;
-                                sendMessage(message);
-                            }
-                        }, 500);
-                        mCurAudioState = sendingState;
-                    } else {
-                        stopRec();
-                        if (!checked && activityFinished) {
-                            sendAudioFile();
-                        }
-                        destroyView();
-                        mCurAudioState = idleState;
-                    }
-                    break;
-                case AUDIO_RECORD_EVENT_TIME_OUT:
-                    int counter = (int) msg.obj;
-                    setTimeoutView(counter);
-                    mCurAudioState = timerState;
-
-                    if (counter >= 0) {
-                        android.os.Message message = android.os.Message.obtain();
-                        message.what = AUDIO_RECORD_EVENT_TICKER;
-                        message.obj = counter - 1;
-                        mHandler.sendMessageDelayed(message, 1000);
-                    } else {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                stopRec();
-                                sendAudioFile();
-                                destroyView();
-                            }
-                        }, 500);
-                        mCurAudioState = idleState;
-
-                    }
-                    break;
-                case AUDIO_RECORD_EVENT_ABORT:
-                    stopRec();
-                    destroyView();
-                    deleteAudioFile();
-                    mCurAudioState = idleState;
-                    idleState.enter();
-                    break;
-            }
-        }
-    }
-
-    IAudioState sendingState = new SendingState();
-
-    class SendingState extends IAudioState {
-        @Override
-        void handleMessage(AudioStateMessage message) {
-            RLog.d(TAG, "SendingState handleMessage " + message.what);
-            switch (message.what) {
-                case AUDIO_RECORD_EVENT_SEND_FILE:
-                    stopRec();
-                    if ((boolean) message.obj) sendAudioFile();
-                    destroyView();
-                    mCurAudioState = idleState;
-                    break;
-            }
-        }
-    }
-
-    IAudioState cancelState = new CancelState();
-
-    class CancelState extends IAudioState {
-        @Override
-        void handleMessage(AudioStateMessage msg) {
-            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
-            switch (msg.what) {
-                case AUDIO_RECORD_EVENT_TRIGGER:
-                    break;
-                case AUDIO_RECORD_EVENT_CONTINUE:
-                    setRecordingView();
-                    mCurAudioState = recordState;
-                    sendEmptyMessage(AUDIO_RECORD_EVENT_SAMPLING);
-                    break;
-                case AUDIO_RECORD_EVENT_ABORT:
-                case AUDIO_RECORD_EVENT_RELEASE:
-                    stopRec();
-                    destroyView();
-                    deleteAudioFile();
-                    mCurAudioState = idleState;
-                    idleState.enter();
-                    break;
-                case AUDIO_RECORD_EVENT_TIME_OUT:
-                    final int counter = (int) msg.obj;
-                    if (counter > 0) {
-                        android.os.Message message = android.os.Message.obtain();
-                        message.what = AUDIO_RECORD_EVENT_TICKER;
-                        message.obj = counter - 1;
-                        mHandler.sendMessageDelayed(message, 1000);
-                    } else {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                stopRec();
-                                sendAudioFile();
-                                destroyView();
-                            }
-                        }, 500);
-                        mCurAudioState = idleState;
-                        idleState.enter();
-                    }
-                    break;
-            }
-        }
-    }
-
-    IAudioState timerState = new TimerState();
-
-    class TimerState extends IAudioState {
-        @Override
-        void handleMessage(AudioStateMessage msg) {
-            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
-            switch (msg.what) {
-                case AUDIO_RECORD_EVENT_TIME_OUT:
-                    final int counter = (int) msg.obj;
-                    if (counter >= 0) {
-                        android.os.Message message = android.os.Message.obtain();
-                        message.what = AUDIO_RECORD_EVENT_TICKER;
-                        message.obj = counter - 1;
-                        mHandler.sendMessageDelayed(message, 1000);
-                        setTimeoutView(counter);
-                    } else {
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                stopRec();
-                                sendAudioFile();
-                                destroyView();
-                            }
-                        }, 500);
-                        mCurAudioState = idleState;
-                    }
-                    break;
-                case AUDIO_RECORD_EVENT_RELEASE:
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            stopRec();
-                            sendAudioFile();
-                            destroyView();
-                        }
-                    }, 500);
-                    mCurAudioState = idleState;
-                    idleState.enter();
-                    break;
-                case AUDIO_RECORD_EVENT_ABORT:
-                    stopRec();
-                    destroyView();
-                    deleteAudioFile();
-                    mCurAudioState = idleState;
-                    idleState.enter();
-                    break;
-                case AUDIO_RECORD_EVENT_WILL_CANCEL:
-                    setCancelView();
-                    mCurAudioState = cancelState;
-                    break;
-            }
-        }
+    public static AudioRecordManager getInstance() {
+        return SingletonHolder.sInstance;
     }
 
     @Override
@@ -461,12 +225,12 @@ public class AudioRecordManager implements Handler.Callback {
         }
     }
 
-    public void setMaxVoiceDuration(int maxVoiceDuration) {
-        RECORD_INTERVAL = maxVoiceDuration;
-    }
-
     public int getMaxVoiceDuration() {
         return RECORD_INTERVAL;
+    }
+
+    public void setMaxVoiceDuration(int maxVoiceDuration) {
+        RECORD_INTERVAL = maxVoiceDuration;
     }
 
     public void startRecord(View rootView, Conversation.ConversationType conversationType, String targetId) {
@@ -515,7 +279,6 @@ public class AudioRecordManager implements Handler.Callback {
     public void stopRecord() {
         sendEmptyMessage(AUDIO_RECORD_EVENT_RELEASE);
     }
-
 
     public void destroyRecord() {
         AudioStateMessage msg = new AudioStateMessage();
@@ -639,7 +402,7 @@ public class AudioRecordManager implements Handler.Callback {
                         //自定义msg，然后发送
                         String path = VRApi.FILE_PATH + url;
                         RCChatroomVoice rcvrVoiceMessage = new RCChatroomVoice();
-                        rcvrVoiceMessage.setDuration(duration+"");
+                        rcvrVoiceMessage.setDuration(duration + "");
                         rcvrVoiceMessage.setPath(path);
                         rcvrVoiceMessage.setUserName(AccountStore.INSTANCE.getUserName());
                         rcvrVoiceMessage.setUserId(AccountStore.INSTANCE.getUserId());
@@ -736,15 +499,6 @@ public class AudioRecordManager implements Handler.Callback {
     }
 
     /**
-     * 设置语音消息采样率
-     *
-     * @param sampleRate 消息采样率{@link SamplingRate}
-     */
-    public void setSamplingRate(SamplingRate sampleRate) {
-        this.mSampleRate = sampleRate;
-    }
-
-    /**
      * 语音消息采样率
      *
      * @return 当前设置的语音采样率
@@ -753,20 +507,13 @@ public class AudioRecordManager implements Handler.Callback {
         return mSampleRate.getValue();
     }
 
-    abstract class IAudioState {
-        void enter() {
-        }
-
-        abstract void handleMessage(AudioStateMessage message);
-    }
-
-    class AudioStateMessage {
-        public int what;
-        public Object obj;
-
-        public AudioStateMessage obtain() {
-            return new AudioStateMessage();
-        }
+    /**
+     * 设置语音消息采样率
+     *
+     * @param sampleRate 消息采样率{@link SamplingRate}
+     */
+    public void setSamplingRate(SamplingRate sampleRate) {
+        this.mSampleRate = sampleRate;
     }
 
     /**
@@ -783,14 +530,255 @@ public class AudioRecordManager implements Handler.Callback {
          */
         RC_SAMPLE_RATE_16000(16000);
 
+        private int value;
+
         SamplingRate(int sampleRate) {
             this.value = sampleRate;
         }
 
-        private int value;
-
         public int getValue() {
             return this.value;
+        }
+    }
+
+    static class SingletonHolder {
+        static AudioRecordManager sInstance = new AudioRecordManager();
+    }
+
+    class IdleState extends IAudioState {
+        public IdleState() {
+            RLog.d(TAG, "IdleState");
+        }
+
+        @Override
+        void enter() {
+            super.enter();
+            if (mHandler != null) {
+                mHandler.removeMessages(AUDIO_RECORD_EVENT_TIME_OUT);
+                mHandler.removeMessages(AUDIO_RECORD_EVENT_TICKER);
+                mHandler.removeMessages(AUDIO_RECORD_EVENT_SAMPLING);
+            }
+        }
+
+        @Override
+        void handleMessage(AudioStateMessage msg) {
+            RLog.d(TAG, "IdleState handleMessage : " + msg.what);
+            switch (msg.what) {
+                case AUDIO_RECORD_EVENT_TRIGGER:
+                    initView(mRootView);
+                    setRecordingView();
+                    startRec();
+                    setCallStateChangeListener();
+                    smStartRecTime = SystemClock.elapsedRealtime();
+                    mCurAudioState = recordState;
+                    sendEmptyMessage(AUDIO_RECORD_EVENT_SAMPLING);
+                    break;
+            }
+        }
+    }
+
+    class RecordState extends IAudioState {
+        @Override
+        void handleMessage(AudioStateMessage msg) {
+            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
+            switch (msg.what) {
+                case AUDIO_RECORD_EVENT_SAMPLING:
+                    audioDBChanged();
+                    mHandler.sendEmptyMessageDelayed(AUDIO_RECORD_EVENT_SAMPLING, 150);
+                    break;
+                case AUDIO_RECORD_EVENT_WILL_CANCEL:
+                    setCancelView();
+                    mCurAudioState = cancelState;
+                    break;
+                case AUDIO_RECORD_EVENT_RELEASE:
+                    final boolean checked = checkAudioTimeLength();
+                    boolean activityFinished = false;
+                    if (msg.obj != null) {
+                        activityFinished = (boolean) msg.obj;
+                    }
+                    if (checked && !activityFinished) {
+                        mStateIV.setImageResource(R.drawable.rc_voice_volume_warning);
+                        mStateTV.setText(R.string.rc_voice_short);
+                        mHandler.removeMessages(AUDIO_RECORD_EVENT_SAMPLING);
+                    }
+                    if (!activityFinished && mHandler != null) {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                AudioStateMessage message = new AudioStateMessage();
+                                message.what = AUDIO_RECORD_EVENT_SEND_FILE;
+                                message.obj = !checked;
+                                sendMessage(message);
+                            }
+                        }, 500);
+                        mCurAudioState = sendingState;
+                    } else {
+                        stopRec();
+                        if (!checked && activityFinished) {
+                            sendAudioFile();
+                        }
+                        destroyView();
+                        mCurAudioState = idleState;
+                    }
+                    break;
+                case AUDIO_RECORD_EVENT_TIME_OUT:
+                    int counter = (int) msg.obj;
+                    setTimeoutView(counter);
+                    mCurAudioState = timerState;
+
+                    if (counter >= 0) {
+                        android.os.Message message = android.os.Message.obtain();
+                        message.what = AUDIO_RECORD_EVENT_TICKER;
+                        message.obj = counter - 1;
+                        mHandler.sendMessageDelayed(message, 1000);
+                    } else {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopRec();
+                                sendAudioFile();
+                                destroyView();
+                            }
+                        }, 500);
+                        mCurAudioState = idleState;
+
+                    }
+                    break;
+                case AUDIO_RECORD_EVENT_ABORT:
+                    stopRec();
+                    destroyView();
+                    deleteAudioFile();
+                    mCurAudioState = idleState;
+                    idleState.enter();
+                    break;
+            }
+        }
+    }
+
+    class SendingState extends IAudioState {
+        @Override
+        void handleMessage(AudioStateMessage message) {
+            RLog.d(TAG, "SendingState handleMessage " + message.what);
+            switch (message.what) {
+                case AUDIO_RECORD_EVENT_SEND_FILE:
+                    stopRec();
+                    if ((boolean) message.obj) sendAudioFile();
+                    destroyView();
+                    mCurAudioState = idleState;
+                    break;
+            }
+        }
+    }
+
+    class CancelState extends IAudioState {
+        @Override
+        void handleMessage(AudioStateMessage msg) {
+            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
+            switch (msg.what) {
+                case AUDIO_RECORD_EVENT_TRIGGER:
+                    break;
+                case AUDIO_RECORD_EVENT_CONTINUE:
+                    setRecordingView();
+                    mCurAudioState = recordState;
+                    sendEmptyMessage(AUDIO_RECORD_EVENT_SAMPLING);
+                    break;
+                case AUDIO_RECORD_EVENT_ABORT:
+                case AUDIO_RECORD_EVENT_RELEASE:
+                    stopRec();
+                    destroyView();
+                    deleteAudioFile();
+                    mCurAudioState = idleState;
+                    idleState.enter();
+                    break;
+                case AUDIO_RECORD_EVENT_TIME_OUT:
+                    final int counter = (int) msg.obj;
+                    if (counter > 0) {
+                        android.os.Message message = android.os.Message.obtain();
+                        message.what = AUDIO_RECORD_EVENT_TICKER;
+                        message.obj = counter - 1;
+                        mHandler.sendMessageDelayed(message, 1000);
+                    } else {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopRec();
+                                sendAudioFile();
+                                destroyView();
+                            }
+                        }, 500);
+                        mCurAudioState = idleState;
+                        idleState.enter();
+                    }
+                    break;
+            }
+        }
+    }
+
+    class TimerState extends IAudioState {
+        @Override
+        void handleMessage(AudioStateMessage msg) {
+            RLog.d(TAG, getClass().getSimpleName() + " handleMessage : " + msg.what);
+            switch (msg.what) {
+                case AUDIO_RECORD_EVENT_TIME_OUT:
+                    final int counter = (int) msg.obj;
+                    if (counter >= 0) {
+                        android.os.Message message = android.os.Message.obtain();
+                        message.what = AUDIO_RECORD_EVENT_TICKER;
+                        message.obj = counter - 1;
+                        mHandler.sendMessageDelayed(message, 1000);
+                        setTimeoutView(counter);
+                    } else {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopRec();
+                                sendAudioFile();
+                                destroyView();
+                            }
+                        }, 500);
+                        mCurAudioState = idleState;
+                    }
+                    break;
+                case AUDIO_RECORD_EVENT_RELEASE:
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            stopRec();
+                            sendAudioFile();
+                            destroyView();
+                        }
+                    }, 500);
+                    mCurAudioState = idleState;
+                    idleState.enter();
+                    break;
+                case AUDIO_RECORD_EVENT_ABORT:
+                    stopRec();
+                    destroyView();
+                    deleteAudioFile();
+                    mCurAudioState = idleState;
+                    idleState.enter();
+                    break;
+                case AUDIO_RECORD_EVENT_WILL_CANCEL:
+                    setCancelView();
+                    mCurAudioState = cancelState;
+                    break;
+            }
+        }
+    }
+
+    abstract class IAudioState {
+        void enter() {
+        }
+
+        abstract void handleMessage(AudioStateMessage message);
+    }
+
+    class AudioStateMessage {
+        public int what;
+        public Object obj;
+
+        public AudioStateMessage obtain() {
+            return new AudioStateMessage();
         }
     }
 }

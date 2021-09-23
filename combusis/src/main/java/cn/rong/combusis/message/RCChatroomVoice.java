@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.message;
+package cn.rong.combusis.message;
 
 import android.os.Parcel;
 import android.text.TextUtils;

@@ -6,17 +6,16 @@ package cn.rongcloud.voiceroom2
 
 import android.util.Log
 import androidx.fragment.app.Fragment
+import cn.rong.combusis.manager.RCChatRoomMessageManager
 import cn.rong.combusis.message.*
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import cn.rongcloud.voiceroom.message.RCChatroomVoice
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroom.utils.AudioEffectManager
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
 import com.rongcloud.common.base.BaseLifeCyclePresenter

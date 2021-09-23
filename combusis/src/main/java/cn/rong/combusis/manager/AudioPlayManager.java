@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.manager;
+package cn.rong.combusis.manager;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -23,11 +23,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import io.rong.common.RLog;
-import io.rong.imkit.manager.IAudioPlayListener;
 
 public class AudioPlayManager implements SensorEventListener {
     private final static String TAG = "AudioPlayManager";
-
+    private final Object mLock = new Object();
     private MediaPlayer mMediaPlayer;
     private IAudioPlayListener _playListener;
     private Uri mUriPlaying;
@@ -39,14 +38,10 @@ public class AudioPlayManager implements SensorEventListener {
     private AudioManager.OnAudioFocusChangeListener afChangeListener;
     private Context mContext;
     private Handler handler;
-    private final Object mLock = new Object();
+    private boolean isVOIPMode = false;
 
     private AudioPlayManager() {
         handler = new Handler(Looper.getMainLooper());
-    }
-
-    static class SingletonHolder {
-        static AudioPlayManager sInstance = new AudioPlayManager();
     }
 
     public static AudioPlayManager getInstance() {
@@ -482,8 +477,6 @@ public class AudioPlayManager implements SensorEventListener {
         }
     }
 
-    private boolean isVOIPMode = false;
-
     public boolean isInVOIPMode(Context context) {
         return isVOIPMode;
     }
@@ -496,5 +489,9 @@ public class AudioPlayManager implements SensorEventListener {
         synchronized (mLock) {
             return mMediaPlayer != null && mMediaPlayer.isPlaying();
         }
+    }
+
+    static class SingletonHolder {
+        static AudioPlayManager sInstance = new AudioPlayManager();
     }
 }

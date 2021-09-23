@@ -6,6 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.model
 
 import android.util.Log
 import androidx.fragment.app.Fragment
+import cn.rong.combusis.manager.RCChatRoomMessageManager
 import cn.rong.combusis.message.*
 import cn.rongcloud.rtc.api.RCRTCAudioMixer
 import cn.rongcloud.rtc.api.RCRTCEngine
@@ -23,7 +24,6 @@ import cn.rongcloud.voiceroom.net.bean.request.*
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroom.ui.uimodel.*
 import cn.rongcloud.voiceroom.utils.LocalUserInfoManager
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.bean.Present

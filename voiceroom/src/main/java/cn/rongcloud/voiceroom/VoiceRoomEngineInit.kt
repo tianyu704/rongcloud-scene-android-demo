@@ -8,8 +8,8 @@ import android.app.Application
 import android.content.Context
 import android.os.Looper
 import android.util.Log
+import cn.rong.combusis.manager.RCChatRoomMessageManager
 import cn.rongcloud.annotation.AutoInit
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import com.rongcloud.common.AppConfig

@@ -21,7 +21,6 @@ import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rong.combusis.ui.room.widget.like.FavAnimation
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
-import cn.rongcloud.voiceroom.manager.AudioRecordManager
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import cn.rongcloud.voiceroom.ui.popup.ExitRoomPopupWindow
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
@@ -69,6 +68,7 @@ import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
 import io.rong.imkit.manager.AudioPlayManager
+import io.rong.imkit.manager.AudioRecordManager
 import io.rong.imkit.utils.PermissionCheckUtil
 import io.rong.imkit.utils.RongUtils
 import io.rong.imkit.utils.RouteUtils
