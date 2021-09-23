@@ -18,6 +18,7 @@ class LockRoomFunction(val roomModel: VoiceRoomModel, val view: IRoomSettingView
 
 
     override fun onCreate() {
+        //监听房间信息发生改变才开始显示
         addDisposable(roomModel
             .obRoomInfoChange()
             .observeOn(AndroidSchedulers.mainThread())

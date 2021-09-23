@@ -47,6 +47,7 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.Revok
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroundSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.IBackgroundSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.IRoomSettingView
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.RoomSettingDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.RoomSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.IViewPageListView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.SeatOrderOperationFragment
@@ -166,7 +167,8 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
             .build(et_message)
     }
 
-    private var roomSettingFragment: RoomSettingFragment? = null
+//    private var roomSettingFragment: RoomSettingFragment? = null
+    private var roomSettingDialogFragment: RoomSettingDialogFragment? = null
 
     @Inject
     lateinit var presenter: VoiceRoomFragmentPresenter
@@ -348,8 +350,10 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         }
         iv_room_setting.setOnClickListener {
             roomInfo.roomBean?.let {
-                roomSettingFragment = RoomSettingFragment(this)
-                roomSettingFragment?.show(this@VoiceRoomFragment.childFragmentManager)
+                roomSettingDialogFragment = RoomSettingDialogFragment(getVoiceRoomModel(),this);
+                roomSettingDialogFragment!!.show(this.childFragmentManager)
+//                roomSettingFragment = RoomSettingFragment(this)
+//                roomSettingFragment?.show(this@VoiceRoomFragment.childFragmentManager)
             }
         }
         btn_seat_order.setOnClickListener {
@@ -716,7 +720,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
     }
 
     override fun showBackgroundFragment() {
-        roomSettingFragment?.dismiss()
+        roomSettingDialogFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
             BackgroundSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
@@ -724,7 +728,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
     }
 
     override fun showMusicSettingFragment() {
-        roomSettingFragment?.dismiss()
+        roomSettingDialogFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
             MusicSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
@@ -733,7 +737,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
 
     override fun hideSettingView() {
         super.hideSettingView()
-        roomSettingFragment?.dismiss()
+        roomSettingDialogFragment?.dismiss()
     }
 
     override fun fragmentDismiss() {

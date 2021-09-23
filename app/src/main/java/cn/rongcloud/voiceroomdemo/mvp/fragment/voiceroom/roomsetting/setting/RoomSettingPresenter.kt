@@ -26,8 +26,8 @@ class RoomSettingPresenter @Inject constructor(
 
     init {
         functionList.apply {
-            add(LockRoomFunction(roomModel, view))
-            add(RoomNameFunction(roomModel, view))
+            add(LockRoomFunction(roomModel, fragment as RoomSettingDialogFragment))
+            add(RoomNameFunction(roomModel, fragment as RoomSettingDialogFragment))
             add(BackgroundFunction(view))
             add(EnterSeatModelFunction(roomModel, view))
             add(MuteAllSeatFunction(roomModel, view))

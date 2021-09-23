@@ -118,8 +118,11 @@ class VoiceRoomListModel @Inject constructor() : BaseModel {
         return VoiceRoomNetManager
             .aRoomApi
             .getVoiceRoomInfo(roomId)
-            .observeOn(loadSchedulers)
             .subscribeOn(loadSchedulers)
+            .observeOn(loadSchedulers)
+            .doOnError{
+                Log.e(TAG, "queryRoomInfoFromServer: " )
+            }
             .doOnSuccess {
                 val currentRoom = currentRoomMap[roomId]
                 if (currentRoom != null) {

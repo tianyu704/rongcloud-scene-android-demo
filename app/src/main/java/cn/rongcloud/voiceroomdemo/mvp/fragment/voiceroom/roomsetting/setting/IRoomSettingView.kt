@@ -23,4 +23,5 @@ interface IRoomSettingView : IBaseView {
     fun showBackgroundFragment()
     fun hideSettingView(){}
     fun showMusicSettingFragment(){}
+
 }

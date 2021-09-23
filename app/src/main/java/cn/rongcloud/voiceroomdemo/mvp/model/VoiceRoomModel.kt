@@ -136,7 +136,6 @@ class VoiceRoomModel @Inject constructor(
 
     private val memberInfoChangeSubject = BehaviorSubject.create<UiMemberModel>()
 
-
     private val pickSeatReceivedSubject = BehaviorSubject.create<String>()
 
     private val recordingStatusSubject = BehaviorSubject.create<Boolean>()
@@ -244,6 +243,7 @@ class VoiceRoomModel @Inject constructor(
 
     init {
         Log.v(TAG, "init:roomId = $roomId")
+        //这里导致了roomId为空，导致下次进来的时候直接为空了
         voiceRoomListModel
             .getRoomInfo(roomId)
             .subscribe({
@@ -819,6 +819,8 @@ class VoiceRoomModel @Inject constructor(
         addDisposable(VoiceRoomNetManager
             .aRoomApi
             .getVoiceRoomInfo(roomId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe { bean ->
                 Log.e(TAG, "queryRoomInfoFromServer :")
                 currentUIRoomInfo.roomBean = bean.room
