@@ -63,7 +63,7 @@ public class EventBus {
     public void emit(String tag, Object... args) {
         List<EventCallback> cals = events.get(tag);
         int count = cals == null ? 0 : cals.size();
-        for (int i = count; i > -1; i--) {
+        for (int i = count - 1; i > -1; i--) {
             cals.get(i).onEvent(args);
         }
     }

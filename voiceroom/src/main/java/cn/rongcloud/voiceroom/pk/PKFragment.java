@@ -2,10 +2,12 @@ package cn.rongcloud.voiceroom.pk;
 
 import com.basis.ui.BaseFragment;
 
+import cn.rongcloud.voiceroom.R;
+
 public class PKFragment extends BaseFragment {
     @Override
     public int setLayoutId() {
-        return 0;
+        return R.layout.fragment_pk;
     }
 
     @Override

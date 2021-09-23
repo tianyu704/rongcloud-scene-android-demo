@@ -3,24 +3,18 @@ package cn.rong.combusis.sdk.event.wrapper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.kit.cache.GsonUtil;
-import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
-import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rong.combusis.sdk.Api;
@@ -35,7 +29,6 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<StatusListener> statusListeners;//网络状态监听
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
-    protected PKInviter pkInviter;
     protected abstract void onShowTipDialog(String roomId, String userId, TipType type, IResultBack<Boolean> resultBack);
 
     protected String roomId;
@@ -415,91 +408,91 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     }
 
 
-    /**
-     * PK开启成功
-     *
-     * @param rcpkInfo
-     */
-    @Override
-    public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
-        Logger.e(TAG, "onPKgoing");
-        //邀请同意 开始PK 释放被邀请信息
-        VoiceRoomApi.getApi().releasePKInvitee();
-    }
-
-    /**
-     * PK结束回调
-     */
-    @Override
-    public void onPKFinish() {
-        Logger.e(TAG, "onPKFinish");
-    }
-
-    /**
-     * 接收到PK邀请回调
-     *
-     * @param inviterRoomId 发起邀请人的房间Id
-     * @param inviterUserId 发起邀请人的Id
-     */
-    @Override
-    public void onReveivePKInvitation(String inviterRoomId, String inviterUserId) {
-        Logger.e(TAG, "onReveivePKInvitation");
-        //保存邀请者信息
-        pkInviter = new PKInviter();
-        pkInviter.inviterRoomId = inviterRoomId;
-        pkInviter.inviterId = inviterUserId;
-
-        onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
-            @Override
-            public void onResult(Boolean result) {
-                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        EToast.showToastWithLag(TAG, result ? "同意PK成功" : "拒绝PK成功");
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        EToast.showToastWithLag(TAG, (result ? "同意PK失败" : "拒绝PK失败") + " code = " + code + " message = " + message);
-                    }
-                });
-            }
-        });
-
-    }
-
-
-    /**
-     * PK邀请被取消
-     *
-     * @param roomId 发起邀请人的房间Id
-     * @param userId 发起邀请人的Id
-     */
-    @Override
-    public void onPKInvitationCanceled(String roomId, String userId) {
-        Logger.e(TAG, "onPKInvitationCanceled");
-        EventDialogHelper.helper().dismissDialog();
-        // 释放邀请者信息
-        pkInviter = null;
-    }
-
-    /**
-     * PK邀请被拒绝
-     *
-     * @param roomId 发起邀请人的房间Id
-     * @param userId 发起邀请人的Id
-     */
-    @Override
-    public void onPKInvitationRejected(String roomId, String userId) {
-        Logger.e(TAG, "onPKInvitationRejected");
-        //邀请被拒绝 释放被邀请信息
-        VoiceRoomApi.getApi().releasePKInvitee();
-    }
-
-    @Override
-    public void onPKInvitationIgnored(String s, String s1) {
-        Logger.e(TAG, "onPKInvitationIgnored");
-        //邀请被忽略 释放被邀请信息
-        VoiceRoomApi.getApi().releasePKInvitee();
-    }
+//    /**
+//     * PK开启成功
+//     *
+//     * @param rcpkInfo
+//     */
+//    @Override
+//    public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
+//        Logger.e(TAG, "onPKgoing");
+//        //邀请同意 开始PK 释放被邀请信息
+//        VoiceRoomApi.getApi().releasePKInvitee();
+//    }
+//
+//    /**
+//     * PK结束回调
+//     */
+//    @Override
+//    public void onPKFinish() {
+//        Logger.e(TAG, "onPKFinish");
+//    }
+//
+//    /**
+//     * 接收到PK邀请回调
+//     *
+//     * @param inviterRoomId 发起邀请人的房间Id
+//     * @param inviterUserId 发起邀请人的Id
+//     */
+//    @Override
+//    public void onReveivePKInvitation(String inviterRoomId, String inviterUserId) {
+//        Logger.e(TAG, "onReveivePKInvitation");
+//        //保存邀请者信息
+//        pkInviter = new PKInviter();
+//        pkInviter.inviterRoomId = inviterRoomId;
+//        pkInviter.inviterId = inviterUserId;
+//
+//        onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
+//            @Override
+//            public void onResult(Boolean result) {
+//                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//                        EToast.showToastWithLag(TAG, result ? "同意PK成功" : "拒绝PK成功");
+//                    }
+//
+//                    @Override
+//                    public void onError(int code, String message) {
+//                        EToast.showToastWithLag(TAG, (result ? "同意PK失败" : "拒绝PK失败") + " code = " + code + " message = " + message);
+//                    }
+//                });
+//            }
+//        });
+//
+//    }
+//
+//
+//    /**
+//     * PK邀请被取消
+//     *
+//     * @param roomId 发起邀请人的房间Id
+//     * @param userId 发起邀请人的Id
+//     */
+//    @Override
+//    public void onPKInvitationCanceled(String roomId, String userId) {
+//        Logger.e(TAG, "onPKInvitationCanceled");
+//        EventDialogHelper.helper().dismissDialog();
+//        // 释放邀请者信息
+//        pkInviter = null;
+//    }
+//
+//    /**
+//     * PK邀请被拒绝
+//     *
+//     * @param roomId 发起邀请人的房间Id
+//     * @param userId 发起邀请人的Id
+//     */
+//    @Override
+//    public void onPKInvitationRejected(String roomId, String userId) {
+//        Logger.e(TAG, "onPKInvitationRejected");
+//        //邀请被拒绝 释放被邀请信息
+//        VoiceRoomApi.getApi().releasePKInvitee();
+//    }
+//
+//    @Override
+//    public void onPKInvitationIgnored(String s, String s1) {
+//        Logger.e(TAG, "onPKInvitationIgnored");
+//        //邀请被忽略 释放被邀请信息
+//        VoiceRoomApi.getApi().releasePKInvitee();
+//    }
 }

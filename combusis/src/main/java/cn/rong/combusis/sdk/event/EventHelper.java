@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.provider.user.UserProvider;
+import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
@@ -25,7 +26,7 @@ import io.rong.imlib.model.ChatRoomInfo;
 import io.rong.imlib.model.ChatRoomMemberInfo;
 import io.rong.imlib.model.UserInfo;
 
-public class EventHelper extends AbsEvenHelper {
+public class EventHelper extends AbsPKHelper {
 
     private final static IEventHelp _helper = new EventHelper();
 

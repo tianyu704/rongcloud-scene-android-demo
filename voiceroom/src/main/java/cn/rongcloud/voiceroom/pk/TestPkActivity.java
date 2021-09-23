@@ -20,11 +20,11 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rongcloud.voiceroom.R;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rong.combusis.sdk.event.PKType;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class TestPkActivity extends BaseActivity {
@@ -36,6 +36,12 @@ public class TestPkActivity extends BaseActivity {
     String V_TAG = "voice_room";
     String PK_TAG = "voice_pk";
     private VoiceRoomBean voiceRoomBean;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.get().off(EventBus.TAG.PK_STATE, null);
+    }
 
     @Override
     public void init() {
@@ -58,34 +64,6 @@ public class TestPkActivity extends BaseActivity {
             }
         });
         EventHelper.helper().regeister(voiceRoomBean.getRoomId());
-//        EventHelper.helper().addRoomListener(new RoomListener() {
-//            @Override
-//            public void onRoomInfo(@NonNull RCVoiceRoomInfo roomInfo) {
-//                Logger.e(TAG, "roomInfo = " + GsonUtil.obj2Json(roomInfo));
-//            }
-//
-//            @Override
-//            public void onSeatList(@NonNull List<RCVoiceSeatInfo> seatInfos) {
-//                Logger.e(TAG, "seatInfos = " + GsonUtil.obj2Json(seatInfos));
-//            }
-//
-//            @Override
-//            public void onNotify(String code, String content) {
-//            }
-//
-//            @Override
-//            public void onOnLineUserIds(@Nullable List<String> userIds) {
-//
-//            }
-//        });
-//        VoiceRoomApi.getApi().joinRoom(voiceRoomBean.getRoomId(), new IResultBack<Boolean>() {
-//            @Override
-//            public void onResult(Boolean aBoolean) {
-//                Log.e(TAG, "加入房间:" + aBoolean);
-//                synToService(voiceRoomBean.getRoomId());
-//                VoiceRoomApi.getApi().enterSeat(0, null);
-//            }
-//        });
         RCVoiceRoomInfo roomInfo = VoiceRoomApi.getApi().getRoomInfo();
         roomInfo.setSeatCount(8);
         roomInfo.setRoomName(voiceRoomBean.getRoomName());
@@ -103,13 +81,14 @@ public class TestPkActivity extends BaseActivity {
             @Override
             public void onEvent(Object... args) {
                 if (args.length != 1) return;
-                if (args[0] instanceof PKType) {
-                    PKType state = (PKType) args[0];
-                    if (PKType.PKGong == state) {
+                if (args[0] instanceof AbsPKHelper.Type) {
+                    AbsPKHelper.Type state = (AbsPKHelper.Type) args[0];
+                    Log.e(TAG, "onEvent:" + state);
+                    if (AbsPKHelper.Type.PK_GOING == state) {
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         PKFragment current = new PKFragment();
                         transaction.replace(R.id.container, current, PK_TAG);
-                    } else if (PKType.PKFinish == state) {
+                    } else if (AbsPKHelper.Type.PK_FINISH == state) {
                         Fragment f = getSupportFragmentManager().findFragmentByTag(V_TAG);
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         transaction.replace(R.id.container, f, V_TAG);

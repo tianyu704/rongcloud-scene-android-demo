@@ -47,7 +47,6 @@ public interface IEventHelp {
      * 根据用户id获取麦位信息
      *
      * @param userId
-     *
      * @return 麦位信息
      */
     RCVoiceSeatInfo getSeatInfo(String userId);
@@ -56,7 +55,6 @@ public interface IEventHelp {
      * 根据用户index获取麦位信息
      *
      * @param index 索引
-     *
      * @return
      */
     RCVoiceSeatInfo getSeatInfo(int index);
@@ -95,6 +93,13 @@ public interface IEventHelp {
      * 获取当前pk邀请者的信息
      */
     PKInviter getPKInviter();
+
+    /**
+     * 获取当前PK状态
+     *
+     * @return
+     */
+    AbsPKHelper.Type getPKState();
 
     /**
      * 释放PK邀请者
