@@ -15,14 +15,20 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import cn.rong.combusis.feedback.FeedbackHelper
+import cn.rong.combusis.ui.room.widget.like.FavAnimation
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
+import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
+import cn.rongcloud.voiceroom.ui.popup.ExitRoomPopupWindow
+import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
+import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.SendPresentFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.FavAnimation
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
@@ -49,21 +55,13 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.VoiceRoomPresenter
-import com.rongcloud.common.ui.dialog.ConfirmDialog
-import com.rongcloud.common.ui.dialog.TipDialog
-import cn.rongcloud.voiceroom.ui.popup.ExitRoomPopupWindow
-import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
-import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
-import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
-import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
-import cn.rongcloud.voiceroom2.VoiceRoomFragmentPresenter
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
+import com.rongcloud.common.ui.dialog.ConfirmDialog
+import com.rongcloud.common.ui.dialog.TipDialog
 import com.rongcloud.common.utils.AccountStore
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
@@ -73,7 +71,6 @@ import io.rong.imlib.model.Conversation
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.activity_voice_room.*
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
-import javax.inject.Inject
 
 
 private const val TAG = "VoiceRoomActivity"
@@ -148,7 +145,9 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
     fun isCreate(): Boolean = isCreate
 
     val favAnimation: FavAnimation by lazy {
-        return@lazy FavAnimation(this).apply {
+        return@lazy FavAnimation(
+            this
+        ).apply {
             this.addLikeImages(
                 R.drawable.ic_present_0,
                 R.drawable.ic_present_1,

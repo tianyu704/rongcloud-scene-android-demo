@@ -12,4 +12,5 @@
     <string name="text_you_have_created_room">您已创建过房间，是否直接进入？</string>
     <string name="text_please_input_four_number">请输入 4 位密码</string>
     <string name="text_creating_room">正在创建房间</string>
+    <string name="text_have_chat">聊聊吧...</string>
 </resources>

@@ -31,7 +31,7 @@ public class RoomVPAdapter<T> extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return mFragmentActivity.getFragment(mRoomList.get(position));
+        return mFragmentActivity.getFragment();
     }
 
     @Override

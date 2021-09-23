@@ -10,7 +10,7 @@
 //import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener
 //import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 //import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener
-//import cn.rongcloud.voiceroom.message.*
+//import cn.rong.combusis.message.*
 //import cn.rongcloud.voiceroom.model.*
 //import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 //import cn.rongcloud.voiceroom.net.bean.request.*

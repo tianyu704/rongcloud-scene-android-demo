@@ -20,5 +20,12 @@
     <style name="TabTheme" parent="ThemeOverlay.AppCompat.Light">
         <item name="android:textSize">17sp</item>
     </style>
+
+    <declare-styleable name="KsgLikeView">
+        <!-- 进入动画 时长-->
+        <attr name="ksg_enter_duration" format="integer" />
+        <!--路径动画 时长-->
+        <attr name="ksg_curve_duration" format="integer" />
+    </declare-styleable>
 </resources>
 

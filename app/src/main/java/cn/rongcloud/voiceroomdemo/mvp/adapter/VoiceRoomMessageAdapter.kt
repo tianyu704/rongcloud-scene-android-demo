@@ -18,11 +18,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import cn.rongcloud.voiceroom.manager.AudioPlayManager
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroom.message.*
-import io.rong.imkit.manager.IAudioPlayListener
 import io.rong.imlib.model.MessageContent
 import kotlinx.android.synthetic.main.layout_system_message_item.view.tv_message_content
 import kotlinx.android.synthetic.main.layout_voice_message_item.view.*

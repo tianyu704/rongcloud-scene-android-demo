@@ -331,6 +331,7 @@
                 android:layout_height="50dp"
                 android:background="@drawable/bg_input_bar"
                 android:visibility="gone"
+                tools:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent">
 
                 <com.vanniktech.emoji.EmojiEditText

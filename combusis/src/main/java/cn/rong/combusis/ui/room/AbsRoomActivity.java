@@ -18,7 +18,8 @@ import cn.rong.combusis.R;
 public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     private ViewPager2 mViewPager;
-    private RoomVPAdapter mRoomAdapter;
+    private RoomVPAdapter<String> mRoomAdapter;
+    private AbsRoomFragment mCurrentFragment;
 
     @Override
     public int setLayoutId() {
@@ -27,10 +28,11 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     @Override
     public void init() {
+        initRoom();
         getWrapBar().setHide(true).work();
         // 初始化viewpager并设置数据和监听
         mViewPager = getView(R.id.vp_room);
-        mRoomAdapter = new RoomVPAdapter(this);
+        mRoomAdapter = new RoomVPAdapter<String>(this);
         mViewPager.setAdapter(mRoomAdapter);
         mRoomAdapter.setData(loadData());
         mViewPager.setCurrentItem(getCurrentItem(), false);
@@ -54,7 +56,8 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
                 if (currentFragment instanceof AbsRoomFragment) {
                     Logger.e("current page show");
-                    ((AbsRoomFragment) currentFragment).joinRoom();
+                    switchRoom(mRoomAdapter.getItemData(position));
+                    mCurrentFragment = (AbsRoomFragment) currentFragment;
                 }
             }
 
@@ -65,12 +68,24 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
         });
     }
 
+    protected abstract void initRoom();
+
     // 当前页的位置
     protected abstract int getCurrentItem();
 
     // 返回要初始化的Fragment
-    protected abstract Fragment getFragment(T t);
+    protected abstract Fragment getFragment();
 
     // 加载数据
-    protected abstract List<T> loadData();
+    protected abstract List<String> loadData();
+
+    // 切换房间，先退出上个房间，根据id查询当前房间数据，再切换房间
+    protected abstract void switchRoom(String roomId);
+
+    // 处理完数据，把数据放到fragment中
+    public void joinRoom(T t) {
+        if (mCurrentFragment != null) {
+            mCurrentFragment.joinRoom(t);
+        }
+    }
 }

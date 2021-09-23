@@ -1,5 +1,6 @@
 package cn.rong.combusis.provider.voiceroom;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import com.bcq.net.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.net.ApiConstant;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,4 +106,29 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
         });
     }
 
+    /**
+     * 获取房间类型
+     *
+     * @param voiceRoomBean 当前房间
+     * @return 房间类型
+     */
+    public RoomOwnerType getRoomOwnerType(VoiceRoomBean voiceRoomBean) {
+        if (voiceRoomBean == null || voiceRoomBean.getCreateUser() == null) {
+            throw new NullPointerException("VoiceRoomBean is null");
+        }
+        String userId = AccountStore.INSTANCE.getUserId();
+        if (TextUtils.equals(userId, voiceRoomBean.getCreateUser().getUserId())) {
+            if (voiceRoomBean.getRoomType() == RoomType.VOICE_ROOM.getType()) {
+                return RoomOwnerType.VOICE_OWNER;
+            } else {
+                return RoomOwnerType.RADIO_OWNER;
+            }
+        } else {
+            if (voiceRoomBean.getRoomType() == RoomType.VOICE_ROOM.getType()) {
+                return RoomOwnerType.VOICE_VIEWER;
+            } else {
+                return RoomOwnerType.RADIO_VIEWER;
+            }
+        }
+    }
 }

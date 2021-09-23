@@ -31,7 +31,6 @@ import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.SendPresentFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.like.FavAnimation
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
@@ -58,6 +57,7 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
 import cn.rongcloud.widget.RecordVoicePopupWindow
+import cn.rongcloud.widget.RecordVoicePopupWindow.RecordCallBack
 import cn.rongcloud.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
@@ -106,8 +106,12 @@ import kotlinx.android.synthetic.main.activity_voice_room.tv_unread_message_numb
 import kotlinx.android.synthetic.main.activity_voice_room.view.*
 import kotlinx.android.synthetic.main.activity_voice_room.wv_creator_background
 import kotlinx.android.synthetic.main.fragment_voice_room.*
+import java.io.File
 import javax.inject.Inject
+import java.lang.System.currentTimeMillis
 import java.util.*
+import java.util.concurrent.TimeUnit
+import com.rongcloud.common.utils.AudioRecorderUtil.AudioRecordListener as AudioRecordListener1
 
 
 private const val TAG = "VoiceRoomFragment"
@@ -180,7 +184,9 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
     }
 
     val favAnimation: FavAnimation by lazy {
-        return@lazy FavAnimation(mActivity).apply {
+        return@lazy FavAnimation(
+            mActivity
+        ).apply {
             this.addLikeImages(
                 R.drawable.ic_present_0,
                 R.drawable.ic_present_1,
@@ -437,8 +443,10 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
             AudioRecordManager.getInstance().stopRecord()
             iv_send_voice_message_id.background = null
         }
-        true
+        //绑定出发的view
+        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
     }
+
 
     private fun sendTextMessage(message: String?) {
         message?.let {

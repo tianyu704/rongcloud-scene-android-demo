@@ -6,31 +6,24 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import cn.rong.combusis.api.VRApi
+import cn.rong.combusis.message.*
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo
-import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
-import cn.rongcloud.voiceroom.message.*
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
-import cn.rongcloud.voiceroom.utils.AudioEffectManager
-import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
-import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
-import com.rongcloud.common.utils.AudioManagerUtil
+import cn.rongcloud.voiceroom.utils.AudioEffectManager
+import cn.rongcloud.voiceroom.utils.RCChatRoomMessageManager
+import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
+import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant
-import com.bcq.net.OkApi
-import com.bcq.net.Request
-import com.bcq.net.WrapperCallBack
-import com.bcq.net.api.Method
-import com.bcq.net.wrapper.Wrapper
-import com.kit.cache.GsonUtil
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.extension.isNotNullOrEmpty
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.AudioManagerUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.rong.imlib.IRongCoreListener
 import io.rong.imlib.model.Message
@@ -39,7 +32,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
-import java.util.logging.Logger
 import javax.inject.Inject
 import javax.inject.Named
 
