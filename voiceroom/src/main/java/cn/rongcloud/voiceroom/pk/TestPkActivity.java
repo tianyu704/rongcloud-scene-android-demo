@@ -26,6 +26,7 @@ import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
+import cn.rongcloud.voiceroom.pk.widget.PKProcessbar;
 
 public class TestPkActivity extends BaseActivity {
     @Override
@@ -56,6 +57,9 @@ public class TestPkActivity extends BaseActivity {
     }
 
     private void initData() {
+//        PKProcessbar pkProcessbar = getView(R.id.pk_sb);
+//        pkProcessbar.setBarResource(R.drawable.ic_score_selected);
+//        pkProcessbar.setProgress(30);
         getView(R.id.leave).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

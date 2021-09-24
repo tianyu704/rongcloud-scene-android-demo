@@ -19,4 +19,7 @@
         android:paddingBottom="@dimen/basis_10px"
         android:text="发起PK" />
 
+    <cn.rongcloud.voiceroom.pk.widget.PKView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </FrameLayout>

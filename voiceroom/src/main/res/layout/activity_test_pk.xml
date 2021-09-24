@@ -7,7 +7,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    android:background="@color/basis_red_dark"
     android:orientation="vertical">
 
     <FrameLayout
@@ -15,6 +14,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1" />
+
+    <cn.rongcloud.voiceroom.pk.widget.PKProcessbar
+        android:id="@+id/pk_sb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:progress_reached_color="@color/basis_red"
+        app:progress_reached_height="20dp"
+        app:progress_unreached_color="@color/basis_blue"
+        app:progress_unreached_height="20dp" />
 
     <TextView
         android:id="@+id/leave"
