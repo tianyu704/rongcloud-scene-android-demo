@@ -99,4 +99,13 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
             mCurrentFragment.joinRoom(t);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        if (mCurrentFragment != null) {
+            mCurrentFragment.onBackPressed();
+        } else {
+            super.onBackPressed();
+        }
+    }
 }

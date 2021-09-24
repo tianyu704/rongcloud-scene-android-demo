@@ -1,6 +1,7 @@
 package cn.rongcloud.radioroom.ui.room;
 
 import android.graphics.Color;
+import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -8,6 +9,10 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.basis.net.LoadTag;
+import com.bcq.net.OkApi;
+import com.bcq.net.WrapperCallBack;
+import com.bcq.net.wrapper.Wrapper;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
@@ -17,19 +22,23 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.manager.RCChatRoomMessageManager;
-import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.ui.mvp.IBaseView;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
+import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
+import cn.rongcloud.messager.RCMessager;
+import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.radioroom.R;
 import cn.rongcloud.radioroom.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
@@ -41,7 +50,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/17
  */
-public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener {
+public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, IBaseView {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -50,6 +59,10 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     private RoomBottomView mRoomBottomView;
     private RecyclerView mMessageView;
     private RoomMessageAdapter mRoomMessageAdapter;
+    private ExitRoomPopupWindow mExitRoomPopupWindow;
+    private LoadTag mLoadTag;
+
+    private RadioRoomPresenter mPresenter = new RadioRoomPresenter();
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -62,15 +75,19 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void init() {
+        mPresenter.attachView(this, getLifecycle());
+
+        mLoadTag = new LoadTag(getActivity());
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         mRoomTitleBar.setOnMenuClickListener(v -> {
-
+            clickMenu();
         });
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
             // TODO:公告弹框
             Logger.e("click notice");
+            sendMessage();
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
@@ -94,6 +111,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
         sendSystemMessage();
     }
 
+    @Override
+    public void onBackPressed() {
+        clickMenu();
+    }
+
     /**
      * 进入房间后发送默认的消息
      */
@@ -109,12 +131,72 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
             showMessage(tips, false);
             Logger.e("=================发送了默认消息");
             // 广播消息
-            RCChatroomEnter enter = new RCChatroomEnter();
-            enter.setUserId(AccountStore.INSTANCE.getUserId());
-            enter.setUserName(AccountStore.INSTANCE.getUserName());
-            RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), enter, false,
-                    integer -> null, (coreErrorCode, integer) -> null);
+//            RCChatroomEnter enter = new RCChatroomEnter();
+//            enter.setUserId(AccountStore.INSTANCE.getUserId());
+//            enter.setUserName(AccountStore.INSTANCE.getUserName());
+//            RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), enter, false,
+//                    integer -> {
+////                        showMessage(enter, false);
+//                        return null;
+//                    }, (coreErrorCode, integer) -> null);
+//            RongCoreClient.setOnReceiveMessageListener(new IRongCoreListener.OnReceiveMessageListener() {
+//                @Override
+//                public boolean onReceived(Message message, int i) {
+//                    Logger.e("222222222222222222222222");
+//                    return false;
+//                }
+//            });
+//            RongIMClient.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
+//                @Override
+//                public boolean onReceived(Message message, int i) {
+//                    Logger.e("333333333333");
+//                    return false;
+//                }
+//            });
+            sendMessage();
         }
+    }
+
+    private void sendMessage() {
+//        RongCoreClient.getInstance().
+
+        RCChatroomBarrage msg = new RCChatroomBarrage();
+        msg.setContent("xxxxxxxxx");
+        msg.setUserId(AccountStore.INSTANCE.getUserId());
+        msg.setUserName(AccountStore.INSTANCE.getUserName());
+        RCMessager.getInstance().sendChatRoomMessage(mVoiceRoomBean.getRoomId(), msg, new SendMessageCallback() {
+            @Override
+            public void onAttached(Message message) {
+
+            }
+
+            @Override
+            public void onSuccess(Message message) {
+                Logger.e("111111111111111111111");
+            }
+
+            @Override
+            public void onError(Message message, int code, String reason) {
+                Logger.e("111111111111111111111" + code + reason);
+            }
+        });
+//        msg.setUserId("1111111");
+//        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mVoiceRoomBean.getRoomId(), msg, null, null, new IRongCoreCallback.ISendMessageCallback() {
+//            @Override
+//            public void onAttached(Message message) {
+//                Logger.e("111111111111111111111222222");
+//            }
+//
+//            @Override
+//            public void onSuccess(Message message) {
+//                Logger.e("111111111111111111111");
+//            }
+//
+//            @Override
+//            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
+//                Logger.e("111111111111111111111" + coreErrorCode.code + coreErrorCode.msg);
+//            }
+//        });
     }
 
     private void showMessage(MessageContent messageContent, boolean isRefresh) {
@@ -127,6 +209,67 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
         if (count > 0) {
             mMessageView.smoothScrollToPosition(count - 1);
         }
+    }
+
+    /**
+     * 点击右上角菜单按钮
+     */
+    private void clickMenu() {
+        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
+            @Override
+            public void clickPackRoom() {
+
+            }
+
+            @Override
+            public void clickLeaveRoom() {
+                // 观众离开房间
+                leaveRoom();
+            }
+
+            @Override
+            public void clickCloseRoom() {
+                mLoadTag.show("正在退出房间");
+                // 房主关闭房间
+                OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            leaveRoom();
+                        } else {
+                            mLoadTag.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        mLoadTag.dismiss();
+                    }
+                });
+            }
+        });
+        mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
+        mExitRoomPopupWindow.showAtLocation(mBackgroundImageView, Gravity.TOP, 0, 0);
+    }
+
+    private void leaveRoom() {
+        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
+
+            @Override
+            public void onSuccess() {
+                Logger.e("==============leaveRoom onSuccess");
+                mLoadTag.dismiss();
+                getActivity().finish();
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                Logger.e("==============leaveRoom onError");
+                mLoadTag.dismiss();
+                getActivity().finish();
+            }
+        });
     }
 
     /**
@@ -180,7 +323,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void onSpeakingStateChanged(boolean isSpeaking) {
-        Logger.e("==============onSpeakingStateChanged: " + isSpeaking);
+//        Logger.e("==============onSpeakingStateChanged: " + isSpeaking);
         mRoomSeatView.setSpeaking(isSpeaking);
     }
 
@@ -194,8 +337,18 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     }
 
     @Override
+    public void onAudienceEnter(String s) {
+
+    }
+
+    @Override
+    public void onAudienceLeave(String s) {
+
+    }
+
+    @Override
     public void onNetworkStatus(int delayMs) {
-        Logger.e("==============onNetworkStatus: " + delayMs);
+//        Logger.e("==============onNetworkStatus: " + delayMs);
 //        mRoomTitleBar.setDelay(delayMs);
     }
 
