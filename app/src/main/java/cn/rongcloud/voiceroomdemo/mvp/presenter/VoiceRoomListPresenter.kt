@@ -19,6 +19,7 @@ import com.rongcloud.common.utils.AccountStore
 import com.rongcloud.common.utils.UIKit
 import dagger.hilt.android.scopes.ActivityScoped
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -110,12 +111,12 @@ class VoiceRoomListPresenter @Inject constructor(
         isCreate: Boolean
     ) {
         info?.createUser?.let {
-//            ScorlVoiceRoomActivity.startActivity(context, info.roomId, Arrays.asList(info), isCreate)
-            UIKit.startActivityByBasis(
-                context as Activity,
-                TestPkActivity::class.java,
-                GsonUtil.obj2Json(info)
-            )
+            ScorlVoiceRoomActivity.startActivity(context, info.roomId, Arrays.asList(info), isCreate)
+//            UIKit.startActivityByBasis(
+//                context as Activity,
+//                TestPkActivity::class.java,
+//                GsonUtil.obj2Json(info)
+//            )
         } ?: view.showError("房间数据错误")
     }
 
