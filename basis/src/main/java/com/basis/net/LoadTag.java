@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.basis.R;
-import com.bcq.net.wrapper.interfaces.ILoadTag;
+import com.basis.net.oklib.wrapper.interfaces.ILoadTag;
 import com.bcq.refresh.progress.IndicatorView;
 import com.bcq.refresh.progress.Style;
 

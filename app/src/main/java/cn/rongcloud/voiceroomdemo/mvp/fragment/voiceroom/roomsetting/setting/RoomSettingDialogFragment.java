@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.rongcloud.common.base.BaseBottomSheetDialogFragment;
 import com.rongcloud.common.ui.dialog.EditDialog;
 import com.rongcloud.common.ui.dialog.InputPasswordDialog;
-import com.rongcloud.common.ui.widget.GridSpacingItemDecoration;
 
+import cn.rong.combusis.common.ui.widget.GridSpacingItemDecoration;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel;
 import io.reactivex.rxjava3.annotations.NonNull;

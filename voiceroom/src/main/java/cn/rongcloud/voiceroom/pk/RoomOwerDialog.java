@@ -8,17 +8,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.basis.adapter.interfaces.IAdapte;
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.widget.BottomDialog;
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.wrapper.Wrapper;
 import com.bcq.refresh.XRecyclerView;
+import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.ImageLoader;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.utils.UIKit;
 
 import java.util.List;
 

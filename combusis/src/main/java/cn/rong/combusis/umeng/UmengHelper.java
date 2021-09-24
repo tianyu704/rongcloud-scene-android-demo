@@ -1,7 +1,7 @@
 package cn.rong.combusis.umeng;
 
+import com.kit.UIKit;
 import com.rongcloud.common.utils.AccountStore;
-import com.rongcloud.common.utils.UIKit;
 import com.umeng.analytics.MobclickAgent;
 
 import java.util.HashMap;

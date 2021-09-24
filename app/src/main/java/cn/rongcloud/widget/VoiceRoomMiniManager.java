@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.rongcloud.common.net.ApiConstant;
-import com.rongcloud.common.ui.widget.WaveView;
 import com.rongcloud.common.utils.UiUtils;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
@@ -17,6 +16,7 @@ import com.yhao.floatwindow.PermissionListener;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
 
+import cn.rong.combusis.common.ui.widget.WaveView;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroomdemo.R;

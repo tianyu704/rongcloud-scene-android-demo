@@ -20,10 +20,10 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.kit.utils.Logger;
-import com.rongcloud.common.utils.SoftKeyboardUtils;
 import com.vanniktech.emoji.EmojiPopup;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.common.utils.SoftKeyboardUtils;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.ui.room.widget.like.FavAnimation;
 

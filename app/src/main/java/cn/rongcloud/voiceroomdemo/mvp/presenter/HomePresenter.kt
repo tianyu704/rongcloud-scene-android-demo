@@ -7,13 +7,13 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 import android.content.Context
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import cn.rong.combusis.common.utils.RealPathFromUriUtils
 import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
-import com.rongcloud.common.utils.RealPathFromUriUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject

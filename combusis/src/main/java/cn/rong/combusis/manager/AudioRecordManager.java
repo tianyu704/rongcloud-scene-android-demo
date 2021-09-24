@@ -21,10 +21,10 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.api.body.FileBody;
-import com.bcq.net.wrapper.Wrapper;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.api.body.FileBody;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.io.File;

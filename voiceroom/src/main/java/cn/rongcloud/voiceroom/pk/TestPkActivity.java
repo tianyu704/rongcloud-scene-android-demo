@@ -3,35 +3,28 @@ package cn.rongcloud.voiceroom.pk;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.ui.BaseActivity;
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.wrapper.Wrapper;
+import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.utils.UIKit;
-import com.umeng.commonsdk.debug.I;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rongcloud.voiceroom.R;
-import cn.rong.combusis.sdk.event.EventHelper;
-import cn.rong.combusis.EventBus;
-import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
-import cn.rongcloud.voiceroom.pk.widget.PKProcessbar;
 
 public class TestPkActivity extends BaseActivity {
     @Override

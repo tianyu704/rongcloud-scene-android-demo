@@ -2,7 +2,7 @@ package cn.rong.combusis.model;
 
 import androidx.annotation.Nullable;
 
-import com.bcq.net.wrapper.OkUtil;
+import com.basis.net.oklib.wrapper.OkUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 

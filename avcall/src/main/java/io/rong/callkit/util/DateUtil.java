@@ -3,7 +3,7 @@ package io.rong.callkit.util;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DateUtil extends com.rongcloud.common.utils.DateUtil {
+public class DateUtil extends cn.rong.combusis.common.utils.DateUtil {
 
     /**
      * 当天，显示时间；hh:mm

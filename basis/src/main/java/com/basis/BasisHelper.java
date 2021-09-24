@@ -1,7 +1,7 @@
 package com.basis;
 
 import com.basis.net.DefauPage;
-import com.bcq.net.net.Page;
+import com.basis.net.oklib.net.Page;
 
 /**
  * 以下资源配置如下修改 覆盖即可

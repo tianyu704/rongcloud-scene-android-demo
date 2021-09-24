@@ -14,16 +14,15 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 
 import com.basis.net.LoadTag;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.api.body.FileBody;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.widget.BottomDialog;
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.api.body.FileBody;
-import com.bcq.net.wrapper.Wrapper;
 import com.kit.utils.ImageLoader;
 import com.rongcloud.common.ui.dialog.InputPasswordDialog;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.LocalDataStore;
-import com.rongcloud.common.utils.RealPathFromUriUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,6 +32,7 @@ import java.util.Map;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import io.rong.imkit.picture.tools.ToastUtils;

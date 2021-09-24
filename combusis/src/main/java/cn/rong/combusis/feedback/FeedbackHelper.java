@@ -14,13 +14,13 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.wrapper.Wrapper;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
+import com.kit.UIKit;
+import com.kit.cache.SharedPreferUtil;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.net.ApiConstant;
-import com.rongcloud.common.net.IResultBack;
-import com.rongcloud.common.utils.SharedPreferUtil;
-import com.rongcloud.common.utils.UIKit;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

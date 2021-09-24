@@ -11,10 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.rongcloud.common.ui.widget.WaveView;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.common.ui.widget.WaveView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**

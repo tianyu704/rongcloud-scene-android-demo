@@ -5,7 +5,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
-import com.rongcloud.common.utils.UIKit;
+import com.kit.UIKit;
 
 import io.rong.callkit.R;
 import io.rong.calllib.RongCallCommon;

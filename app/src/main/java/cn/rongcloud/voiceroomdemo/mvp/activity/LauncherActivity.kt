@@ -5,10 +5,10 @@
 package cn.rongcloud.voiceroomdemo.mvp.activity
 
 import android.os.Bundle
+import cn.rong.combusis.common.base.PermissionActivity
 import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.extension.showToast
-import com.rongcloud.common.base.PermissionActivity
 import com.rongcloud.common.extension.setAndroidNativeLightStatusBar
+import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.utils.AccountStore
 
 

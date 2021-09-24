@@ -1,16 +1,16 @@
 package com.basis.net;
 
-import com.bcq.net.api.Method;
-import com.bcq.net.api.ORequest;
-import com.bcq.net.net.IOpe;
-import com.bcq.net.net.Page;
-import com.bcq.net.wrapper.GeneralWrapperCallBack;
-import com.bcq.net.wrapper.OkUtil;
-import com.bcq.net.wrapper.interfaces.BusiCallback;
-import com.bcq.net.wrapper.interfaces.ILoadTag;
-import com.bcq.net.wrapper.interfaces.IPage;
-import com.bcq.net.wrapper.interfaces.IParse;
-import com.bcq.net.wrapper.interfaces.IResult;
+import com.basis.net.oklib.api.Method;
+import com.basis.net.oklib.api.ORequest;
+import com.basis.net.oklib.net.IOpe;
+import com.basis.net.oklib.net.Page;
+import com.basis.net.oklib.wrapper.GeneralWrapperCallBack;
+import com.basis.net.oklib.wrapper.OkUtil;
+import com.basis.net.oklib.wrapper.interfaces.BusiCallback;
+import com.basis.net.oklib.wrapper.interfaces.ILoadTag;
+import com.basis.net.oklib.wrapper.interfaces.IPage;
+import com.basis.net.oklib.wrapper.interfaces.IParse;
+import com.basis.net.oklib.wrapper.interfaces.IResult;
 
 import java.util.HashMap;
 import java.util.List;

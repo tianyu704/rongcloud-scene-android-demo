@@ -14,18 +14,18 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.rongcloud.common.utils.AudioRecorderUtil.AudioRecordListener;
-import com.rongcloud.common.utils.AudioRecorderUtil.AudioRecorder;
-import com.rongcloud.common.utils.AudioRecorderUtil.RecordStreamListener;
-import com.rongcloud.common.utils.EncryUtils;
 import com.rongcloud.common.utils.FileUtil;
-import com.rongcloud.common.utils.MediaPlayTools;
-import com.rongcloud.common.utils.PermissionUtil;
 import com.rongcloud.common.utils.UiUtils;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import cn.rong.combusis.common.utils.AudioRecorderUtil.AudioRecordListener;
+import cn.rong.combusis.common.utils.AudioRecorderUtil.AudioRecorder;
+import cn.rong.combusis.common.utils.AudioRecorderUtil.RecordStreamListener;
+import cn.rong.combusis.common.utils.EncryUtils;
+import cn.rong.combusis.common.utils.MediaPlayTools;
+import cn.rong.combusis.common.utils.PermissionUtil;
 import cn.rongcloud.voiceroomdemo.R;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;

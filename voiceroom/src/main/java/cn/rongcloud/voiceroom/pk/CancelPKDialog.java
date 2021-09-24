@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.view.View;
 
 import com.basis.widget.BottomDialog;
+import com.kit.UIKit;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.utils.UIKit;
 
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.R;

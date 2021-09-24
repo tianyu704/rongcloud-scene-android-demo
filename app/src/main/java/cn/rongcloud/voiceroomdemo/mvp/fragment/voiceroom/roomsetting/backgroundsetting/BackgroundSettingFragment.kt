@@ -5,13 +5,13 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting
 
 import androidx.recyclerview.widget.GridLayoutManager
+import cn.rong.combusis.common.ui.widget.GridSpacingItemDecoration
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.extension.showToast
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
-import com.rongcloud.common.ui.widget.GridSpacingItemDecoration
+import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.rongcloud.common.base.BaseBottomSheetDialogFragment
+import com.rongcloud.common.extension.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_background_setting.*

@@ -3,22 +3,9 @@ package cn.rong.combusis;
 import android.app.Application;
 
 import com.basis.BasisHelper;
-import com.bcq.net.net.Page;
-import com.bcq.net.wrapper.BaseProcessor;
-import com.bcq.net.wrapper.OkHelper;
-import com.bcq.net.wrapper.OkUtil;
-import com.bcq.net.wrapper.Wrapper;
-import com.bcq.net.wrapper.interfaces.IHeader;
-import com.bcq.net.wrapper.interfaces.IPage;
-import com.bcq.net.wrapper.interfaces.IParse;
-import com.bcq.net.wrapper.interfaces.IResult;
-import com.bcq.net.wrapper.interfaces.IWrap;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.kit.cache.GsonUtil;
-import com.kit.utils.Logger;
+import com.basis.net.oklib.net.Page;
+import com.basis.net.oklib.wrapper.OkHelper;
+import com.basis.net.oklib.wrapper.interfaces.IHeader;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.HashMap;

@@ -1,7 +1,7 @@
 package com.basis.ui;
 
-import com.bcq.net.api.Method;
-import com.bcq.net.wrapper.interfaces.IParse;
+import com.basis.net.oklib.api.Method;
+import com.basis.net.oklib.wrapper.interfaces.IParse;
 
 import java.util.List;
 import java.util.Map;

@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.basis.net.LoadTag;
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.wrapper.Wrapper;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;

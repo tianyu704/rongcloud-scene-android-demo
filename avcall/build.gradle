@@ -41,6 +41,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.1'
     implementation 'com.github.lbasis:adapter:1.0.1'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    implementation project(path: ':common')
+//    implementation project(path: ':common')
     implementation project(path: ':combusis')
 }

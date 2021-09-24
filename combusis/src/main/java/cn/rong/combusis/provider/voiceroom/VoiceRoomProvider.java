@@ -6,9 +6,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.bcq.net.OkApi;
-import com.bcq.net.WrapperCallBack;
-import com.bcq.net.wrapper.Wrapper;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.net.ApiConstant;

@@ -2,7 +2,7 @@ package com.basis.net;
 
 import com.basis.adapter.interfaces.IAdapte;
 import com.basis.adapter.interfaces.IHolder;
-import com.bcq.net.net.IOpe;
+import com.basis.net.oklib.net.IOpe;
 
 import java.util.List;
 

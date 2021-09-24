@@ -9,9 +9,9 @@ import com.basis.adapter.interfaces.IHolder;
 import com.basis.net.Controller;
 import com.basis.net.IOperator;
 import com.basis.net.LoadTag;
-import com.bcq.net.api.Method;
-import com.bcq.net.wrapper.interfaces.ILoadTag;
-import com.bcq.net.wrapper.interfaces.IParse;
+import com.basis.net.oklib.api.Method;
+import com.basis.net.oklib.wrapper.interfaces.ILoadTag;
+import com.basis.net.oklib.wrapper.interfaces.IParse;
 import com.kit.utils.Logger;
 
 import java.util.List;
