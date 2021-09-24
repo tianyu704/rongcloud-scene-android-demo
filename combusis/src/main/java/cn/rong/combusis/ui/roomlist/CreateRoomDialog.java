@@ -62,7 +62,7 @@ public class CreateRoomDialog extends BottomDialog {
         this.mLauncher = launcher;
         this.mRoomType = roomType;
         this.mCreateRoomCallBack = createRoomCallBack;
-        setContentView(R.layout.dialog_create_room, -1);
+        setContentView(R.layout.dialog_create_room, 80);
         initView();
     }
 

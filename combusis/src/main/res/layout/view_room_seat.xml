@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     tools:background="#000">
 
-    <com.rongcloud.common.ui.widget.WaveView
+    <cn.rong.combusis.common.ui.widget.WaveView
         android:id="@+id/wv_creator_background"
         android:layout_width="140dp"
         android:layout_height="140dp"
