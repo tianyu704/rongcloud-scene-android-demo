@@ -25,6 +25,7 @@ public class LoadTag implements ILoadTag {
     private String loadMsg;
     private IndicatorView progressBar;
     private DialogInterface.OnDismissListener dismissListener;
+    private TextView messageTextView;
 
     public LoadTag(Activity activity) {
         this(activity, activity.getString(R.string.re_loading));
@@ -35,12 +36,12 @@ public class LoadTag implements ILoadTag {
         View rootView = LayoutInflater.from(activity).inflate(R.layout.basis_layout_loadtag, null);
         progressBar = rootView.findViewById(R.id.prgressBar);
         progressBar.setStyle(Style.BallSpinFadeLoader);
-        TextView textView = (TextView) rootView.findViewById(R.id.tv_load_msg);
+        messageTextView = (TextView) rootView.findViewById(R.id.tv_load_msg);
         if (TextUtils.isEmpty(dialogMsg)) {
             dialogMsg = activity.getString(R.string.re_loading);
         }
         this.loadMsg = dialogMsg;
-        textView.setText(loadMsg);
+        messageTextView.setText(loadMsg);
         // 允许点返回键取消
         dialog.setCancelable(true);
         // 触碰其他地方不消失
@@ -55,8 +56,8 @@ public class LoadTag implements ILoadTag {
         });
     }
 
-    public ILoadTag processStyle(Style processStyle){
-        if (null != progressBar){
+    public ILoadTag processStyle(Style processStyle) {
+        if (null != progressBar) {
             progressBar.setStyle(processStyle);
         }
         return this;
@@ -71,6 +72,13 @@ public class LoadTag implements ILoadTag {
     @Override
     public String getTagMsg() {
         return loadMsg;
+    }
+
+    public void show(String msg) {
+        if (messageTextView != null) {
+            messageTextView.setText(msg);
+        }
+        show();
     }
 
     @Override

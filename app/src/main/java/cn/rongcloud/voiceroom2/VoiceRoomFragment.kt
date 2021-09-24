@@ -50,7 +50,6 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgrounds
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.IBackgroundSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.IRoomSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.RoomSettingDialogFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.RoomSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.IViewPageListView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation.SeatOrderOperationFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.ISelfSettingView

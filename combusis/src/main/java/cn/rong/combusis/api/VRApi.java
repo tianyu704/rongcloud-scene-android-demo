@@ -27,6 +27,15 @@ public class VRApi {
     public final static String ROOM_CREATE = HOST + "mic/room/create";
 
     /**
+     * 删除房间
+     *
+     * @return link
+     */
+    public static String deleteRoom(String roomId) {
+        return HOST + "mic/room/" + roomId + "/delete";
+    }
+
+    /**
      * 在线房主
      */
     public static String ONLINE_CREATER = HOST + "mic/room/online/created/list";

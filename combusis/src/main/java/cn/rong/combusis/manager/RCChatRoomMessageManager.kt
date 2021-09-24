@@ -90,7 +90,6 @@ object RCChatRoomMessageManager {
                     message?.let {
                         onError?.invoke(coreErrorCode, message.messageId)
                     }
-
                 }
             }
         )

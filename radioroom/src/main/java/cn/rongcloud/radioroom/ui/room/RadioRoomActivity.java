@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.message.RCChatroomBarrage;
+import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomLike;
@@ -44,6 +45,7 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     protected void initRoom() {
         mLoadTag = new LoadTag(activity, "Loading...");
         RCMessager.getInstance().addMessageTypes(
+                RCChatroomEnter.class,
                 RCChatroomBarrage.class,
                 RCChatroomGift.class,
                 RCChatroomGiftAll.class,
@@ -116,17 +118,5 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
-
-            @Override
-            public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============leaveRoom onError");
-            }
-        });
     }
 }
