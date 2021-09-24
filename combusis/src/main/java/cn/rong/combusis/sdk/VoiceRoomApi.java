@@ -1,14 +1,17 @@
 package cn.rong.combusis.sdk;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class VoiceRoomApi implements Api {
@@ -16,6 +19,7 @@ public class VoiceRoomApi implements Api {
     private final static Api api = new VoiceRoomApi();
     private final RCVoiceRoomInfo roomInfo = new RCVoiceRoomInfo();
     private IEventHelp.PKInvitee pkInvitee;
+
     private VoiceRoomApi() {
     }
 
@@ -274,8 +278,6 @@ public class VoiceRoomApi implements Api {
                         resultBack));
     }
 
-
-
     @Override
     public void sendPKInvitation(String inviteeRoomId, String inviteeId, IResultBack<Boolean> resultBack) {
         //保存pk信息
@@ -304,11 +306,32 @@ public class VoiceRoomApi implements Api {
 
     @Override
     public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKState pkState, IResultBack<Boolean> resultBack) {
+        String action = (pkState == PKState.accept ? "同意" : pkState == PKState.reject ? "拒绝" : "忽略") + "K邀请";
         RCVoiceRoomEngine.getInstance().responsePKInvitation(
                 inviterRoomId,
                 inviterUserId,
                 pkState,
-                new DefaultRoomCallback("responsePKInvitation", (pkState == PKState.accept ? "同意" : pkState == PKState.reject ? "拒绝" : "忽略") + "K邀请", resultBack));
+                new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        KToast.show(action + "成功");
+                        if (null != resultBack) resultBack.onResult(true);
+                        // 当前邀请人信息
+                        IEventHelp.PKInviter pkInviter = EventHelper.helper().getPKInviter();
+                        //判断是否是当前正在邀请的信息
+                        if (pkInviter.inviterId.equals(inviterUserId) && pkInviter.inviterRoomId.equals(inviterRoomId)) {
+                            //处理成功后 该邀请流程结束 释放被邀请信息
+                            EventHelper.helper().releasePKInviter();
+                        }
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        KToast.show(action + "失败");
+                        Log.e(TAG, "responsePKInvitation#onError [" + i + "]:" + s);
+                        if (null != resultBack) resultBack.onResult(false);
+                    }
+                });
     }
 
     @Override
@@ -329,4 +352,8 @@ public class VoiceRoomApi implements Api {
         pkInvitee = null;
     }
 
+    @Override
+    public IEventHelp.PKInvitee getPKInvitee() {
+        return pkInvitee;
+    }
 }

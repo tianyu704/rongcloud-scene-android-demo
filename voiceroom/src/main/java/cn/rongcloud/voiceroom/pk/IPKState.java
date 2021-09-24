@@ -1,12 +1,22 @@
 package cn.rongcloud.voiceroom.pk;
 
 import android.app.Activity;
+import android.view.View;
 
 import com.kit.wapper.IResultBack;
 
 public interface IPKState {
+    /**
+     * 初始化
+     *
+     * @param roomId   房间id
+     * @param listener pk监听
+     */
     void init(String roomId, VRStateListener listener);
 
+    /**
+     * 反初始化
+     */
     void unInit();
 
     /**
@@ -24,6 +34,24 @@ public interface IPKState {
      * @param resultBack 取消邀请会状态回调
      */
     void cancelPkInvitation(Activity activity, IResultBack<Boolean> resultBack);
+
+    /**
+     * pk 动画进场
+     *
+     * @param left
+     * @param in
+     * @param duration
+     */
+    void enterPkWithAnimation(View left, View in, long duration);
+
+    /**
+     * pk 动画退场
+     *
+     * @param left
+     * @param in
+     * @param duration
+     */
+    void quitPkWithAnimation(View left, View in, long duration);
 
     interface VRStateListener {
         void onPkStart();

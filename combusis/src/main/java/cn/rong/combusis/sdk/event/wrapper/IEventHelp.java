@@ -10,6 +10,13 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 
 public interface IEventHelp {
 
+    enum Type {
+        PK_NONE,//默认状态
+        PK_INVITE,//邀请状态
+        PK_GOING,//pk 进行中
+        PK_FINISH//pk关闭状态
+    }
+
     /**
      * 是否初始化
      *
@@ -99,7 +106,7 @@ public interface IEventHelp {
      *
      * @return
      */
-    AbsPKHelper.Type getPKState();
+    Type getPKState();
 
     /**
      * 释放PK邀请者

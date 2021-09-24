@@ -12,14 +12,13 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/voice_room"
             style="@style/main_white_17"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="250dp"
             android:background="@color/basis_blue"
             android:gravity="center"
             android:text="语聊房麦位视图" />
@@ -37,6 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="@dimen/basis_20px"
         android:layout_marginBottom="@dimen/basis_20px"
         android:background="@drawable/basis_selector_blue_solid"
         android:paddingLeft="@dimen/basis_20px"

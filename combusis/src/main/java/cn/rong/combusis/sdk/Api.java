@@ -2,6 +2,7 @@ package cn.rong.combusis.sdk;
 
 import com.kit.wapper.IResultBack;
 
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
@@ -231,4 +232,9 @@ public interface Api {
      * 释放pk被邀请者
      */
     void releasePKInvitee();
+
+    /**
+     * 获取当前被邀请人的信息
+     */
+    IEventHelp.PKInvitee getPKInvitee();
 }

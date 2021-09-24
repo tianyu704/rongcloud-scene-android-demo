@@ -19,13 +19,6 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     //pk 邀请者
     protected PKInviter pkInviter;
 
-    public enum Type {
-        PK_NONE,//默认状态
-        PK_INVITE,//邀请状态
-        PK_GOING,//pk 进行中
-        PK_FINISH//pk关闭状态
-    }
-
     protected Type current = Type.PK_NONE;
 
     @Override
@@ -116,22 +109,37 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     @Override
     public void onPKInvitationRejected(String roomId, String userId) {
         Logger.e(TAG, "onPKInvitationRejected");
-        //邀请被拒绝 释放被邀请信息
-        VoiceRoomApi.getApi().releasePKInvitee();
+        IEventHelp.PKInvitee invitee = VoiceRoomApi.getApi().getPKInvitee();
+        //判断是否是当前正在邀请的信息
+        if (invitee.inviteeRoomId.equals(roomId) && invitee.inviteeId.equals(userId)) {
+            dispatchPKResponse(PKState.reject);
+            //邀请被忽略 该邀请流程结束 释放被邀请信息
+            VoiceRoomApi.getApi().releasePKInvitee();
+        }
         current = Type.PK_NONE;
         dispatchPKState();
     }
 
     @Override
-    public void onPKInvitationIgnored(String s, String s1) {
+    public void onPKInvitationIgnored(String roomId, String userId) {
         Logger.e(TAG, "onPKInvitationIgnored");
-        //邀请被忽略 释放被邀请信息
-        VoiceRoomApi.getApi().releasePKInvitee();
+        IEventHelp.PKInvitee invitee = VoiceRoomApi.getApi().getPKInvitee();
+        //判断是否是当前正在邀请的信息
+        if (invitee.inviteeRoomId.equals(roomId) && invitee.inviteeId.equals(userId)) {
+            dispatchPKResponse(PKState.ignore);
+            //邀请被忽略 该邀请流程结束 释放被邀请信息
+            VoiceRoomApi.getApi().releasePKInvitee();
+        }
         current = Type.PK_NONE;
         dispatchPKState();
+
     }
 
     private void dispatchPKState() {
         EventBus.get().emit(EventBus.TAG.PK_STATE, current);
+    }
+
+    private void dispatchPKResponse(PKState pkState) {
+        EventBus.get().emit(EventBus.TAG.PK_RESPONSE, pkState);
     }
 }

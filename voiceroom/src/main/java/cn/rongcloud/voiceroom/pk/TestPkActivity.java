@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.pk;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.KToast;
+import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.UIKit;
 import com.umeng.commonsdk.debug.I;
@@ -54,15 +56,11 @@ public class TestPkActivity extends BaseActivity {
     }
 
     TextView pkButton;
+    View voice_room, pkVew;
 
     private void initData() {
-        getView(R.id.leave).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                VoiceRoomApi.getApi().leaveRoom(null);
-                synToService("");
-            }
-        });
+        voice_room = getView(R.id.voice_room);
+        pkVew = getView(R.id.pk_view);
         pkButton = getView(R.id.send_pk);
         pkButton.setText(EventHelper.helper().getPKState() == AbsPKHelper.Type.PK_INVITE ? "取消PK" : "邀请PK");
         pkButton.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +71,7 @@ public class TestPkActivity extends BaseActivity {
                     KToast.show("当前正在进行PK");
                     return;
                 }
+                Logger.e(TAG,"state = "+state);
                 if (state == AbsPKHelper.Type.PK_INVITE) {
                     PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
                         @Override
@@ -88,7 +87,6 @@ public class TestPkActivity extends BaseActivity {
                         }
                     });
                 }
-                pkButton.setText(EventHelper.helper().getPKState() == AbsPKHelper.Type.PK_INVITE ? "取消PK" : "邀请PK");
             }
         });
         join();
@@ -96,12 +94,12 @@ public class TestPkActivity extends BaseActivity {
         PKStateManager.get().init(voiceRoomBean.getRoomId(), new IPKState.VRStateListener() {
             @Override
             public void onPkStart() {
-
+                PKStateManager.get().enterPkWithAnimation(voice_room, pkVew,200);
             }
 
             @Override
             public void onPkStop() {
-
+                PKStateManager.get().quitPkWithAnimation(pkVew, voice_room,200);
             }
         });
     }

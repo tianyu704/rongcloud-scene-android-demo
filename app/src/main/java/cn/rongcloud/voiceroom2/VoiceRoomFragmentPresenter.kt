@@ -588,7 +588,6 @@ class VoiceRoomFragmentPresenter @Inject constructor(
         Log.d(TAG, "onReceived: ")
         message?.content?.let {
             RCChatRoomMessageManager.onReceiveMessage(roomId, it)
-
         }
         return true
     }
