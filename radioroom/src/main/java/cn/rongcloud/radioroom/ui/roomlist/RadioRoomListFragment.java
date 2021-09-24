@@ -1,6 +1,12 @@
 package cn.rongcloud.radioroom.ui.roomlist;
 
+import android.text.TextUtils;
+
 import androidx.fragment.app.Fragment;
+
+import com.rongcloud.common.utils.AccountStore;
+
+import java.util.ArrayList;
 
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -19,7 +25,13 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
 
     @Override
     public void clickItem(VoiceRoomBean item, int position) {
-        RadioRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
+        if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
+            ArrayList list = new ArrayList();
+            list.add(item.getRoomId());
+            RadioRoomActivity.startActivity(getActivity(), list, 0);
+        } else {
+            RadioRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
+        }
     }
 
     @Override

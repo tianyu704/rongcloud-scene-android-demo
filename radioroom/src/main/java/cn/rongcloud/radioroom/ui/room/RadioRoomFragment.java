@@ -14,6 +14,7 @@ import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
 import com.kit.utils.Logger;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -23,14 +24,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.api.VRApi;
-import cn.rong.combusis.message.RCChatroomBarrage;
+import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
-import cn.rong.combusis.ui.mvp.IBaseView;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
@@ -50,7 +51,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/17
  */
-public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, IBaseView {
+public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -131,40 +132,15 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
             showMessage(tips, false);
             Logger.e("=================发送了默认消息");
             // 广播消息
-//            RCChatroomEnter enter = new RCChatroomEnter();
-//            enter.setUserId(AccountStore.INSTANCE.getUserId());
-//            enter.setUserName(AccountStore.INSTANCE.getUserName());
-//            RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), enter, false,
-//                    integer -> {
-////                        showMessage(enter, false);
-//                        return null;
-//                    }, (coreErrorCode, integer) -> null);
-//            RongCoreClient.setOnReceiveMessageListener(new IRongCoreListener.OnReceiveMessageListener() {
-//                @Override
-//                public boolean onReceived(Message message, int i) {
-//                    Logger.e("222222222222222222222222");
-//                    return false;
-//                }
-//            });
-//            RongIMClient.setOnReceiveMessageListener(new RongIMClient.OnReceiveMessageListener() {
-//                @Override
-//                public boolean onReceived(Message message, int i) {
-//                    Logger.e("333333333333");
-//                    return false;
-//                }
-//            });
             sendMessage();
         }
     }
 
     private void sendMessage() {
-//        RongCoreClient.getInstance().
-
-        RCChatroomBarrage msg = new RCChatroomBarrage();
-        msg.setContent("xxxxxxxxx");
-        msg.setUserId(AccountStore.INSTANCE.getUserId());
-        msg.setUserName(AccountStore.INSTANCE.getUserName());
-        RCMessager.getInstance().sendChatRoomMessage(mVoiceRoomBean.getRoomId(), msg, new SendMessageCallback() {
+        RCChatroomEnter enter = new RCChatroomEnter();
+        enter.setUserId(AccountStore.INSTANCE.getUserId());
+        enter.setUserName(AccountStore.INSTANCE.getUserName());
+        RCMessager.getInstance().sendChatRoomMessage(mVoiceRoomBean.getRoomId(), enter, new SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
 
@@ -180,23 +156,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
                 Logger.e("111111111111111111111" + code + reason);
             }
         });
-//        msg.setUserId("1111111");
-//        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mVoiceRoomBean.getRoomId(), msg, null, null, new IRongCoreCallback.ISendMessageCallback() {
-//            @Override
-//            public void onAttached(Message message) {
-//                Logger.e("111111111111111111111222222");
-//            }
-//
-//            @Override
-//            public void onSuccess(Message message) {
-//                Logger.e("111111111111111111111");
-//            }
-//
-//            @Override
-//            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-//                Logger.e("111111111111111111111" + coreErrorCode.code + coreErrorCode.msg);
-//            }
-//        });
     }
 
     private void showMessage(MessageContent messageContent, boolean isRefresh) {
@@ -338,12 +297,24 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void onAudienceEnter(String s) {
-
+        Logger.e("==============onAudienceEnter: " + s);
+        EventHelper.helper().getOnLineUserIds(mVoiceRoomBean.getRoomId(), new IResultBack<List<String>>() {
+            @Override
+            public void onResult(List<String> strings) {
+                mRoomTitleBar.setOnlineNum(strings.size());
+            }
+        });
     }
 
     @Override
     public void onAudienceLeave(String s) {
-
+        Logger.e("==============onAudienceLeave: " + s);
+        EventHelper.helper().getOnLineUserIds(mVoiceRoomBean.getRoomId(), new IResultBack<List<String>>() {
+            @Override
+            public void onResult(List<String> strings) {
+                mRoomTitleBar.setOnlineNum(strings.size());
+            }
+        });
     }
 
     @Override

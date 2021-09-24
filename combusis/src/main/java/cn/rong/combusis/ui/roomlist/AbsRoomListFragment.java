@@ -77,11 +77,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
             mRoomList.setNoMore(false);
         }
         VoiceRoomProvider.provider().loadPage(mCurrentPage, getRoomType(), voiceRoomBeans -> {
-            List<VoiceRoomBean> list = new ArrayList<>();
-            list.addAll(voiceRoomBeans);
-            list.addAll(voiceRoomBeans);
-            list.addAll(voiceRoomBeans);
-            refresh(list, isRefresh);
+//            List<VoiceRoomBean> list = new ArrayList<>();
+//            list.addAll(voiceRoomBeans);
+//            list.addAll(voiceRoomBeans);
+//            list.addAll(voiceRoomBeans);
+            refresh(voiceRoomBeans, isRefresh);
             if (mCurrentPage == 1) {
                 mRoomList.refreshComplete();
             } else {
