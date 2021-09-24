@@ -20,6 +20,7 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     private ViewPager2 mViewPager;
     private RoomVPAdapter<String> mRoomAdapter;
     private AbsRoomFragment mCurrentFragment;
+    private int mCurrentPosition;
 
     @Override
     public int setLayoutId() {
@@ -32,11 +33,6 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
         getWrapBar().setHide(true).work();
         // 初始化viewpager并设置数据和监听
         mViewPager = getView(R.id.vp_room);
-        mRoomAdapter = new RoomVPAdapter<String>(this);
-        mViewPager.setAdapter(mRoomAdapter);
-        mRoomAdapter.setData(loadData());
-        mViewPager.setCurrentItem(getCurrentItem(), false);
-
         mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -46,6 +42,7 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+                mCurrentPosition = position;
                 // 上一个滑走
                 Fragment lastFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
                 if (lastFragment instanceof AbsRoomFragment) {
@@ -56,9 +53,10 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
                 if (currentFragment instanceof AbsRoomFragment) {
                     Logger.e("current page show");
-                    switchRoom(mRoomAdapter.getItemData(position));
                     mCurrentFragment = (AbsRoomFragment) currentFragment;
+                    switchRoom(mRoomAdapter.getItemData(position));
                 }
+                Logger.e("==================选中了第几个：" + position + " last:" + lastFragment + ",current:" + currentFragment);
             }
 
             @Override
@@ -66,6 +64,19 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 super.onPageScrollStateChanged(state);
             }
         });
+        // 第一次进入非选中第一页时onPageSelected获得不了fragment
+        getSupportFragmentManager().addFragmentOnAttachListener((fragmentManager, fragment) -> {
+            Logger.e("==========" + fragmentManager.getFragments().size() + "  " + fragment.getTag());
+            if (mCurrentFragment == null) {
+                mCurrentFragment = (AbsRoomFragment) fragment;
+                switchRoom(mRoomAdapter.getItemData(mCurrentPosition));
+            }
+        });
+
+        mRoomAdapter = new RoomVPAdapter<String>(this);
+        mViewPager.setAdapter(mRoomAdapter);
+        mRoomAdapter.setData(loadData());
+        mViewPager.setCurrentItem(getCurrentItem(), false);
     }
 
     protected abstract void initRoom();

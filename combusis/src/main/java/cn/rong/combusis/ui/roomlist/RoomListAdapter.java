@@ -2,8 +2,8 @@ package cn.rong.combusis.ui.roomlist;
 
 import android.content.Context;
 
-import com.bcq.adapter.recycle.RcyHolder;
-import com.bcq.adapter.recycle.RcySAdapter;
+import com.basis.adapter.recycle.RcyHolder;
+import com.basis.adapter.recycle.RcySAdapter;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rong.combusis.R;

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
-import com.bcq.adapter.recycle.RcyHolder;
-import com.bcq.adapter.recycle.RcySAdapter;
+import com.basis.adapter.recycle.RcyHolder;
+import com.basis.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
 
 import cn.rong.combusis.R;

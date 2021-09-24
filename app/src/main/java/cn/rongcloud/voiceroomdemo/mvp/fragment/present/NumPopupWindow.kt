@@ -6,9 +6,9 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 
 import android.content.Context
 import android.view.View
-import com.bcq.adapter.recycle.RcyHolder
-import com.bcq.adapter.recycle.RcySAdapter
 import cn.rongcloud.voiceroomdemo.R
+import com.basis.adapter.recycle.RcyHolder
+import com.basis.adapter.recycle.RcySAdapter
 import com.rongcloud.common.utils.UiUtils.dp2Px
 import kotlinx.android.synthetic.main.layout_pop_present_num.view.*
 import kotlinx.android.synthetic.main.layout_pop_present_num_item.view.*

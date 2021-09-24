@@ -3,9 +3,9 @@ package cn.rong.combusis.ui.friend;
 
 import android.os.Bundle;
 
+import com.basis.adapter.interfaces.IAdapte;
+import com.basis.adapter.recycle.RcyHolder;
 import com.basis.ui.ListFragment;
-import com.bcq.adapter.interfaces.IAdapte;
-import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
 import com.bcq.net.api.Method;

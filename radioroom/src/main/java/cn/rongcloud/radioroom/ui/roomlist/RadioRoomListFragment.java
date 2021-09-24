@@ -11,10 +11,10 @@ import cn.rongcloud.radioroom.ui.room.RadioRoomActivity;
  * @author gyn
  * @date 2021/9/14
  */
-public class RadioAbsRoomListFragment extends AbsRoomListFragment {
+public class RadioRoomListFragment extends AbsRoomListFragment {
 
     public static Fragment getInstance() {
-        return new RadioAbsRoomListFragment();
+        return new RadioRoomListFragment();
     }
 
     @Override

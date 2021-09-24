@@ -3,9 +3,9 @@ package cn.rong.combusis.ui.roomlist;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
+import com.basis.adapter.interfaces.IAdapte;
+import com.basis.adapter.recycle.RcyHolder;
 import com.basis.ui.ListFragment;
-import com.bcq.adapter.interfaces.IAdapte;
-import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.refresh.XRecyclerView;
 import com.rongcloud.common.ui.dialog.ConfirmDialog;
 
@@ -77,7 +77,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
             mRoomList.setNoMore(false);
         }
         VoiceRoomProvider.provider().loadPage(mCurrentPage, getRoomType(), voiceRoomBeans -> {
-            refresh(voiceRoomBeans, isRefresh);
+            List<VoiceRoomBean> list = new ArrayList<>();
+            list.addAll(voiceRoomBeans);
+            list.addAll(voiceRoomBeans);
+            list.addAll(voiceRoomBeans);
+            refresh(list, isRefresh);
             if (mCurrentPage == 1) {
                 mRoomList.refreshComplete();
             } else {
@@ -94,6 +98,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
 
     @Override
     public List<VoiceRoomBean> onPreSetData(List<VoiceRoomBean> netData) {
+        mRoomIdList.clear();
         if (netData != null && netData.size() > 0) {
             for (int i = 0; i < netData.size(); i++) {
                 mRoomIdList.add(netData.get(i).getRoomId());
@@ -109,9 +114,9 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     @Override
     public void onCreateSuccess(VoiceRoomBean voiceRoomBean) {
         mCreateRoomDialog.dismiss();
-        List<VoiceRoomBean> list = new ArrayList<>();
-        list.add(voiceRoomBean);
-        mRoomList.notifyItemInserted(list, 0);
+        mRoomIdList.add(0, voiceRoomBean.getRoomId());
+        mAdapter.getData().add(0, voiceRoomBean);
+        mAdapter.notifyItemInserted(0);
         clickItem(voiceRoomBean, 0);
     }
 

@@ -50,18 +50,21 @@
         app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_message"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/dimen_room_padding"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="70dp"
-        android:background="#55000000"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/room_seat_view"
-        app:layout_constraintWidth_percent="0.7" />
-
+        app:layout_constraintWidth_percent="0.7"
+        tools:itemCount="20"
+        tools:listitem="@layout/item_message_system" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

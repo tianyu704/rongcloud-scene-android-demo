@@ -122,6 +122,14 @@ public class VoiceRoomBean implements Provide {
         }
     }
 
+    public String getCreateUserId() {
+        if (createUser != null) {
+            return createUser.getUserId();
+        } else {
+            return "";
+        }
+    }
+
     public void setCreateUser(User createUser) {
         this.createUser = createUser;
     }

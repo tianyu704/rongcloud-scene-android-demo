@@ -5,10 +5,10 @@ import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.basis.adapter.interfaces.IAdapte;
+import com.basis.adapter.recycle.RcyHolder;
+import com.basis.adapter.recycle.RcySAdapter;
 import com.basis.widget.BottomDialog;
-import com.bcq.adapter.interfaces.IAdapte;
-import com.bcq.adapter.recycle.RcyHolder;
-import com.bcq.adapter.recycle.RcySAdapter;
 import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
@@ -25,8 +25,8 @@ import java.util.List;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
-import cn.rongcloud.voiceroom.R;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rongcloud.voiceroom.R;
 
 /**
  * pk在线房主弹框

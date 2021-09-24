@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.basis.BasisHelper;
-import com.bcq.adapter.interfaces.DataObserver;
-import com.bcq.adapter.interfaces.IAdapte;
-import com.bcq.adapter.interfaces.IHolder;
+import com.basis.adapter.interfaces.DataObserver;
+import com.basis.adapter.interfaces.IAdapte;
+import com.basis.adapter.interfaces.IHolder;
 import com.bcq.net.net.NetRefresher;
 import com.bcq.net.net.Page;
 import com.bcq.net.wrapper.interfaces.IPage;
