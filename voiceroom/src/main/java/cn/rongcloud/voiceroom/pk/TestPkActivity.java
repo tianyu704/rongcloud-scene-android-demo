@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.pk;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -12,8 +13,10 @@ import com.bcq.net.OkApi;
 import com.bcq.net.WrapperCallBack;
 import com.bcq.net.wrapper.Wrapper;
 import com.kit.cache.GsonUtil;
+import com.kit.utils.KToast;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.UIKit;
+import com.umeng.commonsdk.debug.I;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,14 +37,12 @@ public class TestPkActivity extends BaseActivity {
         return R.layout.activity_test_pk;
     }
 
-    String V_TAG = "voice_room";
-    String PK_TAG = "voice_pk";
     private VoiceRoomBean voiceRoomBean;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.get().off(EventBus.TAG.PK_STATE, null);
+        PKStateManager.get().unInit();
     }
 
     @Override
@@ -49,17 +50,12 @@ public class TestPkActivity extends BaseActivity {
         getWrapBar().setTitle(R.string.rc_location_title).setBackHide(true).work();
         String json = getIntent().getStringExtra(UIKit.KEY_BASE);
         voiceRoomBean = GsonUtil.json2Obj(json, VoiceRoomBean.class);
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        VoomFragment current = new VoomFragment();
-        transaction.add(R.id.container, current, V_TAG);
-        transaction.commitAllowingStateLoss();
         initData();
     }
 
+    TextView pkButton;
+
     private void initData() {
-//        PKProcessbar pkProcessbar = getView(R.id.pk_sb);
-//        pkProcessbar.setBarResource(R.drawable.ic_score_selected);
-//        pkProcessbar.setProgress(30);
         getView(R.id.leave).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,7 +63,50 @@ public class TestPkActivity extends BaseActivity {
                 synToService("");
             }
         });
-        EventHelper.helper().regeister(voiceRoomBean.getRoomId());
+        pkButton = getView(R.id.send_pk);
+        pkButton.setText(EventHelper.helper().getPKState() == AbsPKHelper.Type.PK_INVITE ? "取消PK" : "邀请PK");
+        pkButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AbsPKHelper.Type state = EventHelper.helper().getPKState();
+                if (AbsPKHelper.Type.PK_GOING == state) {
+                    KToast.show("当前正在进行PK");
+                    return;
+                }
+                if (state == AbsPKHelper.Type.PK_INVITE) {
+                    PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
+                        @Override
+                        public void onResult(Boolean aBoolean) {
+                            if (aBoolean) pkButton.setText("邀请PK");
+                        }
+                    });
+                } else {
+                    PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
+                        @Override
+                        public void onResult(Boolean aBoolean) {
+                            if (aBoolean) pkButton.setText("取消PK");
+                        }
+                    });
+                }
+                pkButton.setText(EventHelper.helper().getPKState() == AbsPKHelper.Type.PK_INVITE ? "取消PK" : "邀请PK");
+            }
+        });
+        join();
+
+        PKStateManager.get().init(voiceRoomBean.getRoomId(), new IPKState.VRStateListener() {
+            @Override
+            public void onPkStart() {
+
+            }
+
+            @Override
+            public void onPkStop() {
+
+            }
+        });
+    }
+
+    private void join() {
         RCVoiceRoomInfo roomInfo = VoiceRoomApi.getApi().getRoomInfo();
         roomInfo.setSeatCount(8);
         roomInfo.setRoomName(voiceRoomBean.getRoomName());
@@ -79,26 +118,6 @@ public class TestPkActivity extends BaseActivity {
                 Log.e(TAG, "加入房间:" + aBoolean);
                 synToService(voiceRoomBean.getRoomId());
                 VoiceRoomApi.getApi().enterSeat(1, null);
-            }
-        });
-        EventBus.get().on(EventBus.TAG.PK_STATE, new EventBus.EventCallback() {
-            @Override
-            public void onEvent(Object... args) {
-                if (args.length != 1) return;
-                if (args[0] instanceof AbsPKHelper.Type) {
-                    AbsPKHelper.Type state = (AbsPKHelper.Type) args[0];
-                    Log.e(TAG, "onEvent:" + state);
-                    if (AbsPKHelper.Type.PK_GOING == state) {
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        PKFragment current = new PKFragment();
-                        transaction.replace(R.id.container, current, PK_TAG);
-                    } else if (AbsPKHelper.Type.PK_FINISH == state) {
-                        Fragment f = getSupportFragmentManager().findFragmentByTag(V_TAG);
-                        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                        transaction.replace(R.id.container, f, V_TAG);
-                        transaction.commitAllowingStateLoss();
-                    }
-                }
             }
         });
     }

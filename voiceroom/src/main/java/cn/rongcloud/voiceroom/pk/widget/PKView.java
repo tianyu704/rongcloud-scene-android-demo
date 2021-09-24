@@ -12,9 +12,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bcq.adapter.recycle.RcyAdapter;
-import com.bcq.adapter.recycle.RcyHolder;
-import com.bcq.adapter.recycle.RcySAdapter;
+
+import com.basis.adapter.recycle.RcyAdapter;
+import com.basis.adapter.recycle.RcyHolder;
+import com.basis.adapter.recycle.RcySAdapter;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
