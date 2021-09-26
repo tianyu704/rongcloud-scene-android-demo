@@ -34,6 +34,7 @@ import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.radioroom.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.voiceroom.R;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imlib.model.MessageContent;
@@ -89,10 +90,15 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     }
 
     @Override
+    public void initListener() {
+
+    }
+
+    @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
-//        RCRadioRoomEngine.getInstance().setRadioEventListener(this);
         mVoiceRoomBean = voiceRoomBean;
         setRoomData(mVoiceRoomBean);
+        present.setCurrentRoom(mVoiceRoomBean);
         sendSystemMessage();
     }
 
@@ -317,7 +323,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     }
 
     @Override
-    public void showSingalInfo(int i) {
-
+    public void onNetworkStatus(int i) {
+        mRoomTitleBar.setDelay(i);
     }
 }

@@ -1,40 +1,20 @@
 package com.basis.mvp;
 
+
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
+public abstract class BaseModel<V extends BasePresenter> implements ILifeCycle, LifecycleObserver {
 
-/**
- * @author gyn
- * @date 2021/9/24
- */
-public abstract class BasePresenter<V extends IBaseView> implements IPresenter<V>,
-        ILifeCycle, LifecycleObserver {
-
-    public V mView;
+    public V present;
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public BasePresenter(V mView,Lifecycle lifecycle) {
-        super();
-        this.mView = mView;
+    public BaseModel(V present, Lifecycle lifecycle) {
+        this.present=present;
         lifecycle.addObserver(this);
-    }
-
-    @Override
-    public void attachView(V mView, Lifecycle lifecycle) {
-
-    }
-
-    @Override
-    public void detachView() {
-
-    }
-
-    public boolean isViewAttached() {
-        return mView != null;
     }
 
     public void addSubscription(Disposable disposable) {
@@ -48,7 +28,7 @@ public abstract class BasePresenter<V extends IBaseView> implements IPresenter<V
 
     @Override
     public void onDestroy() {
-        mView = null;
+        present = null;
         if (!compositeDisposable.isDisposed()) {
             compositeDisposable.clear();
         }

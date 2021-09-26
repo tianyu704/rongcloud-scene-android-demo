@@ -16,6 +16,8 @@ import com.basis.mvp.IBaseView;
 import com.basis.net.LoadTag;
 import com.kit.utils.Logger;
 
+import io.rong.imkit.picture.tools.ToastUtils;
+
 /**
  * @author: BaiCQ
  * @ClassName: BaseFragment
@@ -71,6 +73,8 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
     @Override
     public abstract void init();
 
+    public abstract void initListener();
+
     protected View getLayout() {
         return layout;
     }
@@ -113,6 +117,6 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
 
     @Override
     public void showMessage(String message) {
-
+        ToastUtils.s(getActivity(),message);
     }
 }

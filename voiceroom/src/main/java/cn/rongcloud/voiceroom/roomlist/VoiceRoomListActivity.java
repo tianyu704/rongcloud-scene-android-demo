@@ -30,6 +30,6 @@ public class VoiceRoomListActivity extends AbsSwitchActivity {
 
     @Override
     public String[] onSetSwitchTitle() {
-        return new String[]{"电台", "好友"};
+        return new String[]{"语聊房", "好友"};
     }
 }

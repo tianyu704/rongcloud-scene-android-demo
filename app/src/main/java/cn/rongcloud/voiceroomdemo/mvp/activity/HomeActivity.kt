@@ -17,6 +17,7 @@ import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.radioroom.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
+import cn.rongcloud.voiceroom.roomlist.VoiceRoomListActivity
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
@@ -69,6 +70,7 @@ class HomeActivity : BaseActivity(), IHomeView,
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VoiceRoom)
+//                    VoiceRoomListActivity.startActivity(this)
                     VoiceRoomListActivity.startActivity(this)
                 } else {
                     showToast("请赋予必要权限！")

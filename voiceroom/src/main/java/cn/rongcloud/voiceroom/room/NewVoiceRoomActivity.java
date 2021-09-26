@@ -11,10 +11,20 @@ import com.kit.utils.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
+import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.message.RCChatroomFollow;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLike;
+import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.message.RCChatroomSeats;
+import cn.rong.combusis.message.RCChatroomUserBan;
+import cn.rong.combusis.message.RCChatroomUserBlock;
+import cn.rong.combusis.message.RCChatroomUserUnBan;
+import cn.rong.combusis.message.RCChatroomUserUnBlock;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
@@ -45,9 +55,19 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     protected void initRoom() {
         mLoadTag = new LoadTag(activity, "Loading...");
         RCMessager.getInstance().addMessageTypes(
+                RCChatroomAdmin.class,
                 RCChatroomBarrage.class,
+                RCChatroomEnter.class,
+                RCChatroomFollow.class,
                 RCChatroomGift.class,
                 RCChatroomGiftAll.class,
+                RCChatroomKickOut.class,
+                RCChatroomLocationMessage.class,
+                RCChatroomSeats.class,
+                RCChatroomUserBan.class,
+                RCChatroomUserBlock.class,
+                RCChatroomUserUnBan.class,
+                RCChatroomUserUnBlock.class,
                 RCChatroomLike.class,
                 RCChatroomVoice.class);
     }

@@ -61,6 +61,11 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
     }
 
     @Override
+    public void initListener() {
+
+    }
+
+    @Override
     public void onRefresh(Object obj) {
         super.onRefresh(obj);
     }

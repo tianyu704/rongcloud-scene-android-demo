@@ -45,6 +45,7 @@ import cn.rongcloud.radioroom.R;
 import cn.rongcloud.radioroom.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.rroom.RCRadioEventListener;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 
@@ -112,6 +113,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
         mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
         mMessageView.setAdapter(mRoomMessageAdapter);
+    }
+
+    @Override
+    public void initListener() {
+
     }
 
     @Override

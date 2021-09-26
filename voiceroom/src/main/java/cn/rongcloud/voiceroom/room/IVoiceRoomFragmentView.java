@@ -60,5 +60,5 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void onMemberInfoChange();
 
-    void showSingalInfo(int i);
+    void onNetworkStatus(int i);
 }

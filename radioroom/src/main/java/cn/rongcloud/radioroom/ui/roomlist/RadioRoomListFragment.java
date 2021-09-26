@@ -44,4 +44,9 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
     public BasePresenter createPresent() {
         return null;
     }
+
+    @Override
+    public void initListener() {
+
+    }
 }

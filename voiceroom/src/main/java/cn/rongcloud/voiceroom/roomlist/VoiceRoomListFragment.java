@@ -33,4 +33,9 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
     public BasePresenter createPresent() {
         return null;
     }
+
+    @Override
+    public void initListener() {
+
+    }
 }

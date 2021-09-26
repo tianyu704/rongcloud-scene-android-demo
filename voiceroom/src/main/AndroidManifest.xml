@@ -8,5 +8,9 @@
     <application>
         <activity android:name=".pk.TestPkActivity"
             android:theme="@style/BasisTheme"/>
+        <activity android:name=".roomlist.VoiceRoomListActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".room.NewVoiceRoomActivity"
+            android:screenOrientation="portrait"/>
     </application>
 </manifest>
