@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.basis.UIStack;
+import com.basis.mvp.BasePresenter;
 import com.kit.utils.Logger;
 
 /**
@@ -24,6 +25,7 @@ public abstract class BaseFragment extends Fragment implements IBasis {
     protected BaseActivity activity;
     private View layout;
     private boolean init = false;//init 和 onRefresh()的执行的先后问题
+    public BasePresenter present;
 
     @Override
     public final void onAttach(Context context) {
@@ -40,6 +42,8 @@ public abstract class BaseFragment extends Fragment implements IBasis {
         Logger.e(TAG, "onDetach");
     }
 
+    public abstract BasePresenter createPresent();
+
     @Deprecated
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +56,7 @@ public abstract class BaseFragment extends Fragment implements IBasis {
     public final void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Logger.e(TAG, "onViewCreated");
+        present = createPresent();
         init();
         init = true;
     }

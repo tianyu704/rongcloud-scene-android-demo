@@ -1,4 +1,4 @@
-package cn.rong.combusis.ui.mvp;
+package com.basis.mvp;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.OnLifecycleEvent;

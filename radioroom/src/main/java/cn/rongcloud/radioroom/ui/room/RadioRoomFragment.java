@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.basis.mvp.BasePresenter;
 import com.basis.net.LoadTag;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
@@ -63,10 +64,15 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private LoadTag mLoadTag;
 
-    private RadioRoomPresenter mPresenter = new RadioRoomPresenter();
+    private RadioRoomPresenter mPresenter = new RadioRoomPresenter(this,getLifecycle());
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
+    }
+
+    @Override
+    public BasePresenter createPresent() {
+        return null;
     }
 
     @Override
@@ -340,6 +346,51 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void clickMessageUser(String userId) {
+
+    }
+
+    @Override
+    public void showWaitingDialog() {
+
+    }
+
+    @Override
+    public void hideWaitingDialog() {
+
+    }
+
+    @Override
+    public void showLoadingView() {
+
+    }
+
+    @Override
+    public void showNormal() {
+
+    }
+
+    @Override
+    public void showEmpty() {
+
+    }
+
+    @Override
+    public void showError(int errorCode, String message) {
+
+    }
+
+    @Override
+    public void showError(String message) {
+
+    }
+
+    @Override
+    public void onLogout() {
+
+    }
+
+    @Override
+    public void showMessage(String message) {
 
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import com.basis.adapter.interfaces.IAdapte;
 import com.basis.adapter.recycle.RcyHolder;
+import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.api.Method;
@@ -47,6 +48,11 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
         mAdapter.setType(mType);
         mAdapter.setOnFollowClickListener(this);
         return mAdapter;
+    }
+
+    @Override
+    public BasePresenter createPresent() {
+        return null;
     }
 
     @Override

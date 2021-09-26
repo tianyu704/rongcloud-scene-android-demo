@@ -47,6 +47,7 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.MusicSetti
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.IRevokeSeatView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.RevokeSeatRequestFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroundSettingFragment
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroupSettingDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.IBackgroundSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.IRoomSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.RoomSettingDialogFragment
@@ -723,7 +724,10 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         roomSettingDialogFragment?.dismiss()
         val roomInfoBean = presenter.getCurrentRoomInfo().roomBean
         roomInfoBean?.let {
-            BackgroundSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
+            val backgroupSettingDialogFragment =
+                BackgroupSettingDialogFragment(getVoiceRoomModel(), this);
+            backgroupSettingDialogFragment.show(childFragmentManager)
+//            BackgroundSettingFragment(this).show(this@VoiceRoomFragment.childFragmentManager)
         }
     }
 

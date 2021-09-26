@@ -1,6 +1,6 @@
 package cn.rongcloud.radioroom.ui.room;
 
-import cn.rong.combusis.ui.mvp.IBaseView;
+import com.basis.mvp.IBaseView;
 
 /**
  * @author gyn

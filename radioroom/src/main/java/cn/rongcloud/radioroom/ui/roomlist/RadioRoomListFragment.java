@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.fragment.app.Fragment;
 
+import com.basis.mvp.BasePresenter;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
@@ -37,5 +38,10 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
     @Override
     public RoomType getRoomType() {
         return RoomType.RADIO_ROOM;
+    }
+
+    @Override
+    public BasePresenter createPresent() {
+        return null;
     }
 }
