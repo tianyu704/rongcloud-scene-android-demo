@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/vr_shape_dialog_bg">
 
-    <com.rongcloud.common.ui.widget.RealtimeBlurView
+    <cn.rong.combusis.common.ui.widget.RealtimeBlurView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:left_top_radius="20dp"

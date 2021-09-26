@@ -53,4 +53,21 @@ public class VRApi {
      * 上传文件后，文件的前缀
      */
     public static final String FILE_PATH = HOST + "file/show?path=";
+
+    /**
+     * pk状态上报
+     */
+    public static final String PK_STATE = HOST + "mic/room/pk";
+
+    private static final String PK_INFO = HOST + "mic/room/pk/info/";
+
+    /**
+     * 获取pk积分排行
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getPKInfo(String roomId) {
+        return PK_INFO + roomId;
+    }
 }

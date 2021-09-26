@@ -37,7 +37,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         //邀请同意 开始PK 释放被邀请信息
         VoiceRoomApi.getApi().releasePKInvitee();
         current = Type.PK_GOING;
-        dispatchPKState();
+        dispatchPKState(rcpkInfo);
     }
 
     /**
@@ -47,7 +47,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     public void onPKFinish() {
         Logger.e(TAG, "onPKFinish");
         current = Type.PK_FINISH;
-        dispatchPKState();
+        dispatchPKState(null);
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         pkInviter.inviterRoomId = inviterRoomId;
         pkInviter.inviterId = inviterUserId;
         current = Type.PK_INVITE;
-        dispatchPKState();
+        dispatchPKState(null);
         onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean result) {
@@ -97,7 +97,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         // 释放邀请者信息
         pkInviter = null;
         current = Type.PK_NONE;
-        dispatchPKState();
+        dispatchPKState(null);
     }
 
     /**
@@ -117,7 +117,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
             VoiceRoomApi.getApi().releasePKInvitee();
         }
         current = Type.PK_NONE;
-        dispatchPKState();
+        dispatchPKState(null);
     }
 
     @Override
@@ -131,12 +131,12 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
             VoiceRoomApi.getApi().releasePKInvitee();
         }
         current = Type.PK_NONE;
-        dispatchPKState();
+        dispatchPKState(null);
 
     }
 
-    private void dispatchPKState() {
-        EventBus.get().emit(EventBus.TAG.PK_STATE, current);
+    private void dispatchPKState(RCPKInfo rcpkInfo) {
+        EventBus.get().emit(EventBus.TAG.PK_STATE, current, rcpkInfo);
     }
 
     private void dispatchPKResponse(PKState pkState) {

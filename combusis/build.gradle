@@ -6,6 +6,8 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
+apply from: rootProject.file("ext.gradle")
+
 android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -21,6 +23,9 @@ android {
         versionCode 1
         versionName "1.0"
 
+        renderscriptTargetApi 14
+        renderscriptSupportModeEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -34,6 +39,10 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+
+    kapt {
+        correctErrorTypes true
     }
 }
 

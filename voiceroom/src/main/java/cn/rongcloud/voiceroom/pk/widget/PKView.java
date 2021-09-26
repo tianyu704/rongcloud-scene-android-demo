@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.basis.adapter.recycle.RcyAdapter;
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
@@ -64,7 +63,7 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public void pkStart(OnEndListener listener) {
+    public void pkStart(OnTimerEndListener listener) {
         if (null != timer) {
             timer.cancel();
         }
@@ -72,6 +71,14 @@ public class PKView extends LinearLayout implements IPK {
         timer.start();
     }
 
+    @Override
+    public void punishStart(OnTimerEndListener listener) {
+        if (null != timer) {
+            timer.cancel();
+        }
+//        timer = new Timer(tvTime, listener);
+//        timer.start();
+    }
 
     @Override
     public void pkStop() {
@@ -128,9 +135,9 @@ public class PKView extends LinearLayout implements IPK {
 
     public class Timer extends CountDownTimer {
         private WeakReference<TextView> reference;
-        private WeakReference<OnEndListener> listenerWeakReference;
+        private WeakReference<OnTimerEndListener> listenerWeakReference;
 
-        Timer(TextView textView, OnEndListener listener) {
+        Timer(TextView textView, OnTimerEndListener listener) {
             super(MAX * 1000, 1000);
             this.reference = new WeakReference<>(textView);
             this.listenerWeakReference = new WeakReference<>(listener);
@@ -142,7 +149,7 @@ public class PKView extends LinearLayout implements IPK {
                 reference.get().setText(msToShow(l));
             }
             if (l < 1000 && null != listenerWeakReference && null != listenerWeakReference.get()) {
-                listenerWeakReference.get().onEnd();
+                listenerWeakReference.get().onTimerEnd();
             }
         }
 

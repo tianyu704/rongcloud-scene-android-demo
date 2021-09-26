@@ -25,6 +25,7 @@ import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
+import cn.rongcloud.voiceroom.pk.widget.PKView;
 
 public class TestPkActivity extends BaseActivity {
     @Override
@@ -49,7 +50,8 @@ public class TestPkActivity extends BaseActivity {
     }
 
     TextView pkButton;
-    View voice_room, pkVew;
+    PKView pkVew;
+    View voice_room;
 
     private void initData() {
         voice_room = getView(R.id.voice_room);
@@ -64,7 +66,7 @@ public class TestPkActivity extends BaseActivity {
                     KToast.show("当前正在进行PK");
                     return;
                 }
-                Logger.e(TAG,"state = "+state);
+                Logger.e(TAG, "state = " + state);
                 if (state == AbsPKHelper.Type.PK_INVITE) {
                     PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
                         @Override
@@ -83,16 +85,21 @@ public class TestPkActivity extends BaseActivity {
             }
         });
         join();
-
-        PKStateManager.get().init(voiceRoomBean.getRoomId(), new IPKState.VRStateListener() {
+        PKStateManager.get().init(voiceRoomBean.getRoomId(), pkVew, new IPKState.VRStateListener() {
             @Override
             public void onPkStart() {
-                PKStateManager.get().enterPkWithAnimation(voice_room, pkVew,200);
+                PKStateManager.get().enterPkWithAnimation(voice_room, pkVew, 200);
             }
 
             @Override
             public void onPkStop() {
-                PKStateManager.get().quitPkWithAnimation(pkVew, voice_room,200);
+                PKStateManager.get().quitPkWithAnimation(pkVew, voice_room, 200);
+            }
+        });
+        getView(R.id.leave).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                leave();
             }
         });
     }
@@ -109,6 +116,16 @@ public class TestPkActivity extends BaseActivity {
                 Log.e(TAG, "加入房间:" + aBoolean);
                 synToService(voiceRoomBean.getRoomId());
                 VoiceRoomApi.getApi().enterSeat(1, null);
+            }
+        });
+    }
+
+    private void leave() {
+        VoiceRoomApi.getApi().leaveRoom(new IResultBack<Boolean>() {
+            @Override
+            public void onResult(Boolean aBoolean) {
+                Log.e(TAG, "加入房间:" + aBoolean);
+                synToService("");
             }
         });
     }

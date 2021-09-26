@@ -8,10 +8,17 @@ public interface IPK {
      *
      * @param listener 定时结束回调
      */
-    void pkStart(OnEndListener listener);
+    void pkStart(OnTimerEndListener listener);
 
     /**
-     * pk 结束
+     * 惩罚阶段开始
+     *
+     * @param listener 定时结束回调
+     */
+    void punishStart(OnTimerEndListener listener);
+
+    /**
+     * pk 流程结束
      */
     void pkStop();
 
@@ -31,7 +38,7 @@ public interface IPK {
      */
     void setGiftSenders(List<String> lefts, List<String> rights);
 
-    public interface OnEndListener {
-        void onEnd();
+    public interface OnTimerEndListener {
+        void onTimerEnd();
     }
 }

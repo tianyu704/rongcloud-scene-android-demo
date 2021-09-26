@@ -5,14 +5,17 @@ import android.view.View;
 
 import com.kit.wapper.IResultBack;
 
+import cn.rongcloud.voiceroom.pk.widget.IPK;
+
 public interface IPKState {
     /**
      * 初始化
      *
      * @param roomId   房间id
+     * @param pkView   PK 视图
      * @param listener pk监听
      */
-    void init(String roomId, VRStateListener listener);
+    void init(String roomId, IPK pkView, VRStateListener listener);
 
     /**
      * 反初始化
@@ -34,6 +37,11 @@ public interface IPKState {
      * @param resultBack 取消邀请会状态回调
      */
     void cancelPkInvitation(Activity activity, IResultBack<Boolean> resultBack);
+
+    /**
+     * 刷新pk礼物排行榜信息
+     */
+    void refreshPKGiftRank();
 
     /**
      * pk 动画进场
