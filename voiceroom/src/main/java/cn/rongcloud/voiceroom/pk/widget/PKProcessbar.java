@@ -5,19 +5,15 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.ProgressBar;
 
 import androidx.annotation.DrawableRes;
 
-import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 
 import cn.rongcloud.voiceroom.R;
@@ -156,6 +152,7 @@ public class PKProcessbar extends ProgressBar {
     public void setPKValue(int leftValue, int rightValue) {
         this.leftValue = leftValue;
         this.rightValue = rightValue;
+        postInvalidate();
     }
 
     /**

@@ -22,6 +22,18 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     protected Type current = Type.PK_NONE;
 
     @Override
+    protected void init(String roomId) {
+        super.init(roomId);
+        current = Type.PK_NONE;
+    }
+
+    @Override
+    protected void unInit() {
+        super.unInit();
+        current = Type.PK_NONE;
+    }
+
+    @Override
     public Type getPKState() {
         return current;
     }

@@ -18,17 +18,21 @@ import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
+import cn.rongcloud.voiceroom.pk.domain.PKInfo;
 import cn.rongcloud.voiceroom.pk.widget.IPK;
 
 /**
@@ -50,11 +54,10 @@ import cn.rongcloud.voiceroom.pk.widget.IPK;
  */
 public class PKStateManager implements IPKState, EventBus.EventCallback, DialogInterface.OnDismissListener {
     private final static String TAG = "VoiceRoomManager";
-    private String roomId;
+    private String roomId, pkRoomId;
     private IPK pkView;
     private final static PKStateManager manager = new PKStateManager();
     private VRStateListener stateListener;
-    private RCPKInfo rcpkInfo;
 
     public PKStateManager() {
     }
@@ -108,17 +111,83 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         dialog.show();
     }
 
+    private PKInfo lastLeftInfo;
+    private PKInfo lastRightInfo;
+
+    @Override
+    public void quitPK() {
+        VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
+            @Override
+            public void onResult(Boolean aBoolean) {
+                //手动退出成功，上报pk状态：pk结束
+                reportPKState(2);
+                //惩罚记时
+                if (null != pkView) pkView.pkStop();
+                // 回调状态
+                if (null != stateListener) stateListener.onPkStop();
+            }
+        });
+    }
+
     @Override
     public void refreshPKGiftRank() {
-        Map<String, Object> params = new HashMap<>();
-        OkApi.post(VRApi.getPKInfo(roomId), params, new WrapperCallBack() {
+        // load left pk info
+        OkApi.get(VRApi.getPKInfo(roomId), null, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
+                Logger.e(TAG, "result:" + GsonUtil.obj2Json(result));
                 if (null != result && result.ok()) {
-                    // 解析数据
+                    PKInfo pkInfo = result.get(PKInfo.class);
+                    Logger.e(TAG, "pkInfo:" + GsonUtil.obj2Json(pkInfo));
+                    refreshPKInfo(pkInfo, null);
                 }
             }
         });
+        // load right pk info
+        OkApi.get(VRApi.getPKInfo(pkRoomId), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (null != result && result.ok()) {
+                    if (null != result && result.ok()) {
+                        refreshPKInfo(null, result.get(PKInfo.class));
+                    }
+                }
+            }
+        });
+    }
+
+    void refreshPKInfo(PKInfo left, PKInfo right) {
+        Logger.e(TAG, "left:" + GsonUtil.obj2Json(left));
+        Logger.e(TAG, "right:" + GsonUtil.obj2Json(right));
+        if (null != left) {
+            lastLeftInfo = left;
+        }
+        if (null != right) {
+            lastRightInfo = right;
+        }
+        // set score
+        pkView.setPKScore(null == lastLeftInfo ? 0 : lastLeftInfo.getScore(),
+                null == lastRightInfo ? 0 : lastRightInfo.getScore());
+
+        List<String> lefts = new ArrayList<>();
+        if (null != lastLeftInfo) {
+            List<User> users = lastLeftInfo.getUserInfoList();
+            int ls = null == users ? 0 : users.size();
+            for (int i = 0; i < ls; i++) {
+                lefts.add(users.get(i).getPortrait());
+            }
+        }
+
+        List<String> rights = new ArrayList<>();
+        if (null != lastRightInfo) {
+            List<User> users = lastRightInfo.getUserInfoList();
+            int ls = null == users ? 0 : users.size();
+            for (int i = 0; i < ls; i++) {
+                rights.add(users.get(i).getPortrait());
+            }
+        }
+        // set sender rank
+        pkView.setGiftRank(lefts, rights);
     }
 
     @Override
@@ -130,7 +199,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             // pk邀请成功 对方同意 进入pk开始阶段
             if (IEventHelp.Type.PK_GOING == pkState) {
                 if (args.length == 2) {
-                    rcpkInfo = (RCPKInfo) args[1];
+                    RCPKInfo rcpkInfo = (RCPKInfo) args[1];
+                    pkRoomId = TextUtils.equals(rcpkInfo.getInviteeRoomId(), roomId) ? rcpkInfo.getInviterRoomId() : rcpkInfo.getInviteeRoomId();
                 }
                 handlePKStart();
             } else if (IEventHelp.Type.PK_FINISH == pkState) {
@@ -163,6 +233,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 }
             });
         }
+        // 首次刷新pk信息
+        refreshPKGiftRank();
     }
 
     /**
@@ -195,6 +267,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
      */
     void handlePKStop() {
         if (null != stateListener) stateListener.onPkStop();
+        if (null != pkView) pkView.pkStop();
         // 上报pk状态：结束
         reportPKState(2);
     }
@@ -250,18 +323,19 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
      * @param status pk状态 0：开始 1：暂停，惩罚阶段（送礼物不计算了） 2：结束
      */
     void reportPKState(int status) {
-        if (null != rcpkInfo) {
-            return;
-        }
         Map<String, Object> params = new HashMap<>();
         params.put("roomId", roomId);
-        String toRoomId = TextUtils.equals(rcpkInfo.getInviteeRoomId(), roomId) ? rcpkInfo.getInviterRoomId() : rcpkInfo.getInviteeRoomId();
-        params.put("toRoomId", toRoomId);
+        params.put("toRoomId", pkRoomId);
         params.put("status", status);
         OkApi.post(VRApi.PK_STATE, params, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
                 Logger.e(TAG, "reportPKState:" + GsonUtil.obj2Json(result));
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
             }
         });
     }

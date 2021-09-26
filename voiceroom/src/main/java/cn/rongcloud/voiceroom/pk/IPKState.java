@@ -39,6 +39,11 @@ public interface IPKState {
     void cancelPkInvitation(Activity activity, IResultBack<Boolean> resultBack);
 
     /**
+     * 手动退出pk
+     */
+    void quitPK();
+
+    /**
      * 刷新pk礼物排行榜信息
      */
     void refreshPKGiftRank();
@@ -62,8 +67,14 @@ public interface IPKState {
     void quitPkWithAnimation(View left, View in, long duration);
 
     interface VRStateListener {
+        /**
+         * pk开始
+         */
         void onPkStart();
 
+        /**
+         * pk结束：1、惩罚记时结束，2、手动退出PK
+         */
         void onPkStop();
     }
 }

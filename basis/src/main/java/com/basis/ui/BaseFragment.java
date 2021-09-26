@@ -14,9 +14,9 @@ import com.basis.UIStack;
 import com.basis.mvp.BasePresenter;
 import com.basis.mvp.IBaseView;
 import com.basis.net.LoadTag;
+import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 
-import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author: BaiCQ
@@ -117,6 +117,6 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
 
     @Override
     public void showMessage(String message) {
-        ToastUtils.s(getActivity(),message);
+        KToast.show(message);
     }
 }

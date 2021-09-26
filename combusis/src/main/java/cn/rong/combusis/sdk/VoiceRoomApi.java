@@ -344,7 +344,8 @@ public class VoiceRoomApi implements Api {
     @Override
     public void quitPK(IResultBack<Boolean> resultBack) {
         RCVoiceRoomEngine.getInstance().quitPK(
-                new DefaultRoomCallback("quitPK", "退出PK", resultBack));
+                new DefaultRoomCallback("quitPK", "", resultBack));
+
     }
 
     @Override

@@ -22,12 +22,12 @@ import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.EventHelper;
-import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 
-public class TestPkActivity extends BaseActivity {
+public class TestPkActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public int setLayoutId() {
         return R.layout.activity_test_pk;
@@ -57,33 +57,7 @@ public class TestPkActivity extends BaseActivity {
         voice_room = getView(R.id.voice_room);
         pkVew = getView(R.id.pk_view);
         pkButton = getView(R.id.send_pk);
-        pkButton.setText(EventHelper.helper().getPKState() == AbsPKHelper.Type.PK_INVITE ? "取消PK" : "邀请PK");
-        pkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AbsPKHelper.Type state = EventHelper.helper().getPKState();
-                if (AbsPKHelper.Type.PK_GOING == state) {
-                    KToast.show("当前正在进行PK");
-                    return;
-                }
-                Logger.e(TAG, "state = " + state);
-                if (state == AbsPKHelper.Type.PK_INVITE) {
-                    PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
-                        @Override
-                        public void onResult(Boolean aBoolean) {
-                            if (aBoolean) pkButton.setText("邀请PK");
-                        }
-                    });
-                } else {
-                    PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
-                        @Override
-                        public void onResult(Boolean aBoolean) {
-                            if (aBoolean) pkButton.setText("取消PK");
-                        }
-                    });
-                }
-            }
-        });
+        pkButton.setText(EventHelper.helper().getPKState() == IEventHelp.Type.PK_INVITE ? "取消PK" : "邀请PK");
         join();
         PKStateManager.get().init(voiceRoomBean.getRoomId(), pkVew, new IPKState.VRStateListener() {
             @Override
@@ -96,12 +70,45 @@ public class TestPkActivity extends BaseActivity {
                 PKStateManager.get().quitPkWithAnimation(pkVew, voice_room, 200);
             }
         });
-        getView(R.id.leave).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                leave();
+        // click
+        pkButton.setOnClickListener(this);
+        getView(R.id.leave).setOnClickListener(this);
+        getView(R.id.refresh).setOnClickListener(this);
+        getView(R.id.quitpk).setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        if (R.id.leave == id) {
+            leave();
+        } else if (R.id.refresh == id) {
+            PKStateManager.get().refreshPKGiftRank();
+        } else if (R.id.quitpk == id) {
+            PKStateManager.get().quitPK();
+        } else if (R.id.send_pk == id) {
+            IEventHelp.Type state = EventHelper.helper().getPKState();
+            if (IEventHelp.Type.PK_GOING == state) {
+                KToast.show("当前正在进行PK");
+                return;
             }
-        });
+            Logger.e(TAG, "state = " + state);
+            if (state == IEventHelp.Type.PK_INVITE) {
+                PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        if (aBoolean) pkButton.setText("邀请PK");
+                    }
+                });
+            } else {
+                PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        if (aBoolean) pkButton.setText("取消PK");
+                    }
+                });
+            }
+        }
     }
 
     private void join() {
@@ -110,12 +117,18 @@ public class TestPkActivity extends BaseActivity {
         roomInfo.setRoomName(voiceRoomBean.getRoomName());
         roomInfo.setMuteAll(false);
         roomInfo.setLockAll(false);
-        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
+//        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
+//            @Override
+//            public void onResult(Boolean aBoolean) {
+//                Log.e(TAG, "加入房间:" + aBoolean);
+//                synToService(voiceRoomBean.getRoomId());
+//                VoiceRoomApi.getApi().enterSeat(1, null);
+//            }
+//        });
+        VoiceRoomApi.getApi().joinRoom(voiceRoomBean.getRoomId(), new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean aBoolean) {
                 Log.e(TAG, "加入房间:" + aBoolean);
-                synToService(voiceRoomBean.getRoomId());
-                VoiceRoomApi.getApi().enterSeat(1, null);
             }
         });
     }
@@ -126,6 +139,7 @@ public class TestPkActivity extends BaseActivity {
             public void onResult(Boolean aBoolean) {
                 Log.e(TAG, "加入房间:" + aBoolean);
                 synToService("");
+                PKStateManager.get().unInit();
             }
         });
     }

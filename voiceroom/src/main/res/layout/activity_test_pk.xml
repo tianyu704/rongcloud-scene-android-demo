@@ -2,8 +2,6 @@
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
@@ -44,6 +42,34 @@
         android:paddingRight="@dimen/basis_20px"
         android:paddingBottom="@dimen/basis_10px"
         android:text="发起PK" />
+
+    <TextView
+        android:id="@+id/refresh"
+        style="@style/main_white_17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/basis_20px"
+        android:background="@drawable/basis_selector_blue_solid"
+        android:paddingLeft="@dimen/basis_20px"
+        android:paddingTop="@dimen/basis_10px"
+        android:paddingRight="@dimen/basis_20px"
+        android:paddingBottom="@dimen/basis_10px"
+        android:text="刷新PK Info" />
+
+    <TextView
+        android:id="@+id/quitpk"
+        style="@style/main_white_17"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/basis_20px"
+        android:background="@drawable/basis_selector_blue_solid"
+        android:paddingLeft="@dimen/basis_20px"
+        android:paddingTop="@dimen/basis_10px"
+        android:paddingRight="@dimen/basis_20px"
+        android:paddingBottom="@dimen/basis_10px"
+        android:text="退出PK" />
 
     <TextView
         android:id="@+id/leave"

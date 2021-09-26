@@ -9,7 +9,6 @@ import java.util.List;
 public class EventBus {
 
     public class TAG {
-        public final static String SPEACK = "voiceroom_speaking";
         public final static String MUSIC_LIST = "music_play_list";
         public final static String PK_STATE = "pk_state";// pk状态
         public final static String PK_RESPONSE = "pk_response"; // pk邀请响应状态

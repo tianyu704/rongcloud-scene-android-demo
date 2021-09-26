@@ -104,14 +104,14 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sender"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginRight="@dimen/basis_50px"
             android:layout_weight="1" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_receiver"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_weight="1" />
     </LinearLayout>
 

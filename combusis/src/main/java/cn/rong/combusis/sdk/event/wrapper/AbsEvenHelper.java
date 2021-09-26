@@ -10,15 +10,15 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.sdk.Api;
+import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.listener.RoomListener;
+import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
-import cn.rong.combusis.sdk.event.listener.RoomListener;
-import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import cn.rong.combusis.sdk.Api;
-import cn.rong.combusis.sdk.VoiceRoomApi;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 
@@ -400,6 +400,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onNetworkStatus(int i) {
+        Log.d(TAG, "onNetworkStatus: rtt = " + i);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
                 l.onStatus(i);
