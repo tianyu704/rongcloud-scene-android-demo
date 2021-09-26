@@ -49,22 +49,30 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_message"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/dimen_room_padding"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="70dp"
         android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/room_seat_view"
-        app:layout_constraintWidth_percent="0.7"
-        tools:itemCount="20"
-        tools:listitem="@layout/item_message_system" />
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintWidth_percent="0.7">
+
+        <cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2
+            android:id="@+id/rv_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_message_system" />
+    </FrameLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,7 @@ import com.kit.utils.ImageLoader;
 import com.rongcloud.common.ui.dialog.InputPasswordDialog;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.LocalDataStore;
+import com.rongcloud.common.utils.UiUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +63,7 @@ public class CreateRoomDialog extends BottomDialog {
         this.mLauncher = launcher;
         this.mRoomType = roomType;
         this.mCreateRoomCallBack = createRoomCallBack;
-        setContentView(R.layout.dialog_create_room, 80);
+        setContentView(R.layout.dialog_create_room, -1, UiUtils.INSTANCE.dp2Px(activity, 590));
         initView();
     }
 

@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.basis.mvp.BasePresenter;
 import com.basis.net.LoadTag;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
@@ -36,6 +35,7 @@ import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
+import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -52,7 +52,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/17
  */
-public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView {
+public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -63,8 +63,8 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     private RoomMessageAdapter mRoomMessageAdapter;
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private LoadTag mLoadTag;
-
-    private RadioRoomPresenter mPresenter = new RadioRoomPresenter(this,getLifecycle());
+    private RoomNoticeDialog mNoticeDialog;
+    private RadioRoomPresenter mPresenter = new RadioRoomPresenter();
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -82,9 +82,9 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void init() {
-        mPresenter.attachView(this, getLifecycle());
 
         mLoadTag = new LoadTag(getActivity());
+        mNoticeDialog = new RoomNoticeDialog(getContext());
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         mRoomTitleBar.setOnMenuClickListener(v -> {
@@ -92,9 +92,14 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
         });
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
-            // TODO:公告弹框
-            Logger.e("click notice");
-            sendMessage();
+            mNoticeDialog.show("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n" +
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
+                    "aaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
+                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false, notice -> {
+
+            });
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
@@ -164,7 +169,8 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
         });
     }
 
-    private void showMessage(MessageContent messageContent, boolean isRefresh) {
+    @Override
+    public void showMessage(MessageContent messageContent, boolean isRefresh) {
         List<MessageContent> list = new ArrayList<>(1);
         if (messageContent != null) {
             list.add(messageContent);
@@ -267,7 +273,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
         // 设置房主麦位信息
         mRoomSeatView.setData(mVoiceRoomBean.getCreateUserName(), mVoiceRoomBean.getCreateUserPortrait());
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), null);
+        mRoomBottomView.setData(getRoomOwnerType(), this);
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(mVoiceRoomBean.getCreateUserId());
 //        mRoomMessageAdapter.setData();
@@ -350,47 +356,37 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     }
 
     @Override
-    public void showWaitingDialog() {
+    public void clickSendMessage(String message) {
+        mPresenter.sendMessage(message);
+    }
+
+    @Override
+    public void clickPrivateMessage() {
 
     }
 
     @Override
-    public void hideWaitingDialog() {
+    public void clickSeatOrder() {
 
     }
 
     @Override
-    public void showLoadingView() {
+    public void clickSettings() {
 
     }
 
     @Override
-    public void showNormal() {
+    public void clickPk(boolean isInPk) {
 
     }
 
     @Override
-    public void showEmpty() {
+    public void clickRequestSeat() {
 
     }
 
     @Override
-    public void showError(int errorCode, String message) {
-
-    }
-
-    @Override
-    public void showError(String message) {
-
-    }
-
-    @Override
-    public void onLogout() {
-
-    }
-
-    @Override
-    public void showMessage(String message) {
+    public void onSendGift() {
 
     }
 }

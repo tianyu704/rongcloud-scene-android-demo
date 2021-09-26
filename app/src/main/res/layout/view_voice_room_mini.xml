@@ -4,7 +4,7 @@
     android:layout_height="120dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.rongcloud.common.ui.widget.WaveView
+    <cn.rong.combusis.common.ui.widget.WaveView
         android:id="@+id/wv_creator_background"
         app:init_radius="40dp"
         app:wave_color="@color/color_speaking_bg"

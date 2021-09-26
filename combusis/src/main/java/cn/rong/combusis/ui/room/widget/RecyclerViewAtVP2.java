@@ -1,4 +1,4 @@
-package cn.rongcloud.widget;
+package cn.rong.combusis.ui.room.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;

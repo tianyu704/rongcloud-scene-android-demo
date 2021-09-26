@@ -41,6 +41,17 @@ public class BottomDialog {
      * @param percent 百分比
      */
     public BottomDialog setContentView(@LayoutRes int res, int percent) {
+        int height = ScreenUtil.getScreenPoint().y * percent / 100;
+        return setContentView(res, 0, height);
+    }
+
+    /**
+     * @param res    布局文件
+     * @param width  宽度，<=0全屏宽
+     * @param height 高度
+     * @return dialog
+     */
+    public BottomDialog setContentView(@LayoutRes int res, int width, int height) {
         contentView = mActivity.getLayoutInflater().inflate(res, null);
         mDialog.setContentView(contentView, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         Window window = mDialog.getWindow();
@@ -49,10 +60,13 @@ public class BottomDialog {
         WindowManager.LayoutParams wl = window.getAttributes();
         wl.x = 0;
         wl.y = ScreenUtil.getScreenPoint().y;
-
-        wl.width = ScreenUtil.getScreenPoint().x;
-        if (percent > 0) {
-            wl.height = ScreenUtil.getScreenPoint().y * percent / 100;
+        if (width > 0) {
+            wl.width = width;
+        } else {
+            wl.width = ScreenUtil.getScreenPoint().x;
+        }
+        if (height > 0) {
+            wl.height = height;
         }
         Logger.e("y = " + wl.y + " height = " + wl.height);
         mDialog.onWindowAttributesChanged(wl);

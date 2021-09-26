@@ -23,4 +23,6 @@
     <color name="defaultTextColor">#333333</color>
 
     <color name="ActionbarColor">@color/colorPrimary</color>
+
+    <color name="color_red">#EF499A</color>
 </resources>

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
+import android.text.Editable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import com.vanniktech.emoji.EmojiPopup;
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.utils.SoftKeyboardUtils;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.widget.like.FavAnimation;
 
 /**
@@ -98,6 +101,7 @@ public class RoomBottomView extends ConstraintLayout {
     // 动画
     private FavAnimation mFavAnimation;
     private GestureDetector mGestureDetector;
+    private boolean isInPk;
 
 //    private RecordVoicePopupWindow
 
@@ -232,7 +236,35 @@ public class RoomBottomView extends ConstraintLayout {
         setViewState(roomOwnerType);
         this.mOnBottomOptionClickListener = onBottomOptionClickListener;
         if (onBottomOptionClickListener != null) {
-
+            mSettingView.setOnClickListener(v -> {
+                onBottomOptionClickListener.clickSettings();
+            });
+            mPrivateMessageView.setOnClickListener(v -> {
+                onBottomOptionClickListener.clickPrivateMessage();
+            });
+            mRequestSeatView.setOnClickListener(v -> {
+                onBottomOptionClickListener.clickRequestSeat();
+            });
+            mSeatOrder.setOnClickListener(v -> {
+                onBottomOptionClickListener.clickSeatOrder();
+            });
+            mSendButton.setOnClickListener(v -> {
+                Editable msg = mInputView.getText();
+                if (TextUtils.isEmpty(msg)) {
+                    EToast.showToast("消息不能为空");
+                    return;
+                }
+                onBottomOptionClickListener.clickSendMessage(msg.toString().trim());
+            });
+            mPkView.setOnClickListener(v -> {
+                isInPk = !isInPk;
+                if (isInPk) {
+                    mPkView.setImageResource(R.drawable.ic_pk_close);
+                } else {
+                    mPkView.setImageResource(R.drawable.ic_request_pk);
+                }
+                onBottomOptionClickListener.clickPk(isInPk);
+            });
         }
     }
 
@@ -281,11 +313,13 @@ public class RoomBottomView extends ConstraintLayout {
     public interface OnBottomOptionClickListener {
         void clickSendMessage(String message);
 
+        void clickPrivateMessage();
+
         void clickSeatOrder();
 
         void clickSettings();
 
-        void clickPk();
+        void clickPk(boolean isInPk);
 
         void clickRequestSeat();
 
