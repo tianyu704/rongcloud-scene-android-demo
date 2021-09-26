@@ -52,7 +52,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/17
  */
-public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener {
+public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomPresenter> implements RCRadioEventListener, RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -64,15 +64,14 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private LoadTag mLoadTag;
     private RoomNoticeDialog mNoticeDialog;
-    private RadioRoomPresenter mPresenter = new RadioRoomPresenter();
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
     }
 
     @Override
-    public BasePresenter createPresent() {
-        return null;
+    public RadioRoomPresenter createPresent() {
+        return new RadioRoomPresenter(this, getLifecycle());
     }
 
     @Override
@@ -117,6 +116,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
+        present.joinRoom(voiceRoomBean);
         RCRadioRoomEngine.getInstance().setRadioEventListener(this);
         mVoiceRoomBean = voiceRoomBean;
         setRoomData(mVoiceRoomBean);
@@ -357,7 +357,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements
 
     @Override
     public void clickSendMessage(String message) {
-        mPresenter.sendMessage(message);
+        present.sendMessage(message);
     }
 
     @Override

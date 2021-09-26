@@ -6,24 +6,11 @@ package com.basis.mvp;
  */
 public interface IBaseView {
 
-    //    void showLoading(String msg);
-//
-//    void dismissLoading();
-    void showWaitingDialog();
+    void showLoading(String msg);
 
-    void hideWaitingDialog();
-
-    void showLoadingView();
-
-    void showNormal();
+    void dismissLoading();
 
     void showEmpty();
-
-    void showError(int errorCode, String message);
-
-    void showError(String message);
-
-    void onLogout();
 
     void showMessage(String message);
 }

@@ -51,7 +51,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
 
     @Override
     public void initView() {
-        mRoomList = getView(R.id.xrv_room);
+        mRoomList = (XRecyclerView) getView(R.id.xrv_room);
         getView(R.id.iv_create_room).setOnClickListener(v -> {
             createRoom();
         });

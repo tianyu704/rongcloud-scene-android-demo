@@ -26,7 +26,6 @@ import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
-import com.basis.mvp.BasePresenter;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
@@ -43,8 +42,8 @@ import io.rong.imlib.model.MessageContent;
  * @author 李浩
  * @date 2021/9/24
  */
-public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean> implements IVoiceRoomFragmentView,
-         RoomMessageAdapter.OnClickMessageUserListener {
+public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoiceRoomPresenter> implements IVoiceRoomFragmentView,
+        RoomMessageAdapter.OnClickMessageUserListener {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -103,8 +102,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean> impleme
     }
 
     @Override
-    public BasePresenter createPresent() {
-        return new NewVoiceRoomPresenter(this,getLifecycle());
+    public NewVoiceRoomPresenter createPresent() {
+        return new NewVoiceRoomPresenter(this, getLifecycle());
     }
 
     /**
@@ -209,51 +208,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean> impleme
 
     @Override
     public void clickMessageUser(String userId) {
-
-    }
-
-    @Override
-    public void showWaitingDialog() {
-
-    }
-
-    @Override
-    public void hideWaitingDialog() {
-
-    }
-
-    @Override
-    public void showLoadingView() {
-
-    }
-
-    @Override
-    public void showNormal() {
-
-    }
-
-    @Override
-    public void showEmpty() {
-
-    }
-
-    @Override
-    public void showError(int errorCode, @Nullable String message) {
-
-    }
-
-    @Override
-    public void showError(@Nullable String message) {
-
-    }
-
-    @Override
-    public void onLogout() {
-
-    }
-
-    @Override
-    public void showMessage(@Nullable String message) {
 
     }
 

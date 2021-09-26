@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 
 import com.basis.UIStack;
 import com.basis.mvp.BasePresenter;
+import com.basis.mvp.IBaseView;
+import com.basis.net.LoadTag;
 import com.kit.utils.Logger;
 
 /**
@@ -20,18 +22,20 @@ import com.kit.utils.Logger;
  * @date: 2018/8/17
  * @Description: Fragment 的基类
  */
-public abstract class BaseFragment extends Fragment implements IBasis {
+public abstract class BaseFragment<P extends BasePresenter> extends Fragment implements IBasis, IBaseView {
     protected final String TAG = this.getClass().getSimpleName();
     protected BaseActivity activity;
     private View layout;
     private boolean init = false;//init 和 onRefresh()的执行的先后问题
-    public BasePresenter present;
+    public P present;
+    private LoadTag mLoadTag;
 
     @Override
     public final void onAttach(Context context) {
         super.onAttach(context);
         activity = (BaseActivity) context;
         UIStack.getInstance().add(this);
+        mLoadTag = new LoadTag(activity);
     }
 
     @Override
@@ -42,7 +46,7 @@ public abstract class BaseFragment extends Fragment implements IBasis {
         Logger.e(TAG, "onDetach");
     }
 
-    public abstract BasePresenter createPresent();
+    public abstract P createPresent();
 
     @Deprecated
     @Override
@@ -90,5 +94,25 @@ public abstract class BaseFragment extends Fragment implements IBasis {
 
     public boolean isInit() {
         return init;
+    }
+
+    @Override
+    public void showLoading(String msg) {
+        mLoadTag.show(msg);
+    }
+
+    @Override
+    public void dismissLoading() {
+        mLoadTag.dismiss();
+    }
+
+    @Override
+    public void showEmpty() {
+
+    }
+
+    @Override
+    public void showMessage(String message) {
+
     }
 }
