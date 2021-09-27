@@ -18,17 +18,20 @@ import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
 import com.kit.utils.ImageLoader;
 import com.kit.utils.Logger;
+import com.kit.wapper.IResultBack;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.provider.user.UserProvider;
+import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.R;
+import io.rong.imlib.model.UserInfo;
 
 public class PKView extends LinearLayout implements IPK {
     private final static String TAG = "PKView";
-    //    private final static int MAX = 180;
-    private final static int MAX = 10;
+    private final static int MAX = 180;
 
     public PKView(Context context) {
         this(context, null, -1);
@@ -48,12 +51,36 @@ public class PKView extends LinearLayout implements IPK {
     private RcyAdapter lAdapter, rAdapter;
     private Timer timer;
     private TextView tvTime;
+    private ImageView ivVs;
+    //pk者信息
+    private ImageView ivLeft, ivRight, ivMute;
+    private TextView tvLeft, tvRight;
+    // pk结果
+    private ImageView ivLeftResultTop, ivLeftResultDown, ivRightResultTop, ivRightResultDown;
+    private int leftValue, rightValue;
 
     private void init(Context context) {
         View view = LayoutInflater.from(context).inflate(R.layout.layout_pk_customer, this);
+        ivVs = view.findViewById(R.id.iv_vs);
         tvTime = view.findViewById(R.id.tv_time);
+        tvLeft = view.findViewById(R.id.tv_sender_name);
+        tvRight = view.findViewById(R.id.tv_receiver_name);
+        ivLeft = view.findViewById(R.id.iv_left);
+        ivRight = view.findViewById(R.id.iv_right);
+        ivMute = view.findViewById(R.id.iv_right_mute);
+        // pk结果
+        ivLeftResultTop = view.findViewById(R.id.iv_left_result_up);
+        ivLeftResultDown = view.findViewById(R.id.iv_left_result_down);
+        ivRightResultTop = view.findViewById(R.id.iv_right_result_up);
+        ivRightResultDown = view.findViewById(R.id.iv_right_result_down);
+        ivLeftResultTop.setVisibility(GONE);
+        ivLeftResultDown.setVisibility(GONE);
+        ivRightResultTop.setVisibility(GONE);
+        ivRightResultDown.setVisibility(GONE);
+        ivVs.setImageResource(R.drawable.ic_vs);
+        // sb pk
         pkProcessbar = view.findViewById(R.id.pk_sb);
-        pkProcessbar.setBarResource(R.drawable.ic_score_selected);
+        pkProcessbar.setBarResource(R.drawable.ic_sb_pk);
         pkProcessbar.setPKValue(4, 10);
         rvSender = view.findViewById(R.id.rv_sender);
         rvReceiver = view.findViewById(R.id.rv_receiver);
@@ -73,10 +100,57 @@ public class PKView extends LinearLayout implements IPK {
                 return false;
             }
         });
+        //默认unmute
+        ivMute.setSelected(false);
+        ivMute.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean mute = !ivMute.isSelected();
+                VoiceRoomApi.getApi().mutePKUser(mute, new IResultBack<Boolean>() {
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        if (aBoolean) ivMute.setSelected(mute);
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 刷新pk结果
+     */
+    void refreshPkResult() {
+        if (leftValue == rightValue) {// 平局
+            ivVs.setImageResource(R.drawable.ic_tie);
+        } else {
+            ivVs.setImageResource(R.drawable.ic_vs);
+            if (leftValue > rightValue) {// left win
+                // 左侧
+                ivLeft.setBackgroundResource(R.drawable.shape_yellow_stroke);
+                ivLeftResultTop.setVisibility(VISIBLE);
+                ivLeftResultDown.setVisibility(VISIBLE);
+                ivLeftResultDown.setImageResource(R.drawable.ic_pk_win);
+                // 右侧
+                ivRight.setBackgroundResource(R.drawable.shape_grad_stroke);
+                ivRightResultTop.setVisibility(GONE);
+                ivRightResultDown.setVisibility(VISIBLE);
+                ivRightResultDown.setImageResource(R.drawable.ic_pk_fail);
+            } else { // right win
+                ivRight.setBackgroundResource(R.drawable.shape_yellow_stroke);
+                ivRightResultTop.setVisibility(VISIBLE);
+                ivRightResultDown.setVisibility(VISIBLE);
+                ivRightResultDown.setImageResource(R.drawable.ic_pk_win);
+
+                ivLeft.setBackgroundResource(R.drawable.shape_grad_stroke);
+                ivLeftResultTop.setVisibility(GONE);
+                ivLeftResultDown.setVisibility(VISIBLE);
+                ivLeftResultDown.setImageResource(R.drawable.ic_pk_fail);
+            }
+        }
     }
 
     @Override
-    public synchronized void pkStart(OnTimerEndListener listener) {
+    public synchronized void pkStart(String localId, String pkId, OnTimerEndListener listener) {
         if (null != timer) {
             timer.cancel();
             timer = null;
@@ -84,6 +158,24 @@ public class PKView extends LinearLayout implements IPK {
         // 开启 pk记时
         timer = new Timer(tvTime, listener);
         timer.start();
+        UserProvider.provider().getAsyn(localId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(UserInfo userInfo) {
+                if (null != userInfo) {
+                    tvLeft.setText(userInfo.getName());
+                    ImageLoader.loadUri(ivLeft, userInfo.getPortraitUri(), R.drawable.default_portrait, ImageLoader.Size.SZ_200);
+                }
+            }
+        });
+        UserProvider.provider().getAsyn(pkId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(UserInfo userInfo) {
+                if (null != userInfo) {
+                    tvRight.setText(userInfo.getName());
+                    ImageLoader.loadUri(ivRight, userInfo.getPortraitUri(), R.drawable.default_portrait, ImageLoader.Size.SZ_200);
+                }
+            }
+        });
     }
 
     @Override
@@ -95,20 +187,29 @@ public class PKView extends LinearLayout implements IPK {
         // 开启 惩罚记时
         timer = new Timer(tvTime, listener);
         timer.start();
+        refreshPkResult();
     }
 
     @Override
     public synchronized void pkStop() {
+        ivLeftResultTop.setVisibility(GONE);
+        ivLeftResultDown.setVisibility(GONE);
+        ivRightResultTop.setVisibility(GONE);
+        ivRightResultDown.setVisibility(GONE);
+        ivVs.setImageResource(R.drawable.ic_vs);
+        ivLeft.setBackgroundResource(R.drawable.shape_pink_stroke);
+        ivRight.setBackgroundResource(R.drawable.shape_pink_stroke);
         if (null != timer) {
             timer.cancel();
             timer = null;
         }
     }
 
-
     @Override
     public void setPKScore(int left, int right) {
-        pkProcessbar.setPKValue(left, right);
+        leftValue = left;
+        rightValue = right;
+        pkProcessbar.setPKValue(leftValue, rightValue);
     }
 
     @Override

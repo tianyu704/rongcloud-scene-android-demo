@@ -15,9 +15,11 @@ public interface IPK {
     /**
      * pk 开始
      *
+     * @param localId  当前人的id
+     * @param pkId     pk对象的UserId
      * @param listener 定时结束回调
      */
-    void pkStart(OnTimerEndListener listener);
+    void pkStart(String localId, String pkId, OnTimerEndListener listener);
 
     /**
      * 惩罚 开始

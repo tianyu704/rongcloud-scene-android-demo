@@ -2,7 +2,6 @@ package cn.rongcloud.voiceroom.pk;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -66,7 +65,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     private final static PKStateManager manager = new PKStateManager();
     private VRStateListener stateListener;
     // 标是否是邀请者 pk记时结束 约定邀请者调用quitPk
-    private boolean isInviter;
+//    private boolean isInviter;
+    private RCPKInfo rcpkInfo;
 
     public PKStateManager() {
     }
@@ -206,10 +206,11 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             // pk邀请成功 对方同意 进入pk开始阶段
             if (IEventHelp.Type.PK_GOING == pkState) {
                 if (args.length == 2) {
-                    RCPKInfo rcpkInfo = (RCPKInfo) args[1];
-                    pkRoomId = TextUtils.equals(rcpkInfo.getInviteeRoomId(), roomId) ? rcpkInfo.getInviterRoomId() : rcpkInfo.getInviteeRoomId();
-                    isInviter = AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId());
-                    Logger.e(TAG, "isInviter = " + isInviter);
+                    rcpkInfo = (RCPKInfo) args[1];
+//                    RCPKInfo rcpkInfo = (RCPKInfo) args[1];
+//                    pkRoomId = TextUtils.equals(rcpkInfo.getInviteeRoomId(), roomId) ? rcpkInfo.getInviterRoomId() : rcpkInfo.getInviteeRoomId();
+//                    isInviter = AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId());
+//                    Logger.e(TAG, "isInviter = " + isInviter);
                 }
                 handlePKStart();
             } else if (IEventHelp.Type.PK_FINISH == pkState) {
@@ -235,8 +236,10 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         // 上报pk状态：开始
         reportPKState(0);
         // pk记时
-        if (null != pkView) {
-            pkView.pkStart(new IPK.OnTimerEndListener() {
+        if (null != pkView && null != rcpkInfo) {
+            String local = AccountStore.INSTANCE.getUserId();
+            String otherId = local.equals(rcpkInfo.getInviterId()) ? rcpkInfo.getInviteeId() : rcpkInfo.getInviterId();
+            pkView.pkStart(local, otherId, new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
                     handlePkPunish();
@@ -261,7 +264,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             pkView.punishStart(new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
-                    if (isInviter) {
+                    if (AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId())) {
                         //约定邀请者 quitpk
                         VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
                             @Override

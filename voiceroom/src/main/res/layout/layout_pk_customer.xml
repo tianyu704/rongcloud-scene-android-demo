@@ -13,65 +13,121 @@
         android:layout_height="wrap_content">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/iv_sender"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginLeft="@dimen/basis_30px"
-            android:layout_marginTop="@dimen/basis_30px"
-            android:padding="1dp"
-            android:src="@drawable/ic_room_creator_not_in_seat"
+            android:id="@+id/iv_left"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginLeft="@dimen/basis_40px"
+            android:layout_marginTop="@dimen/basis_40px"
+            android:background="@drawable/shape_pink_stroke"
+            android:src="@drawable/default_portrait"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_left_result_up"
+            android:layout_width="50dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_pk_win_top"
+            app:layout_constraintEnd_toEndOf="@+id/iv_left"
+            app:layout_constraintStart_toStartOf="@+id/iv_left"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_left_result_down"
+            android:layout_width="83dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="70dp"
+            android:src="@drawable/ic_pk_fail"
+            app:layout_constraintEnd_toEndOf="@+id/iv_left"
+            app:layout_constraintStart_toStartOf="@+id/iv_left"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_sender_name"
-            style="@style/main_white_17"
+            style="@style/main_white_15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/basis_15px"
+            android:layout_marginTop="@dimen/basis_25px"
+            android:ellipsize="end"
+            android:maxLength="8"
             android:text="@string/app_name"
-            app:layout_constraintEnd_toEndOf="@+id/iv_sender"
-            app:layout_constraintStart_toStartOf="@+id/iv_sender"
-            app:layout_constraintTop_toBottomOf="@+id/iv_sender" />
+            app:layout_constraintEnd_toEndOf="@+id/iv_left"
+            app:layout_constraintStart_toStartOf="@+id/iv_left"
+            app:layout_constraintTop_toBottomOf="@+id/iv_left" />
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/iv_pk_received"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginTop="@dimen/basis_30px"
-            android:layout_marginRight="@dimen/basis_30px"
-            android:padding="1dp"
-            android:src="@drawable/ic_room_creator_not_in_seat"
+            android:id="@+id/iv_right"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="@dimen/basis_40px"
+            android:layout_marginRight="@dimen/basis_40px"
+            android:background="@drawable/shape_pink_stroke"
+            android:src="@drawable/default_portrait"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_right_mute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/selector_pk_mute"
+            android:padding="5dp"
+            app:layout_constraintEnd_toEndOf="@+id/iv_right"
+            app:layout_constraintTop_toTopOf="@id/iv_right" />
+
+        <ImageView
+            android:id="@+id/iv_right_result_up"
+            android:layout_width="50dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_pk_win_top"
+            app:layout_constraintEnd_toEndOf="@+id/iv_right"
+            app:layout_constraintStart_toStartOf="@+id/iv_right"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/iv_right_result_down"
+            android:layout_width="83dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="70dp"
+            android:src="@drawable/ic_pk_fail"
+            app:layout_constraintEnd_toEndOf="@+id/iv_right"
+            app:layout_constraintStart_toStartOf="@+id/iv_right"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_receiver_name"
-            style="@style/main_white_17"
+            style="@style/main_white_15"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/basis_15px"
+            android:layout_marginTop="@dimen/basis_25px"
+            android:ellipsize="end"
+            android:maxLength="8"
+            android:singleLine="true"
             android:text="@string/app_name"
-            app:layout_constraintEnd_toEndOf="@+id/iv_pk_received"
-            app:layout_constraintStart_toStartOf="@+id/iv_pk_received"
-            app:layout_constraintTop_toBottomOf="@+id/iv_pk_received" />
+            app:layout_constraintEnd_toEndOf="@+id/iv_right"
+            app:layout_constraintStart_toStartOf="@+id/iv_right"
+            app:layout_constraintTop_toBottomOf="@+id/iv_right" />
 
 
         <LinearLayout
-            android:id="@+id/iv_vs"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
+            android:layout_marginTop="@dimen/basis_20px"
+            android:gravity="center"
             android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_pk_received"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_right"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/iv_pk_received">
+            app:layout_constraintTop_toTopOf="@+id/iv_right">
 
             <ImageView
+                android:id="@+id/iv_vs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/svg_search_clear" />
+                android:src="@drawable/ic_vs" />
 
             <TextView
                 android:id="@+id/tv_time"
@@ -87,8 +143,11 @@
         android:id="@+id/pk_sb"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/basis_30px"
-        app:progress_reached_color="@color/basis_red"
+        android:layout_marginLeft="@dimen/basis_20px"
+        android:layout_marginTop="@dimen/basis_30px"
+        android:layout_marginRight="@dimen/basis_20px"
+        android:layout_marginBottom="@dimen/basis_10px"
+        app:progress_reached_color="#EF499A"
         app:progress_reached_height="20dp"
         app:progress_text_color="@color/white"
         app:progress_unreached_color="@color/basis_blue"
@@ -97,21 +156,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/basis_30px"
-        android:layout_marginRight="@dimen/basis_30px"
+        android:layout_marginLeft="@dimen/basis_20px"
+        android:layout_marginRight="@dimen/basis_20px"
         android:layout_marginBottom="@dimen/basis_30px">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sender"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:layout_marginRight="@dimen/basis_50px"
             android:layout_weight="1" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_receiver"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:layout_weight="1" />
     </LinearLayout>
 
