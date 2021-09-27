@@ -117,20 +117,20 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
         roomInfo.setRoomName(voiceRoomBean.getRoomName());
         roomInfo.setMuteAll(false);
         roomInfo.setLockAll(false);
-//        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
-//            @Override
-//            public void onResult(Boolean aBoolean) {
-//                Log.e(TAG, "加入房间:" + aBoolean);
-//                synToService(voiceRoomBean.getRoomId());
-//                VoiceRoomApi.getApi().enterSeat(1, null);
-//            }
-//        });
-        VoiceRoomApi.getApi().joinRoom(voiceRoomBean.getRoomId(), new IResultBack<Boolean>() {
+        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean aBoolean) {
                 Log.e(TAG, "加入房间:" + aBoolean);
+                synToService(voiceRoomBean.getRoomId());
+                VoiceRoomApi.getApi().enterSeat(1, null);
             }
         });
+//        VoiceRoomApi.getApi().joinRoom(voiceRoomBean.getRoomId(), new IResultBack<Boolean>() {
+//            @Override
+//            public void onResult(Boolean aBoolean) {
+//                Log.e(TAG, "加入房间:" + aBoolean);
+//            }
+//        });
     }
 
     private void leave() {

@@ -6,12 +6,27 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import cn.rong.combusis.common.utils.UIKit;
+
 public class EventBus {
 
-    public class TAG {
-        public final static String MUSIC_LIST = "music_play_list";
-        public final static String PK_STATE = "pk_state";// pk状态
-        public final static String PK_RESPONSE = "pk_response"; // pk邀请响应状态
+    /**
+     * 触发事件
+     *
+     * @param tag
+     * @param args
+     */
+    public void emit(String tag, Object... args) {
+        UIKit.runOnUiTherad(new Runnable() {
+            @Override
+            public void run() {
+                List<EventCallback> cals = events.get(tag);
+                int count = cals == null ? 0 : cals.size();
+                for (int i = count - 1; i > -1; i--) {
+                    cals.get(i).onEvent(args);
+                }
+            }
+        });
     }
 
     private final static EventBus _bus = new EventBus();
@@ -54,18 +69,11 @@ public class EventBus {
         }
     }
 
-    /**
-     * 触发事件
-     *
-     * @param tag
-     * @param args
-     */
-    public void emit(String tag, Object... args) {
-        List<EventCallback> cals = events.get(tag);
-        int count = cals == null ? 0 : cals.size();
-        for (int i = count - 1; i > -1; i--) {
-            cals.get(i).onEvent(args);
-        }
+    public class TAG {
+        public final static String MUSIC_LIST = "music_play_list";
+        public final static String PK_STATE = "pk_state";// pk状态
+        public final static String PK_RESPONSE = "pk_response"; // pk邀请响应状态
+        public final static String PK_QUIT = "pk_quit"; // 退出pk
     }
 
     public interface EventCallback {

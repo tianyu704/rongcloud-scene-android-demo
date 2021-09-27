@@ -157,12 +157,12 @@ public class PKView extends LinearLayout implements IPK {
 
     public class Timer extends CountDownTimer {
         private WeakReference<TextView> reference;
-        private WeakReference<OnTimerEndListener> listenerWeakReference;
+        private OnTimerEndListener listener;
 
         Timer(TextView textView, OnTimerEndListener listener) {
             super(MAX * 1000, 1000);
             this.reference = new WeakReference<>(textView);
-            this.listenerWeakReference = new WeakReference<>(listener);
+            this.listener = listener;
         }
 
         @Override
@@ -176,8 +176,8 @@ public class PKView extends LinearLayout implements IPK {
         @Override
         public void onFinish() {
             Logger.e("Timer", "onFinish");
-            if (null != listenerWeakReference && null != listenerWeakReference.get()) {
-                listenerWeakReference.get().onTimerEnd();
+            if (null != listener) {
+                listener.onTimerEnd();
             }
         }
 

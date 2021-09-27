@@ -7,6 +7,7 @@ import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
+import cn.rong.combusis.EventBus;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.PKState;
@@ -344,7 +345,21 @@ public class VoiceRoomApi implements Api {
     @Override
     public void quitPK(IResultBack<Boolean> resultBack) {
         RCVoiceRoomEngine.getInstance().quitPK(
-                new DefaultRoomCallback("quitPK", "", resultBack));
+                new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        Log.e(TAG, "quitPK#onSuccess ");
+                        //修改pk状态
+                        EventBus.get().emit(EventBus.TAG.PK_QUIT);
+                        if (null != resultBack) resultBack.onResult(true);
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        Log.e(TAG, "quitPK#onError [" + i + "]:" + s);
+                        if (null != resultBack) resultBack.onResult(false);
+                    }
+                });
 
     }
 

@@ -25,12 +25,20 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     protected void init(String roomId) {
         super.init(roomId);
         current = Type.PK_NONE;
+        //由于手动调quitPK 不会回调onPkFinish，因此需要在调用api成功后修改current状态
+        EventBus.get().on(EventBus.TAG.PK_QUIT, new EventBus.EventCallback() {
+            @Override
+            public void onEvent(Object... args) {
+                current = Type.PK_NONE;
+            }
+        });
     }
 
     @Override
     protected void unInit() {
         super.unInit();
         current = Type.PK_NONE;
+        EventBus.get().off(EventBus.TAG.PK_QUIT, null);
     }
 
     @Override
@@ -144,7 +152,6 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         }
         current = Type.PK_NONE;
         dispatchPKState(null);
-
     }
 
     private void dispatchPKState(RCPKInfo rcpkInfo) {
