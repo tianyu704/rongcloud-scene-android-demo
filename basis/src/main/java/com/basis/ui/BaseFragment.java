@@ -115,7 +115,7 @@ public abstract class BaseFragment<P extends BasePresenter> extends Fragment imp
     }
 
     @Override
-    public void showMessage(String message) {
+    public void showToast(String message) {
         KToast.show(message);
     }
 }

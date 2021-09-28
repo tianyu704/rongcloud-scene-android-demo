@@ -108,6 +108,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     }
 
     @Override
+    public void initListener() {
+
+    }
+
+    @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
         present.joinRoom(voiceRoomBean);
         setRoomData(voiceRoomBean);
@@ -275,5 +280,4 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         }
         mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
     }
-
 }
