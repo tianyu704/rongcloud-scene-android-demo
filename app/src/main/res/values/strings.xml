@@ -16,8 +16,7 @@
 
     <string name="please_input_complete_password">请输入完整的密码</string>
     <string name="password_error">密码错误</string>
-    <string name="send_gift">送礼物</string>
-    <string name="send_message">发私信</string>
+
 
     <string name="voice_room">语聊房</string>
     <string name="voice_room_des">超大聊天室，支持麦位、麦序 \n管理，涵盖 KTV 等多种玩法</string>

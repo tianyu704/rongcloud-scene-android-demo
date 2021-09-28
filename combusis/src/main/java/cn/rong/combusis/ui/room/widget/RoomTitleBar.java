@@ -24,6 +24,7 @@ public class RoomTitleBar extends ConstraintLayout {
     private TextView mOnlineTextView;
     private TextView mDelayTextView;
     private ImageButton mMenuButton;
+    private ConstraintLayout mLeftView;
 
     public RoomTitleBar(@NonNull Context context) {
         this(context, null);
@@ -37,10 +38,15 @@ public class RoomTitleBar extends ConstraintLayout {
 
     private void initView() {
         mNameTextView = mRootView.findViewById(R.id.tv_room_name);
+        mLeftView = mRootView.findViewById(R.id.cl_left);
         mIDTextView = mRootView.findViewById(R.id.tv_room_id);
         mOnlineTextView = mRootView.findViewById(R.id.tv_room_online);
         mDelayTextView = mRootView.findViewById(R.id.tv_room_delay);
         mMenuButton = mRootView.findViewById(R.id.btn_menu);
+    }
+
+    public void setOnMemberClickListener(View.OnClickListener v) {
+        mLeftView.setOnClickListener(v);
     }
 
     public void setOnMenuClickListener(View.OnClickListener v) {
@@ -48,8 +54,16 @@ public class RoomTitleBar extends ConstraintLayout {
     }
 
     public void setData(String name, int id) {
-        mNameTextView.setText(name);
+        setRoomName(name);
+        setRoomId(id);
+    }
+
+    public void setRoomId(int id) {
         mIDTextView.setText(String.format("ID %s", id));
+    }
+
+    public void setRoomName(String name) {
+        mNameTextView.setText(name);
     }
 
     public void setOnlineNum(int num) {

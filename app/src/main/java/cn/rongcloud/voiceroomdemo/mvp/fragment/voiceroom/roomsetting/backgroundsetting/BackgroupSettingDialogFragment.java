@@ -8,11 +8,9 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment;
-
-
 import java.util.List;
 
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.ui.widget.GridSpacingItemDecoration;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel;

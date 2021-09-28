@@ -64,6 +64,8 @@ public class ORequest<T> {
             Core.core().get(tag, url, param, callBack);
         } else if (Method.delete == method) {
             Core.core().delete(tag, url, param, callBack);
+        } else if (Method.put == method) {
+            Core.core().put(tag, url, param, callBack);
         }
         return this;
     }

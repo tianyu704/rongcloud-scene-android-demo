@@ -7,12 +7,12 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatoperation
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import com.rongcloud.common.base.BaseFragment
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroomdemo.R
 import com.google.android.material.tabs.TabLayoutMediator
+import com.rongcloud.common.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_viewpage_list.*
 import javax.inject.Inject

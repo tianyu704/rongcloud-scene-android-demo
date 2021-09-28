@@ -1,8 +1,7 @@
 /*
  * Copyright © 2021 RongCloud. All rights reserved.
  */
-
-package com.rongcloud.common.base
+package cn.rong.combusis.common.base
 
 import android.app.Dialog
 import android.os.Bundle

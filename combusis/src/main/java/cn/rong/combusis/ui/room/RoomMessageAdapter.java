@@ -35,6 +35,7 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.ui.room.model.MemberCache;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -43,7 +44,6 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
     OnClickMessageUserListener mOnClickMessageUserListener;
-    private List<String> mAdminIds = new ArrayList<>();
     private String mRoomCreateId = "";
 
     public RoomMessageAdapter(Context context, OnClickMessageUserListener onClickMessageUserListener) {
@@ -79,20 +79,6 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
         } else {
             setNormalMessage(holder, messageContent);
         }
-    }
-
-    /**
-     * 管理员变化后刷新
-     *
-     * @param adminIds
-     */
-    public void refreshAdminIds(List<String> adminIds) {
-        if (adminIds == null) {
-            this.mAdminIds.clear();
-        } else {
-            this.mAdminIds = adminIds;
-        }
-        notifyDataSetChanged();
     }
 
     /**
@@ -216,7 +202,7 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
                     0
             );
             view.setCompoundDrawablePadding(2);
-        } else if (mAdminIds.contains(userId)) {
+        } else if (MemberCache.getInstance().isAdmin(userId)) {
             view.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.ic_is_admin,
                     0,

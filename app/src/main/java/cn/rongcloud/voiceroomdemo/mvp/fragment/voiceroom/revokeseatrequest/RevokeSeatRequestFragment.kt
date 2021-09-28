@@ -4,9 +4,9 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest
 
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_cancel_request_seat.*
 import javax.inject.Inject

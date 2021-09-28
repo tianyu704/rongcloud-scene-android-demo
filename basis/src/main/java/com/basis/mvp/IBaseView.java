@@ -12,5 +12,5 @@ public interface IBaseView {
 
     void showEmpty();
 
-    void showMessage(String message);
+    void showToast(String message);
 }

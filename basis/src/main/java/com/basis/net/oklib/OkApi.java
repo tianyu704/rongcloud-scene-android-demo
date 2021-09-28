@@ -64,6 +64,15 @@ public class OkApi {
                 .request();
     }
 
+    public static <T> ORequest<T> put(String url, Map<String, Object> params, IOCallBack<T, ORequest<T>> callBack) {
+        return ORequest.Builder.method(Method.put)
+                .url(url)
+                .param(params)
+                .callback(callBack)
+                .build()
+                .request();
+    }
+
     public static <T> ORequest<T> delete(String url, Map<String, Object> params, IOCallBack<T, ORequest<T>> callBack) {
         return ORequest.Builder.method(Method.delete)
                 .url(url)

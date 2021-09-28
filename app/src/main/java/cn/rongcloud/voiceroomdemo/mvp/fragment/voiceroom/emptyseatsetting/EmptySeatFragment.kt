@@ -5,11 +5,11 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting
 
 import androidx.core.view.isVisible
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
+import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.ui
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_empty_seat_setting.*

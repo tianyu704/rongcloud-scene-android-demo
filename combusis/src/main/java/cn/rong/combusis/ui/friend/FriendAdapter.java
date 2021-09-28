@@ -9,7 +9,6 @@ import com.basis.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
 
 import cn.rong.combusis.R;
-import cn.rong.combusis.model.Friend;
 
 public class FriendAdapter extends RcySAdapter<Friend, RcyHolder> {
     private int type;

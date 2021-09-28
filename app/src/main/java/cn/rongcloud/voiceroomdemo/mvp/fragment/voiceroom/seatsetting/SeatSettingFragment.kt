@@ -4,8 +4,8 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.seatsetting
 
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 
 /**
  * @author gusd

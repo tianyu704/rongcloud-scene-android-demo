@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.fragment.present
 import android.annotation.SuppressLint
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroomdemo.R
@@ -16,7 +17,6 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.present.page.CustomerPageLayoutMa
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import com.basis.adapter.recycle.RcyHolder
 import com.basis.adapter.recycle.RcySAdapter
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.UiUtils

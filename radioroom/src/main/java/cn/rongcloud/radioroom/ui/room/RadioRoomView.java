@@ -2,6 +2,7 @@ package cn.rongcloud.radioroom.ui.room;
 
 import com.basis.mvp.IBaseView;
 
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -10,6 +11,17 @@ import io.rong.imlib.model.MessageContent;
  */
 public interface RadioRoomView extends IBaseView {
 
-    void showMessage(MessageContent messageContent, boolean isRefresh);
+    void setRoomData(VoiceRoomBean voiceRoomBean);
 
+    void setOnlineCount(int num);
+
+    void addToMessageList(MessageContent messageContent, boolean isRefresh);
+
+    void clearInput();
+
+    void finish();
+
+    void setSpeaking(boolean speaking);
+
+    void setRadioName(String name);
 }

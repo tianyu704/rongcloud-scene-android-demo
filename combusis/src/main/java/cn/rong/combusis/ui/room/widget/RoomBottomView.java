@@ -232,6 +232,10 @@ public class RoomBottomView extends ConstraintLayout {
         }
     }
 
+    public void clearInput() {
+        mInputView.setText("");
+    }
+
     public void setData(RoomOwnerType roomOwnerType, OnBottomOptionClickListener onBottomOptionClickListener) {
         setViewState(roomOwnerType);
         this.mOnBottomOptionClickListener = onBottomOptionClickListener;
@@ -250,7 +254,7 @@ public class RoomBottomView extends ConstraintLayout {
             });
             mSendButton.setOnClickListener(v -> {
                 Editable msg = mInputView.getText();
-                if (TextUtils.isEmpty(msg)) {
+                if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(msg.toString().trim())) {
                     EToast.showToast("消息不能为空");
                     return;
                 }

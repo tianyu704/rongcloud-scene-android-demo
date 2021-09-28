@@ -4,15 +4,15 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting
 
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
+import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
+import com.rongcloud.common.ui.dialog.ConfirmDialog
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
-import com.rongcloud.common.ui.dialog.ConfirmDialog
 import kotlinx.android.synthetic.main.fragmeng_creator_setting.*
 import javax.inject.Inject
 

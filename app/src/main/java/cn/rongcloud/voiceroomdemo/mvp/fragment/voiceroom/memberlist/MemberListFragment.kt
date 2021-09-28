@@ -5,13 +5,13 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.memberlist
 
 import android.util.Log
+import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseBottomSheetDialogFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
+import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
+import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.MemberSettingFragment
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_member_list.*

@@ -17,7 +17,6 @@ import com.basis.net.LoadTag;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 
-
 /**
  * @author: BaiCQ
  * @ClassName: BaseFragment

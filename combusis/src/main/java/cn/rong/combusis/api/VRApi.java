@@ -70,4 +70,30 @@ public class VRApi {
     public static String getPKInfo(String roomId) {
         return PK_INFO + roomId;
     }
+
+    /**
+     * 操作管理员
+     */
+    public static final String ADMIN_MANAGE = HOST + "mic/room/manage";
+
+    /**
+     * 获取房间内成员列表
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getMembers(String roomId) {
+        return HOST + "mic/room/" + roomId + "/members";
+    }
+
+    /**
+     * 获取房间内管理员列表
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getAdminMembers(String roomId) {
+        return HOST + "mic/room/" + roomId + "/manage/list";
+    }
+
 }

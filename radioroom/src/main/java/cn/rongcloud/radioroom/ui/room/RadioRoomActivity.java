@@ -20,8 +20,8 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.messager.RCMessager;
-import cn.rongcloud.radioroom.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
+import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.rroom.RCRadioRoomInfo;
 import cn.rongcloud.rtc.base.RCRTCLiveRole;
 

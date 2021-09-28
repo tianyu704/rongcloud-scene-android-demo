@@ -26,4 +26,6 @@
 
     <string name="please_setting_four_number_password">请设置 4 位数字密码</string>
     <string name="please_input_four_number_password">请输入 4 位数字密码</string>
+    <string name="send_gift">送礼物</string>
+    <string name="send_message">发私信</string>
 </resources>

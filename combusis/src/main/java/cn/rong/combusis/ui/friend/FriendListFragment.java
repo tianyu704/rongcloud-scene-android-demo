@@ -17,7 +17,6 @@ import java.util.Map;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
-import cn.rong.combusis.model.Friend;
 
 public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> implements FriendAdapter.OnFollowClickListener {
     // 1 我关注的 2 我的粉丝
