@@ -34,6 +34,8 @@
         <item name="android:windowIsFloating">true</item>
         <!--是否模糊-->
         <item name="android:backgroundDimEnabled">true</item>
+        <!--半透明-->
+        <item name="android:windowIsTranslucent">false</item>
     </style>
 
     <declare-styleable name="verify_EditText">
@@ -147,6 +149,15 @@
         <!-- 指定显示的动画xml -->
         <item name="android:windowExitAnimation">@anim/pop_exit_anim</item>
         <!-- 指定消失的动画xml -->
+    </style>
+
+    <style name="transparentBackgroundDiaolg" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item><!--边框-->
+        <item name="android:windowIsFloating">true</item><!--是否浮现在activity之上-->
+        <item name="android:windowIsTranslucent">false</item><!--半透明-->
+        <item name="android:windowNoTitle">true</item><!--无标题-->
+        <item name="android:windowBackground">@color/transparent</item><!--背景透明-->
+        <item name="android:backgroundDimEnabled">false</item><!--模糊-->
     </style>
 </resources>
 
