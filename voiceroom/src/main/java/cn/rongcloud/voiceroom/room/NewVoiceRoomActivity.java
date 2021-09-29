@@ -33,6 +33,7 @@ import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import dagger.hilt.android.AndroidEntryPoint;
+import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author 李浩  语聊房重构
@@ -80,6 +81,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
         return 0;
     }
 
+
     @Override
     public Fragment getFragment() {
         return new NewVoiceRoomFragment();
@@ -96,6 +98,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
 
     @Override
     protected void switchRoom(String roomId) {
+        Logger.e("==============switchRoom");
         mLoadTag.show();
         // 先退出上个房间
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
@@ -114,6 +117,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     }
 
     private void joinRadioRoom(String roomId) {
+        ((NewVoiceRoomFragment) getCurrentFragment()).prepareJoinRoom();
         VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
             RCVoiceRoomEngine.getInstance().joinRoom(voiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
                 @Override

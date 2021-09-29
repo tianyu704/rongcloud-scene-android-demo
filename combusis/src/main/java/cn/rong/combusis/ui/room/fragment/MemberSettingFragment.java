@@ -54,6 +54,26 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
     private String roomUserId;
     private OnMemberSettingClickListener mOnMemberSettingClickListener;
 
+    // 操作的用户是否在麦位上 TODO：@lihao 需要知道当前用户是否在麦位上
+    boolean memberIsOnSeat = false;
+    //麦位的位置
+    int seatPosition = 1;
+    //麦位的状态
+    boolean isMute=true;
+
+    public void setMute(boolean mute) {
+        isMute = mute;
+    }
+
+    public void setSeatPosition(int seatPosition) {
+        this.seatPosition = seatPosition;
+    }
+
+
+    public void setMemberIsOnSeat(boolean memberIsOnSeat) {
+        this.memberIsOnSeat = memberIsOnSeat;
+    }
+
     public MemberSettingFragment(RoomOwnerType roomOwnerType, OnMemberSettingClickListener onMemberSettingClickListener) {
         super(R.layout.fragment_member_setting);
         this.mRoomOwnerType = roomOwnerType;
@@ -131,7 +151,6 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             mOnMemberSettingClickListener.clickMuteSeat(member, (result, msg) -> {
                 if (result) {
                     dismiss();
-                    EToast.showToast(msg);
                 } else {
                     EToast.showToast(msg);
                 }
@@ -175,8 +194,6 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         boolean memberIsAdmin = MemberCache.getInstance().isAdmin(member.getUserId());
         // 操作的用户是否是房主
         boolean memberIsOwner = TextUtils.equals(roomUserId, member.getUserId());
-        // 操作的用户是否在麦位上 TODO：@lihao 需要知道当前用户是否在麦位上
-        boolean memberIsOnSeat = false;
 
         // 头像和昵称
         ImageLoaderUtil.INSTANCE.loadImage(getContext(), mIvMemberPortrait, member.getPortrait(), R.drawable.default_portrait);
@@ -199,6 +216,14 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                     mLlInvitedSeat.setVisibility(View.GONE);
                     mLlMuteSeat.setVisibility(View.VISIBLE);
                     mLlCloseSeat.setVisibility(View.VISIBLE);
+                    //根据麦位状态
+                    if (isMute){
+                        mIvMuteSeat.setImageResource(R.drawable.ic_room_setting_unmute_all);
+                        mTvMuteSeat.setText("取消禁麦");
+                    }else {
+                        mIvMuteSeat.setImageResource(R.drawable.ic_member_setting_mute_seat);
+                        mTvMuteSeat.setText("座位禁麦");
+                    }
                 } else {
                     mLlKickSeat.setVisibility(View.GONE);
                     mLlInvitedSeat.setVisibility(View.VISIBLE);
@@ -298,7 +323,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         if (memberIsOnSeat) {
             mTvSeatPosition.setVisibility(View.VISIBLE);
             // TODO：这里需要麦位位置
-            int seatPosition = 1;
+
             mTvSeatPosition.setText(String.format("%s 号麦位", seatPosition));
         } else {
             mTvSeatPosition.setVisibility(View.GONE);

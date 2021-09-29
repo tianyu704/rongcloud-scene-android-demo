@@ -221,6 +221,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     }
 
     @Override
+    public void prepareJoinRoom() {
+
+    }
+
+    @Override
     public void clickMessageUser(String userId) {
         UserProvider.provider().getAsyn(userId, userInfo -> {
             User user = new User();

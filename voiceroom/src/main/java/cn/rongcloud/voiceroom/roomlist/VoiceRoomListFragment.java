@@ -10,6 +10,7 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
 import cn.rongcloud.voiceroom.pk.TestPkActivity;
+import cn.rongcloud.voiceroom.room.NewVoiceRoomActivity;
 
 /**
  * @author gyn
@@ -23,12 +24,12 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
 
     @Override
     public void clickItem(VoiceRoomBean item, int position) {
-//        NewVoiceRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
-        UIKit.startActivityByBasis(
-                activity,
-                TestPkActivity.class,
-                GsonUtil.obj2Json(item)
-        );
+        NewVoiceRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
+//        UIKit.startActivityByBasis(
+//                activity,
+//                TestPkActivity.class,
+//                GsonUtil.obj2Json(item)
+//        );
     }
 
     @Override

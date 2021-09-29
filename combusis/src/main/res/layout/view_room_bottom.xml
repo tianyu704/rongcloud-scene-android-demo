@@ -147,7 +147,7 @@
         android:clickable="true"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <com.vanniktech.emoji.EmojiEditText
             android:id="@+id/et_message"

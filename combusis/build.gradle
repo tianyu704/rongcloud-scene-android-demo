@@ -78,4 +78,5 @@ dependencies {
     kapt "org.xerial:sqlite-jdbc:3.34.0"
 
     api project(path: ':basis')
+    api project(path: ':RCVoiceRoomLib')
 }

@@ -111,30 +111,30 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             if (AudioPlayManager.getInstance().isPlaying() && TextUtils.equals(message.getPath(), AudioPlayManager.getInstance().getPlayingUri().toString())) {
                 //当前正在播放,并且点击的就是当前的
                 AudioPlayManager.getInstance().stopPlay();
-
-                AudioPlayManager.getInstance().startPlay(context, Uri.parse(message.getPath()), new IAudioPlayListener() {
-
-                    @Override
-                    public void onStart(Uri uri) {
-                        //开始动画
-                        animationDrawable.start();
-                    }
-
-                    @Override
-                    public void onStop(Uri uri) {
-                        //音频被停止,停止动画
-                        animationDrawable.stop();
-                        animationDrawable.selectDrawable(0);
-                    }
-
-                    @Override
-                    public void onComplete(Uri uri) {
-                        //停止动画
-                        animationDrawable.stop();
-                        animationDrawable.selectDrawable(0);
-                    }
-                });
+                return;
             }
+            AudioPlayManager.getInstance().startPlay(context, Uri.parse(message.getPath()), new IAudioPlayListener() {
+
+                @Override
+                public void onStart(Uri uri) {
+                    //开始动画
+                    animationDrawable.start();
+                }
+
+                @Override
+                public void onStop(Uri uri) {
+                    //音频被停止,停止动画
+                    animationDrawable.stop();
+                    animationDrawable.selectDrawable(0);
+                }
+
+                @Override
+                public void onComplete(Uri uri) {
+                    //停止动画
+                    animationDrawable.stop();
+                    animationDrawable.selectDrawable(0);
+                }
+            });
         });
     }
 

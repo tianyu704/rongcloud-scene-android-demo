@@ -1,5 +1,7 @@
 package cn.rong.combusis.ui.room;
 
+import android.text.TextUtils;
+
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -53,8 +55,10 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
                 if (currentFragment instanceof AbsRoomFragment) {
                     Logger.e("current page show");
-                    mCurrentFragment = (AbsRoomFragment) currentFragment;
-                    switchRoom(mRoomAdapter.getItemData(position));
+                    if(!TextUtils.equals(mCurrentFragment.getTag(),currentFragment.getTag())){
+                        mCurrentFragment = (AbsRoomFragment) currentFragment;
+                        switchRoom(mRoomAdapter.getItemData(position));
+                    }
                 }
                 Logger.e("==================选中了第几个：" + position + " last:" + lastFragment + ",current:" + currentFragment);
             }
@@ -84,6 +88,10 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     // 当前页的位置
     protected abstract int getCurrentItem();
 
+    //当前页面的fragment
+    protected Fragment getCurrentFragment(){
+        return mCurrentFragment;
+    }
     // 返回要初始化的Fragment
     protected abstract Fragment getFragment();
 
@@ -92,6 +100,8 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     // 切换房间，先退出上个房间，根据id查询当前房间数据，再切换房间
     protected abstract void switchRoom(String roomId);
+
+    //加载房间之前需要先处理
 
     // 处理完数据，把数据放到fragment中
     public void joinRoom(T t) {

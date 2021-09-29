@@ -199,6 +199,19 @@ public class RoomBottomView extends ConstraintLayout {
     }
 
     /**
+     * 设置麦位申请人数
+     * @param number
+     */
+    public void setmSeatOrderNumber(int number){
+        if (number>0){
+            mSeatOrderNumber.setText(number+"");
+            mSeatOrderNumber.setVisibility(VISIBLE);
+        }else {
+            mSeatOrderNumber.setVisibility(GONE);
+        }
+
+    }
+    /**
      * 显示礼物动画
      *
      * @param from
@@ -249,6 +262,7 @@ public class RoomBottomView extends ConstraintLayout {
             mRequestSeatView.setOnClickListener(v -> {
                 onBottomOptionClickListener.clickRequestSeat();
             });
+
             mSeatOrder.setOnClickListener(v -> {
                 onBottomOptionClickListener.clickSeatOrder();
             });

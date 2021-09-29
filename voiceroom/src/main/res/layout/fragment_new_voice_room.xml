@@ -48,7 +48,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
-
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_seat_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/room_seat_view"
+        app:spanCount="4" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_message"
         android:layout_width="0dp"
@@ -62,7 +72,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/room_seat_view"
+        app:layout_constraintTop_toBottomOf="@id/rv_seat_list"
         app:layout_constraintWidth_percent="0.7"
         tools:itemCount="20"
         tools:listitem="@layout/item_message_system" />
