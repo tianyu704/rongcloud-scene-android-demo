@@ -17,6 +17,7 @@ import java.util.Map;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.ui.friend.model.Friend;
 
 public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> implements FriendAdapter.OnFollowClickListener {
     // 1 我关注的 2 我的粉丝
@@ -24,6 +25,7 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
 
     private FriendAdapter mAdapter;
     private int mType;
+    private SendPrivateMessageFragment sendPrivateMessageFragment;
 
     public static FriendListFragment getInstance(int type) {
         FriendListFragment fragment = new FriendListFragment();
@@ -35,6 +37,7 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
 
     @Override
     public void initView() {
+        sendPrivateMessageFragment = new SendPrivateMessageFragment();
         Map<String, Object> params = new HashMap<>(8);
         params.put("type", mType);
         request("Loading...", VRApi.FOLLOW_LIST, params, Method.get, true);
@@ -105,4 +108,10 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
             }
         });
     }
+
+    @Override
+    public void clickItem(Friend friend) {
+        sendPrivateMessageFragment.showDialog(getChildFragmentManager(), friend);
+    }
+
 }

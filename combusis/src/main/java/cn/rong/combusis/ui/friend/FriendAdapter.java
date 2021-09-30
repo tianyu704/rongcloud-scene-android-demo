@@ -9,6 +9,7 @@ import com.basis.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.ui.friend.model.Friend;
 
 public class FriendAdapter extends RcySAdapter<Friend, RcyHolder> {
     private int type;
@@ -28,6 +29,7 @@ public class FriendAdapter extends RcySAdapter<Friend, RcyHolder> {
         follow.setText(friend.getFollowDesc(type));
         if (onFollowClickListener != null) {
             holder.setOnClickListener(R.id.btn_follow, v -> onFollowClickListener.clickFollow(friend));
+            holder.itemView.setOnClickListener(v -> onFollowClickListener.clickItem(friend));
         }
     }
 
@@ -41,5 +43,7 @@ public class FriendAdapter extends RcySAdapter<Friend, RcyHolder> {
 
     interface OnFollowClickListener {
         void clickFollow(Friend friend);
+
+        void clickItem(Friend friend);
     }
 }

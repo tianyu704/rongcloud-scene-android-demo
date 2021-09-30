@@ -48,6 +48,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
     private LinearLayout mLlKickRoom;
     private RelativeLayout mRlSettingAdmin;
     private AppCompatTextView mTvSettingAdmin;
+    private AppCompatButton mBtnFollow;
 
     private RoomOwnerType mRoomOwnerType;
     private User member;
@@ -99,6 +100,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         mLlKickRoom = (LinearLayout) getView().findViewById(R.id.ll_kick_room);
         mRlSettingAdmin = (RelativeLayout) getView().findViewById(R.id.rl_setting_admin);
         mTvSettingAdmin = (AppCompatTextView) getView().findViewById(R.id.tv_setting_admin);
+        mBtnFollow = (AppCompatButton) getView().findViewById(R.id.btn_follow);
 
         refreshView();
     }
@@ -177,6 +179,9 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                     Conversation.ConversationType.PRIVATE,
                     member.getUserId()
             );
+        });
+        mBtnFollow.setOnClickListener(v -> {
+
         });
     }
 

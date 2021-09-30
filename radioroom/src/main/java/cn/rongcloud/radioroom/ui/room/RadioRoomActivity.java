@@ -2,11 +2,13 @@ package cn.rongcloud.radioroom.ui.room;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import androidx.fragment.app.Fragment;
 
 import com.basis.net.LoadTag;
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +97,7 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
 
     private void joinRadioRoom(String roomId) {
         VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
-            RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(RCRTCLiveRole.BROADCASTER);
+            RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(TextUtils.equals(voiceRoomBean.getUserId(), AccountStore.INSTANCE.getUserId()) ? RCRTCLiveRole.BROADCASTER : RCRTCLiveRole.AUDIENCE);
             roomInfo.setRoomId(voiceRoomBean.getRoomId());
             roomInfo.setRoomName(voiceRoomBean.getRoomName());
             RCRadioRoomEngine.getInstance().joinRoom(roomInfo, new RCRadioRoomCallback() {

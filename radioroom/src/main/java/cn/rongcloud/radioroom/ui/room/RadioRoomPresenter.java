@@ -20,18 +20,22 @@ import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
+import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
 import cn.rongcloud.radioroom.rroom.RCRadioEventListener;
+import io.rong.imlib.RongIMClient;
+import io.rong.imlib.model.ChatRoomInfo;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 
@@ -64,6 +68,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             sendDefaultMessage();
             // 获取房间内成员和管理员列表
             MemberCache.getInstance().fetchData(mRoomId);
+            refreshRoomMemberCount();
         }
     }
 
@@ -89,6 +94,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onSuccess() {
                 Logger.e("==============enterSeat onSuccess");
+                mView.setSeatState(RoomSeatView.SeatState.NORMAL);
             }
 
             @Override
@@ -102,8 +108,54 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * 刷新房间人数
      */
     public void refreshRoomMemberCount() {
-        EventHelper.helper().getOnLineUserIds(mVoiceRoomBean.getRoomId(), strings -> {
-            mView.setOnlineCount(strings.size());
+        RongIMClient.getInstance()
+                .getChatRoomInfo(mRoomId, 0, ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC, new RongIMClient.ResultCallback<ChatRoomInfo>() {
+                    @Override
+                    public void onSuccess(ChatRoomInfo chatRoomInfo) {
+                        if (chatRoomInfo != null) {
+                            mView.setOnlineCount(chatRoomInfo.getTotalMemberCount());
+                        }
+                    }
+
+                    @Override
+                    public void onError(RongIMClient.ErrorCode errorCode) {
+                    }
+                });
+    }
+
+    /**
+     * 获取房间公告
+     */
+    public void getNotice(boolean isModify) {
+        RCRadioRoomEngine.getInstance().getNotice(new RCRadioRoomResultCallback<String>() {
+            @Override
+            public void onSuccess(String s) {
+                mView.showNotice(s, isModify);
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                mView.showNotice(String.format("欢迎来到%s。", mVoiceRoomBean.getRoomName()), isModify);
+            }
+        });
+    }
+
+    /**
+     * 修改房间公告
+     *
+     * @param notice
+     */
+    public void modifyNotice(String notice) {
+        RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_NOTICE, notice, new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                sendNoticeModifyMessage();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
+            }
         });
     }
 
@@ -121,13 +173,21 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
             tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
             mView.addToMessageList(tips, false);
-            Logger.e("=================发送了默认消息");
             // 发送进入房间的消息
             RCChatroomEnter enter = new RCChatroomEnter();
             enter.setUserId(AccountStore.INSTANCE.getUserId());
             enter.setUserName(AccountStore.INSTANCE.getUserName());
             sendMessage(enter);
         }
+    }
+
+    /**
+     * 发送公告更新的
+     */
+    private void sendNoticeModifyMessage() {
+        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
+        tips.setContent("房间公告已更新！");
+        mView.addToMessageList(tips, false);
     }
 
     /**
@@ -204,6 +264,25 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     /**
+     * 暂停直播
+     */
+    public void resumeRadioLive() {
+        RCRadioRoomEngine.getInstance().leaveSeat(new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
+                // TODO 发暂停通知
+//                sendMessage();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
+            }
+        });
+    }
+
+    /**
      * 调用离开房间
      */
     public void leaveRoom() {
@@ -230,7 +309,24 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (mVoiceRoomBean == null) {
             return;
         }
+        RCRadioRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                MemberCache.getInstance().removeMember(user);
+                RCChatroomKickOut kickOut = new RCChatroomKickOut();
+                kickOut.setUserId(AccountStore.INSTANCE.getUserId());
+                kickOut.setUserName(AccountStore.INSTANCE.getUserName());
+                kickOut.setTargetId(user.getUserId());
+                kickOut.setTargetName(user.getUserName());
+                sendMessage(kickOut);
+                callback.onResult(true, "");
+            }
 
+            @Override
+            public void onError(int i, String s) {
+                mView.showToast(s);
+            }
+        });
     }
 
     @Override
@@ -271,22 +367,28 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
     @Override
     public void onSpeakingStateChanged(boolean b) {
-
+        mView.setSpeaking(b);
+        Logger.e("==============onSpeakingStateChanged: " + b);
     }
 
     @Override
     public void onMessageReceived(Message message) {
-        Logger.e("==============onMessageReceived: " + message.toString());
         MessageContent content = message.getContent();
+        Logger.e("==============onMessageReceived: " + content.toString());
+        // 显示到弹幕列表
         mView.addToMessageList(content, false);
         if (content instanceof RCChatroomGift || content instanceof RCChatroomGiftAll) {
 
         } else if (content instanceof RCChatroomAdmin) {
-            // 管理变更
-            // 显示到弹幕列表
-            mView.addToMessageList(content, false);
             // 刷新房间管理列表
             MemberCache.getInstance().refreshAdminData(mRoomId);
+        } else if (content instanceof RCChatroomKickOut) {
+            // 如果踢出的是自己，就离开房间
+            String targetId = ((RCChatroomKickOut) content).getTargetId();
+            if (TextUtils.equals(targetId, AccountStore.INSTANCE.getUserId())) {
+                leaveRoom();
+                mView.showToast("你已被踢出房间");
+            }
         }
     }
 
@@ -325,5 +427,26 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onRadioRoomNotify(IRCRadioRoomEngine.NotifyType notifyType, String s) {
         Logger.e("===============" + notifyType.getValue() + "=====" + s);
+        switch (notifyType) {
+            case RC_NOTICE:
+                sendNoticeModifyMessage();
+                break;
+            case RC_SPEAKING:
+                boolean isSpeaking = TextUtils.equals(s, "1") ? true : false;
+                onSpeakingStateChanged(isSpeaking);
+                break;
+        }
+    }
+
+    /**
+     * 房主踢人成功的回调
+     *
+     * @param s
+     * @param s1
+     */
+    @Override
+    public void onUserReceiveKickOutRoom(String s, String s1) {
+        Logger.e("==============onUserReceiveKickOutRoom" + s + " " + s1);
+
     }
 }

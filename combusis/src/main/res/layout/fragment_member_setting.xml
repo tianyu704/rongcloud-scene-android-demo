@@ -72,30 +72,48 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_send_gift"
-            android:layout_width="120dp"
+            android:layout_width="0dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_btn_send_gift"
+            android:gravity="center"
             android:text="@string/send_gift"
             android:textColor="@color/whiteTextColor"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/btn_send_message"
+            app:layout_constraintEnd_toStartOf="@+id/btn_send_message"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.25" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_send_message"
-            android:layout_width="120dp"
+            android:layout_width="0dp"
             android:layout_height="40dp"
             android:background="@drawable/bg_btn_send_message"
+            android:gravity="center"
             android:text="@string/send_message"
             android:textColor="#EF499A"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_send_gift"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/btn_follow"
+            app:layout_constraintStart_toEndOf="@+id/btn_send_gift"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.25" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_follow"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_btn_send_message"
+            android:gravity="center"
+            android:text="@string/friend_follow"
+            android:textColor="#EF499A"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_send_message"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_percent="0.25" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

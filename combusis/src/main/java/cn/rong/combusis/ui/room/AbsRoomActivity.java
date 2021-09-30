@@ -46,14 +46,14 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 super.onPageSelected(position);
                 mCurrentPosition = position;
                 // 上一个滑走
-                Fragment lastFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
+                Fragment lastFragment = getSupportFragmentManager().findFragmentByTag("f" + (position - 1));
                 if (lastFragment instanceof AbsRoomFragment) {
                     Logger.e("last page dismiss");
                     ((AbsRoomFragment) lastFragment).destroyRoom();
                 }
                 // 当前显示
                 Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
-                if (currentFragment instanceof AbsRoomFragment) {
+                if (currentFragment instanceof AbsRoomFragment && mCurrentFragment != currentFragment) {
                     Logger.e("current page show");
                     if(!TextUtils.equals(mCurrentFragment.getTag(),currentFragment.getTag())){
                         mCurrentFragment = (AbsRoomFragment) currentFragment;

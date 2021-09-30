@@ -3,6 +3,7 @@ package cn.rongcloud.radioroom.ui.room;
 import com.basis.mvp.IBaseView;
 
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.room.widget.RoomSeatView.SeatState;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -24,4 +25,8 @@ public interface RadioRoomView extends IBaseView {
     void setSpeaking(boolean speaking);
 
     void setRadioName(String name);
+
+    void showNotice(String notice, boolean isModify);
+
+    void setSeatState(SeatState seatState);
 }

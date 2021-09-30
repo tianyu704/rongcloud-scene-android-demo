@@ -1,4 +1,4 @@
-package cn.rong.combusis.ui.friend;
+package cn.rong.combusis.ui.friend.model;
 
 import com.google.gson.annotations.SerializedName;
 

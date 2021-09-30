@@ -56,9 +56,9 @@ public class MemberListFragment extends BaseBottomSheetDialogFragment {
             }
         };
         mRecyclerView.setAdapter(adapter);
-
-        MemberCache.getInstance().getMemberList().observe(this, users1 -> {
-            adapter.setData(users1, true);
+        adapter.setData(MemberCache.getInstance().getMemberList().getValue(), true);
+        MemberCache.getInstance().getMemberList().observe(this, users -> {
+            adapter.setData(users, true);
         });
         MemberCache.getInstance().fetchData(roomId);
     }

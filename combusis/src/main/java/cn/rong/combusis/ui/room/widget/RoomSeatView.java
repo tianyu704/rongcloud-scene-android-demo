@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.rongcloud.common.utils.ImageLoaderUtil;
@@ -30,6 +31,10 @@ public class RoomSeatView extends ConstraintLayout {
     private TextView mGiftView;
 
     private boolean isMute;
+    private ConstraintLayout mClSeat;
+    private ConstraintLayout mClSelfPause;
+    private AppCompatButton mBtnContinue;
+    private ConstraintLayout mClViewerPause;
 
     public RoomSeatView(@NonNull Context context) {
         this(context, null);
@@ -47,6 +52,10 @@ public class RoomSeatView extends ConstraintLayout {
         mMuteView = mRootView.findViewById(R.id.iv_is_mute);
         mRoomOwnerView = mRootView.findViewById(R.id.tv_room_creator_name);
         mGiftView = mRootView.findViewById(R.id.tv_gift_count);
+        mClSeat = (ConstraintLayout) findViewById(R.id.cl_seat);
+        mClSelfPause = (ConstraintLayout) findViewById(R.id.cl_self_pause);
+        mBtnContinue = (AppCompatButton) findViewById(R.id.btn_continue);
+        mClViewerPause = (ConstraintLayout) findViewById(R.id.cl_viewer_pause);
     }
 
     public void setData(String roomOwnerName, String roomOwnerPortrait) {
@@ -92,5 +101,42 @@ public class RoomSeatView extends ConstraintLayout {
         } else {
             mWaveView.stop();
         }
+    }
+
+    /**
+     * 点击继续直播按钮
+     *
+     * @param l
+     */
+    public void setResumeLiveClickListener(View.OnClickListener l) {
+        mBtnContinue.setOnClickListener(l);
+    }
+
+    /**
+     * 设置房主是否暂停
+     *
+     * @param seatState
+     */
+    public void refreshSeatState(SeatState seatState) {
+        mClSeat.setVisibility(INVISIBLE);
+        mClSelfPause.setVisibility(GONE);
+        mClViewerPause.setVisibility(GONE);
+        switch (seatState) {
+            case NORMAL:
+                mClSeat.setVisibility(VISIBLE);
+                break;
+            case OWNER_PAUSE:
+                mClSelfPause.setVisibility(VISIBLE);
+                break;
+            case VIEWER_PAUSE:
+                mClViewerPause.setVisibility(VISIBLE);
+                break;
+        }
+    }
+
+    public enum SeatState {
+        OWNER_PAUSE,
+        VIEWER_PAUSE,
+        NORMAL
     }
 }

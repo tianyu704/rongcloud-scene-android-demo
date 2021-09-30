@@ -11,15 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.provider.user.UserProvider;
-import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
-import cn.rong.combusis.sdk.event.wrapper.AbsEvenHelper;
+import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.sdk.event.wrapper.TipType;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.ChatRoomInfo;
@@ -102,11 +101,12 @@ public class EventHelper extends AbsPKHelper {
     public void getOnLineUserIds(String roomId, IResultBack<List<String>> resultBack) {
         RongIMClient.getInstance()
                 .getChatRoomInfo(roomId,
-                        0,
+                        20,
                         ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC,
                         new RongIMClient.ResultCallback<ChatRoomInfo>() {
                             @Override
                             public void onSuccess(ChatRoomInfo chatRoomInfo) {
+                                Logger.e("=======" + chatRoomInfo.getTotalMemberCount());
                                 if (null != resultBack && null != chatRoomInfo) {
                                     List<ChatRoomMemberInfo> cs = chatRoomInfo.getMemberInfo();
                                     int count = null == cs ? 0 : cs.size();

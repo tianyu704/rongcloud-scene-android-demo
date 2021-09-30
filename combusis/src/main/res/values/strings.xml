@@ -33,4 +33,7 @@
     <string name="shield_title">屏蔽词</string>
     <string name="shield_setting">设置屏蔽词</string>
     <string name="shield_tip">包含屏蔽词的发言将不会被其他用户看到</string>
+    <string name="radio_room_pause">您已暂停直播，观众无法听到声音</string>
+    <string name="continue_live">继续直播</string>
+    <string name="comeback_soon">请耐心等待，马上回来</string>
 </resources>

@@ -84,14 +84,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         });
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
-            mNoticeDialog.show("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n" +
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
-                    "aaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n" +
-                    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false, notice -> {
-
-            });
+            present.getNotice(true);
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
@@ -183,6 +176,18 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mRoomTitleBar.setRoomName(name);
     }
 
+    @Override
+    public void showNotice(String notice, boolean isModify) {
+        mNoticeDialog.show(notice, isModify, newNotice -> {
+            present.modifyNotice(newNotice);
+        });
+    }
+
+    @Override
+    public void setSeatState(RoomSeatView.SeatState seatState) {
+        mRoomSeatView.refreshSeatState(seatState);
+    }
+
     /**
      * 点击右上角菜单按钮
      */
@@ -190,7 +195,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
-
+                finish();
             }
 
             @Override
