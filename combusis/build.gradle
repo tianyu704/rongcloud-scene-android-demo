@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    api fileTree(includes: ['*.jar','*.aar'], dir: 'libs')
+
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.2.0'
@@ -78,4 +78,13 @@ dependencies {
     kapt "org.xerial:sqlite-jdbc:3.34.0"
 
     api project(path: ':basis')
+    if (USE_AAR.toBoolean()) {
+        println("------------------------>>>>use aar")
+        api fileTree(includes: ['*.jar', '*.aar'], dir: 'libs')
+    } else {
+        println("------------------------>>>>use local module")
+        api project(path: ':VoiceRoomSDK:RCVoiceRoom')
+        api project(path: ':VoiceRoomSDK:RCRadioRoom')
+        api project(path: ':VoiceRoomSDK:messager')
+    }
 }
