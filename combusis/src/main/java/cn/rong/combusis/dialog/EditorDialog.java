@@ -12,9 +12,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.kit.UIKit;
+import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.R;
-import cn.rong.combusis.common.net.IResultBack;
 
 /**
  * 底部编辑弹框

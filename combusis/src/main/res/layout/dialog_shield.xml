@@ -11,7 +11,6 @@
     <cn.rong.combusis.common.ui.widget.RealtimeBlurView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
         app:left_top_radius="20dp"
         app:realtimeBlurRadius="21dp"
         app:realtimeOverlayColor="#39FFFFFF"
@@ -26,8 +25,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/basis_25px"
         android:text="@string/shield_title"
-        android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="@dimen/basis_20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,13 +40,12 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/setting"
-        style="@style/main_white_15"
+        style="@style/main_white_17"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/basis_30px"
         android:layout_marginTop="@dimen/basis_20px"
         android:text="@string/shield_setting"
-        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/divider" />
 
@@ -59,8 +56,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/basis_30px"
         android:layout_marginTop="@dimen/basis_10px"
+        android:textColor="#99ffffff"
         android:text="@string/shield_tip"
-        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/setting" />
 

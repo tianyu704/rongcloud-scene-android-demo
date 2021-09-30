@@ -10,12 +10,12 @@ import android.widget.TextView;
 import com.basis.widget.BottomDialog;
 import com.kit.UIKit;
 import com.kit.utils.KToast;
+import com.kit.wapper.IResultBack;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.R;
-import cn.rong.combusis.common.net.IResultBack;
 import cn.rong.combusis.widget.FlowLayout;
 
 /**
@@ -53,23 +53,29 @@ public class ShieldDialog extends BottomDialog {
         });
     }
 
-    public BottomDialog setResultBack(IResultBack<List<String>> resultBack) {
+    TextView title;
+    String titlePre;
+
+    public ShieldDialog setResultBack(IResultBack<List<String>> resultBack) {
         this.resultBack = resultBack;
         return this;
     }
 
     private void initView() {
         flowLayout = UIKit.getView(getContentView(), R.id.flow_tag);
+        title = UIKit.getView(getContentView(), R.id.setting);
+        titlePre = UIKit.getResources().getString(R.string.shield_setting);
         addView();
     }
 
-    public void setTag(List<String> tags) {
+    public ShieldDialog setTag(List<String> tags) {
         if (null != tags) {
             stags.clear();
             stags.add(TAG_ADD);
             stags.addAll(tags);
         }
         addView();
+        return this;
     }
 
     private void addTag(String tag) {
@@ -82,7 +88,12 @@ public class ShieldDialog extends BottomDialog {
         if (flowLayout != null) {
             flowLayout.removeAllViews();
         }
-        for (int i = 0; i < stags.size(); i++) {
+        int count = stags.size();
+        //修改标题
+        int tagSize = count - 1;
+        String text = titlePre + (tagSize > 0 ? "(" + tagSize + "/" + max_tag + ")" : "");
+        title.setText(text);
+        for (int i = 0; i < count; i++) {
             final View tagView;
             String tag = stags.get(i);
             if (!TAG_ADD.equals(tag)) {// tag
