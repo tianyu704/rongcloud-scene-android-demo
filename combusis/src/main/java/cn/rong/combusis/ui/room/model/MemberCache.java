@@ -103,6 +103,36 @@ public class MemberCache {
         return false;
     }
 
+    /**
+     * 删除某个成员
+     *
+     * @param user
+     */
+    public void removeMember(User user) {
+        List<User> list = getMembers();
+        if (list.contains(user)) {
+            list.remove(user);
+            memberList.setValue(list);
+        }
+    }
+
+    /**
+     * 添加成员
+     *
+     * @param user
+     */
+    public void addMember(User user) {
+        List<User> list = getMembers();
+        if (!list.contains(user)) {
+            list.add(user);
+            memberList.setValue(list);
+        }
+    }
+
+    private List<User> getMembers() {
+        return memberList.getValue();
+    }
+
     private static class Holder {
         private static final MemberCache INSTANCE = new MemberCache();
     }
