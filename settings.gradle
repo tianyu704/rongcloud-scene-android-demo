@@ -32,8 +32,8 @@ if (!(USE_AAR).toBoolean()) {
     include ':VoiceRoomSDK:messager'
 
 
-    project(':VoiceRoomSDK').projectDir = new File("${properties.get("voiceRoomDir")}")
-    project(':VoiceRoomSDK:RCVoiceRoom').projectDir = new File("${properties.get("voiceRoomDir")}/voiceroom")
-    project(':VoiceRoomSDK:RCRadioRoom').projectDir = new File("${properties.get("voiceRoomDir")}/radio-lib")
-    project(':VoiceRoomSDK:messager').projectDir = new File("${properties.get("voiceRoomDir")}/messager")
+    project(':VoiceRoomSDK').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}")
+    project(':VoiceRoomSDK:RCVoiceRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/voiceroom")
+    project(':VoiceRoomSDK:RCRadioRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/radio-lib")
+    project(':VoiceRoomSDK:messager').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/messager")
 }
