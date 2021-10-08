@@ -79,8 +79,12 @@ public class ShieldDialog extends BottomDialog {
     }
 
     private void addTag(String tag) {
-        stags.add(tag);
-        addView();
+        if (!stags.contains(tag)) {
+            stags.add(tag);
+            addView();
+        } else {
+            KToast.show("该屏蔽词已添加");
+        }
     }
 
     private void addView() {
