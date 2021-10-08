@@ -19,7 +19,7 @@ public interface IPK {
      * @param pkId     pk对象的UserId
      * @param listener 定时结束回调
      */
-    void pkStart(String localId, String pkId, OnTimerEndListener listener);
+    void pkStart(String localId, String pkId, long timeDiff, OnTimerEndListener listener);
 
     /**
      * 惩罚 开始

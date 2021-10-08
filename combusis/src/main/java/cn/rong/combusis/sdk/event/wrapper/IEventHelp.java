@@ -10,26 +10,27 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 
 public interface IEventHelp {
 
-    enum Type {
-        PK_NONE,//默认状态
-        PK_INVITE,//邀请状态
-        PK_GOING,//pk 进行中
-        PK_FINISH//pk关闭状态
-    }
-
     /**
      * 是否初始化
      *
-     * @return
+     * @return 是否初始化
      */
     boolean isInitlaized();
 
     /**
      * 注册房间事件 加入房间前调用
      *
-     * @param roomId
+     * @param roomId 房间id
      */
     void regeister(String roomId);
+
+    /**
+     * 根据用户id获取麦位信息
+     *
+     * @param userId 用户id
+     * @return 麦位信息
+     */
+    RCVoiceSeatInfo getSeatInfo(String userId);
 
     /**
      * 取消房间事件注册 退出房间后调用
@@ -51,18 +52,10 @@ public interface IEventHelp {
     void addStatusListener(StatusListener listener);
 
     /**
-     * 根据用户id获取麦位信息
-     *
-     * @param userId
-     * @return 麦位信息
-     */
-    RCVoiceSeatInfo getSeatInfo(String userId);
-
-    /**
      * 根据用户index获取麦位信息
      *
      * @param index 索引
-     * @return
+     * @return 麦位信息
      */
     RCVoiceSeatInfo getSeatInfo(int index);
 
@@ -70,24 +63,31 @@ public interface IEventHelp {
      * 获取房间在线用户id集合
      *
      * @param roomId     房间
-     * @param resultBack
+     * @param resultBack 回调
      */
     void getOnLineUserIds(String roomId, IResultBack<List<String>> resultBack);
 
     /**
      * 获取未读消息数据
      *
-     * @param roomId
-     * @param resultBack
+     * @param roomId     房间
+     * @param resultBack 回调
      */
     void getUnReadMegCount(String roomId, IResultBack<Integer> resultBack);
 
     /**
      * 获取申请麦位用户id
      *
-     * @param resultBack
+     * @param resultBack 回调
      */
     void getRequestSeatUserIds(IResultBack<List<String>> resultBack);
+
+    /**
+     * 获取当前PK状态
+     *
+     * @return pk状态
+     */
+    Type getPKState();
 
     /**
      * 获取可用麦位索引
@@ -101,12 +101,15 @@ public interface IEventHelp {
      */
     PKInviter getPKInviter();
 
-    /**
-     * 获取当前PK状态
-     *
-     * @return
-     */
-    Type getPKState();
+    enum Type {
+        PK_NONE,//默认状态
+        PK_INVITE,//邀请状态
+        PK_GOING,//sdk pk进行中
+        PK_START,//ui pk进行中
+        PK_PUNISH,//ui pk惩罚
+        PK_STOP,//ui pk结束
+        PK_FINISH//pk关闭状态
+    }
 
     /**
      * 释放PK邀请者

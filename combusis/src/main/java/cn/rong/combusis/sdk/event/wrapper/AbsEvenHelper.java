@@ -29,6 +29,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<StatusListener> statusListeners;//网络状态监听
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
+
     protected abstract void onShowTipDialog(String roomId, String userId, TipType type, IResultBack<Boolean> resultBack);
 
     protected String roomId;
@@ -184,7 +185,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSpeakingStateChanged(int index, boolean speaking) {
-        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
+//        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
                 l.onSpeaking(index, speaking);
@@ -208,6 +209,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                 }
             }
         }
+        Log.v(TAG, "onMessageReceived: " + GsonUtil.obj2Json(message.getContent()));
     }
 
     /**
@@ -400,7 +402,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onNetworkStatus(int i) {
-        Log.d(TAG, "onNetworkStatus: rtt = " + i);
+//        Log.d(TAG, "onNetworkStatus: rtt = " + i);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
                 l.onStatus(i);

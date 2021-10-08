@@ -150,13 +150,13 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public synchronized void pkStart(String localId, String pkId, OnTimerEndListener listener) {
+    public synchronized void pkStart(String localId, String pkId, long timeDiff, OnTimerEndListener listener) {
         if (null != timer) {
             timer.cancel();
             timer = null;
         }
         // 开启 pk记时
-        timer = new Timer(tvTime, listener);
+        timer = new Timer(tvTime, timeDiff, listener);
         timer.start();
         UserProvider.provider().getAsyn(localId, new IResultBack<UserInfo>() {
             @Override
@@ -185,7 +185,7 @@ public class PKView extends LinearLayout implements IPK {
             timer = null;
         }
         // 开启 惩罚记时
-        timer = new Timer(tvTime, listener);
+        timer = new Timer(tvTime, -1, listener);
         timer.start();
         refreshPkResult();
     }
@@ -260,15 +260,15 @@ public class PKView extends LinearLayout implements IPK {
         private WeakReference<TextView> reference;
         private OnTimerEndListener listener;
 
-        Timer(TextView textView, OnTimerEndListener listener) {
-            super(MAX * 1000, 1000);
+        Timer(TextView textView, long timeDiff, OnTimerEndListener listener) {
+            super(timeDiff < 0 ? MAX * 1000 : MAX * 1000 - timeDiff, 500);
             this.reference = new WeakReference<>(textView);
             this.listener = listener;
         }
 
         @Override
         public void onTick(long l) {
-            Logger.e("Timer", "l = " + l);
+//            Logger.e("Timer", "l = " + l);
             if (null != reference && reference.get() != null) {
                 reference.get().setText(msToShow(l));
             }

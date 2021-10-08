@@ -25,7 +25,7 @@ public interface IPKState {
     /**
      * 发送pk邀请
      *
-     * @param activity
+     * @param activity   Activity
      * @param resultBack 邀请成功回调
      */
     void sendPkInvitation(Activity activity, IResultBack<Boolean> resultBack);
@@ -33,15 +33,17 @@ public interface IPKState {
     /**
      * 取消邀请
      *
-     * @param activity
+     * @param activity   Activity
      * @param resultBack 取消邀请会状态回调
      */
     void cancelPkInvitation(Activity activity, IResultBack<Boolean> resultBack);
 
     /**
      * 手动退出pk
+     *
+     * @param activity Activity
      */
-    void quitPK();
+    void quitPK(Activity activity);
 
     /**
      * 刷新pk礼物排行榜信息

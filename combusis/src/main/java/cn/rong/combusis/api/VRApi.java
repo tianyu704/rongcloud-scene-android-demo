@@ -59,7 +59,8 @@ public class VRApi {
      */
     public static final String PK_STATE = HOST + "mic/room/pk";
 
-    private static final String PK_INFO = HOST + "mic/room/pk/info/";
+    //    private static final String PK_INFO = HOST + "mic/room/pk/info/";
+    private static final String PK_INFO = HOST + "mic/room/pk/detail/";
 
     /**
      * 获取pk积分排行

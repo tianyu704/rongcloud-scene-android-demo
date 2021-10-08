@@ -2,15 +2,18 @@ package cn.rong.combusis.sdk.event.wrapper;
 
 import androidx.annotation.NonNull;
 
+import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.EventBus;
+import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
+import io.rong.imlib.model.Message;
 
 /**
  * 实现PK相关回调
@@ -46,6 +49,36 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         return current;
     }
 
+    @Override
+    public void onMessageReceived(Message message) {
+        super.onMessageReceived(message);
+        handleBusinessPKState(message);
+    }
+
+    /**
+     * 处理业务pk流在的状态
+     *
+     * @param message 消息
+     */
+    void handleBusinessPKState(Message message) {
+        if (message.getContent() instanceof RCChatroomPK) {
+            RCChatroomPK chatroomPK = (RCChatroomPK) message.getContent();
+            String state = chatroomPK.getStatusMsg();
+            Logger.e(TAG, "state = " + state);
+            Logger.e(TAG, "chatroomPK = " + GsonUtil.obj2Json(chatroomPK));
+            if ("0".equals(state)) {// 开始
+                current = Type.PK_START;
+                dispatchPKState(chatroomPK);
+            } else if ("1".equals(state)) {//惩罚
+                current = Type.PK_PUNISH;
+                dispatchPKState(chatroomPK);
+            } else {// pk finish
+                current = Type.PK_STOP;
+                dispatchPKState(chatroomPK);
+            }
+        }
+    }
+
     /**
      * PK开启成功
      *
@@ -56,6 +89,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         Logger.e(TAG, "onPKgoing");
         //邀请同意 开始PK 释放被邀请信息
         VoiceRoomApi.getApi().releasePKInvitee();
+        // 开启pk 统一有服务端分发消息
         current = Type.PK_GOING;
         dispatchPKState(rcpkInfo);
     }
@@ -66,6 +100,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     @Override
     public void onPKFinish() {
         Logger.e(TAG, "onPKFinish");
+        // 开启pk 统一有服务端分发消息
         current = Type.PK_FINISH;
         dispatchPKState(null);
     }
@@ -154,8 +189,8 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         dispatchPKState(null);
     }
 
-    private void dispatchPKState(RCPKInfo rcpkInfo) {
-        EventBus.get().emit(EventBus.TAG.PK_STATE, current, rcpkInfo);
+    private void dispatchPKState(Object extra) {
+        EventBus.get().emit(EventBus.TAG.PK_STATE, current, extra);
     }
 
     private void dispatchPKResponse(PKState pkState) {
