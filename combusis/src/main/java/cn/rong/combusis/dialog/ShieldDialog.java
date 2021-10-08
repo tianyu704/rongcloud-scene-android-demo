@@ -105,6 +105,10 @@ public class ShieldDialog extends BottomDialog {
                     public void onClick(View view) {
                         stags.remove(tag);
                         flowLayout.removeView(tagView);
+                        //标题
+                        int tagSize = stags.size() - 1;
+                        String text = titlePre + (tagSize > 0 ? "(" + tagSize + "/" + max_tag + ")" : "");
+                        title.setText(text);
                     }
                 });
             } else {// add
@@ -113,7 +117,7 @@ public class ShieldDialog extends BottomDialog {
                     @Override
                     public void onClick(View view) {
                         if (stags.size() >= max_tag + 1) {
-                            KToast.show("最多只能添加10个屏蔽词");
+                            KToast.show("最多只能添加" + max_tag + "个屏蔽词");
                             return;
                         }
                         showAddTag();
