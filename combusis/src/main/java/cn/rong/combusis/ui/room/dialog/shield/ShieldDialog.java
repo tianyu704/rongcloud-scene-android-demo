@@ -140,7 +140,18 @@ public class ShieldDialog extends BottomDialog {
                 editorDialog.dismiss();
                 editorDialog = null;
                 if (!TextUtils.isEmpty(s)) {
-                    addShield(s);
+                    boolean isContains = false;
+                    for (Shield shield : shields) {
+                        if (TextUtils.equals(shield.getName(), s)) {
+                            isContains = true;
+                            break;
+                        }
+                    }
+                    if (isContains) {
+                        ToastUtils.s(getDialog().getContext(), "该屏蔽词已添加！");
+                    } else {
+                        addShield(s);
+                    }
                 }
             }
         });
