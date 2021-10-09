@@ -19,6 +19,8 @@ public abstract class AbsRoomFragment<T, P extends BasePresenter> extends BaseFr
 
     public abstract void joinRoom(T t);
 
+    public abstract void leaveRoom();
+
     public abstract void onBackPressed();
 
     public RoomOwnerType getRoomOwnerType() {

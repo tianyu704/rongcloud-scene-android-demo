@@ -56,6 +56,7 @@ import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.SeatOperationVie
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
@@ -88,6 +89,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     public int currentStatus = STATUS_NOT_ON_SEAT;
     private List<Shield> shields;
+    private Disposable messageDisposable;
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -230,9 +232,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 设置接收消息的监听（包括自己发送的，以及外部发送过来的）
+     * TODO 多次订阅导致了多次回调，导致消息重复
      */
     private void setObMessageListener() {
-        RCChatRoomMessageManager.INSTANCE.obMessageReceiveByRoomId(mVoiceRoomBean.getRoomId())
+        messageDisposable = RCChatRoomMessageManager.INSTANCE.obMessageReceiveByRoomId(mVoiceRoomBean.getRoomId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<MessageContent>() {
                     @Override
@@ -249,6 +252,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         Log.e("TAG", "accept: " + messageContent);
                     }
                 });
+        addSubscription(messageDisposable);
     }
 
 
@@ -713,6 +717,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     public void modifyNotice(String notice) {
 //        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(IRCVoiceRoomEngine.);
 
+    }
+
+    /**
+     * 切换房间的时候，对之前房间的操作
+     */
+    public void leaveCurrentRoom() {
+        if (messageDisposable!=null&&messageDisposable.isDisposed()) {
+            messageDisposable.dispose();
+        }
     }
 
 //    /**

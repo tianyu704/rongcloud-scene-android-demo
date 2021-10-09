@@ -110,12 +110,14 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
             @Override
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
+                leaveRoom();
                 joinRadioRoom(roomId);
             }
 
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
+                leaveRoom();
                 joinRadioRoom(roomId);
             }
         });

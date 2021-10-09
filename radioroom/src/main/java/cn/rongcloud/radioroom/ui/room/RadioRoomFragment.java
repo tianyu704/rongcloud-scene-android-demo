@@ -133,6 +133,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         present.joinRoom(voiceRoomBean);
     }
 
+    @Override
+    public void leaveRoom() {
+
+    }
+
     /**
      * 设置房间数据
      *

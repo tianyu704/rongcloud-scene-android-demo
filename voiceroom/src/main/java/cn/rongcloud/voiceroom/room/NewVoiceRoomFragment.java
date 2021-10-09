@@ -54,12 +54,9 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
-import cn.rongcloud.voiceroom.room.dialogFragment.NewCreatorSettingFragment;
-import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.NewRevokeSeatRequestFragment;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imkit.utils.RouteUtils;
-import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
@@ -286,6 +283,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         setRoomData(mVoiceRoomBean);
         present.setCurrentRoom(mVoiceRoomBean);
         sendSystemMessage();
+    }
+
+    @Override
+    public void leaveRoom() {
+        //离开房间的时候
+        present.leaveCurrentRoom();
     }
 
     @Override

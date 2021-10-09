@@ -113,6 +113,15 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
         }
     }
 
+    /**
+     * 离开当前房间的时候，取消部分订阅
+     */
+    public void leaveRoom(){
+        if (mCurrentFragment != null) {
+            mCurrentFragment.leaveRoom();
+        }
+    }
+
     @Override
     public void onBackPressed() {
         if (mCurrentFragment != null) {
