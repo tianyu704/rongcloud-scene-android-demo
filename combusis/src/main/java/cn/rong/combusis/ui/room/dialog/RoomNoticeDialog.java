@@ -3,6 +3,7 @@ package cn.rong.combusis.ui.room.dialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.kit.utils.ScreenUtil;
+import com.rongcloud.common.utils.MaxLengthWithEmojiFilter;
 
 import cn.rong.combusis.R;
 
@@ -52,6 +54,7 @@ public class RoomNoticeDialog extends Dialog {
             if (!TextUtils.isEmpty(notice)) {
                 mNoticeView.setSelection(notice.length());
             }
+            mNoticeView.setFilters(new InputFilter[]{new MaxLengthWithEmojiFilter(100)});
             mCancelView.setVisibility(View.VISIBLE);
             mConfirmView.setVisibility(View.VISIBLE);
             mConfirmView.setOnClickListener(v -> {

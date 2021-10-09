@@ -3,10 +3,12 @@ package cn.rongcloud.radioroom.ui.room;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,6 +20,8 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.common.ui.dialog.EditDialog;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
@@ -27,8 +31,12 @@ import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
+import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
+import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -42,18 +50,26 @@ import io.rong.imlib.model.MessageContent;
  * @date 2021/9/17
  */
 public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomPresenter> implements
-        RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener {
+        RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener,
+        MemberListFragment.OnClickUserListener {
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
     private RoomSeatView mRoomSeatView;
     private RoomBottomView mRoomBottomView;
     private RecyclerView mMessageView;
+    private View mCoverView;
+
     private RoomMessageAdapter mRoomMessageAdapter;
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private RoomNoticeDialog mNoticeDialog;
     private MemberListFragment mMemberListFragment;
     private MemberSettingFragment mMemberSettingFragment;
+    private RoomSettingFragment mRoomSettingFragment;
+    private InputPasswordDialog mInputPasswordDialog;
+    private EditDialog mEditDialog;
+    private BackgroundSettingFragment mBackgroundSettingFragment;
+    private ShieldDialog mShieldDialog;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -72,6 +88,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void init() {
         mNoticeDialog = new RoomNoticeDialog(getContext());
+        mRoomSettingFragment = new RoomSettingFragment(present);
 
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
@@ -84,12 +101,15 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         });
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
-            present.getNotice(true);
+            present.getNotice(false);
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
+        mRoomSeatView.setResumeLiveClickListener(v -> {
+            present.enterSeat();
+        });
         // 底部操作按钮和双击送礼物
         mRoomBottomView = getView(R.id.room_bottom_view);
         // 弹幕消息列表
@@ -98,6 +118,8 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
         mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
         mMessageView.setAdapter(mRoomMessageAdapter);
+
+        mCoverView = getView(R.id.view_cover);
     }
 
     @Override
@@ -108,7 +130,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
         present.joinRoom(voiceRoomBean);
-        setRoomData(voiceRoomBean);
     }
 
     /**
@@ -126,7 +147,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
             present.enterSeat();
         }
         // 加载背景
-        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, voiceRoomBean.getBackgroundUrl(), R.color.black);
+        setRoomBackground(voiceRoomBean.getBackgroundUrl());
         // 设置title数据
         mRoomTitleBar.setData(voiceRoomBean.getRoomName(), voiceRoomBean.getId());
         mRoomTitleBar.setDelay(0, false);
@@ -186,6 +207,68 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void setSeatState(RoomSeatView.SeatState seatState) {
         mRoomSeatView.refreshSeatState(seatState);
+        if (seatState == RoomSeatView.SeatState.OWNER_PAUSE) {
+            mCoverView.setVisibility(View.VISIBLE);
+        } else {
+            mCoverView.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList) {
+        mRoomSettingFragment.show(getChildFragmentManager(), funList);
+    }
+
+    @Override
+    public void showSetPasswordDialog(MutableLiveData<IFun.BaseFun> item) {
+        mInputPasswordDialog = new InputPasswordDialog(getContext(), false, () -> null, s -> {
+            if (TextUtils.isEmpty(s)) {
+                return null;
+            }
+            if (s.length() < 4) {
+                showToast(getString(R.string.text_please_input_four_number));
+                return null;
+            }
+            mInputPasswordDialog.dismiss();
+            present.setRoomPassword(true, s, item);
+            return null;
+        });
+        mInputPasswordDialog.show();
+    }
+
+    @Override
+    public void showSetRoomNameDialog(String name) {
+        mEditDialog = new EditDialog(
+                requireActivity(),
+                "修改房间标题",
+                "请输入房间名",
+                name,
+                10,
+                () -> null,
+                s -> {
+                    present.setRoomName(s);
+                    mEditDialog.dismiss();
+                    return null;
+                }
+        );
+        mEditDialog.show();
+    }
+
+    @Override
+    public void showSelectBackgroundDialog(String url) {
+        mBackgroundSettingFragment = new BackgroundSettingFragment(url, present);
+        mBackgroundSettingFragment.show(getChildFragmentManager());
+    }
+
+    @Override
+    public void setRoomBackground(String url) {
+        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, url, R.color.black);
+    }
+
+    @Override
+    public void showShieldDialog(String roomId) {
+        mShieldDialog = new ShieldDialog(requireActivity(), roomId, 10);
+        mShieldDialog.show();
     }
 
     /**
@@ -262,7 +345,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void clickSettings() {
-
+        present.showSettingDialog();
     }
 
     @Override

@@ -4,15 +4,21 @@ import android.widget.RadioGroup;
 
 import androidx.fragment.app.Fragment;
 
+import com.basis.mvp.BasePresenter;
+import com.basis.ui.BaseFragment;
 import com.rongcloud.common.utils.FragmentUtils;
 
 import cn.rong.combusis.R;
-import cn.rong.combusis.ui.BaseFragment;
 
 public class FriendFragment extends BaseFragment {
 
     public static FriendFragment getInstance() {
         return new FriendFragment();
+    }
+
+    @Override
+    public BasePresenter createPresent() {
+        return null;
     }
 
     @Override
@@ -22,7 +28,7 @@ public class FriendFragment extends BaseFragment {
 
     @Override
     public void init() {
-        RadioGroup radioGroup = getView(R.id.rg_friend);
+        RadioGroup radioGroup = getView().findViewById(R.id.rg_friend);
         // 粉丝列表
         Fragment followerFragment = FriendListFragment.getInstance(2);
         // 关注列表
@@ -36,5 +42,10 @@ public class FriendFragment extends BaseFragment {
                 FragmentUtils.INSTANCE.switchFragment(getChildFragmentManager(), R.id.fl_content, followFragment, fragments, 0, 0);
             }
         });
+    }
+
+    @Override
+    public void initListener() {
+
     }
 }

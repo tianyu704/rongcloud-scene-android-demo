@@ -8,10 +8,9 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.rongcloud.common.ui.dialog.EditDialog;
-import com.rongcloud.common.ui.dialog.InputPasswordDialog;
-
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
+import cn.rong.combusis.common.ui.dialog.EditDialog;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.ui.widget.GridSpacingItemDecoration;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel;

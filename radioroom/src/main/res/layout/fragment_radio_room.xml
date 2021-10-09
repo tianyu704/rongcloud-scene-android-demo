@@ -43,11 +43,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
 
-    <cn.rong.combusis.ui.room.widget.RoomSeatView
-        android:id="@+id/room_seat_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
 
     <FrameLayout
         android:layout_width="0dp"
@@ -74,5 +69,19 @@
             tools:listitem="@layout/item_message_system" />
     </FrameLayout>
 
+    <View
+        android:id="@+id/view_cover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="#03062F"
+        android:clickable="true"
+        android:visibility="gone" />
+
+    <cn.rong.combusis.ui.room.widget.RoomSeatView
+        android:id="@+id/room_seat_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/room_title_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

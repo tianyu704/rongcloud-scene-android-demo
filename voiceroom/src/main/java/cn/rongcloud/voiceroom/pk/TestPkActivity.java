@@ -15,17 +15,15 @@ import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
-import cn.rong.combusis.dialog.ShieldDialog;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
+import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 
@@ -92,14 +90,7 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
         } else if (R.id.refresh == id) {
             PKStateManager.get().refreshPKGiftRank();
         } else if (R.id.fill == id) {//屏蔽词
-            ShieldDialog dialog = new ShieldDialog(this, 3)
-                    .setTag(Arrays.asList("什么情况", "test"))
-                    .setResultBack(new IResultBack<List<String>>() {
-                        @Override
-                        public void onResult(List<String> strings) {
-                            Logger.e(TAG, "tags = " + GsonUtil.obj2Json(strings));
-                        }
-                    });
+            ShieldDialog dialog = new ShieldDialog(this, "", 3);
             dialog.show();
         } else if (R.id.quitpk == id) {
             PKStateManager.get().quitPK(activity);

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -20,9 +21,9 @@ import com.basis.net.oklib.api.body.FileBody;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.widget.BottomDialog;
 import com.kit.utils.ImageLoader;
-import com.rongcloud.common.ui.dialog.InputPasswordDialog;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.LocalDataStore;
+import com.rongcloud.common.utils.MaxLengthWithEmojiFilter;
 import com.rongcloud.common.utils.UiUtils;
 
 import java.io.File;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -128,7 +130,7 @@ public class CreateRoomDialog extends BottomDialog {
 
         mRoomNameEditText = getContentView().findViewById(R.id.et_room_name);
         mPrivateButton = getContentView().findViewById(R.id.rb_private);
-
+        mRoomNameEditText.setFilters(new InputFilter[]{new MaxLengthWithEmojiFilter(10)});
         mLoading = new LoadTag(mActivity, mActivity.getString(R.string.text_creating_room));
     }
 

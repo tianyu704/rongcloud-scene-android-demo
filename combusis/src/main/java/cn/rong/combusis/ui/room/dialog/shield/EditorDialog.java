@@ -1,4 +1,4 @@
-package cn.rong.combusis.dialog;
+package cn.rong.combusis.ui.room.dialog.shield;
 
 import android.app.Activity;
 import android.app.Dialog;

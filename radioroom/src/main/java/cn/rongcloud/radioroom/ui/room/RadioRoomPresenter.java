@@ -3,6 +3,7 @@ package cn.rongcloud.radioroom.ui.room;
 import android.text.TextUtils;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.MutableLiveData;
 
 import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
@@ -12,7 +13,9 @@ import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.message.RCChatroomAdmin;
@@ -24,7 +27,18 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.OnItemClickListener;
+import cn.rong.combusis.ui.room.dialog.shield.Shield;
+import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBackgroundFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomLockFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMusicFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNameFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNoticeFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomPauseFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rongcloud.messager.RCMessager;
@@ -43,14 +57,13 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/24
  */
-public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements RCRadioEventListener, RadioRoomMemberSettingClickListener {
+public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements RCRadioEventListener,
+        RadioRoomMemberSettingClickListener, OnItemClickListener<MutableLiveData<IFun.BaseFun>>, BackgroundSettingFragment.OnSelectBackgroundListener {
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
-    private LifecycleOwner lifecycleOwner;
 
     public RadioRoomPresenter(RadioRoomView mView, LifecycleOwner lifecycleOwner) {
         super(mView, lifecycleOwner.getLifecycle());
-        this.lifecycleOwner = lifecycleOwner;
     }
 
     @Override
@@ -64,6 +77,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
             mRoomId = voiceRoomBean.getRoomId();
+            mView.setRoomData(voiceRoomBean);
             // 发送默认消息
             sendDefaultMessage();
             // 获取房间内成员和管理员列表
@@ -87,6 +101,29 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     /**
+     * 刷新房间信息
+     */
+    public void refreshRoomInfo() {
+        OkApi.get(VRApi.getRoomInfo(mRoomId), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        mVoiceRoomBean = roomBean;
+                        mView.setRoomData(mVoiceRoomBean);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+    }
+
+    /**
      * 房主上麦
      */
     public void enterSeat() {
@@ -95,6 +132,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             public void onSuccess() {
                 Logger.e("==============enterSeat onSuccess");
                 mView.setSeatState(RoomSeatView.SeatState.NORMAL);
+                RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_SUSPEND, "0", null);
             }
 
             @Override
@@ -200,7 +238,54 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         barrage.setContent(msg);
         barrage.setUserId(AccountStore.INSTANCE.getUserId());
         barrage.setUserName(AccountStore.INSTANCE.getUserName());
-        sendMessage(barrage);
+        getShield(new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    List<Shield> shields = result.getList(Shield.class);
+                    boolean isContains = false;
+                    if (shields != null) {
+                        for (Shield shield : shields) {
+                            if (msg.contains(shield.getName())) {
+                                isContains = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (isContains) {
+                        mView.addToMessageList(barrage, false);
+                        mView.clearInput();
+                    } else {
+                        sendMessage(barrage);
+                    }
+                } else {
+                    sendMessage(barrage);
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                sendMessage(barrage);
+            }
+        });
+
+    }
+
+    /**
+     * 设置弹框数据
+     */
+    public void showSettingDialog() {
+        List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
+                new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
+                new MutableLiveData<>(new RoomNameFun(0)),
+                new MutableLiveData<>(new RoomNoticeFun(0)),
+                new MutableLiveData<>(new RoomBackgroundFun(0)),
+                new MutableLiveData<>(new RoomShieldFun(0)),
+                new MutableLiveData<>(new RoomMusicFun(0)),
+                new MutableLiveData<>(new RoomPauseFun(0))
+        );
+        mView.showSettingDialog(funList);
     }
 
     /**
@@ -264,15 +349,31 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     /**
+     * 设置屏蔽词
+     *
+     * @param shields
+     */
+    public void setShield(List<String> shields) {
+        Logger.e(shields.toString());
+    }
+
+    /**
+     * 获取屏蔽词
+     */
+    private void getShield(WrapperCallBack wrapperCallBack) {
+        OkApi.get(VRApi.getShield(mRoomId), null, wrapperCallBack);
+    }
+
+    /**
      * 暂停直播
      */
-    public void resumeRadioLive() {
+    public void pauseRadioLive() {
         RCRadioRoomEngine.getInstance().leaveSeat(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
                 mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
-                // TODO 发暂停通知
-//                sendMessage();
+                // 发暂停通知
+                RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_SUSPEND, "1", null);
             }
 
             @Override
@@ -302,6 +403,69 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 mView.showToast(message);
             }
         });
+    }
+
+    /**
+     * 设置房间密码
+     *
+     * @param isPrivate
+     * @param password
+     * @param item
+     */
+    public void setRoomPassword(boolean isPrivate, String password, MutableLiveData<IFun.BaseFun> item) {
+        int p = isPrivate ? 1 : 0;
+        OkApi.put(VRApi.ROOM_PASSWORD,
+                new OkParams()
+                        .add("roomId", mRoomId)
+                        .add("isPrivate", p)
+                        .add("password", password).build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mView.showToast(isPrivate ? "设置成功" : "取消成功");
+                            mVoiceRoomBean.setIsPrivate(isPrivate ? 1 : 0);
+                            mVoiceRoomBean.setPassword(password);
+                            IFun.BaseFun fun = item.getValue();
+                            fun.setStatus(p);
+                            item.setValue(fun);
+                        } else {
+                            mView.showToast(isPrivate ? "设置失败" : "取消失败");
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 修改房间名称
+     *
+     * @param name
+     */
+    public void setRoomName(String name) {
+        OkApi.put(VRApi.ROOM_NAME,
+                new OkParams()
+                        .add("roomId", mRoomId)
+                        .add("name", name)
+                        .build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mView.showToast("修改成功");
+                            mView.setRadioName(name);
+                            mVoiceRoomBean.setRoomName(name);
+                            RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_ROOM_NAME, name, null);
+                        } else {
+                            mView.showToast("修改失败");
+                        }
+                    }
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        mView.showToast("修改失败");
+                    }
+                });
     }
 
     @Override
@@ -432,8 +596,19 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 sendNoticeModifyMessage();
                 break;
             case RC_SPEAKING:
-                boolean isSpeaking = TextUtils.equals(s, "1") ? true : false;
+                boolean isSpeaking = TextUtils.equals(s, "1");
                 onSpeakingStateChanged(isSpeaking);
+                break;
+            case RC_SUSPEND:
+                boolean isPause = TextUtils.equals(s, "1");
+                if (isPause) {
+                    mView.setSeatState(RoomSeatView.SeatState.VIEWER_PAUSE);
+                } else {
+                    mView.setSeatState(RoomSeatView.SeatState.NORMAL);
+                }
+                break;
+            case RC_BGNAME:
+                mView.setRoomBackground(s);
                 break;
         }
     }
@@ -448,5 +623,59 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     public void onUserReceiveKickOutRoom(String s, String s1) {
         Logger.e("==============onUserReceiveKickOutRoom" + s + " " + s1);
 
+    }
+
+    /**
+     * 设置里面的设置选项
+     *
+     * @param item
+     * @param position
+     */
+    @Override
+    public void clickItem(MutableLiveData<IFun.BaseFun> item, int position) {
+        IFun.BaseFun fun = item.getValue();
+        if (fun instanceof RoomPauseFun) {
+            pauseRadioLive();
+        } else if (fun instanceof RoomNoticeFun) {
+            getNotice(true);
+        } else if (fun instanceof RoomLockFun) {
+            if (fun.getStatus() == 1) {
+                setRoomPassword(false, "", item);
+            } else {
+                mView.showSetPasswordDialog(item);
+            }
+        } else if (fun instanceof RoomNameFun) {
+            mView.showSetRoomNameDialog(mVoiceRoomBean.getRoomName());
+        } else if (fun instanceof RoomBackgroundFun) {
+            mView.showSelectBackgroundDialog(mVoiceRoomBean.getBackgroundUrl());
+        } else if (fun instanceof RoomShieldFun) {
+            mView.showShieldDialog(mRoomId);
+        }
+    }
+
+    @Override
+    public void selectBackground(String url) {
+        OkApi.put(VRApi.ROOM_BACKGROUND, new OkParams()
+                .add("roomId", mRoomId)
+                .add("backgroundUrl", url)
+                .build(), new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    mVoiceRoomBean.setBackgroundUrl(url);
+                    mView.setRoomBackground(url);
+                    RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_BGNAME, url, null);
+                    mView.showToast("设置成功");
+                } else {
+                    mView.showToast("设置失败");
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                mView.showToast("设置失败");
+            }
+        });
     }
 }

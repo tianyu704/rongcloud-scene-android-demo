@@ -17,7 +17,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_room_setting_close" />
+        app:srcCompat="@drawable/ic_down_dialog" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_function_list"
@@ -29,4 +29,9 @@
         app:layout_constraintTop_toBottomOf="@+id/iv_close"
         app:spanCount="4" />
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rv_function_list" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -97,4 +97,52 @@ public class VRApi {
         return HOST + "mic/room/" + roomId + "/manage/list";
     }
 
+    /**
+     * 房间上锁解锁
+     */
+    public static final String ROOM_PASSWORD = HOST + "mic/room/private";
+
+    /**
+     * 修改房间名称
+     */
+    public static final String ROOM_NAME = HOST + "mic/room/name";
+
+    /**
+     * 修改房间背景
+     */
+    public static final String ROOM_BACKGROUND = HOST + "mic/room/background";
+    /**
+     * 添加屏蔽词
+     */
+    public static final String ADD_SHIELD = HOST + "mic/room/sensitive/add";
+
+    /**
+     * 获取房间信息
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getRoomInfo(String roomId) {
+        return HOST + "mic/room/" + roomId;
+    }
+
+    /**
+     * 获取屏蔽词列表
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getShield(String roomId) {
+        return HOST + "mic/room/sensitive/" + roomId + "/list";
+    }
+
+    /**
+     * 删除敏感词
+     *
+     * @param id
+     * @return
+     */
+    public static String deleteShield(int id) {
+        return HOST + "mic/room/sensitive/del/" + id;
+    }
 }

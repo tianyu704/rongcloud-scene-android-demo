@@ -17,6 +17,8 @@ import android.view.View.OnTouchListener
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog
+import cn.rong.combusis.common.ui.dialog.TipDialog
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rong.combusis.manager.AudioPlayManager
 import cn.rong.combusis.manager.AudioRecordManager
@@ -46,7 +48,6 @@ import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.IMusicSett
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting.MusicSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.IRevokeSeatView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.revokeseatrequest.RevokeSeatRequestFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroundSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.BackgroupSettingDialogFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.backgroundsetting.IBackgroundSettingView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.roomsetting.setting.IRoomSettingView
@@ -64,13 +65,10 @@ import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.ui
-import com.rongcloud.common.ui.dialog.ConfirmDialog
-import com.rongcloud.common.ui.dialog.TipDialog
 import com.rongcloud.common.utils.*
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
-
 import io.rong.imkit.utils.PermissionCheckUtil
 import io.rong.imkit.utils.RongUtils
 import io.rong.imkit.utils.RouteUtils

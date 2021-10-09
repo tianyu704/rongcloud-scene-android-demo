@@ -14,6 +14,8 @@ import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog
+import cn.rong.combusis.common.ui.dialog.TipDialog
 import cn.rong.combusis.feedback.FeedbackHelper
 import cn.rong.combusis.ui.room.widget.like.FavAnimation
 import cn.rongcloud.annotation.HiltBinding
@@ -60,8 +62,6 @@ import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
-import com.rongcloud.common.ui.dialog.ConfirmDialog
-import com.rongcloud.common.ui.dialog.TipDialog
 import com.rongcloud.common.utils.AccountStore
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint

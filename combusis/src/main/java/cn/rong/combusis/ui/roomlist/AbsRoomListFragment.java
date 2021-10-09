@@ -7,12 +7,12 @@ import com.basis.adapter.interfaces.IAdapte;
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.ui.ListFragment;
 import com.bcq.refresh.XRecyclerView;
-import com.rongcloud.common.ui.dialog.ConfirmDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;

@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package com.rongcloud.common.ui.dialog
+package cn.rong.combusis.common.ui.dialog
 
 import android.app.Dialog
 import android.content.Context
