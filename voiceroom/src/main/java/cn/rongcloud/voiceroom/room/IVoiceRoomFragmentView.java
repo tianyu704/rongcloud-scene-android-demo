@@ -61,4 +61,18 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void onMemberInfoChange();
 
     void onNetworkStatus(int i);
+
+    void finish();
+
+    void onSpeakingStateChanged(boolean speaking);
+
+    void refreshRoomOwner(UiSeatModel uiSeatModel);
+
+    void refreshSeatIndex(int index,UiSeatModel uiSeatModel);
+
+    void showNotice(String notice, boolean isModify);
+
+    void clearInput();
+
+    void showMessage(MessageContent messageContent, boolean isRefresh);
 }

@@ -1,9 +1,13 @@
 package cn.rongcloud.voiceroom.room;
 
 
+import static cn.rong.combusis.sdk.Api.EVENT_AGREE_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
+import static cn.rong.combusis.sdk.Api.EVENT_REJECT_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
+import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
+import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -20,10 +24,16 @@ import com.rongcloud.common.utils.AudioManagerUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.common.utils.SharedPreferUtil;
+import cn.rong.combusis.manager.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.rtc.api.RCRTCAudioMixer;
+import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -45,18 +55,24 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
 import io.reactivex.rxjava3.core.SingleOnSubscribe;
+import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
+import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Message;
+import kotlin.Unit;
+import kotlin.jvm.Synchronized;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 
 /**
  * 语聊房的逻辑处理
  */
 public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implements RCVoiceRoomEventListener {
 
-
+    private String TAG = "NewVoiceRoomModel";
     //线程调度器
     Scheduler dataModifyScheduler = Schedulers.computation();
 
@@ -66,7 +82,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     //座位数量订阅器,为了让所有订阅的地方都能回调回去
     private BehaviorSubject<List<UiSeatModel>> seatListChangeSubject = BehaviorSubject.create();
 
-    //房间信息发生改变的额订阅
+    //房间信息发生改变订阅，比如房间被解散，上锁之类的
     private BehaviorSubject<UiRoomModel> roomInfoSubject = BehaviorSubject.create();
 
     //房间事件监听（麦位 进入 踢出等等）
@@ -79,22 +95,23 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 申请和撤销上麦下麦的监听
      */
-    private BehaviorSubject<List<User>> obRequestSeatListChangeSuject=BehaviorSubject.create();
+    private BehaviorSubject<List<User>> obRequestSeatListChangeSuject = BehaviorSubject.create();
     /**
      * 可以被邀请的人员监听
      */
-    private BehaviorSubject<List<User>> obInviteSeatListChangeSuject=BehaviorSubject.create();
+    private BehaviorSubject<List<User>> obInviteSeatListChangeSuject = BehaviorSubject.create();
 
     public UiRoomModel currentUIRoomInfo = new UiRoomModel(roomInfoSubject);
 
     //本地麦克风的状态，默认是开启的
     private boolean recordingStatus = true;
-    //在麦位
-    private ArrayList<UiSeatModel> uiSeatModels= new ArrayList<>();
+    //麦位集合
+    private ArrayList<UiSeatModel> uiSeatModels = new ArrayList<>();
+
     //申请连麦的集合
-    private ArrayList<User> requestSeats= new ArrayList<>();;
+    private ArrayList<User> requestSeats = new ArrayList<>();
     //可以被邀请的集合
-    private ArrayList<User> inviteSeats=new ArrayList<>();
+    private ArrayList<User> inviteSeats = new ArrayList<>();
 
     public ArrayList<User> getInviteSeats() {
         return inviteSeats;
@@ -102,6 +119,10 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
     public ArrayList<User> getRequestSeats() {
         return requestSeats;
+    }
+
+    public ArrayList<UiSeatModel> getUiSeatModels() {
+        return uiSeatModels;
     }
 
     public boolean isRecordingStatus() {
@@ -119,16 +140,25 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
         return seatListChangeSubject.subscribeOn(dataModifyScheduler)
                 .observeOn(AndroidSchedulers.mainThread());
     }
+
     /**
-     * 监控指定位置的麦位的信息变化
+     * 获取指定位置的麦位
      */
-    public Observable<UiSeatModel> obSeatInfoByIndex(int index){
+    public Observable<UiSeatModel> obSeatInfoByIndex(int index) {
         return seatListChangeSubject.map(new Function<List<UiSeatModel>, UiSeatModel>() {
             @Override
             public UiSeatModel apply(List<UiSeatModel> uiSeatModels) throws Throwable {
                 return uiSeatModels.get(index);
             }
         }).subscribeOn(dataModifyScheduler)
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * 麦位信息发生了变化
+     */
+    public Observable<UiSeatModel> obSeatInfoChange() {
+        return seatInfoChangeSubject.subscribeOn(dataModifyScheduler)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -141,10 +171,17 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
     /**
-     * 监听申请上麦和撤销申请的监听
-     *
+     * 监听房间的信息改变，比如上锁，解散之类的信息
      */
-    public Observable<List<User>> obRequestSeatListChange(){
+    public Observable<UiRoomModel> obRoomInfoChange() {
+        return roomInfoSubject.subscribeOn(dataModifyScheduler)
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * 监听申请上麦和撤销申请的监听
+     */
+    public Observable<List<User>> obRequestSeatListChange() {
         return obRequestSeatListChangeSuject.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(dataModifyScheduler);
     }
@@ -152,7 +189,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 监听可以被邀请的人员
      */
-    public Observable<List<User>> obInviteSeatListChange(){
+    public Observable<List<User>> obInviteSeatListChange() {
         return obInviteSeatListChangeSuject.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(dataModifyScheduler);
     }
@@ -169,7 +206,8 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
     @Override
     public void onRoomInfoUpdate(RCVoiceRoomInfo rcVoiceRoomInfo) {
-
+        Log.e(TAG, "onRoomInfoUpdate: ");
+        currentUIRoomInfo.setRcRoomInfo(rcVoiceRoomInfo);
     }
 
     /**
@@ -179,38 +217,69 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        uiSeatModels.clear();
-        for (int i = 0; i < list.size(); i++) {
-            //构建一个集合返回去
-            UiSeatModel uiSeatModel = new UiSeatModel(i, list.get(i), seatInfoChangeSubject);
-            uiSeatModels.add(uiSeatModel);
-        }
-        seatListChangeSubject.onNext(uiSeatModels);
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                uiSeatModels.clear();
+                for (int i = 0; i < list.size(); i++) {
+                    //构建一个集合返回去
+                    UiSeatModel uiSeatModel = new UiSeatModel(i, list.get(i), seatInfoChangeSubject);
+                    uiSeatModels.add(uiSeatModel);
+                }
+                seatListChangeSubject.onNext(uiSeatModels);
+            }
+        }).subscribeOn(Schedulers.io())
+                .subscribe());
     }
 
     /**
      * 用户加入麦位
+     *
      * @param i
      * @param s
      */
     @Override
     public void onUserEnterSeat(int i, String s) {
-
+        Log.e(TAG, "onUserEnterSeat: ");
+        obSeatInfoByIndex(i).subscribe(new Consumer<UiSeatModel>() {
+            @Override
+            public void accept(UiSeatModel uiSeatModel) throws Throwable {
+                seatInfoChangeSubject.onNext(uiSeatModel);
+            }
+        });
+        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
     /**
-     * 用户离开麦位
+     * 用户离开麦位,并且保证该用户在房间里面 那么该用户应该能够被邀请才对
+     *
      * @param i
      * @param s
      */
     @Override
     public void onUserLeaveSeat(int i, String s) {
-
+        Log.e(TAG, "onUserLeaveSeat: ");
+        //如果是房主的话，那么去更新房主的信息
+        obSeatInfoByIndex(i).subscribe(new Consumer<UiSeatModel>() {
+            @Override
+            public void accept(UiSeatModel uiSeatModel) throws Throwable {
+                seatInfoChangeSubject.onNext(uiSeatModel);
+            }
+        });
+        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
+    /**
+     * 麦位被禁止
+     *
+     * @param i
+     * @param b
+     */
     @Override
     public void onSeatMute(int i, boolean b) {
-
+        UiSeatModel uiSeatModel = uiSeatModels.get(i);
+        uiSeatModel.setMute(b);
+        Log.e(TAG, "onSeatMute: ");
     }
 
     /**
@@ -222,21 +291,46 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onSeatLock(int i, boolean b) {
         //锁住的位置，和状态
+        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        Log.e(TAG, "onSeatLock: ");
     }
 
+    /**
+     * 观众加入
+     *
+     * @param s
+     */
     @Override
     public void onAudienceEnter(String s) {
-
+        Log.e(TAG, "onAudienceEnter: ");
+        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
+    /**
+     * 观众退出
+     *
+     * @param s
+     */
     @Override
     public void onAudienceExit(String s) {
-
+        Log.e(TAG, "onAudienceExit: ");
+        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
+    /**
+     * 麦位的信息变化监听
+     *
+     * @param i
+     * @param b
+     */
     @Override
     public void onSpeakingStateChanged(int i, boolean b) {
-        Log.e("TAG", "onSpeakingStateChanged: ");
+        Log.e(TAG, "onSpeakingStateChanged: " + i + ":" + b);
+        if (uiSeatModels.size() > i) {
+            UiSeatModel uiSeatModel = uiSeatModels.get(i);
+            uiSeatModel.setSpeaking(b);
+        }
+
     }
 
     @Override
@@ -250,12 +344,19 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
     /**
+     * 收到上麦邀请
      *
-     * @param s
+     * @param userId
      */
     @Override
-    public void onPickSeatReceivedFrom(String s) {
-        Log.e("TAG", "onPickSeatReceivedFrom: ");
+    public void onPickSeatReceivedFrom(String userId) {
+
+        if (userId.equals(currentUIRoomInfo.getRoomBean().getCreateUser().getUserId())) {
+            //当前是房主邀请的
+            present.showPickReceivedDialog(true, userId);
+        } else {
+            //管理员邀请
+        }
     }
 
     /**
@@ -286,7 +387,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
     /**
-     * 接收请求麦位
+     * 接收请求 撤销麦位
      */
     @Override
     public void onRequestSeatListChanged() {
@@ -296,19 +397,18 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 获取到正在申请麦位的用户的信息
      */
-    public void getRequestSeatUserIds(){
+    public void getRequestSeatUserIds() {
         RCVoiceRoomEngine.getInstance().getRequestSeatUserIds(new RCVoiceRoomResultCallback<List<String>>() {
             @Override
-            public void onSuccess(List<String> strings) {
+            public void onSuccess(List<String> requestUserIds) {
                 //获取到当前房间所有用户
                 List<User> users = MemberCache.getInstance().getMemberList().getValue();
                 requestSeats.clear();
-                for (User user : users) {
-                    //判断申请的用户是否在麦位里面,如果在，说明是撤销，如果不是，那么
-                    //如果当前用户不在麦位上,申请连麦的
-                    for (String userid : strings) {
-                        if (userid.equals(user.getUserId())){
+                for (String requestUserId : requestUserIds) {
+                    for (User user : users) {
+                        if (user.getUserId().equals(requestUserId)) {
                             requestSeats.add(user);
+                            break;
                         }
                     }
                 }
@@ -324,50 +424,55 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
     /**
      * 收到邀请
-     * @param s
-     * @param s1
-     * @param s2
+     *
+     * @param invitationId
+     * @param userId
+     * @param content
      */
     @Override
-    public void onInvitationReceived(String s, String s1, String s2) {
-        Log.e("TAG", "onInvitationReceived: " );
+    public void onInvitationReceived(String invitationId, String userId, String content) {
+        Log.e(TAG, "onInvitationReceived: ");
     }
 
     /**
      * 同意邀请
-     * @param s
+     *
+     * @param invitationId
      */
     @Override
-    public void onInvitationAccepted(String s) {
-        Log.e("TAG", "onInvitationAccepted: " );
+    public void onInvitationAccepted(String invitationId) {
+        Log.e(TAG, "onInvitationAccepted: ");
     }
 
     /**
      * 拒绝邀请
-     * @param s
+     *
+     * @param invitationId
      */
     @Override
-    public void onInvitationRejected(String s) {
-        Log.e("TAG", "onInvitationRejected: " );
+    public void onInvitationRejected(String invitationId) {
+        Log.e(TAG, "onInvitationRejected: ");
     }
 
     /**
      * 取消邀请
-     * @param s
+     *
+     * @param invitationId
      */
     @Override
-    public void onInvitationCancelled(String s) {
-        Log.e("TAG", "onInvitationCancelled: " );
+    public void onInvitationCancelled(String invitationId) {
+        Log.e(TAG, "onInvitationCancelled: ");
     }
 
     /**
-     * 用户收到被踢出房间
+     * 用户收到被踢出房间 然后弹窗告知，然后退出房间等操作
+     *
      * @param s
      * @param s1
      */
     @Override
     public void onUserReceiveKickOutRoom(String s, String s1) {
-
+        Log.e(TAG, "onUserReceiveKickOutRoom: ");
     }
 
     /**
@@ -378,7 +483,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onNetworkStatus(int i) {
         present.onNetworkStatus(i);
-        Log.d("TAG", "onNetworkStatus: ");
+        Log.d(TAG, "onNetworkStatus: ");
     }
 
     @Override
@@ -420,12 +525,12 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
         return Single.create(new SingleOnSubscribe<VoiceRoomBean>() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull SingleEmitter<VoiceRoomBean> emitter) throws Throwable {
-                VoiceRoomBean voiceRoomBean = present.getmVoiceRoomBean();
-                if (present.getmVoiceRoomBean() != null) {
-                    emitter.onSuccess(voiceRoomBean);
+                cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean roomBean = currentUIRoomInfo.getRoomBean();
+                if (roomBean != null) {
+//                    currentUIRoomInfo.setRoomBean(voiceRoomBean);
                 } else {
                     //通过网络去获取
-                    queryRoomInfoFromServer(roomId);
+                    queryRoomInfoFromServer(roomId).subscribe();
                 }
             }
         });
@@ -445,13 +550,102 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
                 .doOnSuccess(new Consumer<VoiceRoomInfoBean>() {
                     @Override
                     public void accept(VoiceRoomInfoBean voiceRoomInfoBean) throws Throwable {
-                       //房间信息
-
+                        //房间信息
+                        currentUIRoomInfo.setRoomBean(voiceRoomInfoBean.getRoom());
                     }
                 });
     }
 
     private RCRTCAudioMixer.MixingState currentMusicState = RCRTCAudioMixer.MixingState.STOPPED;
+
+    /**
+     * 音乐的所有操作
+     * TODO =================================================================
+     */
+
+    /**
+     * 音乐是否正在播放
+     *
+     * @return
+     */
+    public boolean isPlayingMusic() {
+        return false;
+//        // 暂停状态下不视为音乐正在播放
+//        return (currentPlayMusic != null && currentMusicState == RCRTCAudioMixer.MixingState.PLAY)
+//                || (playNextMusicJob ?.isCompleted == false)
+    }
+
+    /**
+     * 用于记录音乐停止的状态
+     */
+
+    private volatile boolean musicStopFlag = true;
+
+    /**
+     * 停止音乐播放，临时放这里
+     */
+    public void stopPlayMusic() {
+//        try {
+//            musicStopFlag = true;
+//            if (playNextMusicJob?.isActive == true) {
+//                playNextMusicJob?.cancel()
+//            }
+//            RCRTCAudioMixer.getInstance().stop()
+//        } catch (e: Exception) {
+//            Log.e(TAG, "stopPlayMusic: ", e)
+//        }
+    }
+
+
+    /**
+     * 当房间人员变化的时候监听，当有人上麦或者下麦的时候也要监听
+     *
+     * @param users
+     */
+    public void onMemberListener(List<User> users) {
+        //只要不在麦位的人都可以被邀请
+        inviteSeats.clear();
+        for (User user : users) {
+            //是否在麦位上标识
+            boolean isInSeat = false;
+            //当前用户在麦位上或者当前用户是房间创建者，那么不可以被邀请
+            for (UiSeatModel uiSeatModel : uiSeatModels) {
+                if ((!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(user.getUserId()))
+                        || user.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                    isInSeat = true;
+                    break;
+                }
+            }
+            if (!isInSeat) {
+                inviteSeats.add(user);
+            }
+        }
+        obInviteSeatListChangeSuject.onNext(inviteSeats);
+    }
+
+    /**
+     * 关于到麦位的所有的操作
+     * TODO =====================================================================
+     */
+
+    /**
+     * 根据ID获取当前的麦位信息
+     *
+     * @param userId
+     * @return
+     */
+    public UiSeatModel getSeatInfoByUserId(String userId) {
+        if (TextUtils.isEmpty(userId)) {
+            return null;
+        }
+        for (UiSeatModel uiSeatModel : uiSeatModels) {
+            if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(userId)) {
+                return uiSeatModel;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 麦位断开链接
@@ -478,7 +672,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
                     @Override
                     public void onError(int i, String s) {
-
+                        emitter.onError(new Throwable(s));
                     }
                 });
             }
@@ -486,58 +680,376 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
     /**
-     * 停止音乐播放，临时放这里
+     * 取消上麦
      */
-    public void stopPlayMusic() {
-//        try {
-//            musicStopFlag = true;
-//            if (playNextMusicJob?.isActive == true) {
-//                playNextMusicJob?.cancel()
-//            }
-//            RCRTCAudioMixer.getInstance().stop()
-//        } catch (e: Exception) {
-//            Log.e(TAG, "stopPlayMusic: ", e)
-//        }
+    public void cancelRequestSeat(ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance().cancelRequestSeat(new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        //取消成功
+                        callback.onResult(true, "");
+                        //发送通知，当前为取消状态，去刷新Ui
+                        roomEventSubject.onNext(new Pair<>(EVENT_REQUEST_SEAT_CANCEL, new ArrayList<>()));
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        //取消失败
+                        callback.onResult(false, s);
+                    }
+                });
+            }
+        }).subscribe());
     }
 
+
     /**
-     * 根据ID获取当前的麦位信息
+     * 同意上麦
+     */
+    public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                int availableIndex = getAvailableIndex();
+                if (availableIndex < 0) {
+                    showToast("房间麦位已满");
+                    return;
+                }
+                RCVoiceRoomEngine.getInstance()
+                        .acceptRequestSeat(userId, new RCVoiceRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                emitter.onComplete();
+                                callback.onResult(true, "");
+                            }
+
+                            @Override
+                            public void onError(int i, String s) {
+                                emitter.onError(new Throwable(s));
+                            }
+                        });
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe());
+    }
+
+
+    /**
+     * 邀请上麦
      *
      * @param userId
-     * @return
+     * @param callback
      */
-    public UiSeatModel getSeatInfoByUserId(String userId) {
-        if (TextUtils.isEmpty(userId)) {
-            return null;
-        }
-        for (UiSeatModel uiSeatModel : uiSeatModels) {
-            if (!TextUtils.isEmpty(uiSeatModel.getUserId())&&uiSeatModel.getUserId().equals(userId)) {
-                return uiSeatModel;
+    public void clickInviteSeat(String userId, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                if (getAvailableIndex() < 0) {
+                    emitter.onError(new Throwable("麦位已满"));
+                    return;
+                }
+                RCVoiceRoomEngine.getInstance().pickUserToSeat(userId, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        //邀请成功,集合会跟着变化
+                        emitter.onComplete();
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        emitter.onError(new Throwable(s));
+                    }
+                });
             }
-        }
-        return null;
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        callback.onResult(true, "邀请成功");
+                    }
+                }).doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        callback.onResult(false, throwable.getMessage());
+                    }
+                }).subscribe());
     }
 
     /**
-     * 当房间人员变化的时候监听
-     * @param users
+     * 踢出去房间
+     *
+     * @param user
+     * @param callback
      */
-    public void onMemberListener(List<User> users) {
-        //只要不在麦位的人都可以被邀请
-        inviteSeats.clear();
-        for (User user : users) {
-            boolean isInSeat=false;
-            for (UiSeatModel uiSeatModel : uiSeatModels) {
-                if ((!TextUtils.isEmpty(uiSeatModel.getUserId())&&uiSeatModel.getUserId().equals(user.getUserId()))
-                        ||user.getUserId().equals(AccountStore.INSTANCE.getUserId())){
-                    isInSeat=true;
-                    break;
-                }
+    public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        //踢出房间成功以后，要发送消息给被踢出的人
+                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(currentUIRoomInfo.getRoomBean().getRoomId(),
+                                new RCChatroomKickOut(),
+                                true,
+                                new Function1<Integer, Unit>() {
+                                    @Override
+                                    public Unit invoke(Integer integer) {
+                                        //成功
+                                        emitter.onComplete();
+                                        return null;
+                                    }
+                                }
+                                , new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
+                                    @Override
+                                    public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
+                                        //失败
+                                        emitter.onError(new Throwable(coreErrorCode + ""));
+                                        return null;
+                                    }
+                                }
+                        );
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        emitter.onError(new Throwable(s));
+                    }
+                });
             }
-            if (!isInSeat){
-                inviteSeats.add(user);
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        callback.onResult(true, "");
+                    }
+                }).doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        callback.onResult(false, throwable.getMessage());
+                    }
+                }).subscribe());
+    }
+
+    /**
+     * 抱下麦
+     *
+     * @param user
+     * @param callback
+     */
+    public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance().kickUserFromSeat(user.getUserId(), new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        emitter.onComplete();
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        emitter.onError(new Throwable(s));
+                    }
+                });
+            }
+        }).doOnComplete(new Action() {
+            @Override
+            public void run() throws Throwable {
+                callback.onResult(true, "");
+            }
+        }).doOnError(new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Throwable {
+                callback.onResult(false, throwable.getMessage());
+            }
+        }).subscribe());
+    }
+
+
+    /**
+     * 座位禁麦，根据点击的位置来禁止
+     */
+    public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance()
+                        .muteSeat(index, isMute, new RCVoiceRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                //座位禁麦成功
+                                emitter.onComplete();
+                                if (isMute) {
+                                    EToast.showToast("此麦位已闭麦");
+                                } else {
+                                    EToast.showToast("已取消闭麦");
+                                }
+                            }
+
+                            @Override
+                            public void onError(int i, String s) {
+                                //座位禁麦失败
+                                emitter.onError(new Throwable(s));
+                            }
+                        });
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        callback.onResult(false, throwable.getMessage());
+                    }
+                }).doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        callback.onResult(true, "");
+                    }
+                }).subscribe());
+    }
+
+    /**
+     * 根据麦位的位置去关闭座位
+     */
+    public void clickCloseSeatByIndex(int index, boolean isClose, ClickCallback<Boolean> callback) {
+        addSubscription(Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance().lockSeat(index, isClose, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        //锁座位成功
+                        emitter.onComplete();
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        //锁座位失败
+                        emitter.onError(new Throwable(s));
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        callback.onResult(false, throwable.getMessage());
+                    }
+                }).doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Throwable {
+                        callback.onResult(true, "");
+                    }
+                }).subscribe());
+    }
+
+    /**
+     * 上麦
+     */
+    public void enterSeatIfAvailable() {
+        RCVoiceRoomEngine.getInstance()
+                .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+        int availableIndex = getAvailableIndex();
+        if (availableIndex > 0) {
+            RCVoiceRoomEngine
+                    .getInstance()
+                    .enterSeat(availableIndex, new RCVoiceRoomCallback() {
+                        @Override
+                        public void onSuccess() {
+                            EToast.showToast("上麦成功");
+                            AudioManagerUtil.INSTANCE.choiceAudioModel();
+                        }
+
+                        @Override
+                        public void onError(int code, String message) {
+                            EToast.showToast(message);
+                        }
+                    });
+        } else {
+            EToast.showToast("当前没有空余的麦位");
+        }
+    }
+
+    /**
+     * 自己是否已经在麦位上了
+     *
+     * @return
+     */
+    public boolean userInSeat() {
+        for (UiSeatModel currentSeat : uiSeatModels) {
+            if (currentSeat.getUserId() != null && currentSeat.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                return true;
             }
         }
-        obInviteSeatListChangeSuject.onNext(inviteSeats);
+        return false;
+    }
+
+    /**
+     * 位置是否有效
+     *
+     * @return
+     */
+    public int getAvailableIndex() {
+        for (int i = 0; i < uiSeatModels.size(); i++) {
+            UiSeatModel uiSeatModel = uiSeatModels.get(i);
+            if (uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty && i != 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 拒绝邀请
+     */
+    public void refuseInvite(String userId) {
+        RCVoiceRoomEngine.getInstance()
+                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+    }
+
+    /**
+     * 房主控制自己上麦和下麦
+     */
+    public Completable creatorMuteSelf() {
+        UiSeatModel seatInfoByUserId = getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
+        boolean isMute = !seatInfoByUserId.isMute();
+        return Completable.create(new CompletableOnSubscribe() {
+            @Override
+            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+                RCVoiceRoomEngine.getInstance().disableAudioRecording(isMute);
+                RCVoiceRoomEngine.getInstance().muteSeat(0, isMute, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        emitter.onComplete();
+                        if (isMute) {
+                            EToast.showToast("此麦位已闭麦");
+                        } else {
+                            EToast.showToast("已取消闭麦");
+                        }
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        emitter.onError(new Throwable(s));
+                    }
+                });
+                //主播禁麦自己
+                if (isMute) {//关闭耳返
+                    RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(false);
+                } else {//根据缓存状态恢复耳返
+                    boolean enable = SharedPreferUtil.getBoolean("key_earMonitoring_" + present.getmVoiceRoomBean().getRoomId());
+                    RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(enable);
+                }
+            }
+        }).subscribeOn(dataModifyScheduler)
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }

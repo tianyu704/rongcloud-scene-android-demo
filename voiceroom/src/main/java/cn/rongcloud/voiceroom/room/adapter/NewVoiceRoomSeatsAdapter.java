@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.room.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.common.ui.widget.WaveView;
+import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 
@@ -59,6 +62,7 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
     public void refreshIndex(int index, UiSeatModel uiSeatModel) {
         if (seatData.get(index) != null) {
             seatData.set(index, uiSeatModel);
+            Log.e("TAG", "refreshIndex: "+index+":"+uiSeatModel.isSpeaking() );
             notifyDataSetChanged();
         }
     }
@@ -82,7 +86,7 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
                 holder.tv_member_name.setVisibility(View.VISIBLE);
                 holder.tv_gift_count.setVisibility(View.VISIBLE);
                 holder.iv_user_portrait.setBackgroundResource(R.drawable.bg_voice_room_portrait);
-                if (uiSeatModel.isSpeaking()) {
+                if (uiSeatModel.isSpeaking()&&!uiSeatModel.isMute()) {
                     holder.wv_seat_background.start();
                 } else {
                     holder.wv_seat_background.stop();
@@ -91,7 +95,9 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
                 holder.iv_user_portrait.setTag(uiSeatModel.getPortrait());
                 holder.iv_is_mute.setVisibility(uiSeatModel.isMute() ? View.VISIBLE : View.GONE);
                 holder.iv_seat_status.setVisibility(View.GONE);
-                holder.tv_member_name.setText(uiSeatModel.getUserName());
+                //TODO 这里一下子如果拿不到怎么办
+                User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
+                holder.tv_member_name.setText(member!=null?member.getUserName():"");
                 holder.tv_gift_count.setText(uiSeatModel.getGiftCount()+"");
                 if (uiSeatModel.isAdmin()) {
                     holder.tv_member_name.setCompoundDrawablesWithIntrinsicBounds(

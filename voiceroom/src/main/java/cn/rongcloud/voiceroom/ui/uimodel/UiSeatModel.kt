@@ -4,8 +4,10 @@
 
 package cn.rongcloud.voiceroom.ui.uimodel
 
+import android.util.Log
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlin.math.log
 
 /**
  * @author gusd
@@ -21,6 +23,11 @@ class UiSeatModel constructor(
      * 记录上次通话状态，防止频繁触发
      */
     private var preSpeakingStatus: Boolean? = null
+
+    init {
+        //首次通话状态位
+        preSpeakingStatus=seatModel.isSpeaking;
+    }
 
     var member: UiMemberModel? = null
         set(value) {
@@ -67,6 +74,7 @@ class UiSeatModel constructor(
             return seatModel.isSpeaking
         }
         set(value) {
+            seatModel.isSpeaking=value;
             if (preSpeakingStatus != value) {
                 preSpeakingStatus = value
                 seatInfoChangeSubject.onNext(this)

@@ -383,9 +383,11 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
 //        //绑定出发的view
 //        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
         //直接使用imkit里面的代码
+        audioRecordManager = AudioRecordManager()
         iv_send_voice_message_id.setOnTouchListener(mOnVoiceBtnTouchListener)
         Log.e(TAG, "initRoleView: ")
     }
+    private var audioRecordManager: AudioRecordManager? = null
 
     private var mConversationType: Conversation.ConversationType =
         Conversation.ConversationType.PRIVATE;
@@ -423,17 +425,17 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
             ) {
                 return@OnTouchListener true
             }
-            AudioRecordManager.getInstance().startRecord(v.rootView, mConversationType, roomId)
+            audioRecordManager?.startRecord(v.rootView, mConversationType, roomId)
         } else if (event.action == MotionEvent.ACTION_MOVE) {
             if (event.rawX <= 0 || event.rawX > x + v.width || event.rawY < y) {
-                AudioRecordManager.getInstance().willCancelRecord()
+                audioRecordManager?.willCancelRecord()
             } else {
-                AudioRecordManager.getInstance().continueRecord()
+                audioRecordManager?.continueRecord()
             }
         } else if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
             Log.e(TAG, ":ACTION_UP ")
             v.getParent().requestDisallowInterceptTouchEvent(false)
-            AudioRecordManager.getInstance().stopRecord()
+            audioRecordManager?.stopRecord()
         }
 //        if (mConversationType == Conversation.ConversationType.PRIVATE) {
 //            RongIMClient.getInstance().sendTypingStatus(mConversationType, roomId, "RC:VcMsg")

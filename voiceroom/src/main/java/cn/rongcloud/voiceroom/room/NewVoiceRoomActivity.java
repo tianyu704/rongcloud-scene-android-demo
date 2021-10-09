@@ -2,6 +2,7 @@ package cn.rongcloud.voiceroom.room;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
@@ -30,10 +31,13 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.messager.RCMessager;
+import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.rong.imkit.picture.tools.ToastUtils;
+import io.rong.imkit.utils.StatusBarUtil;
+import io.rong.imkit.utils.SystemBarTintManager;
 
 /**
  * @author 李浩  语聊房重构
@@ -51,6 +55,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
         intent.putExtra(KEY_ROOM_POSITION, position);
         activity.startActivity(intent);
     }
+
 
     @Override
     protected void initRoom() {

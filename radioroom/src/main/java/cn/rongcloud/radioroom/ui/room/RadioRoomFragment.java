@@ -22,6 +22,7 @@ import java.util.List;
 
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
@@ -154,7 +155,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         // 设置房主麦位信息
         mRoomSeatView.setData(voiceRoomBean.getCreateUserName(), voiceRoomBean.getCreateUserPortrait());
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), this);
+        mRoomBottomView.setData(getRoomOwnerType(), this,voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
     }
@@ -360,6 +361,15 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void onSendGift() {
+
+    }
+
+    /**
+     * 松手发送语音消息
+     * @param rcChatroomVoice
+     */
+    @Override
+    public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
 
     }
 

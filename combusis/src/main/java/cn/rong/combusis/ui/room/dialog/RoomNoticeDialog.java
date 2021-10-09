@@ -44,8 +44,18 @@ public class RoomNoticeDialog extends Dialog {
         onWindowAttributesChanged(wl);
     }
 
-    public void show(String notice, boolean isEdit, OnSaveNoticeListener confirmListener) {
+    /**
+     * 公告信息与展示分离
+     * @param notice
+     */
+    public void setNotice(String notice){
         mNoticeView.setText(notice);
+    }
+
+    public void show(String notice, boolean isEdit, OnSaveNoticeListener confirmListener) {
+        if (!TextUtils.isEmpty(notice)){
+            mNoticeView.setText(notice);
+        }
         if (isEdit) {
             mTitleView.setText("修改房间公告");
             mNoticeView.setFocusable(true);

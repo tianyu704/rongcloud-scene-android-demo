@@ -84,18 +84,15 @@ public class AudioRecordManager implements Handler.Callback {
     private TextView mTimerTV;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private AudioRecordManager() {
+    public AudioRecordManager() {
         RLog.d(TAG, "AudioRecordManager");
         mHandler = new Handler(Looper.getMainLooper(), this);
         mCurAudioState = idleState;
         idleState.enter();
     }
 
-    public static AudioRecordManager getInstance() {
-        return SingletonHolder.sInstance;
-    }
 
-    @Override
+  @Override
     final public boolean handleMessage(android.os.Message msg) {
         RLog.i(TAG, "handleMessage " + msg.what);
         switch (msg.what) {
@@ -406,38 +403,24 @@ public class AudioRecordManager implements Handler.Callback {
                         rcvrVoiceMessage.setPath(path);
                         rcvrVoiceMessage.setUserName(AccountStore.INSTANCE.getUserName());
                         rcvrVoiceMessage.setUserId(AccountStore.INSTANCE.getUserId());
-                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mTargetId, rcvrVoiceMessage, true, new Function1<Integer, Unit>() {
-                            @Override
-                            public Unit invoke(Integer integer) {
-                                //成功
-                                return null;
-                            }
-                        }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
-                            @Override
-                            public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
-                                //失败
-                                return null;
-                            }
-                        });
-//                        RongCoreClient.getInstance().sendMessage(Conversation.ConversationType.CHATROOM, mTargetId, rcvrVoiceMessage, null, null, new IRongCoreCallback.ISendMessageCallback() {
+                        if (onSendVoiceMessageClickListener!=null){
+                            onSendVoiceMessageClickListener.onSendVoiceMessage(rcvrVoiceMessage);
+                        }
+//                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mTargetId, rcvrVoiceMessage, true, new Function1<Integer, Unit>() {
 //                            @Override
-//                            public void onAttached(Message message) {
-//
+//                            public Unit invoke(Integer integer) {
+//                                //成功
+//                                return null;
 //                            }
-//
+//                        }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
 //                            @Override
-//                            public void onSuccess(Message message) {
-//                                Log.e(TAG, "onSuccess: " );
-//                            }
-//
-//                            @Override
-//                            public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-//                                Log.e(TAG, "onError: ");
+//                            public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
+//                                //失败
+//                                return null;
 //                            }
 //                        });
                     } else {
                         Log.e(TAG, "onResult: ");
-//                        ToastUtils.s(mContext, result.getMessage());
                     }
                 }
             });
@@ -541,9 +524,9 @@ public class AudioRecordManager implements Handler.Callback {
         }
     }
 
-    static class SingletonHolder {
-        static AudioRecordManager sInstance = new AudioRecordManager();
-    }
+//    static class SingletonHolder {
+//        static AudioRecordManager sInstance = new AudioRecordManager();
+//    }
 
     class IdleState extends IAudioState {
         public IdleState() {
@@ -764,6 +747,16 @@ public class AudioRecordManager implements Handler.Callback {
                     break;
             }
         }
+    }
+    private OnSendVoiceMessageClickListener onSendVoiceMessageClickListener;
+
+    public void setOnSendVoiceMessageClickListener(OnSendVoiceMessageClickListener onSendVoiceMessageClickListener){
+        this.onSendVoiceMessageClickListener=onSendVoiceMessageClickListener;
+    }
+
+    public interface OnSendVoiceMessageClickListener{
+
+        void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice);
     }
 
     abstract class IAudioState {

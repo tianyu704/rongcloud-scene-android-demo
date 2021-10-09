@@ -113,7 +113,7 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
 
     //座位的关闭和打开
     private void closeOrOpenSeat() {
-        newVoiceRoomModel.present.clickCloseSeatByIndex(uiSeatModel.getIndex(),
+        newVoiceRoomModel.clickCloseSeatByIndex(uiSeatModel.getIndex(),
                 uiSeatModel.getSeatStatus() != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking,
                 new ClickCallback<Boolean>() {
                     @Override

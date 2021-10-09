@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"/>
 
     <cn.rong.combusis.ui.room.widget.RoomBottomView
         android:id="@+id/room_bottom_view"
@@ -23,7 +23,8 @@
         android:id="@+id/room_title_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="25dp"/>
 
     <TextView
         android:id="@+id/tv_notice"

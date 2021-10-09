@@ -16,6 +16,8 @@ import com.rongcloud.common.extension.ExtensKt;
 import java.util.List;
 
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel;
@@ -98,6 +100,17 @@ public class InviteSeatFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         //开始执行邀请逻辑
+                        newVoiceRoomModel.clickInviteSeat(uiMemberModel.getUserId(), new ClickCallback<Boolean>() {
+                            @Override
+                            public void onResult(Boolean result, String msg) {
+                                if (result) {
+                                    ((SeatOperationViewPagerFragment) getParentFragment()).dismiss();
+                                    EToast.showToast("已邀请上麦");
+                                } else {
+                                    EToast.showToast(msg);
+                                }
+                            }
+                        });
                     }
                 });
             }

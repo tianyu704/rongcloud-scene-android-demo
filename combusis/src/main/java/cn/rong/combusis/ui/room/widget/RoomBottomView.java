@@ -1,5 +1,6 @@
 package cn.rong.combusis.ui.room.widget;
 
+import android.Manifest;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -20,15 +21,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentActivity;
 
 import com.kit.utils.Logger;
 import com.vanniktech.emoji.EmojiPopup;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.utils.SoftKeyboardUtils;
+import cn.rong.combusis.manager.AudioPlayManager;
+import cn.rong.combusis.manager.AudioRecordManager;
+import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.widget.like.FavAnimation;
+import io.rong.imkit.utils.PermissionCheckUtil;
+import io.rong.imkit.utils.RongUtils;
+import io.rong.imlib.IMLibExtensionModuleManager;
+import io.rong.imlib.model.Conversation;
+import io.rong.imlib.model.HardwareResource;
 
 /**
  * @author gyn
@@ -106,6 +116,7 @@ public class RoomBottomView extends ConstraintLayout {
 //    private RecordVoicePopupWindow
 
     private OnBottomOptionClickListener mOnBottomOptionClickListener;
+    private AudioRecordManager audioRecordManager;
 
     public RoomBottomView(@NonNull Context context) {
         this(context, null);
@@ -191,26 +202,81 @@ public class RoomBottomView extends ConstraintLayout {
             }
         });
         mGestureDetector.setIsLongpressEnabled(false);
-        // 语音
-//        recordVoicePopupWindow?.bindView(iv_send_voice_message_id)
-        mSendVoiceMassageView.setOnClickListener(v -> {
-
+        audioRecordManager = new AudioRecordManager();
+        audioRecordManager.setOnSendVoiceMessageClickListener(new AudioRecordManager.OnSendVoiceMessageClickListener() {
+            @Override
+            public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
+                mOnBottomOptionClickListener.onSendVoiceMessage(rcChatroomVoice);
+            }
         });
+        // 语音
+        mSendVoiceMassageView.setOnTouchListener(onTouchListener);
     }
+
+    private OnTouchListener onTouchListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            String[] permissions = {Manifest.permission.RECORD_AUDIO};
+            if (!PermissionCheckUtil.checkPermissions(
+                    v.getContext(),
+                    permissions
+            ) && event.getAction() == MotionEvent.ACTION_DOWN
+            ) {
+                PermissionCheckUtil.requestPermissions(
+                        ((FragmentActivity) v.getContext()),
+                        permissions,
+                        PermissionCheckUtil.REQUEST_CODE_ASK_PERMISSIONS
+                );
+                return true;
+            }
+            int[] location = new int[2];
+            mSendVoiceMassageView.getLocationOnScreen(location);
+            int x = location[0];
+            int y = location[1];
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                //在这里拦截外部的滑动事件
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                if (AudioPlayManager.getInstance().isPlaying()) {
+                    AudioPlayManager.getInstance().stopPlay();
+                }
+                //判断正在视频通话和语音通话中不能进行语音消息发送
+                if (RongUtils.phoneIsInUse(v.getContext()) || IMLibExtensionModuleManager.getInstance()
+                        .onRequestHardwareResource(HardwareResource.ResourceType.VIDEO)
+                        || IMLibExtensionModuleManager.getInstance()
+                        .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO)
+                ) {
+                    return true;
+                }
+                audioRecordManager.startRecord(v.getRootView(), Conversation.ConversationType.PRIVATE, roomId);
+            } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                if (event.getRawX() <= 0 || event.getRawX() > x + v.getWidth() || event.getRawY() < y) {
+                    audioRecordManager.willCancelRecord();
+                } else {
+                    audioRecordManager.continueRecord();
+                }
+            } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                v.getParent().requestDisallowInterceptTouchEvent(false);
+                audioRecordManager.stopRecord();
+            }
+            return true;
+        }
+    };
 
     /**
      * 设置麦位申请人数
+     *
      * @param number
      */
-    public void setmSeatOrderNumber(int number){
-        if (number>0){
-            mSeatOrderNumber.setText(number+"");
+    public void setmSeatOrderNumber(int number) {
+        if (number > 0) {
+            mSeatOrderNumber.setText(number + "");
             mSeatOrderNumber.setVisibility(VISIBLE);
-        }else {
+        } else {
             mSeatOrderNumber.setVisibility(GONE);
         }
 
     }
+
     /**
      * 显示礼物动画
      *
@@ -248,8 +314,9 @@ public class RoomBottomView extends ConstraintLayout {
     public void clearInput() {
         mInputView.setText("");
     }
-
-    public void setData(RoomOwnerType roomOwnerType, OnBottomOptionClickListener onBottomOptionClickListener) {
+    private String roomId;
+    public void setData(RoomOwnerType roomOwnerType, OnBottomOptionClickListener onBottomOptionClickListener,String roomId) {
+        this.roomId=roomId;
         setViewState(roomOwnerType);
         this.mOnBottomOptionClickListener = onBottomOptionClickListener;
         if (onBottomOptionClickListener != null) {
@@ -342,5 +409,7 @@ public class RoomBottomView extends ConstraintLayout {
         void clickRequestSeat();
 
         void onSendGift();
+
+        void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice);
     }
 }

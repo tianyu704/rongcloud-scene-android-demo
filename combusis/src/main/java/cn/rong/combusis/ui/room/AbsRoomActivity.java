@@ -1,6 +1,7 @@
 package cn.rong.combusis.ui.room;
 
 import android.text.TextUtils;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
@@ -11,6 +12,7 @@ import com.kit.utils.Logger;
 import java.util.List;
 
 import cn.rong.combusis.R;
+import io.rong.imkit.utils.StatusBarUtil;
 
 
 /**
@@ -31,6 +33,7 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     @Override
     public void init() {
+        StatusBarUtil.setTranslucentStatus(this);
         initRoom();
         getWrapBar().setHide(true).work();
         // 初始化viewpager并设置数据和监听

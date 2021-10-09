@@ -36,6 +36,8 @@ public class RoomSeatView extends ConstraintLayout {
     private AppCompatButton mBtnContinue;
     private ConstraintLayout mClViewerPause;
 
+    private RoomOwnerHeadOnclickListener roomOwnerHeadOnclickListener;
+
     public RoomSeatView(@NonNull Context context) {
         this(context, null);
     }
@@ -44,6 +46,27 @@ public class RoomSeatView extends ConstraintLayout {
         super(context, attrs);
         mRootView = LayoutInflater.from(context).inflate(R.layout.view_room_seat, this);
         initView();
+        initListener();
+    }
+
+    /**
+     *
+     */
+    private void initListener() {
+        mPortraitView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                roomOwnerHeadOnclickListener.onClick();
+            }
+        });
+    }
+
+    /**
+     * 当点击头像的时候
+     * @param roomOwnerHeadOnclickListener
+     */
+    public void setRoomOwnerHeadOnclickListener(RoomOwnerHeadOnclickListener roomOwnerHeadOnclickListener){
+        this.roomOwnerHeadOnclickListener=roomOwnerHeadOnclickListener;
     }
 
     private void initView() {
@@ -94,6 +117,7 @@ public class RoomSeatView extends ConstraintLayout {
      */
     public void setSpeaking(boolean isSpeaking) {
         if (isMute) {
+            mWaveView.stop();
             return;
         }
         if (isSpeaking) {
@@ -138,5 +162,9 @@ public class RoomSeatView extends ConstraintLayout {
         OWNER_PAUSE,
         VIEWER_PAUSE,
         NORMAL
+    }
+
+    public interface RoomOwnerHeadOnclickListener{
+        void onClick();
     }
 }

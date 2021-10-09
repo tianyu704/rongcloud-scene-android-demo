@@ -1,8 +1,8 @@
 package cn.rongcloud.voiceroom.room;
 
-import static cn.rong.combusis.sdk.Api.EVENT_AGREE_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
+import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
 import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 
@@ -19,6 +19,7 @@ import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
+import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
@@ -27,35 +28,41 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomAdmin;
+import cn.rong.combusis.message.RCChatroomBarrage;
+import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.message.RCChatroomGift;
+import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomKickOut;
+import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.message.RCChatroomSeats;
+import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import cn.rongcloud.voiceroom.room.dialogFragment.NewCreatorSettingFragment;
 import cn.rongcloud.voiceroom.room.dialogFragment.NewEmptySeatFragment;
 import cn.rongcloud.voiceroom.room.dialogFragment.NewSelfSettingFragment;
+import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.NewRevokeSeatRequestFragment;
 import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.SeatOperationViewPagerFragment;
+import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Completable;
-import io.reactivex.rxjava3.core.CompletableEmitter;
-import io.reactivex.rxjava3.core.CompletableOnSubscribe;
-import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 
@@ -72,16 +79,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 语聊房model
      */
     private NewVoiceRoomModel newVoiceRoomModel;
-
-    private List<UiSeatModel> currentSeats = new ArrayList<>();
-
+    /**
+     * 房间信息
+     */
     private VoiceRoomBean mVoiceRoomBean;
 
-    public void setmVoiceRoomBean(VoiceRoomBean mVoiceRoomBean) {
-        this.mVoiceRoomBean = mVoiceRoomBean;
-    }
+    private ConfirmDialog confirmDialog;
 
     public int currentStatus = STATUS_NOT_ON_SEAT;
+    private List<Shield> shields;
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -124,7 +130,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public boolean onReceived(Message message, int i) {
-        if (mVoiceRoomBean!=null&& TextUtils.isEmpty(mVoiceRoomBean.getRoomId())){
+        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(mVoiceRoomBean.getRoomId(), message.getContent());
         }
         return true;
@@ -139,7 +145,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     public void setCurrentRoom(VoiceRoomBean mVoiceRoomBean) {
         this.mVoiceRoomBean = mVoiceRoomBean;
         //界面初始化成功的时候，要去请求网络
-        newVoiceRoomModel.getRoomInfo(getmVoiceRoomBean().getRoomId());
+        newVoiceRoomModel.getRoomInfo(getmVoiceRoomBean().getRoomId()).subscribe();
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
         //监听房间里面的人
         MemberCache.getInstance().getMemberList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<User>>() {
@@ -148,6 +154,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 newVoiceRoomModel.onMemberListener(users);
             }
         });
+        //获取屏蔽词
+        getShield();
         setObMessageListener();
     }
 
@@ -165,8 +173,50 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         setObSeatListChange();
         setObRoomEventChange();
         setRequestSeatListener();
+        setObSeatInfoChange();
+        setObRoomInfoChange();
     }
 
+
+    /**
+     * 监听房间的信息
+     */
+    private void setObRoomInfoChange() {
+        addSubscription(newVoiceRoomModel.obRoomInfoChange()
+                .subscribe(new Consumer<UiRoomModel>() {
+                    @Override
+                    public void accept(UiRoomModel uiRoomModel) throws Throwable {
+                        String extra = "";
+                        if (uiRoomModel.getRcRoomInfo() != null) {
+                            extra = uiRoomModel.getRcRoomInfo().getExtra();
+                        }
+                        String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
+                        mView.showNotice(notice, false);
+                    }
+                }));
+    }
+
+    /**
+     * 麦位信息改变监听
+     */
+    private void setObSeatInfoChange() {
+        addSubscription(newVoiceRoomModel.obSeatInfoChange().subscribe(new Consumer<UiSeatModel>() {
+            @Override
+            public void accept(UiSeatModel uiSeatModel) throws Throwable {
+                //根据位置去刷新波纹
+                int index = uiSeatModel.getIndex();
+                if (index == 0) {
+                    mView.refreshRoomOwner(uiSeatModel);
+                } else {
+                    mView.refreshSeatIndex(index - 1, uiSeatModel);
+                }
+            }
+        }));
+    }
+
+    /**
+     * 设置请求上麦监听
+     */
     private void setRequestSeatListener() {
         newVoiceRoomModel.obRequestSeatListChange()
                 .subscribe(new Consumer<List<User>>() {
@@ -187,6 +237,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 .subscribe(new Consumer<MessageContent>() {
                     @Override
                     public void accept(MessageContent messageContent) throws Throwable {
+                        //将消息显示到列表上
+                        Class<? extends MessageContent> aClass = messageContent.getClass();
+                        if (RCChatroomVoice.class.equals(aClass) || RCChatroomLocationMessage.class.equals(aClass)
+                                || RCChatroomVoice.class.equals(aClass) || RCChatroomBarrage.class.equals(aClass)
+                                || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
+                                || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
+                                || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
+                            mView.showMessage(messageContent, false);
+                        }
                         Log.e("TAG", "accept: " + messageContent);
                     }
                 });
@@ -201,7 +260,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void enterSeatViewer(int position) {
         //判断是否在麦位上
-        if (userInSeat()) {
+        if (newVoiceRoomModel.userInSeat()) {
             //在麦位上
             RCVoiceRoomEngine.getInstance().switchSeatTo(position, new RCVoiceRoomCallback() {
                 @Override
@@ -225,7 +284,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             if (newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
                 int index = position;
                 if (index == -1) {
-                    index = getAvailableIndex();
+                    index = newVoiceRoomModel.getAvailableIndex();
                 }
                 if (index == -1) {
                     mView.showToast("当前麦位已满");
@@ -268,25 +327,24 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param position
      */
     public void enterSeatOwner(UiSeatModel seatModel, int position) {
-        if (seatModel.getSeatStatus()==RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty||seatModel.getSeatStatus()==
-                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking){
+        if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty || seatModel.getSeatStatus() ==
+                RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
             //如果当前是空座位或者是上锁的座位
-            new NewEmptySeatFragment(seatModel,mVoiceRoomBean.getRoomId(),newVoiceRoomModel).show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
-        }else if (seatModel.getSeatStatus()==RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+            new NewEmptySeatFragment(seatModel, mVoiceRoomBean.getRoomId(), newVoiceRoomModel).show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
+        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
+            //如果座位正在使用中
 
         }
     }
 
     /**
-     * 监听麦位数量
+     * 监听麦位改变
      */
     private void setObSeatListChange() {
         addSubscription(newVoiceRoomModel.obSeatListChange().subscribe(new Consumer<List<UiSeatModel>>() {
             @Override
             public void accept(List<UiSeatModel> uiSeatModels) throws Throwable {
                 mView.onSeatListChange(uiSeatModels);
-                currentSeats.clear();
-                currentSeats.addAll(uiSeatModels);
             }
         }));
     }
@@ -303,7 +361,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     case EVENT_REQUEST_SEAT_AGREE://请求麦位被允许
                         currentStatus = STATUS_NOT_ON_SEAT;
                         //加入麦位
-                        enterSeatIfAvailable();
+                        newVoiceRoomModel.enterSeatIfAvailable();
                         //去更改底部的状态显示按钮
                         mView.changeStatus(currentStatus);
                         break;
@@ -316,79 +374,75 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     case EVENT_KICK_OUT_OF_SEAT: //被抱下麦
                         mView.showToast("您已被抱下麦位");
                         break;
+                    case EVENT_REQUEST_SEAT_CANCEL://撤销麦位申请
+                        currentStatus = STATUS_NOT_ON_SEAT;
+                        mView.changeStatus(currentStatus);
+                        break;
                 }
             }
         }));
     }
 
-    /**
-     * 上麦
-     */
-    public void enterSeatIfAvailable() {
-        RCVoiceRoomEngine.getInstance()
-                .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
-        int availableIndex = getAvailableIndex();
-        if (availableIndex > 0) {
-            RCVoiceRoomEngine
-                    .getInstance()
-                    .enterSeat(availableIndex, new RCVoiceRoomCallback() {
-                        @Override
-                        public void onSuccess() {
-                            mView.showToast("上麦成功");
-                            AudioManagerUtil.INSTANCE.choiceAudioModel();
-                        }
-
-                        @Override
-                        public void onError(int code, String message) {
-                            mView.showToast(message);
-                        }
-                    });
-        } else {
-            mView.showToast("当前没有空余的麦位");
-        }
-    }
 
     @Override
     public void onNetworkStatus(int i) {
         mView.onNetworkStatus(i);
     }
 
-    /**
-     * 房主
-     *
-     * @return
-     */
-    private boolean userInSeat() {
-        for (UiSeatModel currentSeat : currentSeats) {
-            if (currentSeat.getUserId() != null && currentSeat.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
-     * 位置是否有效
+     * 麦位上点击自己的头像
      *
+     * @param seatModel
+     * @param roomId
      * @return
      */
-    private int getAvailableIndex() {
-        for (int i = 0; i < currentSeats.size(); i++) {
-            UiSeatModel uiSeatModel = currentSeats.get(i);
-            if (uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty && i != 0) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public NewSelfSettingFragment showNewSelfSettingFragment(UiSeatModel seatModel, String roomId) {
         NewSelfSettingFragment newSelfSettingFragment = new NewSelfSettingFragment(seatModel, mVoiceRoomBean.getRoomId()
                 , newVoiceRoomModel);
         return newSelfSettingFragment;
     }
 
+    /**
+     * 房间所有者点击自己的头像
+     */
+    public void onClickRoomOwnerView(FragmentManager fragmentManager) {
+        UiSeatModel uiSeatModel = newVoiceRoomModel.getUiSeatModels().get(0);
+        if (uiSeatModel != null) {
+            if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                //如果在麦位上
+                NewCreatorSettingFragment newCreatorSettingFragment = new NewCreatorSettingFragment(newVoiceRoomModel, uiSeatModel);
+                newCreatorSettingFragment.show(fragmentManager);
+            } else {
+                //如果不在麦位上，直接上麦
+                roomOwnerEnterSeat();
+            }
+        }
+
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param messageContent
+     */
     public void sendMessage(MessageContent messageContent) {
+        //先判断是否包含了屏蔽词
+        boolean isContains = false;
+        if (shields != null) {
+            for (Shield shield : shields) {
+                if (messageContent.toString().contains(shield.getName())) {
+                    isContains = true;
+                    break;
+                }
+            }
+            if (isContains) {
+                //如果是包含了敏感词'
+                mView.showMessage(messageContent, false);
+                mView.clearInput();
+                return;
+            }
+        }
         RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), messageContent, true
                 , new Function1<Integer, Unit>() {
                     @Override
@@ -404,6 +458,30 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     }
                 });
     }
+
+    /**
+     * 设置屏蔽词
+     *
+     * @param shields
+     */
+    public void setShield(List<String> shields) {
+        Logger.e(shields.toString());
+    }
+
+    /**
+     * 获取屏蔽词
+     */
+    private void getShield() {
+        OkApi.get(VRApi.getShield(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    shields = result.getList(Shield.class);
+                }
+            }
+        });
+    }
+
 
     /**
      * 设置管理员
@@ -442,280 +520,54 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         });
     }
 
-    /**
-     * 同意上麦
-     */
-    public void acceptRequestSeat(String userId,ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@NonNull CompletableEmitter emitter) throws Throwable {
-                int availableIndex = getAvailableIndex();
-                if (availableIndex < 0) {
-                    showToast("房间麦位已满");
-                    return;
-                }
-                RCVoiceRoomEngine.getInstance()
-                        .acceptRequestSeat(userId, new RCVoiceRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-                                emitter.onComplete();
-                                callback.onResult(true,"");
-                            }
-
-                            @Override
-                            public void onError(int i, String s) {
-                                emitter.onError(new Throwable(s));
-                            }
-                        });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-    }
-
-    /**
-     * 邀请上麦
-     *
-     * @param user
-     * @param callback
-     */
     @Override
     public void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@NonNull CompletableEmitter emitter) throws Throwable {
-                if (getAvailableIndex() < 0) {
-                    emitter.onError(new Throwable("麦位已满"));
-                    return;
-                }
-                RCVoiceRoomEngine.getInstance().pickUserToSeat(user.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //邀请成功,集合会跟着变化
-                        emitter.onComplete();
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).subscribe());
+        newVoiceRoomModel.clickInviteSeat(user.getUserId(), callback);
     }
 
-    /**
-     * 踢出去房间
-     *
-     * @param user
-     * @param callback
-     */
     @Override
     public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //踢出房间成功以后，要发送消息给被踢出的人
-                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(),
-                                new RCChatroomKickOut(),
-                                true,
-                                new Function1<Integer, Unit>() {
-                                    @Override
-                                    public Unit invoke(Integer integer) {
-                                        //成功
-                                        emitter.onComplete();
-                                        return null;
-                                    }
-                                }
-                                , new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
-                                    @Override
-                                    public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
-                                        //失败
-                                        emitter.onError(new Throwable(coreErrorCode + ""));
-                                        return null;
-                                    }
-                                }
-                        );
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).subscribe());
+        newVoiceRoomModel.clickKickRoom(user, callback);
     }
 
-    /**
-     * 抱下麦
-     *
-     * @param user
-     * @param callback
-     */
     @Override
     public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().kickUserFromSeat(user.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        emitter.onComplete();
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).doOnComplete(new Action() {
-            @Override
-            public void run() throws Throwable {
-                callback.onResult(true, "");
-            }
-        }).doOnError(new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Throwable {
-                callback.onResult(false, throwable.getMessage());
-            }
-        }).subscribe());
+        newVoiceRoomModel.clickKickSeat(user, callback);
     }
 
 
     @Override
     public void clickMuteSeat(User user, ClickCallback<Boolean> callback) {
-        clickMuteSeatByUser(user,callback);
+        clickMuteSeatByUser(user, callback);
     }
 
     /**
-     *座位开麦或者闭麦，通过麦位的位置
+     * 座位开麦或者闭麦，通过麦位的位置
      */
-    public void clickMuteSeatByIndex(int index ,boolean isMute,ClickCallback<Boolean> callback){
-        clickMuteSeat(index,isMute,callback);
+    public void clickMuteSeatByIndex(int index, boolean isMute, ClickCallback<Boolean> callback) {
+        newVoiceRoomModel.clickMuteSeat(index, isMute, callback);
     }
+
     /**
-     *座位开麦或者闭麦，通过当前麦位的位置的用户
+     * 座位开麦或者闭麦，通过当前麦位的位置的用户
      */
-    public void clickMuteSeatByUser(User user,ClickCallback<Boolean> callback){
+    public void clickMuteSeatByUser(User user, ClickCallback<Boolean> callback) {
         UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
-        clickMuteSeat(uiSeatModel.getIndex(),!uiSeatModel.isMute(),callback);
+        newVoiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), callback);
     }
 
-    /**
-     * 座位禁麦，根据点击的位置来禁止
-     */
-    public void clickMuteSeat(int index, boolean isMute,ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance()
-                        .muteSeat(index, isMute, new RCVoiceRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-                                //座位禁麦成功
-                                emitter.onComplete();
-                                if (isMute) {
-                                    EToast.showToast("此麦位已闭麦");
-                                }else {
-                                    EToast.showToast("已取消闭麦");
-                                }
-                            }
-
-                            @Override
-                            public void onError(int i, String s) {
-                                //座位禁麦失败
-                                emitter.onError(new Throwable(s));
-                            }
-                        });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).subscribe());
-    }
 
     /**
      * 关闭座位(根据用户的ID去关闭)
+     *
      * @param user
      * @param callback
      */
-    public void clickCloseSeatByUser(User user,ClickCallback<Boolean> callback){
+    public void clickCloseSeatByUser(User user, ClickCallback<Boolean> callback) {
         UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
-        clickCloseSeatByIndex(uiSeatModel.getIndex(),true,callback);
+        newVoiceRoomModel.clickCloseSeatByIndex(uiSeatModel.getIndex(), true, callback);
     }
-    /**
-     * 根据麦位的位置去关闭座位
-     */
-    public void clickCloseSeatByIndex(int index, boolean isClose,ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().lockSeat(index, isClose, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //锁座位成功
-                        emitter.onComplete();
-                    }
 
-                    @Override
-                    public void onError(int i, String s) {
-                        //锁座位失败
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).subscribe());
-    }
     /**
      * 关闭座位(根据用户的ID去关闭)
      *
@@ -724,7 +576,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public void clickCloseSeat(User user, ClickCallback<Boolean> callback) {
-        clickCloseSeatByUser(user,callback);
+        clickCloseSeatByUser(user, callback);
     }
 
     /**
@@ -737,8 +589,138 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     }
 
+    /**
+     * 展示邀请和接受邀请fragment
+     *
+     * @param index
+     */
     public void showSeatOperationViewPagerFragment(int index) {
-        SeatOperationViewPagerFragment seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(newVoiceRoomModel,index);
+        SeatOperationViewPagerFragment seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(newVoiceRoomModel, index);
         seatOperationViewPagerFragment.show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
     }
+
+    /**
+     * 展示撤销麦位申请
+     */
+    public void showNewRevokeSeatRequestFragment() {
+        NewRevokeSeatRequestFragment newRevokeSeatRequestFragment = new NewRevokeSeatRequestFragment(newVoiceRoomModel);
+        newRevokeSeatRequestFragment.show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
+    }
+
+    /**
+     * 弹窗收到上麦邀请弹窗
+     *
+     * @param isCreate 是否是房主
+     * @param userId   邀请人的ID
+     */
+    public void showPickReceivedDialog(boolean isCreate, String userId) {
+        String pickName = isCreate ? "房主" : "管理员";
+        confirmDialog = new ConfirmDialog(((NewVoiceRoomFragment) mView).getActivity(),
+                "您被" + pickName + "邀请上麦，是否同意?", true,
+                "同意", "拒绝", new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                //拒绝
+                confirmDialog.dismiss();
+                newVoiceRoomModel.refuseInvite(userId);
+                return null;
+            }
+        }, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                //同意
+                newVoiceRoomModel.enterSeatIfAvailable();
+                confirmDialog.dismiss();
+                return null;
+            }
+        }
+        );
+        confirmDialog.show();
+    }
+
+
+    /**
+     * 调用离开房间
+     */
+    public void leaveRoom() {
+        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
+
+            @Override
+            public void onSuccess() {
+                Logger.e("==============leaveRoom onSuccess");
+                mView.dismissLoading();
+                mView.finish();
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                Logger.e("==============leaveRoom onError");
+                mView.dismissLoading();
+                mView.showToast(message);
+            }
+        });
+    }
+
+    /**
+     * 房主关闭房间
+     */
+    public void closeRoom() {
+        mView.showLoading("正在关闭房间");
+        // 房主关闭房间，调用删除房间接口
+        OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    leaveRoom();
+                } else {
+                    mView.dismissLoading();
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                mView.dismissLoading();
+                mView.showToast(msg);
+            }
+        });
+    }
+
+    /**
+     * 房主上麦
+     */
+    public void roomOwnerEnterSeat() {
+        RCVoiceRoomEngine.getInstance().enterSeat(0, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                AudioManagerUtil.INSTANCE.choiceAudioModel();
+                mView.enterSeatSuccess();
+            }
+
+            @Override
+            public void onError(int i, String message) {
+                mView.showToast(message);
+            }
+        });
+    }
+
+
+    /**
+     * 修改房间公告
+     *
+     * @param notice
+     */
+    public void modifyNotice(String notice) {
+//        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(IRCVoiceRoomEngine.);
+
+    }
+
+//    /**
+//     * 发送公告更新的
+//     */
+//    private void sendNoticeModifyMessage() {
+//        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
+//        tips.setContent("房间公告已更新！");
+////        mView.addToMessageList(tips, false);
+//    }
 }

@@ -6,7 +6,9 @@ import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_WAIT_FOR_
 
 import android.graphics.Color;
 import android.graphics.Point;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,15 +30,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
+import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
+import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
+import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -44,19 +53,27 @@ import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import cn.rongcloud.voiceroom.net.bean.respond.Member;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
-import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.SeatOperationViewPagerFragment;
+import cn.rongcloud.voiceroom.room.dialogFragment.NewCreatorSettingFragment;
+import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.NewRevokeSeatRequestFragment;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
+import io.rong.imkit.utils.RouteUtils;
+import io.rong.imkit.utils.StatusBarUtil;
+import io.rong.imlib.IRongCoreEnum;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 
 /**
  * @author 李浩
  * @date 2021/9/24
  */
 public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoiceRoomPresenter>
-        implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener, RoomBottomView.OnBottomOptionClickListener {
+        implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
+        RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener {
     private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -68,6 +85,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private RecyclerView rv_seat_list;
     private NewVoiceRoomSeatsAdapter voiceRoomSeatsAdapter;
     private MemberSettingFragment mMemberSettingFragment;
+    private ExitRoomPopupWindow mExitRoomPopupWindow;
+    private RoomNoticeDialog mNoticeDialog;
+    private MemberListFragment mMemberListFragment;
 
     public static Fragment getInstance() {
         return new NewVoiceRoomFragment();
@@ -80,8 +100,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void init() {
+        mNoticeDialog = new RoomNoticeDialog(getContext());
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
+        mRoomTitleBar.setOnMemberClickListener(v -> {
+            mMemberListFragment = new MemberListFragment(mVoiceRoomBean.getRoomId(), this);
+            mMemberListFragment.show(getChildFragmentManager());
+        });
+
         //麦位
         rv_seat_list = getView(R.id.rv_seat_list);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
@@ -96,17 +122,41 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         rv_seat_list.setAdapter(voiceRoomSeatsAdapter);
 
         mRoomTitleBar.setOnMenuClickListener(v -> {
-
+            clickMenu();
         });
+
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
             // TODO:公告弹框
-            Logger.e("click notice");
+            boolean isEdit = false;
+            if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+                isEdit = true;
+            } else {
+                isEdit = false;
+            }
+            mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+                @Override
+                public void saveNotice(String notice) {
+                    //修改公告信息
+                    present.modifyNotice(notice);
+                }
+            });
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
+
+        mRoomSeatView.setRoomOwnerHeadOnclickListener(new RoomSeatView.RoomOwnerHeadOnclickListener() {
+            @Override
+            public void onClick() {
+                //弹出
+                if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+                    //如果是房间所有者 ,如果在麦位上,那么弹出下麦和关闭麦克风弹窗，如果不在麦位上，那么直接上麦
+                    present.onClickRoomOwnerView(getChildFragmentManager());
+                }
+            }
+        });
         // 底部操作按钮和双击送礼物
         mRoomBottomView = getView(R.id.room_bottom_view);
         // 弹幕消息列表
@@ -118,18 +168,45 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     }
 
     /**
+     * 点击右上角菜单按钮
+     */
+    private void clickMenu() {
+        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
+            @Override
+            public void clickPackRoom() {
+                getActivity().finish();
+            }
+
+            @Override
+            public void clickLeaveRoom() {
+                // 观众离开房间
+                present.leaveRoom();
+            }
+
+            @Override
+            public void clickCloseRoom() {
+                // 房主关闭房间
+                present.closeRoom();
+            }
+        });
+        mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
+        mExitRoomPopupWindow.showAtLocation(mBackgroundImageView, Gravity.TOP, 0, 0);
+    }
+
+
+    /**
      * 麦位被点击的情况
      *
      * @param seatModel
      * @param position
      */
     private void onClickVoiceRoomSeats(UiSeatModel seatModel, int position) {
-        switch (getRoomOwnerType()){
+        switch (getRoomOwnerType()) {
             case VOICE_OWNER://房主
-                onClickVoiceRoomSeatsByOwner(seatModel,position);
+                onClickVoiceRoomSeatsByOwner(seatModel, position);
                 break;
             case VOICE_VIEWER://观众
-                onClickVoiceRoomSeatsByViewer(seatModel,position);
+                onClickVoiceRoomSeatsByViewer(seatModel, position);
                 break;
         }
 
@@ -137,6 +214,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 观众点击麦位的时候
+     *
      * @param seatModel
      * @param position
      */
@@ -161,7 +239,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
                 user.setUserName(seatModel.getUserName());
                 user.setPortrait(seatModel.getPortrait());
                 mMemberSettingFragment.setMemberIsOnSeat(true);
-                mMemberSettingFragment.setSeatPosition(position+1);
+                mMemberSettingFragment.setSeatPosition(position + 1);
                 mMemberSettingFragment.setMute(seatModel.isMute());
                 mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
             }
@@ -170,16 +248,17 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 房主点击麦位的时候
+     *
      * @param seatModel
      * @param position
      */
     private void onClickVoiceRoomSeatsByOwner(UiSeatModel seatModel, int position) {
         if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
-            ||seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+                || seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
             //点击空座位或者锁定座位的时候，弹出弹窗
-            present.enterSeatOwner(seatModel,position);
+            present.enterSeatOwner(seatModel, position);
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-           //弹窗设置弹窗
+            //弹窗设置弹窗
             // 点击别人头像
             if (mMemberSettingFragment == null) {
                 mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
@@ -189,7 +268,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             user.setUserName(seatModel.getUserName());
             user.setPortrait(seatModel.getPortrait());
             mMemberSettingFragment.setMemberIsOnSeat(true);
-            mMemberSettingFragment.setSeatPosition(position+1);
+            mMemberSettingFragment.setSeatPosition(position + 1);
             mMemberSettingFragment.setMute(seatModel.isMute());
             mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
         }
@@ -225,6 +304,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         });
     }
 
+
     @Override
     public NewVoiceRoomPresenter createPresent() {
         return new NewVoiceRoomPresenter(this, getLifecycle());
@@ -253,7 +333,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         }
     }
 
-    private void showMessage(MessageContent messageContent, boolean isRefresh) {
+    /**
+     * 显示消息
+     *
+     * @param messageContent
+     * @param isRefresh
+     */
+    @Override
+    public void showMessage(MessageContent messageContent, boolean isRefresh) {
         List<MessageContent> list = new ArrayList<>(1);
         if (messageContent != null) {
             list.add(messageContent);
@@ -287,6 +374,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
                 }
             });
         }
+        // 房主上麦
+        if (roomOwnerType == RoomOwnerType.VOICE_OWNER) {
+            present.roomOwnerEnterSeat();
+        }
         // 加载背景
         ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, mVoiceRoomBean.getBackgroundUrl(), R.color.black);
         // 设置title数据
@@ -295,10 +386,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         // 设置房主麦位信息
         mRoomSeatView.setData(mVoiceRoomBean.getCreateUserName(), mVoiceRoomBean.getCreateUserPortrait());
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), this);
+        mRoomBottomView.setData(getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(mVoiceRoomBean.getCreateUserId());
-//        mRoomMessageAdapter.setData();
+
         loadMemberData();
     }
 
@@ -322,25 +413,66 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         present.initListener();
     }
 
-//    @Override
-//    public void onSpeakingStateChanged(boolean isSpeaking) {
-//        Logger.e("==============onSpeakingStateChanged: " + isSpeaking);
-//        mRoomSeatView.setSpeaking(isSpeaking);
-//    }
-//
-//    @Override
-//    public void onMessageReceived(Message message) {
-//        Logger.e("==============onMessageReceived: " + message.toString());
-//        showMessage(message.getContent(), false);
-//        if (message.getContent() instanceof RCChatroomGift || message.getContent() instanceof RCChatroomGiftAll) {
-//
-//        }
-//    }
+    @Override
+    public void onSpeakingStateChanged(boolean isSpeaking) {
+        mRoomSeatView.setSpeaking(isSpeaking);
+    }
+
+    /**
+     * 刷新当前房主信息Ui
+     *
+     * @param uiSeatModel
+     */
+    @Override
+    public void refreshRoomOwner(UiSeatModel uiSeatModel) {
+        if (uiSeatModel == null) {
+            return;
+        }
+        if (TextUtils.isEmpty(uiSeatModel.getUserId())) {
+            mRoomSeatView.setData("", null);
+            mRoomSeatView.setSpeaking(false);
+            mRoomSeatView.setRoomOwnerMute(false);
+            mRoomSeatView.setGiftCount(0);
+        } else {
+            User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
+            mRoomSeatView.setData(member.getUserName(), member.getPortrait());
+            mRoomSeatView.setSpeaking(uiSeatModel.isSpeaking());
+            mRoomSeatView.setRoomOwnerMute(uiSeatModel.isMute());
+            mRoomSeatView.setGiftCount(uiSeatModel.getGiftCount());
+        }
+    }
+
+    /**
+     * 刷新当前麦位信息UI
+     *
+     * @param index
+     * @param uiSeatModel
+     */
+    @Override
+    public void refreshSeatIndex(int index, UiSeatModel uiSeatModel) {
+        mRoomSeatView.post(new Runnable() {
+            @Override
+            public void run() {
+                voiceRoomSeatsAdapter.refreshIndex(index, uiSeatModel);
+            }
+        });
+    }
+
+    @Override
+    public void showNotice(String notice, boolean isModify) {
+        mNoticeDialog.setNotice(notice);
+    }
 
 
     @Override
     public void clickMessageUser(String userId) {
-
+        UserProvider.provider().getAsyn(userId, userInfo -> {
+            User user = new User();
+            user.setUserId(userId);
+            user.setUserName(userInfo.getName());
+            user.setPortrait(userInfo.getPortraitUri().toString());
+            clickUser(user);
+        });
     }
 
     @Override
@@ -365,7 +497,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void enterSeatSuccess() {
-
+        showToast("上麦成功");
     }
 
     @Override
@@ -460,6 +592,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 //                RevokeSeatRequestFragment(this).show(
 //                        this @VoiceRoomFragment.childFragmentManager
 //                )
+                present.showNewRevokeSeatRequestFragment();
                 break;
             case STATUS_NOT_ON_SEAT:
                 present.enterSeatViewer(-1);
@@ -488,13 +621,36 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     }
 
     @Override
-    public void clickSendMessage(String message) {
-
+    public void finish() {
+        requireActivity().finish();
     }
 
     @Override
-    public void clickPrivateMessage() {
+    public void clickSendMessage(String message) {
+        //发送文字消息
+        RCChatroomBarrage barrage = new RCChatroomBarrage();
+        barrage.setContent(message);
+        barrage.setUserId(AccountStore.INSTANCE.getUserId());
+        barrage.setUserName(AccountStore.INSTANCE.getUserName());
+        present.sendMessage(barrage);
+    }
 
+    @Override
+    public void clearInput() {
+        mRoomBottomView.clearInput();
+    }
+
+
+    /**
+     * 发送私信
+     */
+    @Override
+    public void clickPrivateMessage() {
+        RouteUtils.routeToSubConversationListActivity(
+                requireActivity(),
+                Conversation.ConversationType.PRIVATE,
+                "消息"
+        );
     }
 
     @Override
@@ -521,5 +677,34 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void onSendGift() {
 
+    }
+
+    @Override
+    public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
+        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), rcChatroomVoice, true, new Function1<Integer, Unit>() {
+            @Override
+            public Unit invoke(Integer integer) {
+                //成功
+                return null;
+            }
+        }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
+            @Override
+            public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
+                //失败
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public void clickUser(User user) {
+        //如果点击的是本人的名称，那么无效
+        if (TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId())) {
+            return;
+        }
+        if (mMemberSettingFragment == null) {
+            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+        }
+        mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
     }
 }

@@ -117,6 +117,19 @@ public class MemberCache {
     }
 
     /**
+     * 通过userId，拿到对应的成员
+     */
+    public User getMember(String userId){
+        List<User> members = getMembers();
+        for (User member : members) {
+            if (member.getUserId().equals(userId)) {
+                return member;
+            }
+        }
+        return null;
+    }
+
+    /**
      * 添加成员
      *
      * @param user

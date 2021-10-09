@@ -114,7 +114,7 @@ public class RequestSeatFragment extends BaseFragment {
      */
     private void acceptRequest(String userId) {
         //判断麦位是否已经满了，这里需要交给界面去处理，因为麦位信息是时时刻刻在变化的
-        newVoiceRoomModel.present.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
+        newVoiceRoomModel.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 if (result){
