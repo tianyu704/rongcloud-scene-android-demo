@@ -289,7 +289,22 @@ public class VoiceRoomApi implements Api {
         RCVoiceRoomEngine.getInstance().sendPKInvitation(
                 inviteeRoomId,
                 inviteeId,
-                new DefaultRoomCallback("sendPKInvitation", "发送PK邀请", resultBack));
+                new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        KToast.show("发送PK邀请成功");
+                        // 邀请成功 修改pk状态
+                        EventBus.get().emit(EventBus.TAG.PK_INVITE_QUIT, IEventHelp.Type.PK_INVITE);
+                        if (null != resultBack) resultBack.onResult(true);
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        KToast.show("发送PK邀请失败");
+                        Log.e(TAG, "sendPKInvitation#onError [" + i + "]:" + s);
+                        if (null != resultBack) resultBack.onResult(false);
+                    }
+                });
     }
 
     @Override
@@ -350,7 +365,7 @@ public class VoiceRoomApi implements Api {
                     public void onSuccess() {
                         Log.e(TAG, "quitPK#onSuccess ");
                         //修改pk状态
-                        EventBus.get().emit(EventBus.TAG.PK_QUIT);
+                        EventBus.get().emit(EventBus.TAG.PK_INVITE_QUIT, IEventHelp.Type.PK_NONE);
                         if (null != resultBack) resultBack.onResult(true);
                     }
 

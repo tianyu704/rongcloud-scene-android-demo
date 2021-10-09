@@ -11,7 +11,6 @@ import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.ui.BaseActivity;
 import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
-import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
@@ -96,8 +95,7 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
             PKStateManager.get().quitPK(activity);
         } else if (R.id.send_pk == id) {
             IEventHelp.Type state = EventHelper.helper().getPKState();
-            if (IEventHelp.Type.PK_GOING == state) {
-                KToast.show("当前正在进行PK");
+            if (!StateUtil.enableInvite()) {
                 return;
             }
             Logger.e(TAG, "state = " + state);

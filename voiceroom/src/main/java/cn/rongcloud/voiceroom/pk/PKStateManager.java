@@ -31,6 +31,7 @@ import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
+import cn.rongcloud.voiceroom.pk.domain.PKResult;
 import cn.rongcloud.voiceroom.pk.widget.IPK;
 
 /**
@@ -149,15 +150,15 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
 
     @Override
     public void refreshPKGiftRank() {
-        PKApi.getPKInfo(roomId, new IResultBack<PKApi.PKResult>() {
+        PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
-            public void onResult(PKApi.PKResult pkResult) {
+            public void onResult(PKResult pkResult) {
                 refreshPKInfo(pkResult);
             }
         });
     }
 
-    void refreshPKInfo(PKApi.PKResult pkResult) {
+    void refreshPKInfo(PKResult pkResult) {
         if (null == pkResult) return;
         List<PKInfo> pkInfos = pkResult.getRoomScores();
         if (null != pkInfos && 2 == pkInfos.size()) {
@@ -186,7 +187,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             for (int i = 0; i < rs; i++) {
                 rights.add(rusers.get(i).getPortrait());
             }
-            pkView.setGiftRank(lefts, rights);
+            pkView.setGiftSenderRank(lefts, rights);
         }
     }
 
@@ -269,9 +270,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "PK Start");
         if (null != stateListener) stateListener.onPkStart();
         // 首次刷新pk信息
-        PKApi.getPKInfo(roomId, new IResultBack<PKApi.PKResult>() {
+        PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
-            public void onResult(PKApi.PKResult pkResult) {
+            public void onResult(PKResult pkResult) {
                 refreshPKInfo(pkResult);
                 // pk记时
                 if (null != pkView && null != rcpkInfo) {
@@ -297,7 +298,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "PK Punish");
         //惩罚记时
         if (null != pkView) {
-            pkView.punishStart(new IPK.OnTimerEndListener() {
+            pkView.pkPunish(new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
                     // 等待服务端分发pk结束消息

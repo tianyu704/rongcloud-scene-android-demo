@@ -6,7 +6,7 @@
     <!-- material 文字分割线色-->
     <color name="basis_color_primary">#212121</color>
     <color name="basis_color_secondary">#757575</color>
-    <color name="basis_color_divider">#BDBDBD</color>
+    <color name="basis_color_divider">#99BDBDBD</color>
 
     <!-- 19种 material design color 和对应的深色-->
     <color name="basis_red">#F44336</color>

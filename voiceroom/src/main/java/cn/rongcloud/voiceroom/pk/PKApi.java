@@ -8,11 +8,10 @@ import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
-import cn.rongcloud.voiceroom.pk.domain.PKInfo;
+import cn.rongcloud.voiceroom.pk.domain.PKResult;
 
 public class PKApi {
     private final static String TAG = "PKApi";
@@ -99,16 +98,5 @@ public class PKApi {
         });
     }
 
-    public static class PKResult {
-        private long timeDiff;
-        private List<PKInfo> roomScores;
 
-        public List<PKInfo> getRoomScores() {
-            return roomScores;
-        }
-
-        public long getTimeDiff() {
-            return timeDiff;
-        }
-    }
 }

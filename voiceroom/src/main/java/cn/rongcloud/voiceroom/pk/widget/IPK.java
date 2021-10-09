@@ -22,11 +22,11 @@ public interface IPK {
     void pkStart(String localId, String pkId, long timeDiff, OnTimerEndListener listener);
 
     /**
-     * 惩罚 开始
+     * PK 惩罚
      *
      * @param listener 定时结束回调
      */
-    void punishStart(OnTimerEndListener listener);
+    void pkPunish(OnTimerEndListener listener);
 
     /**
      * pk 流程结束
@@ -47,8 +47,11 @@ public interface IPK {
      * @param lefts  左侧排行榜
      * @param rights 右侧排行榜
      */
-    void setGiftRank(List<String> lefts, List<String> rights);
+    void setGiftSenderRank(List<String> lefts, List<String> rights);
 
+    /**
+     * 定时器结束监听
+     */
     interface OnTimerEndListener {
         void onTimerEnd();
     }

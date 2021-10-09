@@ -12,13 +12,16 @@ public class StateUtil {
      *
      * @return 否可以发起邀请
      */
-    protected static boolean enableInvite() {
+    public static boolean enableInvite() {
         IEventHelp.Type type = EventHelper.helper().getPKState();
         if (IEventHelp.Type.PK_INVITE == type) {
             KToast.show("您已发出邀请，请耐心等待对方处理");
             return false;
         }
-        if (IEventHelp.Type.PK_GOING == type || IEventHelp.Type.PK_PUNISH == type) {
+        if (IEventHelp.Type.PK_GOING == type
+                || IEventHelp.Type.PK_PUNISH == type
+                || IEventHelp.Type.PK_START == type
+                || IEventHelp.Type.PK_STOP == type) {
             KToast.show("您当前正在PK中");
             return false;
         }
@@ -30,7 +33,7 @@ public class StateUtil {
      *
      * @return 是否可以取消
      */
-    protected static boolean enableCancelInvite() {
+    public static boolean enableCancelInvite() {
         IEventHelp.Type type = EventHelper.helper().getPKState();
         if (IEventHelp.Type.PK_INVITE != type) {
             KToast.show("你还未发出PK邀请");

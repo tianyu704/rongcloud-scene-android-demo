@@ -190,7 +190,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
             }
         }
         // set sender rank
-        pkView.setGiftRank(lefts, rights);
+        pkView.setGiftSenderRank(lefts, rights);
     }
 
     @Override
@@ -257,7 +257,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
         reportPKState(1);
         //惩罚记时
         if (null != pkView) {
-            pkView.punishStart(new IPK.OnTimerEndListener() {
+            pkView.pkPunish(new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
                     if (AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId())) {

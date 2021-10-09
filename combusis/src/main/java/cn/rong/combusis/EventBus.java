@@ -73,7 +73,7 @@ public class EventBus {
         public final static String MUSIC_LIST = "music_play_list";
         public final static String PK_STATE = "pk_state";// pk状态
         public final static String PK_RESPONSE = "pk_response"; // pk邀请响应状态
-        public final static String PK_QUIT = "pk_quit"; // 退出pk
+        public final static String PK_INVITE_QUIT = "pk_intivite_or_quit"; // 用户发起邀请和退出pk 修改状态
     }
 
     public interface EventCallback {

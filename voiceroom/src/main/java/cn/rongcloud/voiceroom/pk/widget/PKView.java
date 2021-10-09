@@ -179,7 +179,7 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public synchronized void punishStart(OnTimerEndListener listener) {
+    public synchronized void pkPunish(OnTimerEndListener listener) {
         if (null != timer) {
             timer.cancel();
             timer = null;
@@ -213,7 +213,7 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public void setGiftRank(List<String> lefts, List<String> rights) {
+    public void setGiftSenderRank(List<String> lefts, List<String> rights) {
         int ls = null != lefts ? lefts.size() : 0;
         List<RankInfo> llis = new ArrayList<>();
         for (int i = ls - 1; i > -1; i--) {

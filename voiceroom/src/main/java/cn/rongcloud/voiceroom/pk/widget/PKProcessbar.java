@@ -18,12 +18,14 @@ import com.kit.utils.Logger;
 
 import cn.rongcloud.voiceroom.R;
 
+/**
+ * 自定义pk进度条
+ */
 public class PKProcessbar extends ProgressBar {
     private static final String TAG = "PKProcessbar";
     /**
      * 设置各种默认值
      */
-
     private static final int DEFAULT_TEXT_SIZE = 10;
     private static final int DEFAULT_TEXT_COLOR = 0XFFFC00D1;
     private static final int DEFAULT_COLOR_UNREACHED_COLOR = 0xFFd3d6da;
@@ -231,59 +233,6 @@ public class PKProcessbar extends ProgressBar {
         rf.right = mRealWidth - r;
         mPaint.setColor(mUnReachedBarColor);
         canvas.drawRoundRect(rf, 0, 0, mPaint);
-//        //draw start circle
-//        float r = mRealheigth / 2.0f;
-//        //左半圆
-//        RectF cl = new RectF();
-//        cl.top = 0;
-//        cl.bottom = mRealheigth;
-//        cl.left = 0;
-//        cl.right = mRealheigth;
-//        mPaint.setColor(mReachedBarColor);
-//        canvas.drawRoundRect(cl, r, r, mPaint);
-//        //右半圆
-//        RectF rl = new RectF();
-//        rl.top = 0;
-//        rl.bottom = mRealheigth;
-//        rl.left = mRealWidth - mRealheigth;
-//        rl.right = mRealWidth;
-//        mPaint.setColor(mUnReachedBarColor);
-//        canvas.drawRoundRect(rl, r, r, mPaint);
-//        // middle
-//        if (progressPosX <= mRealheigth / 2) {//只有右侧
-//            RectF mf = new RectF();
-//            mf.top = 0;
-//            mf.bottom = mRealheigth;
-//            mf.left = mRealheigth / 2;
-//            mf.right = mRealWidth - mRealheigth / 2;
-//            mPaint.setColor(mUnReachedBarColor);
-//            canvas.drawRoundRect(mf, 0, 0, mPaint);
-//        } else if (mRealheigth / 2 < progressPosX && progressPosX <= mRealWidth - mRealheigth / 2) {//左有都有
-//            // 左
-//            RectF mf = new RectF();
-//            mf.top = 0;
-//            mf.bottom = mRealheigth;
-//            mf.left = mRealheigth / 2;
-//            mf.right = progressPosX;
-//            mPaint.setColor(mReachedBarColor);
-//            canvas.drawRoundRect(mf, 0, 0, mPaint);
-//            // 右
-//            RectF mr = new RectF();
-//            mr.top = 0;
-//            mr.bottom = mRealheigth;
-//            mr.left = progressPosX;
-//            mr.right = mRealWidth - mRealheigth / 2;
-//            mPaint.setColor(mUnReachedBarColor);
-//            canvas.drawRoundRect(mr, 0, 0, mPaint);
-//        } else if (progressPosX > mRealWidth - mRealheigth / 2) {//只有左侧
-//            RectF mf = new RectF();
-//            mf.top = 0;
-//            mf.bottom = mRealheigth;
-//            mf.left = mRealheigth / 2;
-//            mf.right = mRealWidth - mRealheigth / 2;
-//            mPaint.setColor(mReachedBarColor);
-//            canvas.drawRoundRect(mf, 0, 0, mPaint);
-//        }
         // draw progress bar
         if (barRes != 0) {
             Bitmap bmp = BitmapFactory.decodeResource(getResources(), barRes);
@@ -300,8 +249,7 @@ public class PKProcessbar extends ProgressBar {
                     end = mRealWidth - mRealheigth / 2;
                     st = end - bmp.getWidth();
                 }
-                Logger.e(TAG, "bh = " + bH);
-                Logger.e(TAG, "mRealheigth = " + mRealheigth);
+                Logger.e(TAG, "mRealheigth = " + mRealheigth + " btmH = " + bH);
                 if (bH < mRealheigth) {//图片全绘制，且居中
                     src.top = 0;
                     src.bottom = bmp.getHeight();
@@ -323,15 +271,6 @@ public class PKProcessbar extends ProgressBar {
                     des.left = st;
                     des.right = end;
                 }
-//                src.top = 0;
-//                src.bottom = bmp.getHeight();
-//                src.left = 0;
-//                src.right = bmp.getWidth();
-//
-//                des.top = 0;
-//                des.bottom = mRealheigth;
-//                des.left = progressPosX - bmp.getWidth() / 2;
-//                des.right = progressPosX + bmp.getWidth() / 2;
                 canvas.drawBitmap(bmp, src, des, mPaint);
             }
         }
