@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +30,8 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.common.ui.dialog.EditDialog;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
@@ -43,12 +46,17 @@ import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
+import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
+import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
+import cn.rong.combusis.widget.VoiceRoomMiniManager;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -85,6 +93,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private RoomNoticeDialog mNoticeDialog;
     private MemberListFragment mMemberListFragment;
+    private RoomSettingFragment mRoomSettingFragment;
+    private InputPasswordDialog mInputPasswordDialog;
+    private EditDialog mEditDialog;
+    private ShieldDialog mShieldDialog;
+    private BackgroundSettingFragment mBackgroundSettingFragment;
 
     public static Fragment getInstance() {
         return new NewVoiceRoomFragment();
@@ -98,6 +111,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void init() {
         mNoticeDialog = new RoomNoticeDialog(getContext());
+        mRoomSettingFragment = new RoomSettingFragment(present);
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         mRoomTitleBar.setOnMemberClickListener(v -> {
@@ -124,26 +138,13 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
-            // TODO:公告弹框
-            boolean isEdit = false;
-            if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
-                isEdit = true;
-            } else {
-                isEdit = false;
-            }
-            mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
-                @Override
-                public void saveNotice(String notice) {
-                    //修改公告信息
-                    present.modifyNotice(notice);
-                }
-            });
+            showNoticeDialog();
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
-
+        //房主点击头像的时候
         mRoomSeatView.setRoomOwnerHeadOnclickListener(new RoomSeatView.RoomOwnerHeadOnclickListener() {
             @Override
             public void onClick() {
@@ -165,13 +166,43 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     }
 
     /**
+     * 显示公告弹窗
+     */
+    @Override
+    public void showNoticeDialog() {
+        boolean isEdit = false;
+        if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+            isEdit = true;
+        } else {
+            isEdit = false;
+        }
+        mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+            @Override
+            public void saveNotice(String notice) {
+                //修改公告信息
+                present.modifyNotice(notice);
+            }
+        });
+    }
+
+    /**
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
-                getActivity().finish();
+                //最小化窗口
+                //先做悬浮窗
+                requireActivity().moveTaskToBack(true);
+                //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+                requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                //设置一下当前的封面图
+                VoiceRoomMiniManager.getInstance().init(requireActivity(), requireActivity().getIntent());
+                VoiceRoomMiniManager.getInstance().refreshRoomOwner(mVoiceRoomBean.getRoomId());
+                VoiceRoomMiniManager.getInstance()
+                        .setBackgroudPic(mVoiceRoomBean.getThemePictureUrl(), activity);
+                VoiceRoomMiniManager.getInstance().showMiniWindows();
             }
 
             @Override
@@ -355,6 +386,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         }
     }
 
+    @Override
+    public void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList) {
+        mRoomSettingFragment.show(getChildFragmentManager(), funList);
+    }
+
     /**
      * 设置房间数据
      *
@@ -410,10 +446,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 加入房间之前的准备工作
+     *
+     * @param roomId
      */
     @Override
-    public void prepareJoinRoom() {
-        present.initListener();
+    public void prepareJoinRoom(String roomId) {
+        present.initListener(roomId);
     }
 
     @Override
@@ -503,6 +541,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         showToast("上麦成功");
     }
 
+    /**
+     * 最小化
+     */
     @Override
     public void packupRoom() {
 
@@ -662,21 +703,35 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         present.showSeatOperationViewPagerFragment(0);
     }
 
+    /**
+     * 设置按钮
+     */
     @Override
     public void clickSettings() {
-
+        present.showSettingDialog();
     }
 
+    /**
+     * PK
+     *
+     * @param isInPk
+     */
     @Override
     public void clickPk(boolean isInPk) {
 
     }
 
+    /**
+     * 请求上麦按钮
+     */
     @Override
     public void clickRequestSeat() {
 
     }
 
+    /**
+     * 发送礼物
+     */
     @Override
     public void onSendGift() {
 
@@ -709,5 +764,71 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
         }
         mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
+    }
+
+    @Override
+    public void showSetPasswordDialog(MutableLiveData<IFun.BaseFun> item) {
+        mInputPasswordDialog = new InputPasswordDialog(getContext(), false, () -> null, s -> {
+            if (TextUtils.isEmpty(s)) {
+                return null;
+            }
+            if (s.length() < 4) {
+                showToast(getString(R.string.text_please_input_four_number));
+                return null;
+            }
+            mInputPasswordDialog.dismiss();
+            present.setRoomPassword(true, s, item);
+            return null;
+        });
+        mInputPasswordDialog.show();
+    }
+
+    @Override
+    public void showSetRoomNameDialog(String name) {
+        mEditDialog = new EditDialog(
+                requireActivity(),
+                "修改房间标题",
+                "请输入房间名",
+                name,
+                10,
+                () -> null,
+                s -> {
+                    present.setRoomName(s);
+                    mEditDialog.dismiss();
+                    return null;
+                }
+        );
+        mEditDialog.show();
+    }
+
+    /**
+     * 屏蔽词弹窗
+     * @param roomId
+     */
+    @Override
+    public void showShieldDialog(String roomId) {
+        mShieldDialog = new ShieldDialog(requireActivity(), roomId, 10);
+        mShieldDialog.show();
+    }
+
+    /**
+     * 房间背景弹窗
+     * @param url
+     */
+    @Override
+    public void showSelectBackgroundDialog(String url) {
+        mBackgroundSettingFragment = new BackgroundSettingFragment(url, present);
+        mBackgroundSettingFragment.show(getChildFragmentManager());
+    }
+
+
+    @Override
+    public void setVoiceName(String name) {
+        mRoomTitleBar.setRoomName(name);
+    }
+
+    @Override
+    public void setRoomBackground(String url) {
+        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, url, R.color.black);
     }
 }

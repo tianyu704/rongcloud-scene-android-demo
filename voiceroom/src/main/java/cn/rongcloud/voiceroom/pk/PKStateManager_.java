@@ -91,7 +91,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
         this.pkView = pkView;
         this.stateListener = listener;
         // 注册房间事件监听
-        EventHelper.helper().regeister(roomId);
+        EventHelper.helper().regeister(roomId,null);
         // 注册pk状态监听
         EventBus.get().on(EventBus.TAG.PK_STATE, this);
         EventBus.get().on(EventBus.TAG.PK_RESPONSE, this);

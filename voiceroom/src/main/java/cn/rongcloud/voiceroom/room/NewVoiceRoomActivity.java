@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import com.basis.net.LoadTag;
+import com.kit.UIKit;
 import com.kit.utils.Logger;
 
 import java.util.ArrayList;
@@ -111,7 +112,12 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
                 leaveRoom();
-                joinRadioRoom(roomId);
+                UIKit.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        joinRadioRoom(roomId);
+                    }
+                },1000);
             }
 
             @Override
@@ -124,7 +130,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     }
 
     private void joinRadioRoom(String roomId) {
-        ((NewVoiceRoomFragment) getCurrentFragment()).prepareJoinRoom();
+        ((NewVoiceRoomFragment) getCurrentFragment()).prepareJoinRoom(roomId);
         VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
             RCVoiceRoomEngine.getInstance().joinRoom(voiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
                 @Override

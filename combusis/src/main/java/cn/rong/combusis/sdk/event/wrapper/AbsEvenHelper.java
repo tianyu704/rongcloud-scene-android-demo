@@ -29,13 +29,15 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<StatusListener> statusListeners;//网络状态监听
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
+    protected RCVoiceRoomEventListener rcVoiceRoomEventListener;
 
     protected abstract void onShowTipDialog(String roomId, String userId, TipType type, IResultBack<Boolean> resultBack);
 
     protected String roomId;
 
-    protected void init(String roomId) {
+    protected void init(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
         this.roomId = roomId;
+        this.rcVoiceRoomEventListener=rcVoiceRoomEventListener;
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(this);
         if (null == mSeatInfos) mSeatInfos = new ArrayList<>();
         if (null == listeners) listeners = new ArrayList<>();
@@ -53,6 +55,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     @Override
     public void onRoomKVReady() {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRoomKVReady();
+        }
         Log.d(TAG, "onRoomKVReady");
     }
 
@@ -63,6 +68,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRoomInfoUpdate(RCVoiceRoomInfo room) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRoomInfoUpdate(room);
+        }
         this.roomInfo = room;
         Log.d(TAG, "onRoomInfoUpdate:" + GsonUtil.obj2Json(roomInfo));
         if (null != listeners) {
@@ -79,6 +87,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onSeatInfoUpdate(list);
+        }
         int count = list.size();
         Log.d(TAG, "onSeatInfoUpdate: count = " + count);
         for (int i = 0; i < count; i++) {
@@ -103,6 +114,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onUserEnterSeat(int index, String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onUserEnterSeat(index,userId);
+        }
         Log.d(TAG, "onUserEnterSeat: index = " + index + " userId = " + userId);
         RCVoiceSeatInfo info = getSeatInfo(index);
         if (null != info) {
@@ -115,6 +129,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onUserLeaveSeat(int index, String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onUserLeaveSeat(index,userId);
+        }
         Log.d(TAG, "onUserLeaveSeat: index = " + index + " userId = " + userId);
         RCVoiceSeatInfo info = getSeatInfo(index);
         if (null != info) {
@@ -128,12 +145,18 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onSeatMute(int index, boolean mute) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onSeatMute(index,mute);
+        }
         Log.d(TAG, "onSeatMute: index = " + index + " mute = " + mute);
     }
 
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onSeatLock(int index, boolean locked) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onSeatLock(index,locked);
+        }
         Log.d(TAG, "onSeatLock: index = " + index + " locked = " + locked);
     }
 
@@ -144,6 +167,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onAudienceEnter(String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onAudienceEnter(userId);
+        }
         Log.d(TAG, "onAudienceEnter: userId = " + userId);
         if (null != listeners) {
             getOnLineUserIds(roomId, new IResultBack<List<String>>() {
@@ -164,6 +190,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onAudienceExit(String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onAudienceExit(userId);
+        }
         Log.d(TAG, "onAudienceExit: userId = " + userId);
         if (null != listeners) {
             getOnLineUserIds(roomId, new IResultBack<List<String>>() {
@@ -185,6 +214,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSpeakingStateChanged(int index, boolean speaking) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onSpeakingStateChanged(index,speaking);
+        }
 //        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
@@ -195,6 +227,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     @Override
     public void onMessageReceived(Message message) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onMessageReceived(message);
+        }
         if (message.getConversationType() == Conversation.ConversationType.PRIVATE) {
             if (null != statusListeners) {
                 if (!TextUtils.isEmpty(roomId)) {
@@ -220,6 +255,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRoomNotificationReceived(String name, String content) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRoomNotificationReceived(name,content);
+        }
         Log.v(TAG, "onRoomNotificationReceived: name = " + name + " content = " + content);
         if (null != listeners) {
             for (RoomListener l : listeners) {
@@ -235,6 +273,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPickSeatReceivedFrom(String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onPickSeatReceivedFrom(userId);
+        }
         Log.d(TAG, "onPickSeatReceivedFrom: userId = " + userId);
         onShowTipDialog("", userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
             @Override
@@ -263,6 +304,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onKickSeatReceived(int index) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onKickSeatReceived(index);
+        }
         Log.d(TAG, "onPickSeatReceivedFrom: index = " + index);
     }
 
@@ -272,6 +316,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatAccepted() {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRequestSeatAccepted();
+        }
         Log.d(TAG, "onRequestSeatAccepted: ");
         VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
         //获取可用麦位索引
@@ -288,6 +335,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatRejected() {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRequestSeatRejected();
+        }
         Log.d(TAG, "onRequestSeatRejected: ");
         EToast.showToast("您的上麦申请被拒绝啦");
     }
@@ -300,45 +350,48 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatListChanged() {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onRequestSeatListChanged();
+        }
         Log.d(TAG, "onRequestSeatListChanged: ");
-        RCVoiceRoomEngine.getInstance().getRequestSeatUserIds(new RCVoiceRoomResultCallback<List<String>>() {
-            @Override
-            public void onSuccess(List<String> strings) {
-                Log.e(TAG, "getRequestSeatUserIds: ids = " + GsonUtil.obj2Json(strings));
-                List<String> requestIds = new ArrayList<>();
-                for (String id : strings) {
-                    if (null == getSeatInfo(id)) {//过滤 不再麦位上
-                        requestIds.add(id);
-                    }
-                }
-                if (!requestIds.isEmpty()) {
-                    String userId = requestIds.get(0);
-                    onShowTipDialog("", userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
-                        @Override
-                        public void onResult(Boolean result) {
-                            if (result) {
-                                //同意
-                                int index = getAvailableSeatIndex();
-                                if (index > -1) {
-                                    RCVoiceRoomEngine.getInstance().acceptRequestSeat(userId, null);
-                                } else {
-                                    EToast.showToast("当前没有空余的麦位");
-                                }
-                            } else {//拒绝
-                                RCVoiceRoomEngine.getInstance().rejectRequestSeat(userId, null);
-                            }
-                        }
-                    });
-                } else {//申请被取消
-                    EventDialogHelper.helper().dismissDialog();
-                }
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                Log.e(TAG, "onError: code:" + i + " ,message = " + s);
-            }
-        });
+//        RCVoiceRoomEngine.getInstance().getRequestSeatUserIds(new RCVoiceRoomResultCallback<List<String>>() {
+//            @Override
+//            public void onSuccess(List<String> strings) {
+//                Log.e(TAG, "getRequestSeatUserIds: ids = " + GsonUtil.obj2Json(strings));
+//                List<String> requestIds = new ArrayList<>();
+//                for (String id : strings) {
+//                    if (null == getSeatInfo(id)) {//过滤 不再麦位上
+//                        requestIds.add(id);
+//                    }
+//                }
+//                if (!requestIds.isEmpty()) {
+//                    String userId = requestIds.get(0);
+//                    onShowTipDialog("", userId, TipType.RequestSeat, new IResultBack<Boolean>() {//申请上麦
+//                        @Override
+//                        public void onResult(Boolean result) {
+//                            if (result) {
+//                                //同意
+//                                int index = getAvailableSeatIndex();
+//                                if (index > -1) {
+//                                    RCVoiceRoomEngine.getInstance().acceptRequestSeat(userId, null);
+//                                } else {
+//                                    EToast.showToast("当前没有空余的麦位");
+//                                }
+//                            } else {//拒绝
+//                                RCVoiceRoomEngine.getInstance().rejectRequestSeat(userId, null);
+//                            }
+//                        }
+//                    });
+//                } else {//申请被取消
+//                    EventDialogHelper.helper().dismissDialog();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(int i, String s) {
+//                Log.e(TAG, "onError: code:" + i + " ,message = " + s);
+//            }
+//        });
 
     }
 
@@ -351,6 +404,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationReceived(String invitationId, String userId, String content) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onInvitationReceived(invitationId,userId,content);
+        }
         Log.d(TAG, "onInvitationReceived: invitationId = " + invitationId + " userId = " + userId + " content = " + content);
     }
 
@@ -361,6 +417,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationAccepted(String invitationId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onInvitationAccepted(invitationId);
+        }
         Log.d(TAG, "onInvitationAccepted: invitationId = " + invitationId);
     }
 
@@ -371,6 +430,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationRejected(String invitationId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onInvitationRejected(invitationId);
+        }
         Log.d(TAG, "onInvitationRejected: invitationId = " + invitationId);
     }
 
@@ -381,6 +443,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationCancelled(String invitationId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onInvitationCancelled(invitationId);
+        }
         Log.d(TAG, "onInvitationCancelled: invitationId = " + invitationId);
     }
 
@@ -392,6 +457,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onUserReceiveKickOutRoom(String targetId, String userId) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onUserReceiveKickOutRoom(targetId,userId);
+        }
         Log.d(TAG, "onUserReceiveKickOutRoom: targetId = " + targetId);
     }
 
@@ -402,6 +470,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onNetworkStatus(int i) {
+        if (rcVoiceRoomEventListener!=null) {
+            rcVoiceRoomEventListener.onNetworkStatus(i);
+        }
 //        Log.d(TAG, "onNetworkStatus: rtt = " + i);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {

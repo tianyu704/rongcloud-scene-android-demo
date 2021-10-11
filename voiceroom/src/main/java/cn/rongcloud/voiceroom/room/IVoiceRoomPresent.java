@@ -19,8 +19,9 @@ interface IVoiceRoomPresent extends IBasePresent {
 
     /**
      * 监听时间
+     * @param roomId
      */
-    void initListener();
+    void initListener(String roomId);
 
     /**
      * 空座位被点击 观众

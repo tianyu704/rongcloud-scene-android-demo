@@ -106,7 +106,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     //本地麦克风的状态，默认是开启的
     private boolean recordingStatus = true;
     //麦位集合
-    private ArrayList<UiSeatModel> uiSeatModels = new ArrayList<>();
+    private volatile ArrayList<UiSeatModel> uiSeatModels = new ArrayList<>();
 
     //申请连麦的集合
     private ArrayList<User> requestSeats = new ArrayList<>();
@@ -212,24 +212,25 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
     /**
      * 麦位信息发生了变化
-     *
+     * 这里用同步锁，避免多线程操作的时候，影响麦位的显示
      * @param list
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                uiSeatModels.clear();
-                for (int i = 0; i < list.size(); i++) {
-                    //构建一个集合返回去
-                    UiSeatModel uiSeatModel = new UiSeatModel(i, list.get(i), seatInfoChangeSubject);
-                    uiSeatModels.add(uiSeatModel);
+        Log.e(TAG, "onSeatInfoUpdate: "+list.get(1).getStatus());
+        synchronized (this){
+            uiSeatModels.clear();
+            for (int i = 0; i < list.size(); i++) {
+                //构建一个集合返回去
+                RCVoiceSeatInfo rcVoiceSeatInfo = list.get(i);
+                if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())&&rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
+                    rcVoiceSeatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
                 }
-                seatListChangeSubject.onNext(uiSeatModels);
+                UiSeatModel uiSeatModel = new UiSeatModel(i,rcVoiceSeatInfo , seatInfoChangeSubject);
+                uiSeatModels.add(uiSeatModel);
             }
-        }).subscribeOn(Schedulers.io())
-                .subscribe());
+            seatListChangeSubject.onNext(uiSeatModels);
+        }
     }
 
     /**
@@ -794,8 +795,13 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
                     @Override
                     public void onSuccess() {
                         //踢出房间成功以后，要发送消息给被踢出的人
+                        RCChatroomKickOut kickOut = new RCChatroomKickOut();
+                        kickOut.setUserId(AccountStore.INSTANCE.getUserId());
+                        kickOut.setUserName(AccountStore.INSTANCE.getUserName());
+                        kickOut.setTargetId(user.getUserId());
+                        kickOut.setTargetName(user.getUserName());
                         RCChatRoomMessageManager.INSTANCE.sendChatMessage(currentUIRoomInfo.getRoomBean().getRoomId(),
-                                new RCChatroomKickOut(),
+                                kickOut,
                                 true,
                                 new Function1<Integer, Unit>() {
                                     @Override

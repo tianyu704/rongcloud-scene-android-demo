@@ -18,6 +18,7 @@ import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.sdk.event.wrapper.TipType;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.RongIMClient;
@@ -41,8 +42,8 @@ public class EventHelper extends AbsPKHelper {
         return !TextUtils.isEmpty(roomId);
     }
 
-    public void regeister(String roomId) {
-        init(roomId);
+    public void regeister(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
+        init(roomId,rcVoiceRoomEventListener);
     }
 
     @Override

@@ -77,7 +77,7 @@ public class RoomTitleBar extends ConstraintLayout {
     public void setDelay(int delay, boolean isShow) {
         if (isShow) {
             mDelayTextView.setVisibility(View.VISIBLE);
-            mDelayTextView.setText(String.valueOf(delay));
+            mDelayTextView.setText(String.valueOf(delay)+"ms");
             int leftPicId;
             if (delay < 100) {
                 leftPicId = R.drawable.ic_room_delay_1;

@@ -6,6 +6,7 @@ import java.util.List;
 
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 
 public interface IEventHelp {
@@ -22,7 +23,7 @@ public interface IEventHelp {
      *
      * @param roomId 房间id
      */
-    void regeister(String roomId);
+    void regeister(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener);
 
     /**
      * 根据用户id获取麦位信息

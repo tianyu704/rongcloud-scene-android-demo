@@ -60,7 +60,7 @@ import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
-import cn.rongcloud.widget.VoiceRoomMiniManager
+import cn.rong.combusis.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait

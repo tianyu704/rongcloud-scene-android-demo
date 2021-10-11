@@ -1,4 +1,4 @@
-package cn.rongcloud.widget;
+package cn.rong.combusis.widget;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.rongcloud.common.net.ApiConstant;
+import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
@@ -16,12 +17,11 @@ import com.yhao.floatwindow.PermissionListener;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
 
+import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
-import cn.rongcloud.voiceroomdemo.R;
 import de.hdodenhof.circleimageview.CircleImageView;
-import io.rong.callkit.util.GlideUtils;
 
 /**
  * 语聊房的最小窗口管理器
@@ -92,7 +92,7 @@ public class VoiceRoomMiniManager {
      */
     public void refreshRoomOwner(String roomId){
         if (!EventHelper.helper().isInitlaized()){
-            EventHelper.helper().regeister(roomId);
+            EventHelper.helper().regeister(roomId,null);
         }
         EventHelper.helper().addStatusListener(new StatusListener() {
             @Override
@@ -123,7 +123,7 @@ public class VoiceRoomMiniManager {
      */
     public void setBackgroudPic(String url,Context context){
         CircleImageView circleImageView=FloatWindow.get(TAG).getView().findViewById(R.id.iv_room_creator_portrait);
-        GlideUtils.showRemotePortrait(context,circleImageView, TextUtils.isEmpty(url)? Uri.parse(ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR()):Uri.parse(url));
+        ImageLoaderUtil.INSTANCE.loadPortraitDef(context,circleImageView,url);
 
     }
     /**

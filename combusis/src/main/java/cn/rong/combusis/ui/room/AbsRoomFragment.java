@@ -15,7 +15,7 @@ public abstract class AbsRoomFragment<T, P extends BasePresenter> extends BaseFr
 
     public abstract void destroyRoom();
 
-    public abstract void prepareJoinRoom();
+    public abstract void prepareJoinRoom(String roomId);
 
     public abstract void joinRoom(T t);
 

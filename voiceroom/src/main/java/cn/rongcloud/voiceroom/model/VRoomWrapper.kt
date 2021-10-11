@@ -56,7 +56,7 @@ class VRoomWrapper(activity: Activity?, val roomId: String) : RoomListener,
         VoiceRoomProvider.provider().observeSingle(roomId) { roomBean ->
             netRoomInfo = roomBean
         }
-        EventHelper.helper().regeister(roomId)
+        EventHelper.helper().regeister(roomId,null)
         EventHelper.helper().addRoomListener(this)
         EventHelper.helper().addStatusListener(this)
     }

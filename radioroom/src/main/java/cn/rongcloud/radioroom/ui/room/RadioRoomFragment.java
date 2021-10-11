@@ -315,7 +315,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     }
 
     @Override
-    public void prepareJoinRoom() {
+    public void prepareJoinRoom(String roomId) {
 
     }
 

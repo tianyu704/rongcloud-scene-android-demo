@@ -2,9 +2,13 @@ package cn.rongcloud.voiceroom.room;
 
 import android.graphics.Point;
 
+import androidx.lifecycle.MutableLiveData;
+
 import java.util.List;
 
 import com.basis.mvp.IBaseView;
+
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imlib.model.MessageContent;
@@ -75,4 +79,20 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void clearInput();
 
     void showMessage(MessageContent messageContent, boolean isRefresh);
+
+    void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList);
+
+    void showSetPasswordDialog(MutableLiveData<IFun.BaseFun> item);
+
+    void showSetRoomNameDialog(String name);
+
+    void setVoiceName(String name);
+
+    void showShieldDialog(String roomId);
+
+    void showSelectBackgroundDialog(String url);
+
+    void showNoticeDialog();
+
+    void setRoomBackground(String url);
 }

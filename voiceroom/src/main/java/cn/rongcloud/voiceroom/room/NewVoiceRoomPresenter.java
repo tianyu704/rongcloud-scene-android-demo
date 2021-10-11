@@ -1,5 +1,6 @@
 package cn.rongcloud.voiceroom.room;
 
+import static cn.rong.combusis.sdk.Api.EVENT_BACKGROUND_CHANGE;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
@@ -12,6 +13,7 @@ import android.util.Pair;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.basis.mvp.BasePresenter;
@@ -24,6 +26,7 @@ import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,12 +44,32 @@ import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.sdk.event.EventHelper;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.OnItemClickListener;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
+import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBackgroundFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomLockAllSeatFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomLockFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMusicFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMuteAllFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMuteFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNameFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNoticeFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomPauseFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatModeFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rongcloud.radioroom.IRCRadioRoomEngine;
+import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.room.dialogFragment.NewCreatorSettingFragment;
 import cn.rongcloud.voiceroom.room.dialogFragment.NewEmptySeatFragment;
@@ -70,8 +93,11 @@ import kotlin.jvm.functions.Function2;
 /**
  * 语聊房present
  */
-public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements
-        IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener {
+public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
+        IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
+        , BackgroundSettingFragment.OnSelectBackgroundListener {
+
+    private String TAG = "NewVoiceRoomPresenter";
 
     public static final int STATUS_ON_SEAT = 0;
     public static final int STATUS_NOT_ON_SEAT = 1;
@@ -168,9 +194,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
 
     @Override
-    public void initListener() {
+    public void initListener(String roomId) {
         //设置界面监听
-        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
+//        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
+        EventHelper.helper().regeister(roomId, newVoiceRoomModel);
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this);
         setObSeatListChange();
         setObRoomEventChange();
@@ -557,7 +584,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     public void clickMuteSeatByUser(User user, ClickCallback<Boolean> callback) {
         UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
-        newVoiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), callback);
+        if (uiSeatModel != null)
+            newVoiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), callback);
     }
 
 
@@ -715,25 +743,315 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param notice
      */
     public void modifyNotice(String notice) {
-//        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(IRCVoiceRoomEngine.);
+        UiRoomModel currentUIRoomInfo = newVoiceRoomModel.currentUIRoomInfo;
+        RCVoiceRoomInfo rcRoomInfo = currentUIRoomInfo.getRcRoomInfo();
+        rcRoomInfo.setExtra(notice);
+        RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                sendNoticeModifyMessage();
+                //公告更新成功
+                Log.d(TAG, "onSuccess: ");
+            }
 
+            @Override
+            public void onError(int i, String s) {
+                //公告更新失败
+                Log.e(TAG, "onError: ");
+            }
+        });
     }
 
     /**
      * 切换房间的时候，对之前房间的操作
      */
     public void leaveCurrentRoom() {
-        if (messageDisposable!=null&&messageDisposable.isDisposed()) {
+        if (messageDisposable != null && messageDisposable.isDisposed()) {
             messageDisposable.dispose();
         }
     }
 
-//    /**
-//     * 发送公告更新的
-//     */
-//    private void sendNoticeModifyMessage() {
-//        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-//        tips.setContent("房间公告已更新！");
-////        mView.addToMessageList(tips, false);
-//    }
+    /**
+     * 发送公告更新的
+     */
+    private void sendNoticeModifyMessage() {
+        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
+        tips.setContent("房间公告已更新！");
+        mView.showMessage(tips, false);
+    }
+
+    /**
+     * 弹出设置弹窗
+     */
+    public void showSettingDialog() {
+        List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
+                new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
+                new MutableLiveData<>(new RoomNameFun(0)),
+                new MutableLiveData<>(new RoomNoticeFun(0)),
+                new MutableLiveData<>(new RoomBackgroundFun(0)),
+                new MutableLiveData<>(new RoomSeatModeFun(newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat() ? 1 : 0)),
+                new MutableLiveData<>(new RoomMuteAllFun(newVoiceRoomModel.currentUIRoomInfo.isMuteAll() ? 1 : 0)),
+                new MutableLiveData<>(new RoomLockAllSeatFun(newVoiceRoomModel.currentUIRoomInfo.isLockAll() ? 1 : 0)),
+                new MutableLiveData<>(new RoomMuteFun(newVoiceRoomModel.currentUIRoomInfo.isMute()?1:0)),
+                new MutableLiveData<>(new RoomSeatSizeFun(newVoiceRoomModel.currentUIRoomInfo.getMSeatCount()==5?1:0)),
+                new MutableLiveData<>(new RoomShieldFun(0)),
+                new MutableLiveData<>(new RoomMusicFun(0))
+        );
+        mView.showSettingDialog(funList);
+    }
+
+    /**
+     * 点击设置的
+     *
+     * @param item
+     * @param position
+     */
+    @Override
+    public void clickItem(MutableLiveData<IFun.BaseFun> item, int position) {
+        IFun.BaseFun fun = item.getValue();
+        if (fun instanceof RoomNoticeFun) {
+            mView.showNoticeDialog();
+        } else if (fun instanceof RoomLockFun) {
+            if (fun.getStatus() == 1) {
+                setRoomPassword(false, "", item);
+            } else {
+                mView.showSetPasswordDialog(item);
+            }
+        } else if (fun instanceof RoomNameFun) {
+            mView.showSetRoomNameDialog(mVoiceRoomBean.getRoomName());
+        } else if (fun instanceof RoomBackgroundFun) {
+            mView.showSelectBackgroundDialog(mVoiceRoomBean.getBackgroundUrl());
+        } else if (fun instanceof RoomShieldFun) {
+            mView.showShieldDialog(mVoiceRoomBean.getRoomId());
+        } else if (fun instanceof RoomSeatModeFun) {
+            if (fun.getStatus() == 1) {
+                //申请上麦
+                setSeatMode(false);
+            } else {
+                //自由上麦
+                setSeatMode(true);
+            }
+        } else if (fun instanceof RoomMuteAllFun) {
+            if (fun.getStatus() == 1) {
+                //解锁全麦
+                setAllSeatLock(false);
+            } else {
+                //全麦锁麦
+                setAllSeatLock(true);
+            }
+        }else if (fun instanceof RoomLockAllSeatFun){
+            if (fun.getStatus() ==1){
+                //解锁全座
+                lockOtherSeats(false);
+            }else {
+                //全麦锁座
+                lockOtherSeats(true);
+            }
+        }else if (fun instanceof RoomMuteFun){
+            if (fun.getStatus()==1){
+                //取消静音
+                muteAllRemoteStreams(false);
+            }else {
+                //静音
+                muteAllRemoteStreams(true);
+            }
+        }else if (fun instanceof RoomSeatSizeFun){
+            if (fun.getStatus()==1){
+                //设置8个座位
+                setSeatCount(9);
+            }else {
+                //设置4个座位
+                setSeatCount(5);
+            }
+        }
+    }
+
+    /**
+     * 设置房间座位
+     * @param seatCount
+     */
+    private void setSeatCount(int seatCount) {
+        newVoiceRoomModel.currentUIRoomInfo.setMSeatCount(seatCount);
+        RCVoiceRoomEngine.getInstance().setRoomInfo(newVoiceRoomModel.currentUIRoomInfo.getRcRoomInfo(), new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                //更换模式成功
+                RCChatroomSeats rcChatroomSeats = new RCChatroomSeats();
+                rcChatroomSeats.setCount(seatCount-1);
+                RCChatRoomMessageManager.INSTANCE.sendChatMessage(getmVoiceRoomBean().getRoomId(), rcChatroomSeats
+                        , true, new Function1<Integer, Unit>() {
+                            @Override
+                            public Unit invoke(Integer integer) {
+                                return null;
+                            }
+                        }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
+                            @Override
+                            public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
+                                return null;
+                            }
+                        });
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
+            }
+        });
+    }
+
+    /**
+     * 静音 取消静音
+     * @param isMute
+     */
+    private void muteAllRemoteStreams(boolean isMute) {
+        RCVoiceRoomEngine.getInstance().muteAllRemoteStreams(isMute);
+        newVoiceRoomModel.currentUIRoomInfo.setMute(isMute);
+        if (isMute){
+            EToast.showToast("扬声器已静音");
+        }else {
+            EToast.showToast("已取消静音");
+        }
+        //此时要将当前的状态同步到服务器，下次进入的时候可以同步
+    }
+
+    /**
+     * 全麦锁座
+     */
+    private void lockOtherSeats(boolean isLockAll){
+        RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll);
+        if (isLockAll) {
+            EToast.showToast("全部座位已锁定");
+        } else {
+            EToast.showToast("已解锁全座");
+        }
+    }
+
+    /**
+     * 全麦锁麦
+     * @param isMuteAll
+     */
+    private void setAllSeatLock(boolean isMuteAll) {
+        RCVoiceRoomEngine.getInstance().muteOtherSeats(isMuteAll);
+        if (isMuteAll) {
+            EToast.showToast("全部麦位已静音");
+        } else {
+            EToast.showToast("已解锁全麦");
+        }
+    }
+
+    /**
+     * 设置上麦的模式
+     */
+    public void setSeatMode(boolean isFreeEnterSeat) {
+        newVoiceRoomModel.currentUIRoomInfo.setFreeEnterSeat(isFreeEnterSeat);
+        RCVoiceRoomEngine.getInstance().setRoomInfo(newVoiceRoomModel.currentUIRoomInfo.getRcRoomInfo(), new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                if (isFreeEnterSeat) {
+                    EToast.showToast("当前观众可自由上麦");
+                } else {
+                    EToast.showToast("当前观众上麦要申请");
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                EToast.showToast(s);
+            }
+        });
+    }
+
+    /**
+     * 设置房间密码
+     *
+     * @param isPrivate
+     * @param password
+     * @param item
+     */
+    public void setRoomPassword(boolean isPrivate, String password, MutableLiveData<IFun.BaseFun> item) {
+        int p = isPrivate ? 1 : 0;
+        OkApi.put(VRApi.ROOM_PASSWORD,
+                new OkParams()
+                        .add("roomId", getmVoiceRoomBean().getRoomId())
+                        .add("isPrivate", p)
+                        .add("password", password).build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mView.showToast(isPrivate ? "设置成功" : "取消成功");
+                            mVoiceRoomBean.setIsPrivate(isPrivate ? 1 : 0);
+                            mVoiceRoomBean.setPassword(password);
+                            IFun.BaseFun fun = item.getValue();
+                            fun.setStatus(p);
+                            item.setValue(fun);
+                        } else {
+                            mView.showToast(isPrivate ? "设置失败" : "取消失败");
+                        }
+                    }
+                });
+    }
+
+
+    /**
+     * 修改房间名称
+     *
+     * @param name
+     */
+    public void setRoomName(String name) {
+        OkApi.put(VRApi.ROOM_NAME,
+                new OkParams()
+                        .add("roomId", getmVoiceRoomBean().getRoomId())
+                        .add("name", name)
+                        .build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mView.showToast("修改成功");
+                            mView.setVoiceName(name);
+                            mVoiceRoomBean.setRoomName(name);
+                            RCVoiceRoomInfo rcRoomInfo = newVoiceRoomModel.currentUIRoomInfo.getRcRoomInfo();
+                            rcRoomInfo.setRoomName(name);
+                            RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, null);
+                        } else {
+                            mView.showToast("修改失败");
+                        }
+                    }
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        mView.showToast("修改失败");
+                    }
+                });
+    }
+
+    @Override
+    public void selectBackground(String url) {
+        OkApi.put(VRApi.ROOM_BACKGROUND, new OkParams()
+                .add("roomId", mVoiceRoomBean.getRoomId())
+                .add("backgroundUrl", url)
+                .build(), new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    mVoiceRoomBean.setBackgroundUrl(url);
+                    mView.setRoomBackground(url);
+                    //通知外部更改
+                    RCVoiceRoomEngine.getInstance()
+                            .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, url);
+                    mView.showToast("设置成功");
+                } else {
+                    mView.showToast("设置失败");
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                mView.showToast("设置失败");
+            }
+        });
+    }
 }

@@ -74,7 +74,13 @@ public class RoomSettingFragment extends BaseBottomSheetDialogFragment {
                 || baseFun instanceof RoomNameFun
                 || baseFun instanceof RoomNoticeFun
                 || baseFun instanceof RoomPauseFun
-                || baseFun instanceof RoomShieldFun) {
+                || baseFun instanceof RoomShieldFun
+                || baseFun instanceof RoomLockFun
+                || baseFun instanceof RoomMuteFun
+                || baseFun instanceof RoomMuteAllFun
+                || baseFun instanceof RoomLockAllSeatFun
+                || baseFun instanceof RoomSeatSizeFun
+                || baseFun instanceof RoomSeatModeFun) {
             return true;
         }
         return false;
