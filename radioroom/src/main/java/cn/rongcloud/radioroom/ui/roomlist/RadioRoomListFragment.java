@@ -9,10 +9,12 @@ import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
 import cn.rongcloud.radioroom.ui.room.RadioRoomActivity;
+import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author gyn
@@ -24,12 +26,34 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
         return new RadioRoomListFragment();
     }
 
+    private InputPasswordDialog inputPasswordDialog;
+
     @Override
     public void clickItem(VoiceRoomBean item, int position) {
         if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
             ArrayList list = new ArrayList();
             list.add(item.getRoomId());
             RadioRoomActivity.startActivity(getActivity(), list, 0);
+        } else if (item.isPrivate()) {
+            inputPasswordDialog = new InputPasswordDialog(requireContext(), false, () -> null, s -> {
+                if (TextUtils.isEmpty(s)) {
+                    return null;
+                }
+                if (s.length() < 4) {
+                    ToastUtils.s(requireContext(), requireContext().getString(cn.rong.combusis.R.string.text_please_input_four_number));
+                    return null;
+                }
+                if (TextUtils.equals(s, item.getPassword())) {
+                    inputPasswordDialog.dismiss();
+                    ArrayList list = new ArrayList();
+                    list.add(item.getRoomId());
+                    RadioRoomActivity.startActivity(getActivity(), list, 0);
+                } else {
+                    showToast("密码错误");
+                }
+                return null;
+            });
+            inputPasswordDialog.show();
         } else {
             RadioRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
         }

@@ -120,6 +120,13 @@ public class LvHolder implements IHolder<LvHolder> {
     }
 
     @Override
+    public LvHolder setImageResource(int viewId, int resource) {
+        ImageView view = getView(viewId);
+        view.setImageResource(resource);
+        return this;
+    }
+
+    @Override
     public LvHolder setBackgroundColor(int viewId, int color) {
         View view = getView(viewId);
         view.setBackgroundColor(color);

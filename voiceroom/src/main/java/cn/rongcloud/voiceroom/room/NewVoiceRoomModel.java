@@ -20,7 +20,6 @@ import com.basis.mvp.BaseModel;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -402,7 +401,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
             @Override
             public void onSuccess(List<String> requestUserIds) {
                 //获取到当前房间所有用户
-                List<User> users = MemberCache.getInstance().getMemberList().getValue();
+                List<User> users = MemberCache.getInstance().getUserList().getValue();
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
                     for (User user : users) {

@@ -5,6 +5,7 @@
 package cn.rong.combusis.common.ui.dialog
 
 import android.content.Context
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import cn.rong.combusis.R
 import com.rongcloud.common.utils.MaxLengthWithEmojiFilter
@@ -20,6 +21,7 @@ class EditDialog(
     private val hint: String,
     private val text: String = "",
     private val maxLength: Int = Int.MAX_VALUE,
+    private val isNumber: Boolean = false,
     private val cancelListener: (() -> Unit)? = null,
     private val callBack: (context: String?) -> Unit
 ) :
@@ -40,6 +42,9 @@ class EditDialog(
         et_content.setText(text)
         et_content.setSelection(text.length)
         et_content.filters = arrayOf(MaxLengthWithEmojiFilter(maxLength))
+        if (isNumber) {
+            et_content.inputType = EditorInfo.TYPE_CLASS_NUMBER
+        }
     }
 
     override fun show() {
@@ -51,8 +56,8 @@ class EditDialog(
     }
 
     override fun dismiss() {
-        super.dismiss()
         hideSoftKeyBoard()
+        super.dismiss()
     }
 
 

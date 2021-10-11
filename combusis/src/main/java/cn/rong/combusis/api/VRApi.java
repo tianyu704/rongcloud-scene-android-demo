@@ -145,4 +145,23 @@ public class VRApi {
     public static String deleteShield(int id) {
         return HOST + "mic/room/sensitive/del/" + id;
     }
+
+    /**
+     * 发送礼物
+     */
+    public static final String SEND_GIFT = HOST + "mic/room/gift/add";
+    /**
+     * 批量获取用户信息
+     */
+    public static final String GET_USER = HOST + "user/batch";
+
+    /**
+     * 获取房间内礼物列表
+     *
+     * @param roomId
+     * @return
+     */
+    public static String getGiftList(String roomId) {
+        return HOST + "mic/room/" + roomId + "/gift/list";
+    }
 }

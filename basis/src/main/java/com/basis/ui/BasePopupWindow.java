@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop;
+package com.basis.ui;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -16,21 +16,17 @@ import android.widget.PopupWindow;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
-/**
- * @author baicq
- * @date 2021/07/06
- */
-public class CustomerPopupWindow extends PopupWindow {
+public class BasePopupWindow extends PopupWindow {
 
     protected void initView(@NonNull View content) {
 
     }
 
-    public CustomerPopupWindow(Context context, @LayoutRes int layoutId, int width, int height, boolean b) {
+    public BasePopupWindow(Context context, @LayoutRes int layoutId, int width, int height, boolean b) {
         this(LayoutInflater.from(context).inflate(layoutId, null), width, height, false);
     }
 
-    public CustomerPopupWindow(View contentView, int width, int height, boolean b) {
+    public BasePopupWindow(View contentView, int width, int height, boolean b) {
         super(contentView, width, height, b);
         initView(contentView);
     }
@@ -52,7 +48,8 @@ public class CustomerPopupWindow extends PopupWindow {
         super.showAsDropDown(anchor);
     }
 
-    public static @NonNull int[] getLocation(View view) {
+    public @NonNull
+    int[] getLocation(View view) {
         int[] location = new int[2];
         if (Build.VERSION.SDK_INT >= 24) {
             Rect rect = new Rect();

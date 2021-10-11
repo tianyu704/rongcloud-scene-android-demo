@@ -27,17 +27,15 @@ import cn.rong.combusis.message.RCChatroomUserBlock;
 import cn.rong.combusis.message.RCChatroomUserUnBan;
 import cn.rong.combusis.message.RCChatroomUserUnBlock;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.messager.RCMessager;
-import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import dagger.hilt.android.AndroidEntryPoint;
 import io.rong.imkit.picture.tools.ToastUtils;
-import io.rong.imkit.utils.StatusBarUtil;
-import io.rong.imkit.utils.SystemBarTintManager;
 
 /**
  * @author 李浩  语聊房重构
@@ -75,7 +73,8 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
                 RCChatroomUserUnBan.class,
                 RCChatroomUserUnBlock.class,
                 RCChatroomLike.class,
-                RCChatroomVoice.class);
+                RCChatroomVoice.class,
+                RCFollowMsg.class);
     }
 
     @Override

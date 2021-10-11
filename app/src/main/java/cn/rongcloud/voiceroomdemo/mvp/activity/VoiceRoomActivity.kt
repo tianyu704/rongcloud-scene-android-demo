@@ -31,7 +31,6 @@ import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomMessageAdapter
 import cn.rongcloud.voiceroomdemo.mvp.adapter.VoiceRoomSeatsAdapter
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.ISendPresentView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.present.SendPresentFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.CreatorSettingFragment
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.creatorsetting.ICreatorView
 import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.EmptySeatFragment
@@ -63,6 +62,7 @@ import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
 import com.rongcloud.common.utils.AccountStore
+import com.rongcloud.common.utils.UiUtils
 import com.vanniktech.emoji.EmojiPopup
 import dagger.hilt.android.AndroidEntryPoint
 import io.rong.callkit.RongCallKit
@@ -184,7 +184,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         if (from != null) {
             favAnimation.addFavor(container, 300, 1500, from, null)
         } else {
-            var location = CustomerPopupWindow.getLocation(iv_send_gift)
+            var location = UiUtils.getLocation(iv_send_gift)
             var from =
                 Point(location[0] + iv_send_gift.width / 2, location[1] - iv_send_gift.height / 2)
             var to = Point(from.x + 200, from.y - 200)

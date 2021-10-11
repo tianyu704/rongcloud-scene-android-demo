@@ -13,11 +13,14 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLike;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
@@ -51,7 +54,10 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
                 RCChatroomBarrage.class,
                 RCChatroomGift.class,
                 RCChatroomGiftAll.class,
-                RCChatroomLike.class);
+                RCChatroomLike.class,
+                RCChatroomAdmin.class,
+                RCChatroomKickOut.class,
+                RCFollowMsg.class);
     }
 
     @Override

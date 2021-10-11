@@ -19,15 +19,15 @@ import cn.rong.combusis.provider.user.UserProvider;
  */
 public class MemberCache {
 
-    private final MutableLiveData<List<User>> memberList = new MutableLiveData<>(new ArrayList<>(0));
+    private final MutableLiveData<List<User>> userList = new MutableLiveData<>(new ArrayList<>(0));
     private final MutableLiveData<List<String>> adminList = new MutableLiveData<>(new ArrayList<>(0));
 
     public static MemberCache getInstance() {
         return Holder.INSTANCE;
     }
 
-    public MutableLiveData<List<User>> getMemberList() {
-        return memberList;
+    public MutableLiveData<List<User>> getUserList() {
+        return userList;
     }
 
     public MutableLiveData<List<String>> getAdminList() {
@@ -56,10 +56,10 @@ public class MemberCache {
                 if (result.ok()) {
                     List<User> list = result.getList(User.class);
                     if (list != null) {
-                        memberList.setValue(list);
+                        userList.setValue(list);
                     }
-                    for (int i = 0; i < list.size(); i++) {
-                        UserProvider.provider().update(list.get(i).toUserInfo());
+                    for (User user : list) {
+                        UserProvider.provider().update(user.toUserInfo());
                     }
                 }
             }
@@ -112,7 +112,7 @@ public class MemberCache {
         List<User> list = getMembers();
         if (list.contains(user)) {
             list.remove(user);
-            memberList.setValue(list);
+            userList.setValue(list);
         }
     }
 
@@ -138,12 +138,12 @@ public class MemberCache {
         List<User> list = getMembers();
         if (!list.contains(user)) {
             list.add(user);
-            memberList.setValue(list);
+            userList.setValue(list);
         }
     }
 
     private List<User> getMembers() {
-        return memberList.getValue();
+        return userList.getValue();
     }
 
     private static class Holder {

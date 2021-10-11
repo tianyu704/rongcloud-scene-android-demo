@@ -3,8 +3,6 @@ package cn.rong.combusis.ui.room.widget;
 import android.Manifest;
 import android.content.Context;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -24,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiPopup;
 
 import cn.rong.combusis.R;
@@ -286,15 +285,7 @@ public class RoomBottomView extends ConstraintLayout {
         if (from != null) {
             mFavAnimation.addFavor(this, 300, 1500, from, null);
         } else {
-            int[] location = new int[2];
-            if (Build.VERSION.SDK_INT >= 24) {
-                Rect rect = new Rect();
-                mSendGiftView.getGlobalVisibleRect(rect);
-                location[0] = rect.left;
-                location[1] = rect.top;
-            } else {
-                mSendGiftView.getLocationOnScreen(location);
-            }
+            int[] location = UiUtils.INSTANCE.getLocation(mSendGiftView);
             from = new Point(location[0] + mSendGiftView.getWidth() / 2, location[1] - mSendGiftView.getHeight() / 2);
             Point to = new Point(from.x + 200, from.y - 200);
             mFavAnimation.addFavor(this, 300, 1200, from, to);
@@ -349,6 +340,9 @@ public class RoomBottomView extends ConstraintLayout {
                     mPkView.setImageResource(R.drawable.ic_request_pk);
                 }
                 onBottomOptionClickListener.clickPk(isInPk);
+            });
+            mSendGiftView.setOnClickListener(v -> {
+                onBottomOptionClickListener.onSendGift();
             });
         }
     }

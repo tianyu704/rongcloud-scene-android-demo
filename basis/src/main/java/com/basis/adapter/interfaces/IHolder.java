@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import androidx.annotation.DrawableRes;
+
 /**
  * 通用holder接口
  */
@@ -61,6 +63,11 @@ public interface IHolder<T extends IHolder> {
      * 设置ImageDrawable
      */
     T setImageDrawable(int viewId, Drawable drawable);
+
+    /**
+     * 设置ImageResource
+     */
+    T setImageResource(int viewId, @DrawableRes int resource);
 
     /**
      * 设置ImageBitmap
