@@ -18,12 +18,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rongcloud.voiceroom.R;
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 
 public class TestPkActivity extends BaseActivity implements View.OnClickListener {
@@ -79,6 +81,7 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
         getView(R.id.refresh).setOnClickListener(this);
         getView(R.id.quitpk).setOnClickListener(this);
         getView(R.id.fill).setOnClickListener(this);
+        getView(R.id.music).setOnClickListener(this);
     }
 
     @Override
@@ -91,6 +94,9 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
         } else if (R.id.fill == id) {//屏蔽词
             ShieldDialog dialog = new ShieldDialog(this, "", 3);
             dialog.show();
+        } else if (R.id.music == id) {//音乐
+            MusicDialog dialog = new MusicDialog(voiceRoomBean.getRoomId());
+            dialog.show(getSupportFragmentManager());
         } else if (R.id.quitpk == id) {
             PKStateManager.get().quitPK(activity);
         } else if (R.id.send_pk == id) {
@@ -118,19 +124,19 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void join() {
-//        RCVoiceRoomInfo roomInfo = VoiceRoomApi.getApi().getRoomInfo();
-//        roomInfo.setSeatCount(8);
-//        roomInfo.setRoomName(voiceRoomBean.getRoomName());
-//        roomInfo.setMuteAll(false);
-//        roomInfo.setLockAll(false);
-//        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
-//            @Override
-//            public void onResult(Boolean aBoolean) {
-//                Log.e(TAG, "加入房间:" + aBoolean);
-//                synToService(voiceRoomBean.getRoomId());
-//                VoiceRoomApi.getApi().enterSeat(1, null);
-//            }
-//        });
+        RCVoiceRoomInfo roomInfo = VoiceRoomApi.getApi().getRoomInfo();
+        roomInfo.setSeatCount(8);
+        roomInfo.setRoomName(voiceRoomBean.getRoomName());
+        roomInfo.setMuteAll(false);
+        roomInfo.setLockAll(false);
+        VoiceRoomApi.getApi().createAndJoin(voiceRoomBean.getRoomId(), roomInfo, new IResultBack<Boolean>() {
+            @Override
+            public void onResult(Boolean aBoolean) {
+                Log.e(TAG, "加入房间:" + aBoolean);
+                synToService(voiceRoomBean.getRoomId());
+                VoiceRoomApi.getApi().enterSeat(1, null);
+            }
+        });
         VoiceRoomApi.getApi().joinRoom(voiceRoomBean.getRoomId(), new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean aBoolean) {

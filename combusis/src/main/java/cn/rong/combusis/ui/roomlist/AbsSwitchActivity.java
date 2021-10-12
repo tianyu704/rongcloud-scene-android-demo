@@ -16,6 +16,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.Arrays;
 
 import cn.rong.combusis.R;
+import io.rong.imkit.utils.StatusBarUtil;
 
 public class AbsSwitchActivity extends BaseActivity implements View.OnClickListener {
 
@@ -34,6 +35,7 @@ public class AbsSwitchActivity extends BaseActivity implements View.OnClickListe
     private int currentIndex = 0;
 
     protected void initView() {
+        StatusBarUtil.setStatusBarFontIconDark(this, StatusBarUtil.TYPE_M, true);
         vp_switch = findViewById(R.id.vp_switch);
 
         tab_switch = findViewById(R.id.tab_switch);

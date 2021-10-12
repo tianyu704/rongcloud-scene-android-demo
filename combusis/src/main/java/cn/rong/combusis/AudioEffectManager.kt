@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroom.utils
+package cn.rong.combusis
 
 import android.util.Log
 import cn.rongcloud.rtc.api.RCRTCEngine
@@ -20,7 +20,8 @@ const val MUSIC_ATMOSPHERE_CHEER = "cheering_effect.mp3"
 
 val MUSIC_ATMOSPHERE_NAME_LIST = arrayListOf<String>(
     MUSIC_ATMOSPHERE_ENTER,
-    MUSIC_ATMOSPHERE_CLAP, MUSIC_ATMOSPHERE_CHEER
+    MUSIC_ATMOSPHERE_CLAP,
+    MUSIC_ATMOSPHERE_CHEER
 )
 
 private const val TAG = "AudioEffectManager"
@@ -56,6 +57,19 @@ object AudioEffectManager {
             RCRTCEngine.getInstance().audioEffectManager.stopAllEffects()
             RCRTCEngine.getInstance().audioEffectManager.playEffect(
                 getMusicAtmosphereIndexByName(name),
+                1,
+                50
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "playEffect: ", e)
+        }
+    }
+
+    fun playEffect(index: Int) {
+        try {
+            RCRTCEngine.getInstance().audioEffectManager.stopAllEffects()
+            RCRTCEngine.getInstance().audioEffectManager.playEffect(
+                getMusicAtmosphereIndexByName(MUSIC_ATMOSPHERE_NAME_LIST[index]),
                 1,
                 50
             )

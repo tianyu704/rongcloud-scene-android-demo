@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltBinding(value = ICreatorView::class)
 @AndroidEntryPoint
 class CreatorSettingFragment(view: ICreatorView, private val roomInfoBean: VoiceRoomBean) :
-    BaseBottomSheetDialogFragment(R.layout.fragmeng_creator_setting),
+    BaseBottomSheetDialogFragment(R.layout.fragment_creator_setting),
     ICreatorView by view {
 
     @Inject

@@ -22,7 +22,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 abstract class BaseBottomSheetDialogFragment(@LayoutRes val layoutId: Int) :
     BottomSheetDialogFragment() {
     private lateinit var mBehavior: BottomSheetBehavior<View>
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         super.onCreate(savedInstanceState)
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog

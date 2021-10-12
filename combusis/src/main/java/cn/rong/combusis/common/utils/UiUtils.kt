@@ -53,8 +53,7 @@ object UiUtils {
         } else {
             view.getLocationOnScreen(location)
         }
-        Log.e("getLocation", "x = " + location[0])
-        Log.e("getLocation", "y = " + location[1])
+        Log.d("getLocation", "(x,y)=(${location[0]},${location[1]})")
         return location
     }
 }

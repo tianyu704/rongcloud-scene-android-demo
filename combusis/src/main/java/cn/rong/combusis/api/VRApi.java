@@ -3,7 +3,7 @@ package cn.rong.combusis.api;
 import com.rongcloud.common.net.ApiConstant;
 
 public class VRApi {
-    private final static String HOST = ApiConstant.INSTANCE.getBASE_URL();
+    public final static String HOST = ApiConstant.INSTANCE.getBASE_URL();
     /**
      * 粉丝或关注列表
      */
