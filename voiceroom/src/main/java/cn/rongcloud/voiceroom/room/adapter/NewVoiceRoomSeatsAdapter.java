@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroom.room.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,10 +97,16 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
                 holder.iv_is_mute.setVisibility(uiSeatModel.isMute() ? View.VISIBLE : View.GONE);
                 holder.iv_seat_status.setVisibility(View.GONE);
                 //TODO 这里一下子如果拿不到怎么办
-                User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
-                holder.tv_member_name.setText(member!=null?member.getUserName():"");
+                if (!TextUtils.isEmpty(uiSeatModel.getUserId())){
+                    User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
+                    if (member!=null&& !TextUtils.isEmpty(member.getUserName())){
+                        holder.tv_member_name.setText(member.getUserName());
+                    }else {
+                        holder.tv_member_name.setText("");
+                    }
+                }
                 holder.tv_gift_count.setText(uiSeatModel.getGiftCount()+"");
-                if (uiSeatModel.isAdmin()) {
+                if (MemberCache.getInstance().isAdmin(uiSeatModel.getUserId())) {
                     holder.tv_member_name.setCompoundDrawablesWithIntrinsicBounds(
                             R.drawable.ic_is_admin,
                             0,

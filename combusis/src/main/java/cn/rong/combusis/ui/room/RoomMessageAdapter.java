@@ -173,12 +173,14 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGiftAll) message).getUserName()), ((RCChatroomGiftAll) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(String.format("全麦打赏 %s x%s", ((RCChatroomGiftAll) message).getGiftName(), ((RCChatroomGiftAll) message).getNumber()), "", false, 0, 0));
             updateRole(((RCChatroomGiftAll) message).getUserId(), messageTextView);
+            messageTextView.setBackground(context.getDrawable(R.drawable.bg_voice_room_gift_message_item));
         } else if (message instanceof RCChatroomGift) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomGift) message).getUserName()), ((RCChatroomGift) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(" 送给 ", "", false, 0, 0));
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGift) message).getTargetName()), ((RCChatroomGift) message).getTargetId(), true, 0, 0));
             list.add(new MsgInfo(String.format(" %s x%s", ((RCChatroomGift) message).getGiftName(), ((RCChatroomGift) message).getNumber()), "", false, 0, 0));
             updateRole(((RCChatroomGift) message).getUserId(), messageTextView);
+            messageTextView.setBackground(context.getDrawable(R.drawable.bg_voice_room_gift_message_item));
         } else if (message instanceof RCChatroomAdmin) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomAdmin) message).getUserName()), ((RCChatroomAdmin) message).getUserId(), true, 0, 0));
             if (((RCChatroomAdmin) message).isAdmin()) {

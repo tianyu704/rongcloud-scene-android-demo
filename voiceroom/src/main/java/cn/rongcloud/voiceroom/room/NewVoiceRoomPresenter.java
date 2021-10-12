@@ -2,6 +2,7 @@ package cn.rongcloud.voiceroom.room;
 
 import static cn.rong.combusis.sdk.Api.EVENT_BACKGROUND_CHANGE;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
+import static cn.rong.combusis.sdk.Api.EVENT_MANAGER_LIST_CHANGE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
@@ -52,6 +54,7 @@ import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBackgroundFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomLockAllSeatFun;
@@ -65,6 +68,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomPauseFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatModeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
@@ -96,7 +100,7 @@ import kotlin.jvm.functions.Function2;
  */
 public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
         IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
-        , BackgroundSettingFragment.OnSelectBackgroundListener {
+        , BackgroundSettingFragment.OnSelectBackgroundListener , GiftFragment.OnSendGiftListener{
 
     private String TAG = "NewVoiceRoomPresenter";
 
@@ -183,9 +187,16 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 newVoiceRoomModel.onMemberListener(users);
             }
         });
+        MemberCache.getInstance().getAdminList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
+                mView.refreshSeat();
+            }
+        });
         //获取屏蔽词
         getShield();
         setObMessageListener();
+        getGiftCount();
     }
 
     @Override
@@ -197,8 +208,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void initListener(String roomId) {
         //设置界面监听
-//        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
-        EventHelper.helper().regeister(roomId, newVoiceRoomModel);
+        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
+//        EventHelper.helper().regeister(roomId, newVoiceRoomModel);
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this);
         setObSeatListChange();
         setObRoomEventChange();
@@ -220,8 +231,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         if (uiRoomModel.getRcRoomInfo() != null) {
                             extra = uiRoomModel.getRcRoomInfo().getExtra();
                         }
-                        String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
-                        mView.showNotice(notice, false);
+                        if (mVoiceRoomBean!=null){
+                            String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
+                            mView.showNotice(notice, false);
+                        }
                     }
                 }));
     }
@@ -276,6 +289,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
+                        }
+                        if (RCChatroomGift.class.equals(aClass)||RCChatroomGiftAll.class.equals(aClass)){
+                            getGiftCount();
                         }
                         Log.e("TAG", "accept: " + messageContent);
                     }
@@ -335,22 +351,31 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     }
                 });
             } else {
-                //申请连麦
-                RCVoiceRoomEngine.getInstance().requestSeat(new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        currentStatus = STATUS_WAIT_FOR_SEAT;
-                        mView.changeStatus(STATUS_WAIT_FOR_SEAT);
-                        mView.showToast("已申请连线，等待房主接受");
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        mView.showToast("请求连麦失败");
-                    }
-                });
+                requestSeat();
             }
         }
+    }
+
+    /**
+     * 申请连麦
+     */
+    public void requestSeat() {
+        if (currentStatus!=STATUS_NOT_ON_SEAT){
+            return;
+        }
+        RCVoiceRoomEngine.getInstance().requestSeat(new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                currentStatus = STATUS_WAIT_FOR_SEAT;
+                mView.changeStatus(STATUS_WAIT_FOR_SEAT);
+                mView.showToast("已申请连线，等待房主接受");
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                mView.showToast("请求连麦失败");
+            }
+        });
     }
 
     /**
@@ -373,12 +398,52 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 监听麦位改变
      */
     private void setObSeatListChange() {
-        addSubscription(newVoiceRoomModel.obSeatListChange().subscribe(new Consumer<List<UiSeatModel>>() {
-            @Override
-            public void accept(List<UiSeatModel> uiSeatModels) throws Throwable {
-                mView.onSeatListChange(uiSeatModels);
+        addSubscription(newVoiceRoomModel.obSeatListChange()
+                .subscribe(new Consumer<List<UiSeatModel>>() {
+                    @Override
+                    public void accept(List<UiSeatModel> uiSeatModels) throws Throwable {
+                        mView.onSeatListChange(uiSeatModels);
+                        refreshCurrentStatus(uiSeatModels);
+                        getGiftCount();
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        Log.e(TAG, "setObSeatListChange: "+throwable );
+                    }
+                }));
+    }
+
+    /**
+     * 刷新当前的状态
+     * @param uiSeatModels
+     */
+    private synchronized void refreshCurrentStatus(List<UiSeatModel> uiSeatModels) {
+        try {
+            boolean inseat=false;
+            for (UiSeatModel uiSeatModel : uiSeatModels) {
+                if (!TextUtils.isEmpty(uiSeatModel.getUserId())&&!TextUtils.isEmpty(AccountStore.INSTANCE.getUserId())&&
+                        uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                    //说明在麦位上
+                    inseat=true;
+                    break;
+                }
             }
-        }));
+            if (currentStatus == STATUS_WAIT_FOR_SEAT){
+                //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
+
+            }else {
+                if (inseat){//在麦位上
+                    currentStatus=STATUS_ON_SEAT;
+                }else {
+                    //不在麦位上
+                    currentStatus=STATUS_NOT_ON_SEAT;
+                }
+            }
+            mView.changeStatus(currentStatus);
+        }catch (Exception e){
+            Log.e(TAG, "refreshCurrentStatus: "+e );
+        }
     }
 
 
@@ -391,7 +456,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             public void accept(Pair<String, ArrayList<String>> stringArrayListPair) throws Throwable {
                 switch (stringArrayListPair.first) {
                     case EVENT_REQUEST_SEAT_AGREE://请求麦位被允许
-                        currentStatus = STATUS_NOT_ON_SEAT;
+                        currentStatus = STATUS_ON_SEAT;
                         //加入麦位
                         newVoiceRoomModel.enterSeatIfAvailable();
                         //去更改底部的状态显示按钮
@@ -409,6 +474,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     case EVENT_REQUEST_SEAT_CANCEL://撤销麦位申请
                         currentStatus = STATUS_NOT_ON_SEAT;
                         mView.changeStatus(currentStatus);
+                        break;
+                    case EVENT_MANAGER_LIST_CHANGE://管理员列表发生了变化
+                        MemberCache.getInstance().refreshAdminData(getmVoiceRoomBean().getRoomId());
+                        Log.e(TAG, "accept: "+"EVENT_MANAGER_LIST_CHANGE");
                         break;
                 }
             }
@@ -479,7 +548,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 , new Function1<Integer, Unit>() {
                     @Override
                     public Unit invoke(Integer integer) {
-                        //发送成功，回调给接收的地方，统一去处理，避免多个地方处理
+                        if (messageContent instanceof RCChatroomAdmin){
+                            //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
+                            RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "");
+                            MemberCache.getInstance().refreshAdminData(mVoiceRoomBean.getRoomId());
+                        }
                         return null;
                     }
                 }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
@@ -613,18 +686,40 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     }
 
     /**
-     * 发送礼物
+     * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
+     */
+    public void sendGift() {
+        ArrayList<UiSeatModel> uiSeatModels = newVoiceRoomModel.getUiSeatModels();
+        ArrayList<Member> memberArrayList = new ArrayList<>();
+        for (UiSeatModel uiSeatModel : uiSeatModels) {
+            String userId = uiSeatModel.getUserId();
+            if (!TextUtils.isEmpty(userId)&&uiSeatModel.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+                User user = MemberCache.getInstance().getMember(userId);
+                Member member = new Member().toMember(user);
+                memberArrayList.add(member);
+            }
+        }
+        mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(),
+                mVoiceRoomBean.getCreateUserId(), mVoiceRoomBean.getCreateUserId(), memberArrayList);
+    }
+
+    /**
+     * 发送礼物 底部发送礼物的按钮
      *
      * @param user
      */
     @Override
     public void clickSendGift(User user) {
-
+        mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(), mVoiceRoomBean.getCreateUserId(), user.getUserId(), Arrays.asList(new Member().toMember(user)));
     }
 
+    /**
+     * 发送关注消息
+     * @param followMsg
+     */
     @Override
     public void clickFollow(RCFollowMsg followMsg) {
-
+        sendMessage(followMsg);
     }
 
     /**
@@ -772,7 +867,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 切换房间的时候，对之前房间的操作
      */
     public void leaveCurrentRoom() {
-        if (messageDisposable != null && messageDisposable.isDisposed()) {
+        if (messageDisposable != null && !messageDisposable.isDisposed()) {
             messageDisposable.dispose();
         }
     }
@@ -1057,6 +1152,56 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             public void onError(int code, String msg) {
                 super.onError(code, msg);
                 mView.showToast("设置失败");
+            }
+        });
+    }
+
+    @Override
+    public void onSendGiftSuccess(List<MessageContent> messages) {
+        if (messages != null && !messages.isEmpty()) {
+            for (MessageContent message : messages) {
+                sendMessage(message);
+            }
+            getGiftCount();
+        }
+    }
+
+    /**
+     * 获取房间内礼物列表 ,刷新列表
+     */
+    public void getGiftCount() {
+        if (mVoiceRoomBean!=null&&!TextUtils.isEmpty(mVoiceRoomBean.getRoomId()))
+        OkApi.get(VRApi.getGiftList(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    Map<String, String> map = result.getMap();
+                    Logger.e("================" + map.toString());
+                    for (String userId : map.keySet()) {
+                        UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(userId);
+                        String gifCount = map.get(userId);
+                        if (uiSeatModel!=null)
+                        uiSeatModel.setGiftCount(Integer.parseInt(gifCount));
+                    }
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 根据id获取用户信息
+     */
+    public void getUserInfo(String userId) {
+        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{userId}).build(), new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    List<Member> members = result.getList(Member.class);
+                    if (members != null && members.size() > 0) {
+                        mView.showUserSetting(members.get(0));
+                    }
+                }
             }
         });
     }

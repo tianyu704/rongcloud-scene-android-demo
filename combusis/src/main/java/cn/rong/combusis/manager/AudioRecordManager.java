@@ -293,7 +293,7 @@ public class AudioRecordManager implements Handler.Callback {
         message.what = event;
         mCurAudioState.handleMessage(message);
     }
-
+    boolean isRecording=false;
     private void startRec() {
         RLog.d(TAG, "startRec");
         try {
@@ -336,7 +336,7 @@ public class AudioRecordManager implements Handler.Callback {
             mMediaRecorder.setOutputFile(mAudioPath.getPath());
             mMediaRecorder.prepare();
             mMediaRecorder.start();
-
+            isRecording=true;
             android.os.Message message = android.os.Message.obtain();
             message.what = AUDIO_RECORD_EVENT_TIME_OUT;
             message.obj = 10;
@@ -359,6 +359,7 @@ public class AudioRecordManager implements Handler.Callback {
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
                 mMediaRecorder = null;
+                isRecording=false;
             }
         } catch (Exception e) {
             RLog.e(TAG, "stopRec", e);
@@ -426,6 +427,14 @@ public class AudioRecordManager implements Handler.Callback {
             });
 
         }
+    }
+
+    /**
+     * 判断是否正在录音中
+     * @return
+     */
+    public boolean isRecording(){
+        return isRecording;
     }
 
     private void audioDBChanged() {

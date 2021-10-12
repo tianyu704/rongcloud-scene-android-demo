@@ -3,6 +3,9 @@ package cn.rong.combusis.ui.room.widget;
 import android.Manifest;
 import android.content.Context;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -277,6 +280,13 @@ public class RoomBottomView extends ConstraintLayout {
     }
 
     /**
+     * 设置申请上面的按钮的图
+     */
+    public void setRequestSeatImage(int drawable){
+        mRequestSeatView.setImageResource(drawable);
+    }
+
+    /**
      * 显示礼物动画
      *
      * @param from
@@ -294,6 +304,9 @@ public class RoomBottomView extends ConstraintLayout {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (audioRecordManager.isRecording()) {
+            return super.dispatchTouchEvent(ev);
+        }
         if (ev.getY() > mOptionContainer.getTop()) {
             return super.dispatchTouchEvent(ev);
         } else {

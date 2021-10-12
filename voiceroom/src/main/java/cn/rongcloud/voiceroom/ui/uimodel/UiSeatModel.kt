@@ -104,9 +104,14 @@ class UiSeatModel constructor(
     var isAdmin: Boolean = false
         get() = member?.isAdmin ?: false
 
-    var giftCount: Int
-        get() = member?.giftCount ?: 0
-        private set(value) {}
+    var giftCount: Int = 0
+//        get() = this.giftCount ?: 0
+        set(value) {
+            if (value != field) {
+                field = value
+                seatInfoChangeSubject.onNext(this)
+            }
+        }
 
 
     override fun equals(other: Any?): Boolean {

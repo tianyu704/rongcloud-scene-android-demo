@@ -22,6 +22,7 @@ import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.common.utils.SharedPreferUtil;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
@@ -42,7 +43,6 @@ import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.net.VoiceRoomNetManager;
 import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomInfoBean;
-import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -85,10 +85,6 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
 
     //房间事件监听（麦位 进入 踢出等等）
     private BehaviorSubject<Pair<String, ArrayList<String>>> roomEventSubject = BehaviorSubject.create();
-    /**
-     * 用户信息监听
-     */
-    private BehaviorSubject<UiMemberModel> memberInfoChangeSubject = BehaviorSubject.create();
 
     /**
      * 申请和撤销上麦下麦的监听
@@ -221,7 +217,8 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
             for (int i = 0; i < list.size(); i++) {
                 //构建一个集合返回去
                 RCVoiceSeatInfo rcVoiceSeatInfo = list.get(i);
-                if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())&&rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
+                if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())
+                        &&rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
                     rcVoiceSeatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
                 }
                 UiSeatModel uiSeatModel = new UiSeatModel(i,rcVoiceSeatInfo , seatInfoChangeSubject);
@@ -240,12 +237,6 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onUserEnterSeat(int i, String s) {
         Log.e(TAG, "onUserEnterSeat: ");
-        obSeatInfoByIndex(i).subscribe(new Consumer<UiSeatModel>() {
-            @Override
-            public void accept(UiSeatModel uiSeatModel) throws Throwable {
-                seatInfoChangeSubject.onNext(uiSeatModel);
-            }
-        });
         MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
@@ -259,12 +250,6 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     public void onUserLeaveSeat(int i, String s) {
         Log.e(TAG, "onUserLeaveSeat: ");
         //如果是房主的话，那么去更新房主的信息
-        obSeatInfoByIndex(i).subscribe(new Consumer<UiSeatModel>() {
-            @Override
-            public void accept(UiSeatModel uiSeatModel) throws Throwable {
-                seatInfoChangeSubject.onNext(uiSeatModel);
-            }
-        });
         MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
     }
 
@@ -324,7 +309,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     @Override
     public void onSpeakingStateChanged(int i, boolean b) {
-        Log.e(TAG, "onSpeakingStateChanged: " + i + ":" + b);
+//        Log.e(TAG, "onSpeakingStateChanged: " + i + ":" + b);
         if (uiSeatModels.size() > i) {
             UiSeatModel uiSeatModel = uiSeatModels.get(i);
             uiSeatModel.setSpeaking(b);
@@ -338,8 +323,10 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
     @Override
-    public void onRoomNotificationReceived(String s, String s1) {
-
+    public void onRoomNotificationReceived(String name, String content) {
+        ArrayList<String> contents = new ArrayList<>();
+        contents.add(content);
+        roomEventSubject.onNext(new Pair<>(name,contents));
     }
 
     /**

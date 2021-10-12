@@ -380,6 +380,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                     }
                     member.setStatus(isFollow ? 1 : 0);
                     refreshFollow(isFollow);
+                    dismiss();
                 } else {
                     if (isFollow) {
                         ToastUtils.s(getContext(), "关注失败");

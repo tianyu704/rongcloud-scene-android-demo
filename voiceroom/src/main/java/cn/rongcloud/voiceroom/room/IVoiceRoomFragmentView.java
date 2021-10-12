@@ -8,7 +8,9 @@ import java.util.List;
 
 import com.basis.mvp.IBaseView;
 
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imlib.model.MessageContent;
@@ -26,14 +28,8 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void enterSeatSuccess();
 
-    void packupRoom();
 
     void refreshOnlineUsersNumber(int onlineUsersNumber);
-
-    /**
-     * 依据 RoomInfo 刷新 UI
-     */
-    void refreshRoomInfo(UiRoomModel roomInfo);
 
     /**
      * 通知指定坐席信息发生了改变，刷新之
@@ -95,4 +91,10 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showNoticeDialog();
 
     void setRoomBackground(String url);
+
+    void refreshSeat();
+
+    void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members);
+
+    void showUserSetting(Member member);
 }
