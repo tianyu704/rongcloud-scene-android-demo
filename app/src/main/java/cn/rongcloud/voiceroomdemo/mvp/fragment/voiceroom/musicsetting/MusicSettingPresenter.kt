@@ -5,9 +5,9 @@
 package cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.musicsetting
 
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroom.utils.AudioEffectManager
-import com.rongcloud.common.base.BaseLifeCyclePresenter
+import cn.rong.combusis.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import javax.inject.Inject
 
 /**

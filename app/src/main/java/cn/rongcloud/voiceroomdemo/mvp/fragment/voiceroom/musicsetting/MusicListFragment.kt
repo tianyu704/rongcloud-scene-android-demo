@@ -10,11 +10,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.base.BaseFragment
-import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_music_list.*
+import kotlinx.android.synthetic.main.fragment_musics.*
 import kotlinx.android.synthetic.main.layout_music_play_item.view.*
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MusicListFragment(val view: IMusicListView) :
     BaseFragment(
-        R.layout.fragment_music_list
+        R.layout.fragment_musics
     ), IMusicListView by view {
 
     @Inject
@@ -53,7 +53,6 @@ class MusicListFragment(val view: IMusicListView) :
             rv_list.isVisible = true
             (rv_list.adapter as MyAdapter).refreshData(musicList)
         }
-
     }
 
 
@@ -64,7 +63,7 @@ class MusicListFragment(val view: IMusicListView) :
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder =
             MyViewHolder(
                 LayoutInflater.from(parent.context)
-                    .inflate(R.layout.layout_music_play_item, parent, false)
+                    .inflate(R.layout.layout_musics_play_item, parent, false)
             )
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {

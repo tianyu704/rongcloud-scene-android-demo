@@ -6,6 +6,7 @@ package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import cn.rong.combusis.AudioEffectManager
 import cn.rong.combusis.manager.RCChatRoomMessageManager
 import cn.rong.combusis.message.*
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -15,7 +16,6 @@ import cn.rongcloud.voiceroom.net.VoiceRoomNetManager
 import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
-import cn.rongcloud.voiceroom.utils.AudioEffectManager
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IVoiceRoomView
 import cn.rongcloud.voiceroomdemo.mvp.model.*
 import cn.rongcloud.voiceroomdemo.utils.DefaultConfigConstant

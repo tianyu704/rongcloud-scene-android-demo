@@ -13,11 +13,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.voiceroomdemo.R
-import com.rongcloud.common.base.BaseFragment
 import cn.rongcloud.voiceroom.ui.uimodel.MUSIC_FROM_TYPE_SYSTEM
 import cn.rongcloud.voiceroom.ui.uimodel.MUSIC_FUNCTION_LOCAL_ADD
 import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel
+import cn.rongcloud.voiceroomdemo.R
+import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.ui
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_music_add.*
@@ -34,7 +34,7 @@ private const val MUSIC_PICK_REQUEST_CODE = 10000
 @HiltBinding(IMusicAddView::class)
 @AndroidEntryPoint
 class MusicAddFragment(view: IMusicAddView) :
-    BaseFragment(R.layout.fragment_music_add),
+    BaseFragment(R.layout.fragment_add_music),
     IMusicAddView by view {
 
     @Inject

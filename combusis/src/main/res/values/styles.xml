@@ -4,6 +4,29 @@
 
 <resources>
 
+    <style name="music_audio_setting_seekbar_style">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">15dp</item>
+        <item name="android:layout_marginEnd">15dp</item>
+        <item name="android:max">100</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:progressDrawable">@drawable/bg_music_audio_volume_seekbar</item>
+        <item name="android:thumb">@drawable/thumb_audio_volume_setting</item>
+    </style>
+
+    <style name="SwitchCompat.Control" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">#EF499A</item>
+        <item name="colorSwitchThumbNormal">#ebebeb</item>
+        <item name="android:colorForeground">#ffffff</item>
+    </style>
+
+    <style name="SwitchCompat.Text" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">9sp</item>
+    </style>
+
     <attr name="radius" format="dimension" />
     <attr name="left_top_radius" format="dimension" />
     <attr name="right_top_radius" format="dimension" />

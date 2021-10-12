@@ -8,12 +8,12 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import cn.rong.combusis.MUSIC_ATMOSPHERE_CHEER
+import cn.rong.combusis.MUSIC_ATMOSPHERE_CLAP
+import cn.rong.combusis.MUSIC_ATMOSPHERE_ENTER
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.ui.uimodel.UiMusicModel
-import cn.rongcloud.voiceroom.utils.MUSIC_ATMOSPHERE_CHEER
-import cn.rongcloud.voiceroom.utils.MUSIC_ATMOSPHERE_CLAP
-import cn.rongcloud.voiceroom.utils.MUSIC_ATMOSPHERE_ENTER
 import cn.rongcloud.voiceroomdemo.R
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.rongcloud.common.ui.widget.ActionSnackBar
