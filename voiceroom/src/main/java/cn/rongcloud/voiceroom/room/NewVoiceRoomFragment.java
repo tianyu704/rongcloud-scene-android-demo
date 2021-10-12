@@ -712,7 +712,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickRequestSeat() {
-        present.requestSeat();
+        present.requestSeat(-1);
     }
 
     /**

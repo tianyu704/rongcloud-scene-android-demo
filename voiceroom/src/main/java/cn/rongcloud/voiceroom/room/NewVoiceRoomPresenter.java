@@ -208,8 +208,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void initListener(String roomId) {
         //设置界面监听
-        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
-//        EventHelper.helper().regeister(roomId, newVoiceRoomModel);
+//        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
+        EventHelper.helper().regeister(roomId, newVoiceRoomModel);
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this);
         setObSeatListChange();
         setObRoomEventChange();
@@ -323,59 +323,61 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             });
         } else {
             //不在麦位上
-            //如果当前正在等待并且不可以自有上麦的模式
-            if (currentStatus == STATUS_WAIT_FOR_SEAT && !newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
-                mView.showRevokeSeatRequest();
-                return;
-            }
-            // 自由上麦模式
-            if (newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
-                int index = position;
-                if (index == -1) {
-                    index = newVoiceRoomModel.getAvailableIndex();
-                }
-                if (index == -1) {
-                    mView.showToast("当前麦位已满");
-                    return;
-                }
-                RCVoiceRoomEngine.getInstance().enterSeat(index, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        mView.showToast("上麦成功");
-                        AudioManagerUtil.INSTANCE.choiceAudioModel();
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        mView.showToast(message);
-                    }
-                });
-            } else {
-                requestSeat();
-            }
+            requestSeat(position);
         }
     }
 
     /**
      * 申请连麦
+     * @param position
      */
-    public void requestSeat() {
-        if (currentStatus!=STATUS_NOT_ON_SEAT){
+    public void requestSeat(int position) {
+        if (currentStatus==STATUS_ON_SEAT){
+            //如果是麦位上
             return;
         }
-        RCVoiceRoomEngine.getInstance().requestSeat(new RCVoiceRoomCallback() {
-            @Override
-            public void onSuccess() {
-                currentStatus = STATUS_WAIT_FOR_SEAT;
-                mView.changeStatus(STATUS_WAIT_FOR_SEAT);
-                mView.showToast("已申请连线，等待房主接受");
+        //如果当前正在等待并且不可以自有上麦的模式
+        if (currentStatus == STATUS_WAIT_FOR_SEAT && !newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
+            mView.showRevokeSeatRequest();
+            return;
+        }
+        //如果是自由上麦模式
+        if (newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
+            int index = position;
+            if (index == -1) {
+                index = newVoiceRoomModel.getAvailableIndex();
             }
+            if (index == -1) {
+                mView.showToast("当前麦位已满");
+                return;
+            }
+            RCVoiceRoomEngine.getInstance().enterSeat(index, new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+                    mView.showToast("上麦成功");
+                    AudioManagerUtil.INSTANCE.choiceAudioModel();
+                }
 
-            @Override
-            public void onError(int code, String message) {
-                mView.showToast("请求连麦失败");
-            }
-        });
+                @Override
+                public void onError(int code, String message) {
+                    mView.showToast(message);
+                }
+            });
+        }else {
+            RCVoiceRoomEngine.getInstance().requestSeat(new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+                    currentStatus = STATUS_WAIT_FOR_SEAT;
+                    mView.changeStatus(STATUS_WAIT_FOR_SEAT);
+                    mView.showToast("已申请连线，等待房主接受");
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    mView.showToast("请求连麦失败");
+                }
+            });
+        }
     }
 
     /**
