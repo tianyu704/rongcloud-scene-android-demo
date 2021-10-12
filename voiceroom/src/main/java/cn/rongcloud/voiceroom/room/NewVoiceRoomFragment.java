@@ -31,6 +31,7 @@ import java.util.List;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
@@ -143,14 +144,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
 
-        mRoomSeatView.setRoomOwnerHeadOnclickListener(new RoomSeatView.RoomOwnerHeadOnclickListener() {
-            @Override
-            public void onClick() {
-                //弹出
-                if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
-                    //如果是房间所有者 ,如果在麦位上,那么弹出下麦和关闭麦克风弹窗，如果不在麦位上，那么直接上麦
-                    present.onClickRoomOwnerView(getChildFragmentManager());
-                }
+        mRoomSeatView.setRoomOwnerHeadOnclickListener(v -> {
+            //弹出
+            if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+                //如果是房间所有者 ,如果在麦位上,那么弹出下麦和关闭麦克风弹窗，如果不在麦位上，那么直接上麦
+                present.onClickRoomOwnerView(getChildFragmentManager());
             }
         });
         // 底部操作按钮和双击送礼物
@@ -696,6 +694,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
                 return null;
             }
         });
+    }
+
+    @Override
+    public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
+        present.sendMessage(rcChatroomLike);
     }
 
     @Override

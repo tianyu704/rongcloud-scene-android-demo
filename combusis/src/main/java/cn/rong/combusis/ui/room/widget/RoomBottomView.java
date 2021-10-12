@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.kit.utils.Logger;
 import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiPopup;
 
@@ -29,6 +28,7 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.common.utils.SoftKeyboardUtils;
 import cn.rong.combusis.manager.AudioPlayManager;
 import cn.rong.combusis.manager.AudioRecordManager;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
@@ -179,17 +179,15 @@ public class RoomBottomView extends ConstraintLayout {
         mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
-                Logger.e("================double");
                 showFov(new Point((int) e.getX(), (int) e.getY()));
                 if (mOnBottomOptionClickListener != null) {
-                    mOnBottomOptionClickListener.onSendGift();
+                    mOnBottomOptionClickListener.onSendLikeMessage(new RCChatroomLike());
                 }
                 return true;
             }
 
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
-                Logger.e("=================single");
                 if (mInputBar.getVisibility() == VISIBLE) {
                     mInputView.clearFocus();
                     SoftKeyboardUtils.hideSoftKeyboard(mInputView);
@@ -281,12 +279,12 @@ public class RoomBottomView extends ConstraintLayout {
      *
      * @param from
      */
-    private void showFov(Point from) {
+    public void showFov(Point from) {
         if (from != null) {
             mFavAnimation.addFavor(this, 300, 1500, from, null);
         } else {
             int[] location = UiUtils.INSTANCE.getLocation(mSendGiftView);
-            from = new Point(location[0] + mSendGiftView.getWidth() / 2, location[1] - mSendGiftView.getHeight() / 2);
+            from = new Point(location[0], location[1] - mSendGiftView.getHeight() / 2);
             Point to = new Point(from.x + 200, from.y - 200);
             mFavAnimation.addFavor(this, 300, 1200, from, to);
         }
@@ -305,9 +303,11 @@ public class RoomBottomView extends ConstraintLayout {
     public void clearInput() {
         mInputView.setText("");
     }
+
     private String roomId;
-    public void setData(RoomOwnerType roomOwnerType, OnBottomOptionClickListener onBottomOptionClickListener,String roomId) {
-        this.roomId=roomId;
+
+    public void setData(RoomOwnerType roomOwnerType, OnBottomOptionClickListener onBottomOptionClickListener, String roomId) {
+        this.roomId = roomId;
         setViewState(roomOwnerType);
         this.mOnBottomOptionClickListener = onBottomOptionClickListener;
         if (onBottomOptionClickListener != null) {
@@ -361,6 +361,7 @@ public class RoomBottomView extends ConstraintLayout {
                 mPrivateMessageView.setVisibility(VISIBLE);
                 mRequestSeatView.setVisibility(GONE);
                 mSettingView.setVisibility(VISIBLE);
+                mSendVoiceMassageView.setVisibility(GONE);
                 break;
             case VOICE_VIEWER:
                 mSeatOrder.setVisibility(GONE);
@@ -369,6 +370,7 @@ public class RoomBottomView extends ConstraintLayout {
                 mPrivateMessageView.setVisibility(VISIBLE);
                 mRequestSeatView.setVisibility(VISIBLE);
                 mSettingView.setVisibility(GONE);
+                mSendVoiceMassageView.setVisibility(VISIBLE);
                 break;
             case RADIO_OWNER:
                 mSeatOrder.setVisibility(GONE);
@@ -377,6 +379,7 @@ public class RoomBottomView extends ConstraintLayout {
                 mPrivateMessageView.setVisibility(VISIBLE);
                 mSettingView.setVisibility(VISIBLE);
                 mRequestSeatView.setVisibility(GONE);
+                mSendVoiceMassageView.setVisibility(GONE);
                 break;
             case RADIO_VIEWER:
                 mSeatOrder.setVisibility(GONE);
@@ -385,6 +388,7 @@ public class RoomBottomView extends ConstraintLayout {
                 mPrivateMessageView.setVisibility(VISIBLE);
                 mSettingView.setVisibility(GONE);
                 mRequestSeatView.setVisibility(GONE);
+                mSendVoiceMassageView.setVisibility(VISIBLE);
                 break;
         }
     }
@@ -405,5 +409,7 @@ public class RoomBottomView extends ConstraintLayout {
         void onSendGift();
 
         void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice);
+
+        void onSendLikeMessage(RCChatroomLike rcChatroomLike);
     }
 }

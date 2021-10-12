@@ -37,6 +37,8 @@ public interface RadioRoomView extends IBaseView {
 
     void setSeatState(SeatState seatState);
 
+    void setSeatMute(boolean isMute);
+
     void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList);
 
     void showSetPasswordDialog(MutableLiveData<IFun.BaseFun> item);
@@ -54,4 +56,8 @@ public interface RadioRoomView extends IBaseView {
     void setGiftCount(Long count);
 
     void showUserSetting(Member member);
+
+    void showLikeAnimation();
+
+    void showCreatorSetting(boolean isMute, boolean isPlayingMusic);
 }

@@ -46,7 +46,7 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
     @Override
     public IAdapte<Friend, RcyHolder> onSetAdapter() {
         mType = getArguments().getInt(FRIEND_TYPE, 1);
-        mAdapter = new FriendAdapter(getContext(), R.layout.layout_friend_item);
+        mAdapter = new FriendAdapter(getContext(), R.layout.item_friend);
         mAdapter.setType(mType);
         mAdapter.setOnFollowClickListener(this);
         return mAdapter;

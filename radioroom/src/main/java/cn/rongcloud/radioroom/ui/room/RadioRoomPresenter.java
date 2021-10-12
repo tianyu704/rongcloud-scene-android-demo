@@ -26,6 +26,7 @@ import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomKickOut;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
@@ -36,6 +37,7 @@ import cn.rong.combusis.ui.OnItemClickListener;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.ui.room.fragment.CreatorSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBackgroundFun;
@@ -66,10 +68,13 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements RCRadioEventListener,
         RadioRoomMemberSettingClickListener, OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
-        BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener {
+        BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, CreatorSettingFragment.OnCreatorSettingClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
     private RoomOwnerType mRoomOwnerType;
+    private boolean isInSeat = false;
+    private boolean isMute = false;
+    private boolean isPlayingMusic = false;
 
     public RadioRoomPresenter(RadioRoomView mView, LifecycleOwner lifecycleOwner) {
         super(mView, lifecycleOwner.getLifecycle());
@@ -96,7 +101,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             sendDefaultMessage();
             // 获取房间内成员和管理员列表
             MemberCache.getInstance().fetchData(mRoomId);
+            // 在线人数
             refreshRoomMemberCount();
+            // 礼物数量
             getGiftCount();
         }
     }
@@ -149,9 +156,10 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RCRadioRoomEngine.getInstance().enterSeat(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
+                isInSeat = true;
                 Logger.e("==============enterSeat onSuccess");
                 mView.setSeatState(RoomSeatView.SeatState.NORMAL);
-                RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_SUSPEND, "0", null);
+                RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "0", null);
             }
 
             @Override
@@ -159,6 +167,39 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 Logger.e("==============enterSeat onError, code:" + code + ",message:" + message);
             }
         });
+    }
+
+    /**
+     * 房主下麦
+     */
+    public void leaveSeat() {
+        RCRadioRoomEngine.getInstance().leaveSeat(new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
+
+            }
+
+            @Override
+            public void onError(int i, String s) {
+
+            }
+        });
+    }
+
+    /**
+     * 点击麦位头像
+     */
+    public void clickRoomSeat() {
+        if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
+            if (isInSeat) {
+                mView.showCreatorSetting(isMute, isPlayingMusic);
+            } else {
+                enterSeat();
+            }
+        } else {
+            getUserInfo(getCreateUserId());
+        }
     }
 
     /**
@@ -206,7 +247,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * 获取房间公告
      */
     public void getNotice(boolean isModify) {
-        RCRadioRoomEngine.getInstance().getNotice(new RCRadioRoomResultCallback<String>() {
+        RCRadioRoomEngine.getInstance().getRadioRoomValue(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, new RCRadioRoomResultCallback<String>() {
             @Override
             public void onSuccess(String s) {
                 mView.showNotice(s, isModify);
@@ -225,17 +266,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param notice
      */
     public void modifyNotice(String notice) {
-        RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_NOTICE, notice, new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                sendNoticeModifyMessage();
-            }
-
-            @Override
-            public void onError(int i, String s) {
-
-            }
-        });
+        RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, notice, null);
     }
 
     /**
@@ -334,7 +365,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      *
      * @param messageContent
      */
-    private void sendMessage(MessageContent messageContent) {
+    public void sendMessage(MessageContent messageContent) {
         RCMessager.getInstance().sendChatRoomMessage(mVoiceRoomBean.getRoomId(), messageContent, new SendMessageCallback() {
             @Override
             public void onAttached(Message message) {
@@ -346,10 +377,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 if (messageContent instanceof RCChatroomEnter && isSelf(((RCChatroomEnter) messageContent).getUserId())) {
                     return;
                 }
+                //
+                if (messageContent instanceof RCChatroomLike) {
+                    mView.showLikeAnimation();
+                    return;
+                }
                 // 自己发消息成功后清除输入框内容
                 if (messageContent instanceof RCChatroomBarrage && isSelf(((RCChatroomBarrage) messageContent).getUserId())) {
                     mView.clearInput();
                 }
+
                 mView.addToMessageList(messageContent, false);
             }
 
@@ -415,7 +452,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             public void onSuccess() {
                 mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
                 // 发暂停通知
-                RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_SUSPEND, "1", null);
+                RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "1", null);
             }
 
             @Override
@@ -497,7 +534,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                             mView.showToast("修改成功");
                             mView.setRadioName(name);
                             mVoiceRoomBean.setRoomName(name);
-                            RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_ROOM_NAME, name, null);
+                            RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_ROOM_NAME, name, null);
                         } else {
                             mView.showToast("修改失败");
                         }
@@ -516,24 +553,14 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (mVoiceRoomBean == null) {
             return;
         }
-        RCRadioRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                MemberCache.getInstance().removeMember(user);
-                RCChatroomKickOut kickOut = new RCChatroomKickOut();
-                kickOut.setUserId(AccountStore.INSTANCE.getUserId());
-                kickOut.setUserName(AccountStore.INSTANCE.getUserName());
-                kickOut.setTargetId(user.getUserId());
-                kickOut.setTargetName(user.getUserName());
-                sendMessage(kickOut);
-                callback.onResult(true, "");
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                mView.showToast(s);
-            }
-        });
+        MemberCache.getInstance().removeMember(user);
+        RCChatroomKickOut kickOut = new RCChatroomKickOut();
+        kickOut.setUserId(AccountStore.INSTANCE.getUserId());
+        kickOut.setUserName(AccountStore.INSTANCE.getUserName());
+        kickOut.setTargetId(user.getUserId());
+        kickOut.setTargetName(user.getUserName());
+        sendMessage(kickOut);
+        callback.onResult(true, "");
     }
 
     @Override
@@ -607,17 +634,10 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     @Override
-    public void onSpeakingStateChanged(boolean b) {
-        mView.setSpeaking(b);
-//        Logger.e("==============onSpeakingStateChanged: " + b);
-    }
-
-    @Override
     public void onMessageReceived(Message message) {
         MessageContent content = message.getContent();
         Logger.e("==============onMessageReceived: " + JsonUtils.toJson(content));
-        // 显示到弹幕列表
-        mView.addToMessageList(content, false);
+
         if (content instanceof RCChatroomGift || content instanceof RCChatroomGiftAll) {
             // 刷新礼物数
             getGiftCount();
@@ -631,7 +651,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 leaveRoom();
                 mView.showToast("你已被踢出房间");
             }
+        } else if (content instanceof RCChatroomLike) {
+            mView.showLikeAnimation();
+            return;
         }
+
+        // 显示到弹幕列表
+        mView.addToMessageList(content, false);
     }
 
     @Override
@@ -647,40 +673,27 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     @Override
-    public void onNetworkStatus(int i) {
-
-    }
-
-    @Override
-    public void onRadioPause() {
-        Logger.e("==============onRadioPause");
-    }
-
-    @Override
-    public void onRadioResume() {
-        Logger.e("==============onRadioResume");
-    }
-
-    @Override
-    public void onRadioName(String s) {
-        mView.setRadioName(s);
-    }
-
-    @Override
-    public void onRadioRoomNotify(IRCRadioRoomEngine.NotifyType notifyType, String s) {
-//        Logger.e("===============" + notifyType.getValue() + "=====" + s);
-        switch (notifyType) {
+    public void onRadioRoomKVUpdate(IRCRadioRoomEngine.UpdateKey updateKey, String s) {
+        Logger.e("===============" + updateKey.getValue() + "=====" + s);
+        switch (updateKey) {
+            case RC_ROOM_NAME:
+                mView.setRadioName(s);
+                break;
             case RC_NOTICE:
                 sendNoticeModifyMessage();
                 break;
             case RC_SPEAKING:
                 boolean isSpeaking = TextUtils.equals(s, "1");
-                onSpeakingStateChanged(isSpeaking);
+                mView.setSpeaking(isSpeaking);
                 break;
             case RC_SUSPEND:
                 boolean isPause = TextUtils.equals(s, "1");
                 if (isPause) {
-                    mView.setSeatState(RoomSeatView.SeatState.VIEWER_PAUSE);
+                    if (isSelf(getCreateUserId())) {
+                        mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
+                    } else {
+                        mView.setSeatState(RoomSeatView.SeatState.VIEWER_PAUSE);
+                    }
                 } else {
                     mView.setSeatState(RoomSeatView.SeatState.NORMAL);
                 }
@@ -688,19 +701,19 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             case RC_BGNAME:
                 mView.setRoomBackground(s);
                 break;
+            case RC_SEATING:
+                isInSeat = TextUtils.equals(s, "1");
+                if (isInSeat) {
+                    mView.setSeatState(RoomSeatView.SeatState.NORMAL);
+                } else {
+                    mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
+                }
+                break;
+            case RC_SILENT:
+                isMute = TextUtils.equals(s, "1");
+                mView.setSeatMute(isMute);
+                break;
         }
-    }
-
-    /**
-     * 房主踢人成功的回调
-     *
-     * @param s
-     * @param s1
-     */
-    @Override
-    public void onUserReceiveKickOutRoom(String s, String s1) {
-        Logger.e("==============onUserReceiveKickOutRoom" + s + " " + s1);
-
     }
 
     /**
@@ -742,7 +755,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 if (result.ok()) {
                     mVoiceRoomBean.setBackgroundUrl(url);
                     mView.setRoomBackground(url);
-                    RCRadioRoomEngine.getInstance().notifyRadioRoom(IRCRadioRoomEngine.NotifyType.RC_BGNAME, url, null);
+                    RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_BGNAME, url, null);
                     mView.showToast("设置成功");
                 } else {
                     mView.showToast("设置失败");
@@ -772,5 +785,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RCRadioRoomEngine.getInstance().setRadioEventListener(null);
         Logger.e("====================" + "radio room destroy, remove listener");
         super.onDestroy();
+    }
+
+    @Override
+    public void clickLeaveSeat() {
+        leaveSeat();
+    }
+
+    @Override
+    public void clickMuteSelf(boolean isMute) {
+        RCRadioRoomEngine.getInstance().muteSelf(isMute);
+        RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SILENT, isMute ? "1" : "0", null);
     }
 }

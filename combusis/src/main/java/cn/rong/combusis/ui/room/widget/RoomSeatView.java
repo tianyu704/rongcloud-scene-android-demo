@@ -35,8 +35,8 @@ public class RoomSeatView extends ConstraintLayout {
     private ConstraintLayout mClSelfPause;
     private AppCompatButton mBtnContinue;
     private ConstraintLayout mClViewerPause;
-
-    private RoomOwnerHeadOnclickListener roomOwnerHeadOnclickListener;
+    private String roomOwnerName;
+    private String roomOwnerPortrait;
 
     public RoomSeatView(@NonNull Context context) {
         this(context, null);
@@ -46,27 +46,15 @@ public class RoomSeatView extends ConstraintLayout {
         super(context, attrs);
         mRootView = LayoutInflater.from(context).inflate(R.layout.view_room_seat, this);
         initView();
-        initListener();
-    }
-
-    /**
-     *
-     */
-    private void initListener() {
-        mPortraitView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                roomOwnerHeadOnclickListener.onClick();
-            }
-        });
     }
 
     /**
      * 当点击头像的时候
-     * @param roomOwnerHeadOnclickListener
+     *
+     * @param onClickListener
      */
-    public void setRoomOwnerHeadOnclickListener(RoomOwnerHeadOnclickListener roomOwnerHeadOnclickListener){
-        this.roomOwnerHeadOnclickListener=roomOwnerHeadOnclickListener;
+    public void setRoomOwnerHeadOnclickListener(View.OnClickListener onClickListener) {
+        mPortraitView.setOnClickListener(onClickListener);
     }
 
     private void initView() {
@@ -82,6 +70,12 @@ public class RoomSeatView extends ConstraintLayout {
     }
 
     public void setData(String roomOwnerName, String roomOwnerPortrait) {
+        this.roomOwnerName = roomOwnerName;
+        this.roomOwnerPortrait = roomOwnerPortrait;
+        refreshHead(roomOwnerName, roomOwnerPortrait);
+    }
+
+    private void refreshHead(String roomOwnerName, String roomOwnerPortrait) {
         mRoomOwnerView.setText(roomOwnerName);
         ImageLoaderUtil.INSTANCE.loadImage(getContext(), mPortraitView, roomOwnerPortrait, R.drawable.ic_room_creator_not_in_seat);
     }
@@ -148,6 +142,7 @@ public class RoomSeatView extends ConstraintLayout {
         switch (seatState) {
             case NORMAL:
                 mClSeat.setVisibility(VISIBLE);
+                refreshHead(roomOwnerName, roomOwnerPortrait);
                 break;
             case OWNER_PAUSE:
                 mClSelfPause.setVisibility(VISIBLE);
@@ -155,16 +150,17 @@ public class RoomSeatView extends ConstraintLayout {
             case VIEWER_PAUSE:
                 mClViewerPause.setVisibility(VISIBLE);
                 break;
+            case LEAVE_SEAT:
+                mClSeat.setVisibility(VISIBLE);
+                refreshHead("", "");
+                break;
         }
     }
 
     public enum SeatState {
         OWNER_PAUSE,
         VIEWER_PAUSE,
-        NORMAL
-    }
-
-    public interface RoomOwnerHeadOnclickListener{
-        void onClick();
+        NORMAL,
+        LEAVE_SEAT
     }
 }

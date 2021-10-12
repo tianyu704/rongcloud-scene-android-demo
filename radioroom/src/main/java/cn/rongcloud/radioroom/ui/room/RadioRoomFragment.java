@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +23,7 @@ import java.util.List;
 
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
@@ -33,6 +35,7 @@ import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
 import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
+import cn.rong.combusis.ui.room.fragment.CreatorSettingFragment;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
@@ -44,6 +47,7 @@ import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.radioroom.R;
 import io.rong.imkit.utils.RouteUtils;
+import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
 
@@ -73,6 +77,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private BackgroundSettingFragment mBackgroundSettingFragment;
     private ShieldDialog mShieldDialog;
     private GiftFragment mGiftFragment;
+    private CreatorSettingFragment mCreatorSettingFragment;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -95,6 +100,9 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
+        ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mRoomTitleBar.getLayoutParams();
+        params.topMargin = StatusBarUtil.getStatusBarHeight(requireContext());
+        mRoomTitleBar.setLayoutParams(params);
         mRoomTitleBar.setOnMenuClickListener(v -> {
             clickMenu();
         });
@@ -112,6 +120,9 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mRoomSeatView = getView(R.id.room_seat_view);
         mRoomSeatView.setResumeLiveClickListener(v -> {
             present.enterSeat();
+        });
+        mRoomSeatView.setRoomOwnerHeadOnclickListener(v -> {
+            present.clickRoomSeat();
         });
         // 底部操作按钮和双击送礼物
         mRoomBottomView = getView(R.id.room_bottom_view);
@@ -157,7 +168,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         // 设置房主麦位信息
         mRoomSeatView.setData(voiceRoomBean.getCreateUserName(), voiceRoomBean.getCreateUserPortrait());
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), this,voiceRoomBean.getRoomId());
+        mRoomBottomView.setData(getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
     }
@@ -215,6 +226,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         } else {
             mCoverView.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void setSeatMute(boolean isMute) {
+        mRoomSeatView.setRoomOwnerMute(isMute);
     }
 
     @Override
@@ -293,6 +309,17 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
             mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
         }
         mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
+    }
+
+    @Override
+    public void showLikeAnimation() {
+        mRoomBottomView.showFov(null);
+    }
+
+    @Override
+    public void showCreatorSetting(boolean isMute, boolean isPlayingMusic) {
+        mCreatorSettingFragment = new CreatorSettingFragment(isMute, isPlayingMusic, present);
+        mCreatorSettingFragment.show(getChildFragmentManager());
     }
 
     /**
@@ -393,11 +420,17 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     /**
      * 松手发送语音消息
+     *
      * @param rcChatroomVoice
      */
     @Override
     public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
+        present.sendMessage(rcChatroomVoice);
+    }
 
+    @Override
+    public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
+        present.sendMessage(rcChatroomLike);
     }
 
     @Override
