@@ -62,7 +62,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Message;
 import kotlin.Unit;
-import kotlin.jvm.Synchronized;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 
@@ -401,7 +400,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
             @Override
             public void onSuccess(List<String> requestUserIds) {
                 //获取到当前房间所有用户
-                List<User> users = MemberCache.getInstance().getUserList().getValue();
+                List<User> users = MemberCache.getInstance().getMemberList().getValue();
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
                     for (User user : users) {
