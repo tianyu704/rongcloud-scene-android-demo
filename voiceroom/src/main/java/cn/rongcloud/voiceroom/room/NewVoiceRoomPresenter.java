@@ -42,6 +42,7 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.EventHelper;
@@ -618,6 +619,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public void clickSendGift(User user) {
+
+    }
+
+    @Override
+    public void clickFollow(RCFollowMsg followMsg) {
 
     }
 

@@ -9,6 +9,7 @@ import android.view.View
 import cn.rongcloud.voiceroomdemo.R
 import com.basis.adapter.recycle.RcyHolder
 import com.basis.adapter.recycle.RcySAdapter
+import com.basis.ui.BasePopupWindow
 import com.rongcloud.common.utils.UiUtils.dp2Px
 import kotlinx.android.synthetic.main.layout_pop_present_num.view.*
 import kotlinx.android.synthetic.main.layout_pop_present_num_item.view.*
@@ -25,7 +26,7 @@ class NumPopupWindow(
     heith: Int = dp2Px(context, 30f) * 6,
     focusable: Boolean = false
 ) :
-    cn.rongcloud.voiceroomdemo.mvp.fragment.present.pop.CustomerPopupWindow(context, R.layout.layout_pop_present_num, width, heith, focusable) {
+    BasePopupWindow(context, R.layout.layout_pop_present_num, width, heith, focusable) {
 
     override fun initView(content: View) {
         with(content) {

@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 
 import com.basis.adapter.recycle.RcyAdapter;
 import com.basis.adapter.recycle.RcyHolder;
+import com.rongcloud.common.utils.AccountStore;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.message.RCFollowMsg;
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import io.rong.imlib.model.MessageContent;
 
@@ -188,6 +191,13 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             list.add(new MsgInfo(String.format("房间更换为 %s 座模式，请重新上麦", ((RCChatroomSeats) message).getCount()), "", false, 0, 0));
         } else if (message instanceof RCChatroomLocationMessage) {
             list.add(new MsgInfo(((RCChatroomLocationMessage) message).getContent(), "", false, 0, 0));
+        } else if (message instanceof RCFollowMsg) {
+            User user = ((RCFollowMsg) message).getUser();
+            User targetUser = ((RCFollowMsg) message).getTargetUser();
+            list.add(new MsgInfo(TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId()) ? "你" : user.getUserName(), user.getUserId(), true, 0, 0));
+            list.add(new MsgInfo(" 关注了 ", "", false, 0, 0));
+            list.add(new MsgInfo(TextUtils.equals(targetUser.getUserId(), AccountStore.INSTANCE.getUserId()) ? "你" : targetUser.getUserName(), targetUser.getUserId(), true, 0, 0));
+            updateRole(user.getUserId(), messageTextView);
         }
         messageTextView.setText(styleBuilder(list));
         messageTextView.setMovementMethod(LinkMovementMethod.getInstance());

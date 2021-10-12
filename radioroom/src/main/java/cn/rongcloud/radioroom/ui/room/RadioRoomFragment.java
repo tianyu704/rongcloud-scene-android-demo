@@ -27,7 +27,6 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
@@ -36,8 +35,10 @@ import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -71,6 +72,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private EditDialog mEditDialog;
     private BackgroundSettingFragment mBackgroundSettingFragment;
     private ShieldDialog mShieldDialog;
+    private GiftFragment mGiftFragment;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -142,16 +144,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
      * 设置房间数据
      *
      * @param voiceRoomBean
+     * @param roomOwnerType
      */
     @Override
-    public void setRoomData(VoiceRoomBean voiceRoomBean) {
-        // 设置房间类型
-        RoomOwnerType roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
+    public void setRoomData(VoiceRoomBean voiceRoomBean, RoomOwnerType roomOwnerType) {
         setRoomOwnerType(roomOwnerType);
-        // 房主上麦
-        if (roomOwnerType == RoomOwnerType.RADIO_OWNER) {
-            present.enterSeat();
-        }
         // 加载背景
         setRoomBackground(voiceRoomBean.getBackgroundUrl());
         // 设置title数据
@@ -250,6 +247,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
                 "请输入房间名",
                 name,
                 10,
+                false,
                 () -> null,
                 s -> {
                     present.setRoomName(s);
@@ -277,10 +275,34 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mShieldDialog.show();
     }
 
+    @Override
+    public void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members) {
+        mGiftFragment = new GiftFragment(roomId, createUserId, selectUserId, present);
+        mGiftFragment.refreshMember(members);
+        mGiftFragment.show(getChildFragmentManager());
+    }
+
+    @Override
+    public void setGiftCount(Long count) {
+        mRoomSeatView.setGiftCount(count);
+    }
+
+    @Override
+    public void showUserSetting(Member member) {
+        if (mMemberSettingFragment == null) {
+            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+        }
+        mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
+    }
+
     /**
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
+        if (getRoomOwnerType() == null) {
+            finish();
+            return;
+        }
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
@@ -366,7 +388,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void onSendGift() {
-
+        present.sendGift();
     }
 
     /**
@@ -383,9 +405,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         if (TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId())) {
             return;
         }
-        if (mMemberSettingFragment == null) {
-            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
-        }
-        mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
+        present.getUserInfo(user.getUserId());
     }
 }

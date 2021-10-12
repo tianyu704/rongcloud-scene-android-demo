@@ -7,8 +7,11 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -21,7 +24,7 @@ public class OkUtil {
     protected static boolean debug = true;
     public final static String TAG = "OkUtil";
     public final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss:SSS";
-    private final static Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
+    private final static Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).enableComplexMapKeySerialization().create();
 
     public static void i(String tag, Object obj) {
         if (null == obj || !debug) return;
@@ -81,4 +84,17 @@ public class OkUtil {
         return lst;
     }
 
+    public static <T> HashMap<String, T> json2Map(JsonElement element, Type type) {
+        if (null == type) {
+            e(TAG, "the typeToken can not null!");
+            return null;
+        }
+        try {
+            return gson.fromJson(element, type);
+        } catch (JsonSyntaxException e) {
+            return null;
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
 }

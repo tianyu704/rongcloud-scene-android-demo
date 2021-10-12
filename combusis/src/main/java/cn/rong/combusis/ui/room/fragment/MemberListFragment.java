@@ -49,7 +49,7 @@ public class MemberListFragment extends BaseBottomSheetDialogFragment {
                 ImageLoaderUtil.INSTANCE.loadImage(getContext(), holder.getView(R.id.iv_member_portrait), user.getPortrait(), R.drawable.default_portrait);
                 holder.itemView.setOnClickListener(v -> {
                     if (mOnClickUserListener != null) {
-                        dismiss();
+//                        dismiss();
                         mOnClickUserListener.clickUser(user);
                     }
                 });
@@ -57,8 +57,8 @@ public class MemberListFragment extends BaseBottomSheetDialogFragment {
         };
         mRecyclerView.setAdapter(adapter);
         adapter.setData(MemberCache.getInstance().getMemberList().getValue(), true);
-        MemberCache.getInstance().getMemberList().observe(this, users -> {
-            adapter.setData(users, true);
+        MemberCache.getInstance().getMemberList().observe(this, members -> {
+            adapter.setData(members, true);
         });
         MemberCache.getInstance().fetchData(roomId);
     }

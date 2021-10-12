@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
@@ -473,13 +472,13 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             mRoomSeatView.setData("", null);
             mRoomSeatView.setSpeaking(false);
             mRoomSeatView.setRoomOwnerMute(false);
-            mRoomSeatView.setGiftCount(0);
+            mRoomSeatView.setGiftCount(0L);
         } else {
             User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
             mRoomSeatView.setData(member.getUserName(), member.getPortrait());
             mRoomSeatView.setSpeaking(uiSeatModel.isSpeaking());
             mRoomSeatView.setRoomOwnerMute(uiSeatModel.isMute());
-            mRoomSeatView.setGiftCount(uiSeatModel.getGiftCount());
+            mRoomSeatView.setGiftCount((long) uiSeatModel.getGiftCount());
         }
     }
 

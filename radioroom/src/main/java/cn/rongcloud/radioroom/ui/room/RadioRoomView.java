@@ -6,8 +6,10 @@ import com.basis.mvp.IBaseView;
 
 import java.util.List;
 
+import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.RoomSeatView.SeatState;
 import io.rong.imlib.model.MessageContent;
 
@@ -17,7 +19,7 @@ import io.rong.imlib.model.MessageContent;
  */
 public interface RadioRoomView extends IBaseView {
 
-    void setRoomData(VoiceRoomBean voiceRoomBean);
+    void setRoomData(VoiceRoomBean voiceRoomBean, RoomOwnerType roomOwnerType);
 
     void setOnlineCount(int num);
 
@@ -46,4 +48,10 @@ public interface RadioRoomView extends IBaseView {
     void setRoomBackground(String url);
 
     void showShieldDialog(String roomId);
+
+    void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members);
+
+    void setGiftCount(Long count);
+
+    void showUserSetting(Member member);
 }

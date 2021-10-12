@@ -10,7 +10,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import cn.rong.combusis.provider.user.User
 import cn.rongcloud.voiceroom.R
-import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
 
 /**
  * @author gusd

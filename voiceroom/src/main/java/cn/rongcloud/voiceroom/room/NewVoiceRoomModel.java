@@ -20,7 +20,6 @@ import com.basis.mvp.BaseModel;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +62,6 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Message;
 import kotlin.Unit;
-import kotlin.jvm.Synchronized;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 

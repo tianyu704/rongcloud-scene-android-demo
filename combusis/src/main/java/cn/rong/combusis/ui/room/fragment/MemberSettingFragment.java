@@ -12,16 +12,23 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Guideline;
 import androidx.fragment.app.FragmentManager;
 
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.rong.imkit.picture.tools.ToastUtils;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.model.Conversation;
 
@@ -51,7 +58,8 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
     private AppCompatButton mBtnFollow;
 
     private RoomOwnerType mRoomOwnerType;
-    private User member;
+    //麦位的状态
+    boolean isMute = true;
     private String roomUserId;
     private OnMemberSettingClickListener mOnMemberSettingClickListener;
 
@@ -59,8 +67,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
     boolean memberIsOnSeat = false;
     //麦位的位置
     int seatPosition = 1;
-    //麦位的状态
-    boolean isMute=true;
+    private Member member;
 
     public void setMute(boolean mute) {
         isMute = mute;
@@ -112,7 +119,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             return;
         }
         mRlSettingAdmin.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickSettingAdmin(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickSettingAdmin(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                 } else {
@@ -121,7 +128,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlInvitedSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickInviteSeat(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickInviteSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                     EToast.showToast("发送上麦通知成功");
@@ -131,7 +138,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlKickRoom.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickKickRoom(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickKickRoom(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                 } else {
@@ -140,7 +147,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlKickSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickKickSeat(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickKickSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                     EToast.showToast("发送下麦通知成功");
@@ -150,7 +157,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlMuteSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickMuteSeat(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickMuteSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                 } else {
@@ -159,7 +166,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlCloseSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickCloseSeat(member, (result, msg) -> {
+            mOnMemberSettingClickListener.clickCloseSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                     EToast.showToast("座位已关闭");
@@ -169,7 +176,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mBtnSendGift.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickSendGift(member);
+            mOnMemberSettingClickListener.clickSendGift(member.toUser());
             dismiss();
         });
         mBtnSendMessage.setOnClickListener(v -> {
@@ -181,11 +188,17 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             );
         });
         mBtnFollow.setOnClickListener(v -> {
-
+            follow();
         });
     }
 
-    public void show(FragmentManager fragmentManager, User member, String roomUserId) {
+    public void show(FragmentManager fragmentManager, User user, String roomUserId) {
+        this.member = new Member().toMember(user);
+        this.roomUserId = roomUserId;
+        show(fragmentManager);
+    }
+
+    public void show(FragmentManager fragmentManager, Member member, String roomUserId) {
         this.member = member;
         this.roomUserId = roomUserId;
         show(fragmentManager);
@@ -209,6 +222,8 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         refreshSettingAdmin(memberIsAdmin);
         // 设置底部操作按钮view展示
         refreshBottomView(selfIsAdmin, memberIsAdmin, memberIsOnSeat, memberIsOwner);
+
+        refreshFollow(member.isFollow());
     }
 
     private void refreshBottomView(boolean selfIsAdmin, boolean memberIsAdmin, boolean memberIsOnSeat, boolean memberIsOwner) {
@@ -222,10 +237,10 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                     mLlMuteSeat.setVisibility(View.VISIBLE);
                     mLlCloseSeat.setVisibility(View.VISIBLE);
                     //根据麦位状态
-                    if (isMute){
+                    if (isMute) {
                         mIvMuteSeat.setImageResource(R.drawable.ic_room_setting_unmute_all);
                         mTvMuteSeat.setText("取消禁麦");
-                    }else {
+                    } else {
                         mIvMuteSeat.setImageResource(R.drawable.ic_member_setting_mute_seat);
                         mTvMuteSeat.setText("座位禁麦");
                     }
@@ -294,6 +309,14 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         }
     }
 
+    private void refreshFollow(boolean isFollow) {
+        if (isFollow) {
+            mBtnFollow.setText("已关注");
+        } else {
+            mBtnFollow.setText("关注");
+        }
+    }
+
     private void refreshSettingAdmin(boolean memberIsAdmin) {
         switch (mRoomOwnerType) {
             case VOICE_OWNER:
@@ -333,6 +356,48 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         } else {
             mTvSeatPosition.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * 关注
+     */
+    private void follow() {
+        boolean isFollow = !member.isFollow();
+        OkApi.get(VRApi.followUrl(member.getUserId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    if (isFollow) {
+                        ToastUtils.s(getContext(), "关注成功");
+                        if (mOnMemberSettingClickListener != null) {
+                            RCFollowMsg followMsg = new RCFollowMsg();
+                            followMsg.setUser(AccountStore.INSTANCE.toUser());
+                            followMsg.setTargetUser(member.toUser());
+                            mOnMemberSettingClickListener.clickFollow(followMsg);
+                        }
+                    } else {
+                        ToastUtils.s(getContext(), "取消关注成功");
+                    }
+                    member.setStatus(isFollow ? 1 : 0);
+                    refreshFollow(isFollow);
+                } else {
+                    if (isFollow) {
+                        ToastUtils.s(getContext(), "关注失败");
+                    } else {
+                        ToastUtils.s(getContext(), "取消关注失败");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                if (isFollow) {
+                    ToastUtils.s(getContext(), "关注失败");
+                } else {
+                    ToastUtils.s(getContext(), "取消关注失败");
+                }
+            }
+        });
     }
 
     public interface OnMemberSettingClickListener {
@@ -390,5 +455,12 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
          * @param user
          */
         void clickSendGift(User user);
+
+        /**
+         * 关注
+         *
+         * @param followMsg
+         */
+        void clickFollow(RCFollowMsg followMsg);
     }
 }

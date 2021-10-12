@@ -4,9 +4,13 @@ import androidx.annotation.Nullable;
 
 import com.basis.net.oklib.wrapper.interfaces.IPage;
 import com.basis.net.oklib.wrapper.interfaces.IWrap;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Wrapper implements IWrap {
     private int code;
@@ -90,6 +94,25 @@ public class Wrapper implements IWrap {
     public <T> List<T> getList(String key, Class<T> tClass) {
         if (null != body && null != tClass && body.isJsonObject() && body.getAsJsonObject().has(key)) {
             return OkUtil.json2List(body.getAsJsonObject().get(key), tClass);
+        }
+        return null;
+    }
+
+    /**
+     * [{"aaa":1},{"bbb":2}] 解析这种数据
+     *
+     * @param
+     * @return
+     */
+    @Nullable
+    public Map<String, String> getMap() {
+        if (null != body && body.isJsonArray()) {
+            HashMap<String, String> map = new HashMap<>();
+            for (JsonElement element : (JsonArray) body) {
+                map.putAll(OkUtil.json2Map(element, new TypeToken<HashMap<String, String>>() {
+                }.getType()));
+            }
+            return map;
         }
         return null;
     }

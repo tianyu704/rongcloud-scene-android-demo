@@ -20,7 +20,6 @@ import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
-import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel;
 import io.reactivex.rxjava3.functions.Consumer;
 
 /**

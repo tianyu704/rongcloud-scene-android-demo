@@ -106,7 +106,7 @@ public class RoomSeatView extends ConstraintLayout {
      *
      * @param count 礼物数量
      */
-    public void setGiftCount(int count) {
+    public void setGiftCount(Long count) {
         mGiftView.setText(String.valueOf(count));
     }
 

@@ -173,6 +173,7 @@ public class RoomSettingDialogFragment extends BaseBottomSheetDialogFragment
                         "请输入房间名",
                         TextUtils.isEmpty(roomName) ? "" : roomName,
                         10,
+                        false,
                         new Function0<Unit>() {
                             @Override
                             public Unit invoke() {

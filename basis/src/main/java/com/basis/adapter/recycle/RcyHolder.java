@@ -11,6 +11,7 @@ import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.basis.adapter.interfaces.IHolder;
@@ -118,6 +119,13 @@ public class RcyHolder extends RecyclerView.ViewHolder implements IHolder<RcyHol
     public RcyHolder setImageDrawable(int viewId, Drawable drawable) {
         ImageView view = getView(viewId);
         view.setImageDrawable(drawable);
+        return this;
+    }
+
+    @Override
+    public RcyHolder setImageResource(int viewId, @DrawableRes int resource) {
+        ImageView view = getView(viewId);
+        view.setImageResource(resource);
         return this;
     }
 

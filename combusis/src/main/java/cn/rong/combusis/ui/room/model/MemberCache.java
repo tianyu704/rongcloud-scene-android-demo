@@ -58,8 +58,8 @@ public class MemberCache {
                     if (list != null) {
                         memberList.setValue(list);
                     }
-                    for (int i = 0; i < list.size(); i++) {
-                        UserProvider.provider().update(list.get(i).toUserInfo());
+                    for (User user : list) {
+                        UserProvider.provider().update(user.toUserInfo());
                     }
                 }
             }

@@ -7,6 +7,7 @@ package com.rongcloud.common.utils
 import android.annotation.SuppressLint
 import android.content.Context
 import cn.rong.combusis.common.utils.JsonUtils
+import cn.rong.combusis.provider.user.User
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.extension.*
 import com.rongcloud.common.model.AccountInfo
@@ -79,4 +80,12 @@ object AccountStore {
         context.obValue(ACCOUNT_INFO).map {
             return@map JsonUtils.fromJson(it, AccountInfo::class.java) ?: EMPTY_ACCOUNT
         }.observeOn(AndroidSchedulers.mainThread())
+
+    fun toUser(): User {
+        return User().apply {
+            this.userId = getAccountInfo().userId
+            this.userName = getAccountInfo().userName
+            this.portrait = getAccountInfo().portrait
+        }
+    }
 }
