@@ -5,18 +5,14 @@ import android.util.Log;
 
 import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.sdk.Api;
-import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.model.Conversation;
@@ -37,7 +33,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     protected void init(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
         this.roomId = roomId;
-        this.rcVoiceRoomEventListener=rcVoiceRoomEventListener;
+        this.rcVoiceRoomEventListener = rcVoiceRoomEventListener;
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(this);
         if (null == mSeatInfos) mSeatInfos = new ArrayList<>();
         if (null == listeners) listeners = new ArrayList<>();
@@ -46,16 +42,16 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     protected void unInit() {
         RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null);
-        mSeatInfos.clear();
-        listeners.clear();
-        statusListeners.clear();
+        if (null != mSeatInfos) mSeatInfos.clear();
+        if (null != listeners) listeners.clear();
+        if (null != statusListeners) statusListeners.clear();
         roomInfo = null;
         roomId = null;
     }
 
     @Override
     public void onRoomKVReady() {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRoomKVReady();
         }
         Log.d(TAG, "onRoomKVReady");
@@ -68,7 +64,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRoomInfoUpdate(RCVoiceRoomInfo room) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRoomInfoUpdate(room);
         }
         this.roomInfo = room;
@@ -87,7 +83,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onSeatInfoUpdate(list);
         }
         int count = list.size();
@@ -114,8 +110,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onUserEnterSeat(int index, String userId) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onUserEnterSeat(index,userId);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onUserEnterSeat(index, userId);
         }
         Log.d(TAG, "onUserEnterSeat: index = " + index + " userId = " + userId);
         RCVoiceSeatInfo info = getSeatInfo(index);
@@ -129,8 +125,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onUserLeaveSeat(int index, String userId) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onUserLeaveSeat(index,userId);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onUserLeaveSeat(index, userId);
         }
         Log.d(TAG, "onUserLeaveSeat: index = " + index + " userId = " + userId);
         RCVoiceSeatInfo info = getSeatInfo(index);
@@ -145,8 +141,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onSeatMute(int index, boolean mute) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onSeatMute(index,mute);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onSeatMute(index, mute);
         }
         Log.d(TAG, "onSeatMute: index = " + index + " mute = " + mute);
     }
@@ -154,8 +150,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     //同步回调 onSeatInfoUpdate 此处无特殊需求可不处理
     @Override
     public void onSeatLock(int index, boolean locked) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onSeatLock(index,locked);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onSeatLock(index, locked);
         }
         Log.d(TAG, "onSeatLock: index = " + index + " locked = " + locked);
     }
@@ -167,7 +163,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onAudienceEnter(String userId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onAudienceEnter(userId);
         }
         Log.d(TAG, "onAudienceEnter: userId = " + userId);
@@ -190,7 +186,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onAudienceExit(String userId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onAudienceExit(userId);
         }
         Log.d(TAG, "onAudienceExit: userId = " + userId);
@@ -214,8 +210,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onSpeakingStateChanged(int index, boolean speaking) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onSpeakingStateChanged(index,speaking);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onSpeakingStateChanged(index, speaking);
         }
 //        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (null != statusListeners) {
@@ -227,7 +223,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
 
     @Override
     public void onMessageReceived(Message message) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onMessageReceived(message);
         }
         if (message.getConversationType() == Conversation.ConversationType.PRIVATE) {
@@ -255,8 +251,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRoomNotificationReceived(String name, String content) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onRoomNotificationReceived(name,content);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onRoomNotificationReceived(name, content);
         }
         Log.v(TAG, "onRoomNotificationReceived: name = " + name + " content = " + content);
         if (null != listeners) {
@@ -273,7 +269,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onPickSeatReceivedFrom(String userId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onPickSeatReceivedFrom(userId);
         }
         Log.d(TAG, "onPickSeatReceivedFrom: userId = " + userId);
@@ -304,7 +300,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onKickSeatReceived(int index) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onKickSeatReceived(index);
         }
         Log.d(TAG, "onPickSeatReceivedFrom: index = " + index);
@@ -316,7 +312,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatAccepted() {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRequestSeatAccepted();
         }
         Log.d(TAG, "onRequestSeatAccepted: ");
@@ -335,7 +331,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatRejected() {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRequestSeatRejected();
         }
         Log.d(TAG, "onRequestSeatRejected: ");
@@ -350,7 +346,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onRequestSeatListChanged() {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRequestSeatListChanged();
         }
         Log.d(TAG, "onRequestSeatListChanged: ");
@@ -404,8 +400,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationReceived(String invitationId, String userId, String content) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onInvitationReceived(invitationId,userId,content);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onInvitationReceived(invitationId, userId, content);
         }
         Log.d(TAG, "onInvitationReceived: invitationId = " + invitationId + " userId = " + userId + " content = " + content);
     }
@@ -417,7 +413,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationAccepted(String invitationId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onInvitationAccepted(invitationId);
         }
         Log.d(TAG, "onInvitationAccepted: invitationId = " + invitationId);
@@ -430,7 +426,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationRejected(String invitationId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onInvitationRejected(invitationId);
         }
         Log.d(TAG, "onInvitationRejected: invitationId = " + invitationId);
@@ -443,7 +439,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onInvitationCancelled(String invitationId) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onInvitationCancelled(invitationId);
         }
         Log.d(TAG, "onInvitationCancelled: invitationId = " + invitationId);
@@ -457,8 +453,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onUserReceiveKickOutRoom(String targetId, String userId) {
-        if (rcVoiceRoomEventListener!=null) {
-            rcVoiceRoomEventListener.onUserReceiveKickOutRoom(targetId,userId);
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onUserReceiveKickOutRoom(targetId, userId);
         }
         Log.d(TAG, "onUserReceiveKickOutRoom: targetId = " + targetId);
     }
@@ -470,7 +466,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      */
     @Override
     public void onNetworkStatus(int i) {
-        if (rcVoiceRoomEventListener!=null) {
+        if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onNetworkStatus(i);
         }
 //        Log.d(TAG, "onNetworkStatus: rtt = " + i);

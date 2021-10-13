@@ -63,7 +63,7 @@ public class FragmentMusicList extends BaseFragment {
             }
         });
         rvMusic.enableLoad(false);
-        rvMusic.enableRefresh(true);
+        rvMusic.enableRefresh(false);
         adapter = new RcySAdapter<MusicBean, RcyHolder>(getContext(), R.layout.layout_musics_play_item) {
             @Override
             public void convert(RcyHolder holder, MusicBean musicBean, int position) {

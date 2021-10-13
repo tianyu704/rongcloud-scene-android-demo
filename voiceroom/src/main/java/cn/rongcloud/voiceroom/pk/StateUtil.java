@@ -1,6 +1,7 @@
 package cn.rongcloud.voiceroom.pk;
 
 import com.kit.utils.KToast;
+import com.kit.utils.Logger;
 
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
@@ -40,5 +41,16 @@ public class StateUtil {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return 是否正在pk中
+     */
+    public static boolean isPking() {
+        IEventHelp.Type type = EventHelper.helper().getPKState();
+        Logger.e("StateUtil", "isPking: type = " + type);
+        return type == IEventHelp.Type.PK_GOING ||
+                type == IEventHelp.Type.PK_START ||
+                type == IEventHelp.Type.PK_PUNISH;
     }
 }

@@ -74,6 +74,11 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
             public void onPkStop() {
                 PKStateManager.get().quitPkWithAnimation(pkVew, voice_room, 200);
             }
+
+            @Override
+            public void onPkState() {
+
+            }
         });
         // click
         pkButton.setOnClickListener(this);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="basis_white">#FFFFFF</color>
     <color name="basis_bg">#EFEFF4</color>
 
@@ -53,4 +53,8 @@
     <color name="basis_color_loadtag">@android:color/white</color>
     <!--    svg图片颜色-->
     <color name="basis_color_svg">#8A96A3</color>
+
+    <!--    根据需要 可覆盖Refresh库中指示器的颜色-->
+    <!--        <color name="re_color_default">#FF02479C</color>-->
+    <color name="re_color_default" tools:ignore="ResourceName">@color/basis_blue_dark</color>
 </resources>
