@@ -5,6 +5,8 @@
 package cn.rong.combusis.common.ui.dialog
 
 import android.content.Context
+import android.text.TextUtils
+import android.view.View
 import cn.rong.combusis.R
 import kotlinx.android.synthetic.main.layout_confirm_dialog.*
 
@@ -37,6 +39,7 @@ class ConfirmDialog(
     override fun initView() {
         tv_message.text = message
         btn_cancel.text = cancel
+        if (TextUtils.isEmpty(cancel)) btn_cancel.visibility = View.GONE
         btn_confirm.text = confirm
     }
 }

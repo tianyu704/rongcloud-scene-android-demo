@@ -277,24 +277,24 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             rcVoiceRoomEventListener.onPickSeatReceivedFrom(userId);
         }
         Log.d(TAG, "onPickSeatReceivedFrom: userId = " + userId);
-        onShowTipDialog("", userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
-            @Override
-            public void onResult(Boolean result) {
-                if (result) {
-                    //同意
-                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
-                    //获取可用麦位索引
-                    int availableIndex = getAvailableSeatIndex();
-                    if (availableIndex > -1) {
-                        VoiceRoomApi.getApi().enterSeat(availableIndex, null);
-                    } else {
-                        EToast.showToast("当前没有空余的麦位");
-                    }
-                } else {//拒绝
-                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
-                }
-            }
-        });
+//        onShowTipDialog("", userId, TipType.InvitedSeat, new IResultBack<Boolean>() {//邀请上麦
+//            @Override
+//            public void onResult(Boolean result) {
+//                if (result) {
+//                    //同意
+//                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+//                    //获取可用麦位索引
+//                    int availableIndex = getAvailableSeatIndex();
+//                    if (availableIndex > -1) {
+//                        VoiceRoomApi.getApi().enterSeat(availableIndex, null);
+//                    } else {
+//                        EToast.showToast("当前没有空余的麦位");
+//                    }
+//                } else {//拒绝
+//                    VoiceRoomApi.getApi().notifyRoom(Api.EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+//                }
+//            }
+//        });
     }
 
     /**
@@ -320,14 +320,14 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             rcVoiceRoomEventListener.onRequestSeatAccepted();
         }
         Log.d(TAG, "onRequestSeatAccepted: ");
-        VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
-        //获取可用麦位索引
-        int availableIndex = getAvailableSeatIndex();
-        if (availableIndex > -1) {
-            VoiceRoomApi.getApi().enterSeat(availableIndex, null);
-        } else {
-            EToast.showToast("当前没有空余的麦位");
-        }
+//        VoiceRoomApi.getApi().notifyRoom(Api.EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+//        //获取可用麦位索引
+//        int availableIndex = getAvailableSeatIndex();
+//        if (availableIndex > -1) {
+//            VoiceRoomApi.getApi().enterSeat(availableIndex, null);
+//        } else {
+//            EToast.showToast("当前没有空余的麦位");
+//        }
     }
 
     /**

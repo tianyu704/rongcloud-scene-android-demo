@@ -1,11 +1,13 @@
 package cn.rongcloud.voiceroom.room;
 
 import static cn.rong.combusis.sdk.Api.EVENT_BACKGROUND_CHANGE;
+import static cn.rong.combusis.sdk.Api.EVENT_KICKED_OUT_OF_ROOM;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_MANAGER_LIST_CHANGE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
+import static cn.rong.combusis.sdk.Api.EVENT_ROOM_CLOSE;
 import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 
 import android.text.TextUtils;
@@ -34,6 +36,7 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.common.ui.dialog.TipDialog;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
@@ -100,7 +103,7 @@ import kotlin.jvm.functions.Function2;
  */
 public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
         IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
-        , BackgroundSettingFragment.OnSelectBackgroundListener , GiftFragment.OnSendGiftListener{
+        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener {
 
     private String TAG = "NewVoiceRoomPresenter";
 
@@ -231,7 +234,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         if (uiRoomModel.getRcRoomInfo() != null) {
                             extra = uiRoomModel.getRcRoomInfo().getExtra();
                         }
-                        if (mVoiceRoomBean!=null){
+                        if (mVoiceRoomBean != null) {
                             String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
                             mView.showNotice(notice, false);
                         }
@@ -290,7 +293,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
                         }
-                        if (RCChatroomGift.class.equals(aClass)||RCChatroomGiftAll.class.equals(aClass)){
+                        if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             getGiftCount();
                         }
                         Log.e("TAG", "accept: " + messageContent);
@@ -329,10 +332,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 申请连麦
+     *
      * @param position
      */
     public void requestSeat(int position) {
-        if (currentStatus==STATUS_ON_SEAT){
+        if (currentStatus == STATUS_ON_SEAT) {
             //如果是麦位上
             return;
         }
@@ -363,7 +367,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     mView.showToast(message);
                 }
             });
-        }else {
+        } else {
             RCVoiceRoomEngine.getInstance().requestSeat(new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
@@ -411,40 +415,41 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        Log.e(TAG, "setObSeatListChange: "+throwable );
+                        Log.e(TAG, "setObSeatListChange: " + throwable);
                     }
                 }));
     }
 
     /**
      * 刷新当前的状态
+     *
      * @param uiSeatModels
      */
     private synchronized void refreshCurrentStatus(List<UiSeatModel> uiSeatModels) {
         try {
-            boolean inseat=false;
+            boolean inseat = false;
             for (UiSeatModel uiSeatModel : uiSeatModels) {
-                if (!TextUtils.isEmpty(uiSeatModel.getUserId())&&!TextUtils.isEmpty(AccountStore.INSTANCE.getUserId())&&
+                if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && !TextUtils.isEmpty(AccountStore.INSTANCE.getUserId()) &&
                         uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                     //说明在麦位上
-                    inseat=true;
+                    inseat = true;
                     break;
                 }
             }
-            if (currentStatus == STATUS_WAIT_FOR_SEAT){
+            if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                 //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
 
-            }else {
-                if (inseat){//在麦位上
-                    currentStatus=STATUS_ON_SEAT;
-                }else {
+            } else {
+                if (inseat) {//在麦位上
+                    currentStatus = STATUS_ON_SEAT;
+                } else {
                     //不在麦位上
-                    currentStatus=STATUS_NOT_ON_SEAT;
+                    currentStatus = STATUS_NOT_ON_SEAT;
                 }
             }
             mView.changeStatus(currentStatus);
-        }catch (Exception e){
-            Log.e(TAG, "refreshCurrentStatus: "+e );
+        } catch (Exception e) {
+            Log.e(TAG, "refreshCurrentStatus: " + e);
         }
     }
 
@@ -479,9 +484,32 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         break;
                     case EVENT_MANAGER_LIST_CHANGE://管理员列表发生了变化
                         MemberCache.getInstance().refreshAdminData(getmVoiceRoomBean().getRoomId());
-                        Log.e(TAG, "accept: "+"EVENT_MANAGER_LIST_CHANGE");
+                        Log.e(TAG, "accept: " + "EVENT_MANAGER_LIST_CHANGE");
+                        break;
+                    case EVENT_KICKED_OUT_OF_ROOM://被踢出了房间
+                        ArrayList<String> second = stringArrayListPair.second;
+                        if (second.get(1).equals(AccountStore.INSTANCE.getUserId())) {
+                            EToast.showToast("你已被踢出房间");
+                            leaveRoom();
+                        }
+                        break;
+                    case EVENT_ROOM_CLOSE://当前房间被关闭
+                        ConfirmDialog confirmDialog = new ConfirmDialog(((NewVoiceRoomFragment) mView).requireContext(), "当前直播已结束", true
+                                , "确定", "", null, new Function0<Unit>() {
+                            @Override
+                            public Unit invoke() {
+                                leaveRoom();
+                                return null;
+                            }
+                        });
+                        confirmDialog.show();
                         break;
                 }
+            }
+        }, new Consumer<Throwable>() {
+            @Override
+            public void accept(Throwable throwable) throws Throwable {
+                Log.e(TAG, "setObRoomEventChange: "+throwable);
             }
         }));
     }
@@ -550,7 +578,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 , new Function1<Integer, Unit>() {
                     @Override
                     public Unit invoke(Integer integer) {
-                        if (messageContent instanceof RCChatroomAdmin){
+                        if (messageContent instanceof RCChatroomAdmin) {
                             //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
                             RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "");
                             MemberCache.getInstance().refreshAdminData(mVoiceRoomBean.getRoomId());
@@ -695,7 +723,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         ArrayList<Member> memberArrayList = new ArrayList<>();
         for (UiSeatModel uiSeatModel : uiSeatModels) {
             String userId = uiSeatModel.getUserId();
-            if (!TextUtils.isEmpty(userId)&&uiSeatModel.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+            if (!TextUtils.isEmpty(userId) && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 User user = MemberCache.getInstance().getMember(userId);
                 Member member = new Member().toMember(user);
                 memberArrayList.add(member);
@@ -717,6 +745,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 发送关注消息
+     *
      * @param followMsg
      */
     @Override
@@ -807,6 +836,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             public void onResult(Wrapper result) {
                 if (result.ok()) {
                     leaveRoom();
+                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "");
                 } else {
                     mView.dismissLoading();
                 }
@@ -895,8 +925,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 new MutableLiveData<>(new RoomSeatModeFun(newVoiceRoomModel.currentUIRoomInfo.isFreeEnterSeat() ? 1 : 0)),
                 new MutableLiveData<>(new RoomMuteAllFun(newVoiceRoomModel.currentUIRoomInfo.isMuteAll() ? 1 : 0)),
                 new MutableLiveData<>(new RoomLockAllSeatFun(newVoiceRoomModel.currentUIRoomInfo.isLockAll() ? 1 : 0)),
-                new MutableLiveData<>(new RoomMuteFun(newVoiceRoomModel.currentUIRoomInfo.isMute()?1:0)),
-                new MutableLiveData<>(new RoomSeatSizeFun(newVoiceRoomModel.currentUIRoomInfo.getMSeatCount()==5?1:0)),
+                new MutableLiveData<>(new RoomMuteFun(newVoiceRoomModel.currentUIRoomInfo.isMute() ? 1 : 0)),
+                new MutableLiveData<>(new RoomSeatSizeFun(newVoiceRoomModel.currentUIRoomInfo.getMSeatCount() == 5 ? 1 : 0)),
                 new MutableLiveData<>(new RoomShieldFun(0)),
                 new MutableLiveData<>(new RoomMusicFun(0))
         );
@@ -942,27 +972,27 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 //全麦锁麦
                 setAllSeatLock(true);
             }
-        }else if (fun instanceof RoomLockAllSeatFun){
-            if (fun.getStatus() ==1){
+        } else if (fun instanceof RoomLockAllSeatFun) {
+            if (fun.getStatus() == 1) {
                 //解锁全座
                 lockOtherSeats(false);
-            }else {
+            } else {
                 //全麦锁座
                 lockOtherSeats(true);
             }
-        }else if (fun instanceof RoomMuteFun){
-            if (fun.getStatus()==1){
+        } else if (fun instanceof RoomMuteFun) {
+            if (fun.getStatus() == 1) {
                 //取消静音
                 muteAllRemoteStreams(false);
-            }else {
+            } else {
                 //静音
                 muteAllRemoteStreams(true);
             }
-        }else if (fun instanceof RoomSeatSizeFun){
-            if (fun.getStatus()==1){
+        } else if (fun instanceof RoomSeatSizeFun) {
+            if (fun.getStatus() == 1) {
                 //设置8个座位
                 setSeatCount(9);
-            }else {
+            } else {
                 //设置4个座位
                 setSeatCount(5);
             }
@@ -971,6 +1001,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 设置房间座位
+     *
      * @param seatCount
      */
     private void setSeatCount(int seatCount) {
@@ -980,7 +1011,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             public void onSuccess() {
                 //更换模式成功
                 RCChatroomSeats rcChatroomSeats = new RCChatroomSeats();
-                rcChatroomSeats.setCount(seatCount-1);
+                rcChatroomSeats.setCount(seatCount - 1);
                 RCChatRoomMessageManager.INSTANCE.sendChatMessage(getmVoiceRoomBean().getRoomId(), rcChatroomSeats
                         , true, new Function1<Integer, Unit>() {
                             @Override
@@ -1004,14 +1035,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 静音 取消静音
+     *
      * @param isMute
      */
     private void muteAllRemoteStreams(boolean isMute) {
         RCVoiceRoomEngine.getInstance().muteAllRemoteStreams(isMute);
         newVoiceRoomModel.currentUIRoomInfo.setMute(isMute);
-        if (isMute){
+        if (isMute) {
             EToast.showToast("扬声器已静音");
-        }else {
+        } else {
             EToast.showToast("已取消静音");
         }
         //此时要将当前的状态同步到服务器，下次进入的时候可以同步
@@ -1020,7 +1052,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     /**
      * 全麦锁座
      */
-    private void lockOtherSeats(boolean isLockAll){
+    private void lockOtherSeats(boolean isLockAll) {
         RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll);
         if (isLockAll) {
             EToast.showToast("全部座位已锁定");
@@ -1031,6 +1063,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     /**
      * 全麦锁麦
+     *
      * @param isMuteAll
      */
     private void setAllSeatLock(boolean isMuteAll) {
@@ -1172,22 +1205,22 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 获取房间内礼物列表 ,刷新列表
      */
     public void getGiftCount() {
-        if (mVoiceRoomBean!=null&&!TextUtils.isEmpty(mVoiceRoomBean.getRoomId()))
-        OkApi.get(VRApi.getGiftList(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    Map<String, String> map = result.getMap();
-                    Logger.e("================" + map.toString());
-                    for (String userId : map.keySet()) {
-                        UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(userId);
-                        String gifCount = map.get(userId);
-                        if (uiSeatModel!=null)
-                        uiSeatModel.setGiftCount(Integer.parseInt(gifCount));
+        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId()))
+            OkApi.get(VRApi.getGiftList(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+                @Override
+                public void onResult(Wrapper result) {
+                    if (result.ok()) {
+                        Map<String, String> map = result.getMap();
+                        Logger.e("================" + map.toString());
+                        for (String userId : map.keySet()) {
+                            UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(userId);
+                            String gifCount = map.get(userId);
+                            if (uiSeatModel != null)
+                                uiSeatModel.setGiftCount(Integer.parseInt(gifCount));
+                        }
                     }
                 }
-            }
-        });
+            });
     }
 
 

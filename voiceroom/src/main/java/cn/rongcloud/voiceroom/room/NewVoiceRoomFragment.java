@@ -55,6 +55,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -87,7 +88,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private TextView mNoticeView;
     private RoomSeatView mRoomSeatView;
     private RoomBottomView mRoomBottomView;
-    private RecyclerView mMessageView;
+    private RecyclerViewAtVP2 mMessageView;
     private RoomMessageAdapter mRoomMessageAdapter;
     private RecyclerView rv_seat_list;
     private NewVoiceRoomSeatsAdapter voiceRoomSeatsAdapter;
@@ -444,6 +445,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
+        Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString() );
         if (uiSeatModel == null) {
             return;
         }

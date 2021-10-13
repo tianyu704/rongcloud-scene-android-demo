@@ -9,6 +9,7 @@ import com.rongcloud.common.utils.ImageLoaderUtil;
 import cn.rong.combusis.R;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.OnItemClickListener;
+import cn.rong.combusis.ui.OnItemClickRoomListListener;
 
 /**
  * @author gyn
@@ -16,13 +17,13 @@ import cn.rong.combusis.ui.OnItemClickListener;
  */
 public class RoomListAdapter extends RcySAdapter<VoiceRoomBean, RcyHolder> {
 
-    private OnItemClickListener<VoiceRoomBean> mOnItemClickListener;
+    private OnItemClickRoomListListener<VoiceRoomBean> mOnItemClickListener;
 
     public RoomListAdapter(Context context, int itemLayoutId) {
         super(context, itemLayoutId);
     }
 
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
+    public void setOnItemClickListener(OnItemClickRoomListListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
     }
 
@@ -36,7 +37,7 @@ public class RoomListAdapter extends RcySAdapter<VoiceRoomBean, RcyHolder> {
         holder.setVisible(R.id.iv_room_locked, voiceRoomBean.isPrivate());
         holder.itemView.setOnClickListener(v -> {
             if (mOnItemClickListener != null) {
-                mOnItemClickListener.clickItem(voiceRoomBean, position);
+                mOnItemClickListener.clickItem(voiceRoomBean, position,false);
             }
         });
     }

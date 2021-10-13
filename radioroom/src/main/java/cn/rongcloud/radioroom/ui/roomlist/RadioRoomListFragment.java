@@ -29,7 +29,7 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
     private InputPasswordDialog inputPasswordDialog;
 
     @Override
-    public void clickItem(VoiceRoomBean item, int position) {
+    public void clickItem(VoiceRoomBean item, int position ,boolean isCreate) {
         if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
             ArrayList list = new ArrayList();
             list.add(item.getRoomId());

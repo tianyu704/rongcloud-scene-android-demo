@@ -2,6 +2,7 @@ package cn.rongcloud.voiceroom.room;
 
 
 import static cn.rong.combusis.sdk.Api.EVENT_AGREE_MANAGE_PICK;
+import static cn.rong.combusis.sdk.Api.EVENT_KICKED_OUT_OF_ROOM;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_REJECT_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
@@ -453,12 +454,16 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 用户收到被踢出房间 然后弹窗告知，然后退出房间等操作
      *
-     * @param s
-     * @param s1
+     * @param targetId 被踢用户的标识
+     * @param userId 发起踢人用户的标识
      */
     @Override
-    public void onUserReceiveKickOutRoom(String s, String s1) {
+    public void onUserReceiveKickOutRoom(String targetId, String userId) {
         Log.e(TAG, "onUserReceiveKickOutRoom: ");
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add(userId);
+        strings.add(targetId);
+        roomEventSubject.onNext(new Pair(EVENT_KICKED_OUT_OF_ROOM, strings));
     }
 
     /**

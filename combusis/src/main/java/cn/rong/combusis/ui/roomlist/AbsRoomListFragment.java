@@ -17,13 +17,14 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickListener;
+import cn.rong.combusis.ui.OnItemClickRoomListListener;
 import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author gyn
  * @date 2021/9/15
  */
-public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
+public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickRoomListListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
 
     private RoomListAdapter mAdapter;
     private int mCurrentPage = 1;
@@ -117,7 +118,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         mRoomIdList.add(0, voiceRoomBean.getRoomId());
         mAdapter.getData().add(0, voiceRoomBean);
         mAdapter.notifyItemInserted(0);
-        clickItem(voiceRoomBean, 0);
+        clickItem(voiceRoomBean, 0,true);
     }
 
     @Override
