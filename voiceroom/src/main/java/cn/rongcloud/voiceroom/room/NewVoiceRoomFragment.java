@@ -312,7 +312,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     }
 
-    boolean isfirst = true;
     private PKView pkView;
     private View voiceRoom;
 
@@ -326,15 +325,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
         // init pk
         initPk();
-    }
-
-    @Override
-    public void leaveRoom() {
-        //离开房间的时候
-        present.leaveCurrentRoom();
-        isfirst = true;
-        // uninit pk
-        unInitPk();
     }
 
     private void initPk() {
@@ -475,7 +465,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void destroyRoom() {
-
+        //离开房间的时候
+        present.leaveCurrentRoom();
+        // uninit pk
+        unInitPk();
     }
 
     /**
@@ -541,6 +534,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     /**
      * 设置公告的内容
      *
+     *
      * @param notice
      * @param isModify
      */
@@ -551,6 +545,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 点击消息列表中的用户名称
+     *
      *
      * @param userId
      */
@@ -868,6 +863,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     /**
      * 屏蔽词弹窗
      *
+     *
      * @param roomId
      */
     @Override
@@ -878,6 +874,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 房间背景弹窗
+     *
      *
      * @param url
      */

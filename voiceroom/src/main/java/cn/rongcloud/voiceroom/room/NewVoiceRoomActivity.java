@@ -2,7 +2,6 @@ package cn.rongcloud.voiceroom.room;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
@@ -46,15 +45,15 @@ import io.rong.imkit.picture.tools.ToastUtils;
 @AndroidEntryPoint
 public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     private static final String KEY_ROOM_IDS = "KEY_ROOM_IDS";
-    private static final String ISCREATE= "ROOM_IS_CREATE";
+    private static final String ISCREATE = "ROOM_IS_CREATE";
     private static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
     private LoadTag mLoadTag;
 
-    public static void startActivity(Activity activity, ArrayList<String> roomIds, int position ,boolean isCreate) {
+    public static void startActivity(Activity activity, ArrayList<String> roomIds, int position, boolean isCreate) {
         Intent intent = new Intent(activity, NewVoiceRoomActivity.class);
         intent.putStringArrayListExtra(KEY_ROOM_IDS, roomIds);
         intent.putExtra(KEY_ROOM_POSITION, position);
-        intent.putExtra(ISCREATE,isCreate);
+        intent.putExtra(ISCREATE, isCreate);
         activity.startActivity(intent);
     }
 
@@ -113,20 +112,17 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
             @Override
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
-                leaveRoom();
                 UIKit.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         joinRoom(roomId);
                     }
-                },1000);
+                }, 1000);
             }
 
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
-                leaveRoom();
-                //
                 joinRoom(roomId);
             }
         });
@@ -137,7 +133,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
         ((NewVoiceRoomFragment) getCurrentFragment()).prepareJoinRoom(roomId);
         VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
             if (isCreate) {
-                RCVoiceRoomInfo rcVoiceRoomInfo=new RCVoiceRoomInfo();
+                RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
                 rcVoiceRoomInfo.setRoomName(voiceRoomBean.getRoomName());
                 rcVoiceRoomInfo.setSeatCount(9);
                 rcVoiceRoomInfo.setFreeEnterSeat(false);
@@ -157,7 +153,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
                         Logger.e("==============createAndJoinRoom onError,code:" + code + ",message:" + message);
                     }
                 });
-            }else {
+            } else {
                 RCVoiceRoomEngine.getInstance().joinRoom(voiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {

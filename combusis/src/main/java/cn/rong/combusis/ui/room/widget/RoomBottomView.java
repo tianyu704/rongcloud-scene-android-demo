@@ -113,8 +113,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     private GestureDetector mGestureDetector;
 //    private boolean isInPk;
 
-//    private RecordVoicePopupWindow
-
     private OnBottomOptionClickListener mOnBottomOptionClickListener;
     private AudioRecordManager audioRecordManager;
 
@@ -189,14 +187,14 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
             }
 
             @Override
-            public boolean onSingleTapUp(MotionEvent e) {
+            public boolean onDown(MotionEvent e) {
                 if (mInputBar.getVisibility() == VISIBLE) {
                     mInputView.clearFocus();
                     SoftKeyboardUtils.hideSoftKeyboard(mInputView);
                     mInputBar.setVisibility(View.GONE);
                     return true;
                 } else {
-                    return super.onSingleTapUp(e);
+                    return super.onDown(e);
                 }
             }
         });
@@ -306,7 +304,11 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         if (audioRecordManager.isRecording()) {
             return super.dispatchTouchEvent(ev);
         }
-        if (ev.getY() > mOptionContainer.getTop()) {
+        int safeHeight = mOptionContainer.getTop();
+        if (mInputBar.getVisibility() == VISIBLE) {
+            safeHeight = mInputBar.getTop();
+        }
+        if (ev.getY() > safeHeight) {
             return super.dispatchTouchEvent(ev);
         } else {
             mGestureDetector.onTouchEvent(ev);

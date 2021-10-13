@@ -80,6 +80,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
+    private int bottomMargin = 0;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -146,11 +147,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
         present.joinRoom(voiceRoomBean);
-    }
-
-    @Override
-    public void leaveRoom() {
-
     }
 
     /**
@@ -316,9 +312,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void showUserSetting(Member member) {
-        if (mMemberSettingFragment == null) {
-            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
-        }
+        mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
         mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }
 
@@ -356,7 +350,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
             @Override
             public void clickLeaveRoom() {
                 // 观众离开房间
-                present.leaveRoom();
+                present.leaveRoom(false);
             }
 
             @Override
@@ -377,7 +371,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void destroyRoom() {
-
+        present.leaveRoom(true);
     }
 
     @Override

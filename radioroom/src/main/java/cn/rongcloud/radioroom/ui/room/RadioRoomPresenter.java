@@ -86,6 +86,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
+        Logger.e("================jjjjjjjjjjjjjjjj" + voiceRoomBean);
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
             mRoomId = voiceRoomBean.getRoomId();
@@ -395,7 +396,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onResult(Wrapper result) {
                 if (result.ok()) {
-                    leaveRoom();
+                    leaveRoom(false);
                 } else {
                     mView.dismissLoading();
                 }
@@ -447,10 +448,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
     /**
      * 调用离开房间
+     *
+     * @param isSwitchLeave 是否是上下滑动切换导致的离开房间，切换时有离开操作，所以不用再离开
      */
-    public void leaveRoom() {
+    public void leaveRoom(boolean isSwitchLeave) {
         MusicManager.get().stopPlayMusic();
         RadioEventHelper.getInstance().unRegister();
+        Logger.e("================llllllllllll");
+        if (isSwitchLeave) {
+            return;
+        }
         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
 
             @Override
@@ -620,7 +627,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onMessageReceived(Message message) {
         MessageContent content = message.getContent();
-        Logger.e("==============onMessageReceived: " + JsonUtils.toJson(content));
+        Logger.e("==============onMessageReceived: " + content.getClass() + JsonUtils.toJson(content));
 
         if (content instanceof RCChatroomGift || content instanceof RCChatroomGiftAll) {
             // 刷新礼物数
@@ -632,7 +639,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             // 如果踢出的是自己，就离开房间
             String targetId = ((RCChatroomKickOut) content).getTargetId();
             if (TextUtils.equals(targetId, AccountStore.INSTANCE.getUserId())) {
-                leaveRoom();
+                leaveRoom(false);
                 mView.showToast("你已被踢出房间");
             }
         } else if (content instanceof RCChatroomLike) {

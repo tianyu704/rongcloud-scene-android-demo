@@ -1,13 +1,14 @@
 package cn.rong.combusis.ui.room;
 
+import android.graphics.Rect;
 import android.text.TextUtils;
-import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.UiUtils;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     private RoomVPAdapter<String> mRoomAdapter;
     private AbsRoomFragment mCurrentFragment;
     private int mCurrentPosition;
+    private int bottomMargin = 0;
 
     @Override
     public int setLayoutId() {
@@ -33,6 +35,7 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     @Override
     public void init() {
+        // 状态栏透明
         StatusBarUtil.setTranslucentStatus(this);
         initRoom();
         getWrapBar().setHide(true).work();
@@ -48,22 +51,19 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 mCurrentPosition = position;
-                // 上一个滑走
-                Fragment lastFragment = getSupportFragmentManager().findFragmentByTag("f" + (position - 1));
-                if (lastFragment instanceof AbsRoomFragment) {
-                    Logger.e("last page dismiss");
-                    ((AbsRoomFragment) lastFragment).destroyRoom();
-                }
                 // 当前显示
                 Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
                 if (currentFragment instanceof AbsRoomFragment && mCurrentFragment != currentFragment) {
                     Logger.e("current page show");
-                    if(!TextUtils.equals(mCurrentFragment.getTag(),currentFragment.getTag())){
+                    if (!TextUtils.equals(mCurrentFragment.getTag(), currentFragment.getTag())) {
+                        // 上一个滑走要销毁
+                        mCurrentFragment.destroyRoom();
+                        // 要显示的
                         mCurrentFragment = (AbsRoomFragment) currentFragment;
                         switchRoom(mRoomAdapter.getItemData(position));
                     }
                 }
-                Logger.e("==================选中了第几个：" + position + " last:" + lastFragment + ",current:" + currentFragment);
+                Logger.e("==================选中了第几个：" + position + ",current:" + currentFragment);
             }
 
             @Override
@@ -84,6 +84,23 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
         mViewPager.setAdapter(mRoomAdapter);
         mRoomAdapter.setData(loadData());
         mViewPager.setCurrentItem(getCurrentItem(), false);
+
+        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
+        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect rect = new Rect();
+            getLayout().getWindowVisibleDisplayFrame(rect);
+            int height = screenHeight - rect.bottom;
+            if (bottomMargin != height) {
+                // 假定高度超过屏幕的1/4代表键盘弹出了
+                if (height > screenHeight / 4) {
+                    bottomMargin = height;
+                } else {
+                    bottomMargin = 0;
+                }
+                getLayout().setPadding(0, 0, 0, bottomMargin);
+            }
+        });
     }
 
     protected abstract void initRoom();
@@ -92,9 +109,10 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     protected abstract int getCurrentItem();
 
     //当前页面的fragment
-    protected Fragment getCurrentFragment(){
+    protected Fragment getCurrentFragment() {
         return mCurrentFragment;
     }
+
     // 返回要初始化的Fragment
     protected abstract Fragment getFragment();
 
@@ -110,15 +128,6 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     public void joinRoom(T t) {
         if (mCurrentFragment != null) {
             mCurrentFragment.joinRoom(t);
-        }
-    }
-
-    /**
-     * 离开当前房间的时候，取消部分订阅
-     */
-    public void leaveRoom(){
-        if (mCurrentFragment != null) {
-            mCurrentFragment.leaveRoom();
         }
     }
 
