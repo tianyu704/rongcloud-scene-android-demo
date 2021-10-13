@@ -16,7 +16,6 @@ import androidx.annotation.NonNull;
 import com.basis.net.oklib.wrapper.interfaces.ILoadTag;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
-import com.rongcloud.common.utils.AccountStore;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ import cn.rong.combusis.common.net.IResultBack;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.common.utils.UIKit;
 import cn.rong.combusis.music.domain.MusicBean;
-import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rongcloud.rtc.api.RCRTCAudioMixer;
 import cn.rongcloud.rtc.api.callback.RCRTCAudioMixingStateChangeListener;
 
@@ -249,10 +247,6 @@ public class MusicManager implements IMusic {
      */
     @Override
     public void switchMusicPlayState(MusicBean music) {
-        if (null == EventHelper.helper().getSeatInfo(AccountStore.INSTANCE.getUserId())) {
-            KToast.show("请先上麦之后再播放音乐");
-            return;
-        }
         Logger.e(TAG, "playOrPauseMusic");
         if (!TextUtils.isEmpty(currentPlayMusicUrl) && currentPlayMusicUrl.equals(music.getUrl())) {
             if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
@@ -429,6 +423,11 @@ public class MusicManager implements IMusic {
                 addMusic(bean, resultBack);
             }
         });
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return currentMusicState == RCRTCAudioMixer.MixingState.PLAY;
     }
 
     public void addMusicListenre(VRMusicListener listener) {

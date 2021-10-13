@@ -74,6 +74,13 @@ public interface IMusic {
      */
     void addMusicByUri(Uri uri, ILoadTag loadTag, IResultBack<Boolean> resultBack);
 
+    /**
+     * 是否播放
+     *
+     * @return
+     */
+    boolean isPlaying();
+
     interface VRMusicListener {
         /**
          * 音乐集合监听

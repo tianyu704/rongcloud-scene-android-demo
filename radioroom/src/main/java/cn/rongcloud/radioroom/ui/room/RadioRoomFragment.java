@@ -25,6 +25,7 @@ import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
@@ -78,6 +79,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private ShieldDialog mShieldDialog;
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
+    private MusicDialog mMusicDialog;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -185,6 +187,15 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
             list.add(messageContent);
         }
         mRoomMessageAdapter.setData(list, isRefresh);
+        int count = mRoomMessageAdapter.getItemCount();
+        if (count > 0) {
+            mMessageView.smoothScrollToPosition(count - 1);
+        }
+    }
+
+    @Override
+    public void addAllToMessageList(List<MessageContent> messageContents, boolean isRefresh) {
+        mRoomMessageAdapter.setData(messageContents, isRefresh);
         int count = mRoomMessageAdapter.getItemCount();
         if (count > 0) {
             mMessageView.smoothScrollToPosition(count - 1);
@@ -320,6 +331,12 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     public void showCreatorSetting(boolean isMute, boolean isPlayingMusic) {
         mCreatorSettingFragment = new CreatorSettingFragment(isMute, isPlayingMusic, present);
         mCreatorSettingFragment.show(getChildFragmentManager());
+    }
+
+    @Override
+    public void showMusicDialog() {
+        mMusicDialog = new MusicDialog(present.getRoomId());
+        mMusicDialog.show(getChildFragmentManager());
     }
 
     /**
