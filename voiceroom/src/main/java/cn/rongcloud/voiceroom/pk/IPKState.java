@@ -78,5 +78,10 @@ public interface IPKState {
          * pk结束：1、惩罚记时结束，2、手动退出PK
          */
         void onPkStop();
+
+        /**
+         * pk状态变化
+         */
+        void onPkState();
     }
 }

@@ -3,9 +3,6 @@ package cn.rong.combusis.ui.room.widget;
 import android.Manifest;
 import android.content.Context;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -114,7 +111,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     // 动画
     private FavAnimation mFavAnimation;
     private GestureDetector mGestureDetector;
-    private boolean isInPk;
+//    private boolean isInPk;
 
 //    private RecordVoicePopupWindow
 
@@ -142,6 +139,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         mPrivateMessageCountView = mRootView.findViewById(R.id.tv_unread_message_number);
         mSendGiftView = mRootView.findViewById(R.id.iv_send_gift);
         mPkView = mRootView.findViewById(R.id.iv_request_pk);
+        mPkView.setSelected(false);
         mRequestSeatView = mRootView.findViewById(R.id.iv_request_enter_seat);
         mInputBar = mRootView.findViewById(R.id.cl_input_bar);
         mInputView = mRootView.findViewById(R.id.et_message);
@@ -283,7 +281,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     /**
      * 设置申请上面的按钮的图
      */
-    public void setRequestSeatImage(int drawable){
+    public void setRequestSeatImage(int drawable) {
         mRequestSeatView.setImageResource(drawable);
     }
 
@@ -349,18 +347,23 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 onBottomOptionClickListener.clickSendMessage(msg.toString().trim());
             });
             mPkView.setOnClickListener(v -> {
-                isInPk = !isInPk;
-                if (isInPk) {
-                    mPkView.setImageResource(R.drawable.ic_pk_close);
-                } else {
-                    mPkView.setImageResource(R.drawable.ic_request_pk);
-                }
-                onBottomOptionClickListener.clickPk(isInPk);
+//                isInPk = !isInPk;
+//                if (isInPk) {
+//                    mPkView.setImageResource(R.drawable.ic_pk_close);
+//                } else {
+//                    mPkView.setImageResource(R.drawable.ic_request_pk);
+//                }
+//                mPkView.setSelected(!mPkView.isSelected());
+                onBottomOptionClickListener.clickPk(v);
             });
             mSendGiftView.setOnClickListener(v -> {
                 onBottomOptionClickListener.onSendGift();
             });
         }
+    }
+
+    public void setPkState(boolean isInPk) {
+        if (null != mPkView) mPkView.setSelected(isInPk);
     }
 
     /**
@@ -430,7 +433,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
 
         void clickSettings();
 
-        void clickPk(boolean isInPk);
+        void clickPk(View view);
 
         void clickRequestSeat();
 

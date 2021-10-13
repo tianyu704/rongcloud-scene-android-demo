@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kit.utils.Logger;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -65,6 +67,10 @@ import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import cn.rongcloud.voiceroom.pk.IPKState;
+import cn.rongcloud.voiceroom.pk.PKStateManager;
+import cn.rongcloud.voiceroom.pk.StateUtil;
+import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
@@ -305,6 +311,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     }
 
+    boolean isfirst = true;
+    private PKView pkView;
+    private View voiceRoom;
+
     @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
         mVoiceRoomBean = voiceRoomBean;
@@ -312,13 +322,43 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         present.setCurrentRoom(mVoiceRoomBean);
         sendSystemMessage();
         Log.e(TAG, "joinRoom: ");
+
+        // init pk
+        initPk();
     }
-    boolean isfirst=true;
+
     @Override
     public void leaveRoom() {
         //离开房间的时候
         present.leaveCurrentRoom();
-        isfirst=true;
+        isfirst = true;
+        // uninit pk
+        unInitPk();
+    }
+
+    private void initPk() {
+        pkView = getView(R.id.pk_view);
+        voiceRoom = getView(R.id.voice_room);
+        PKStateManager.get().init(mVoiceRoomBean.getRoomId(), pkView, new IPKState.VRStateListener() {
+            @Override
+            public void onPkStart() {
+                PKStateManager.get().enterPkWithAnimation(voiceRoom, pkView, 200);
+            }
+
+            @Override
+            public void onPkStop() {
+                PKStateManager.get().quitPkWithAnimation(pkView, voiceRoom, 200);
+            }
+
+            @Override
+            public void onPkState() {
+                mRoomBottomView.setPkState(StateUtil.isPking());
+            }
+        });
+    }
+
+    private void unInitPk() {
+        PKStateManager.get().unInit();
     }
 
     @Override
@@ -415,7 +455,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         /**
          * 设一个默认的公告
          */
-        showNotice(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()),false);
+        showNotice(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()), false);
 
     }
 
@@ -458,9 +498,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             mRoomSeatView.setGiftCount(0L);
         } else {
             User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
-            if (member!=null){
+            if (member != null) {
                 mRoomSeatView.setData(member.getUserName(), member.getPortrait());
-            }else {
+            } else {
                 mRoomSeatView.setData("", null);
             }
             mRoomSeatView.setSpeaking(uiSeatModel.isSpeaking());
@@ -487,6 +527,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 设置公告的内容
+     *
      * @param notice
      * @param isModify
      */
@@ -497,6 +538,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 点击消息列表中的用户名称
+     *
      * @param userId
      */
     @Override
@@ -704,11 +746,19 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     /**
      * PK
      *
-     * @param isInPk
+     * @param view
      */
     @Override
-    public void clickPk(boolean isInPk) {
-
+    public void clickPk(View view) {
+        if (view.isSelected()) {// 关闭pk
+            PKStateManager.get().quitPK(activity);
+        } else {// 发起pk
+            PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
+                @Override
+                public void onResult(Boolean aBoolean) {
+                }
+            });
+        }
     }
 
     /**
@@ -796,6 +846,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 屏蔽词弹窗
+     *
      * @param roomId
      */
     @Override
@@ -806,6 +857,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 房间背景弹窗
+     *
      * @param url
      */
     @Override

@@ -105,9 +105,11 @@ public interface IEventHelp {
     enum Type {
         PK_NONE,//默认状态
         PK_INVITE,//邀请状态
+        // pk 中
         PK_GOING,//sdk pk进行中
         PK_START,//ui pk进行中
         PK_PUNISH,//ui pk惩罚
+        // pk 结束
         PK_STOP,//ui pk结束
         PK_FINISH//pk关闭状态
     }

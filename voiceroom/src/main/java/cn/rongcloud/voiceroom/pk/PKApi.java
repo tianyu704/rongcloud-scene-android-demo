@@ -98,5 +98,28 @@ public class PKApi {
         });
     }
 
+    /**
+     * 获取PK 状态
+     *
+     * @param roomId     房间id
+     * @param resultBack 结果回调
+     */
+    static void isPkState(String roomId, IResultBack<PKResult> resultBack) {
+        OkApi.get(VRApi.isPkState(roomId), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                Logger.e(TAG, "result:" + GsonUtil.obj2Json(result));
+                if (null != result && result.ok()) {
+                    PKResult pkResult = result.get(PKResult.class);
+                    if (null != resultBack) resultBack.onResult(pkResult);
+                }
+            }
 
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                if (null != resultBack) resultBack.onResult(null);
+            }
+        });
+    }
 }

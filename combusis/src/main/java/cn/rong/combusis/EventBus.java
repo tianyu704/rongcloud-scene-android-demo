@@ -65,7 +65,8 @@ public class EventBus {
         if (null == callback) {
             events.remove(tag);
         } else {
-            events.get(tag).remove(callback);
+            List temp = events.get(tag);
+            if (null != temp) temp.remove(callback);
         }
     }
 

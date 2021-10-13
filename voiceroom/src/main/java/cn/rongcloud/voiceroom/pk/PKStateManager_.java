@@ -91,7 +91,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
         this.pkView = pkView;
         this.stateListener = listener;
         // 注册房间事件监听
-        EventHelper.helper().regeister(roomId,null);
+        EventHelper.helper().regeister(roomId, null);
         // 注册pk状态监听
         EventBus.get().on(EventBus.TAG.PK_STATE, this);
         EventBus.get().on(EventBus.TAG.PK_RESPONSE, this);
@@ -235,7 +235,8 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
         if (null != pkView && null != rcpkInfo) {
             String local = AccountStore.INSTANCE.getUserId();
             String otherId = local.equals(rcpkInfo.getInviterId()) ? rcpkInfo.getInviteeId() : rcpkInfo.getInviterId();
-            pkView.pkStart(local, otherId, -1, new IPK.OnTimerEndListener() {
+            pkView.setPKUserInfo(local, otherId);
+            pkView.pkStart(-1, new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
                     handlePkPunish();
@@ -257,7 +258,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
         reportPKState(1);
         //惩罚记时
         if (null != pkView) {
-            pkView.pkPunish(new IPK.OnTimerEndListener() {
+            pkView.pkPunish(-1, new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
                     if (AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId())) {

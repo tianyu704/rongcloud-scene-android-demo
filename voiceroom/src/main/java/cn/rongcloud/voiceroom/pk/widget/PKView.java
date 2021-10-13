@@ -150,14 +150,7 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public synchronized void pkStart(String localId, String pkId, long timeDiff, OnTimerEndListener listener) {
-        if (null != timer) {
-            timer.cancel();
-            timer = null;
-        }
-        // 开启 pk记时
-        timer = new Timer(tvTime, timeDiff, listener);
-        timer.start();
+    public void setPKUserInfo(String localId, String pkId) {
         UserProvider.provider().getAsyn(localId, new IResultBack<UserInfo>() {
             @Override
             public void onResult(UserInfo userInfo) {
@@ -179,13 +172,25 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
-    public synchronized void pkPunish(OnTimerEndListener listener) {
+    public synchronized void pkStart(long timeDiff, OnTimerEndListener listener) {
+        if (null != timer) {
+            timer.cancel();
+            timer = null;
+        }
+        // 开启 pk记时
+        timer = new Timer(tvTime, timeDiff, listener);
+        timer.start();
+
+    }
+
+    @Override
+    public synchronized void pkPunish(long timeDiff, OnTimerEndListener listener) {
         if (null != timer) {
             timer.cancel();
             timer = null;
         }
         // 开启 惩罚记时
-        timer = new Timer(tvTime, -1, listener);
+        timer = new Timer(tvTime, timeDiff, listener);
         timer.start();
         refreshPkResult();
     }

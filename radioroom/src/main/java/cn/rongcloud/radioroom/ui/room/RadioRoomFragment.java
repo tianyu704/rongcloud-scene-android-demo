@@ -421,7 +421,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     }
 
     @Override
-    public void clickPk(boolean isInPk) {
+    public void clickPk(View view) {
 
     }
 
