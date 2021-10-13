@@ -97,4 +97,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members);
 
     void showUserSetting(Member member);
+
+    void showMusicDialog();
 }

@@ -23,11 +23,11 @@ import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.common.utils.SharedPreferUtil;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomKickOut;
+import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
@@ -547,7 +547,6 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
                 });
     }
 
-    private RCRTCAudioMixer.MixingState currentMusicState = RCRTCAudioMixer.MixingState.STOPPED;
 
     /**
      * 音乐的所有操作
@@ -560,32 +559,9 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * @return
      */
     public boolean isPlayingMusic() {
-        return false;
-//        // 暂停状态下不视为音乐正在播放
-//        return (currentPlayMusic != null && currentMusicState == RCRTCAudioMixer.MixingState.PLAY)
-//                || (playNextMusicJob ?.isCompleted == false)
+        return MusicManager.get().isPlaying();
     }
 
-    /**
-     * 用于记录音乐停止的状态
-     */
-
-    private volatile boolean musicStopFlag = true;
-
-    /**
-     * 停止音乐播放，临时放这里
-     */
-    public void stopPlayMusic() {
-//        try {
-//            musicStopFlag = true;
-//            if (playNextMusicJob?.isActive == true) {
-//                playNextMusicJob?.cancel()
-//            }
-//            RCRTCAudioMixer.getInstance().stop()
-//        } catch (e: Exception) {
-//            Log.e(TAG, "stopPlayMusic: ", e)
-//        }
-    }
 
 
     /**
@@ -641,22 +617,15 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 麦位断开链接
      *
-     * @param userId
      * @return
      */
-    public Completable leaveSeat(String userId) {
+    public Completable leaveSeat() {
         return Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                UiSeatModel uiSeatModel = getSeatInfoByUserId(userId);
                 RCVoiceRoomEngine.getInstance().leaveSeat(new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
-                        if (currentMusicState == RCRTCAudioMixer.MixingState.PLAY
-                                || currentMusicState == RCRTCAudioMixer.MixingState.PAUSED
-                        ) {
-                            stopPlayMusic();
-                        }
                         AudioManagerUtil.INSTANCE.choiceAudioModel();
                         emitter.onComplete();
                     }

@@ -37,6 +37,7 @@ import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
@@ -102,6 +103,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private ShieldDialog mShieldDialog;
     private BackgroundSettingFragment mBackgroundSettingFragment;
     private GiftFragment mGiftFragment;
+    private MusicDialog mMusicDialog;
 
     public static Fragment getInstance() {
         return new NewVoiceRoomFragment();
@@ -825,6 +827,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
         }
         mMemberSettingFragment.show(getChildFragmentManager(), member, mVoiceRoomBean.getCreateUserId());
+    }
+
+    @Override
+    public void showMusicDialog() {
+        mMusicDialog = new MusicDialog(mVoiceRoomBean.getRoomId());
+        mMusicDialog.show(getChildFragmentManager());
     }
 
 

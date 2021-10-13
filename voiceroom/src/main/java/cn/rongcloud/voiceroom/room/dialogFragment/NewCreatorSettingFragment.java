@@ -6,10 +6,10 @@ import android.view.View;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.Guideline;
 
-import com.rongcloud.common.utils.AccountStore;
 
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
@@ -89,7 +89,7 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
      * 离开麦位
      */
     private void leaveSeat() {
-        newVoiceRoomModel.leaveSeat(AccountStore.INSTANCE.getUserId())
+        newVoiceRoomModel.leaveSeat()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action() {
                     @Override
@@ -117,7 +117,7 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
             @Override
             public Unit invoke() {
                 //确定
-                newVoiceRoomModel.stopPlayMusic();
+                MusicManager.get().stopPlayMusic();
                 leaveSeat();
                 return null;
             }

@@ -96,7 +96,7 @@ public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
      */
     private void leaveSeat() {
         isLeaveSeating=true;
-        newVoiceRoomModel.leaveSeat(AccountStore.INSTANCE.getUserId())
+        newVoiceRoomModel.leaveSeat()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(new Action() {
                     @Override

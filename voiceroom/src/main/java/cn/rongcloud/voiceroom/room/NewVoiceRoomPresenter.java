@@ -48,6 +48,7 @@ import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
+import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.EventHelper;
@@ -807,6 +808,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 调用离开房间
      */
     public void leaveRoom() {
+        MusicManager.get().stopPlayMusic();
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
 
             @Override
@@ -995,6 +997,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             } else {
                 //设置4个座位
                 setSeatCount(5);
+            }
+        }else if (fun instanceof RoomMusicFun){
+            //音乐 判断房主是否在麦位上
+            UiSeatModel seatInfoByUserId = newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
+            if (seatInfoByUserId!=null&&seatInfoByUserId.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+                //在座位上，可以播放音乐
+                mView.showMusicDialog();
+            }else {
+                mView.showToast("请先上麦之后再播放音乐");
             }
         }
     }
