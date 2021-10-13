@@ -785,8 +785,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
                 10,
                 false,
                 () -> null,
-                s -> {
-                    present.setRoomName(name);
+                newName -> {
+                    present.setRoomName(newName);
                     mEditDialog.dismiss();
                     return null;
                 }

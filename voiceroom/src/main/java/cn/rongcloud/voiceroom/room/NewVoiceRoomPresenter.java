@@ -234,11 +234,17 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         String extra = "";
                         if (uiRoomModel.getRcRoomInfo() != null) {
                             extra = uiRoomModel.getRcRoomInfo().getExtra();
+                            mView.setVoiceName(uiRoomModel.getRcRoomInfo().getRoomName());
                         }
                         if (mVoiceRoomBean != null) {
                             String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
                             mView.showNotice(notice, false);
                         }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        Log.e(TAG, "setObRoomInfoChange: " +throwable);
                     }
                 }));
     }
@@ -1160,7 +1166,17 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             mVoiceRoomBean.setRoomName(name);
                             RCVoiceRoomInfo rcRoomInfo = newVoiceRoomModel.currentUIRoomInfo.getRcRoomInfo();
                             rcRoomInfo.setRoomName(name);
-                            RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, null);
+                            RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, new RCVoiceRoomCallback() {
+                                @Override
+                                public void onSuccess() {
+                                    Log.e(TAG, "onSuccess: " );
+                                }
+
+                                @Override
+                                public void onError(int i, String s) {
+                                    Log.e(TAG, "onError: ");
+                                }
+                            });
                         } else {
                             mView.showToast("修改失败");
                         }
