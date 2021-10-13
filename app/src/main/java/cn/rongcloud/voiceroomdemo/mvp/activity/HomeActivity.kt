@@ -29,11 +29,9 @@ import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.callkit.DialActivity
+import io.rong.imkit.manager.UnReadMessageManager
 import io.rong.imkit.utils.RouteUtils
-import io.rong.imlib.IRongCoreListener
-import io.rong.imlib.RongIMClient
 import io.rong.imlib.model.Conversation
-import io.rong.imlib.model.Message
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
@@ -46,8 +44,7 @@ private const val TAG = "HomeActivity"
 
 @HiltBinding(value = IHomeView::class)
 @AndroidEntryPoint
-class HomeActivity : BaseActivity(), IHomeView,
-    IRongCoreListener.OnReceiveMessageListener {
+class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMessageObserver {
 
     companion object {
         fun startActivity(context: Context) {
@@ -161,7 +158,7 @@ class HomeActivity : BaseActivity(), IHomeView,
                 it.dismiss()
             }
         }
-        RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this)
+        UnReadMessageManager.getInstance().removeObserver(this)
     }
 
     override fun getRightActionButton(): View? {
@@ -182,25 +179,11 @@ class HomeActivity : BaseActivity(), IHomeView,
 
     override fun onResume() {
         super.onResume()
-        refreshUnreadMessageCount()
-    }
-
-    private fun refreshUnreadMessageCount() {
-        RongIMClient.getInstance().getUnreadCount(object : RongIMClient.ResultCallback<Int>() {
-            override fun onSuccess(number: Int) {
-                ui {
-                    findViewById<View>(R.id.tv_seat_order_operation_number)?.isVisible = number > 0
-                }
-            }
-
-            override fun onError(p0: RongIMClient.ErrorCode?) {
-            }
-
-        }, Conversation.ConversationType.PRIVATE)
     }
 
     override fun initData() {
-        RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this)
+        UnReadMessageManager.getInstance()
+            .addObserver(arrayOf(Conversation.ConversationType.PRIVATE), this)
     }
 
     override fun modifyInfoSuccess() {
@@ -221,10 +204,7 @@ class HomeActivity : BaseActivity(), IHomeView,
         }
     }
 
-    override fun onReceived(message: Message?, p1: Int): Boolean {
-        refreshUnreadMessageCount()
-        return true
+    override fun onCountChanged(p0: Int) {
+        findViewById<View>(R.id.tv_seat_order_operation_number)?.isVisible = p0 > 0
     }
-
-
 }

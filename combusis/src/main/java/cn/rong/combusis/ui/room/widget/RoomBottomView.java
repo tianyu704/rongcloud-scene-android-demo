@@ -36,6 +36,7 @@ import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.widget.like.FavAnimation;
+import io.rong.imkit.manager.UnReadMessageManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imkit.utils.RongUtils;
 import io.rong.imlib.IMLibExtensionModuleManager;
@@ -46,7 +47,7 @@ import io.rong.imlib.model.HardwareResource;
  * @author gyn
  * @date 2021/9/17
  */
-public class RoomBottomView extends ConstraintLayout {
+public class RoomBottomView extends ConstraintLayout implements UnReadMessageManager.IUnReadMessageObserver {
     private View mRootView;
 
     private ConstraintLayout mOptionContainer;
@@ -211,6 +212,8 @@ public class RoomBottomView extends ConstraintLayout {
         });
         // 语音
         mSendVoiceMassageView.setOnTouchListener(onTouchListener);
+        // 私密消息数量监听
+        UnReadMessageManager.getInstance().addObserver(new Conversation.ConversationType[]{Conversation.ConversationType.PRIVATE}, this);
     }
 
     private OnTouchListener onTouchListener = new OnTouchListener() {
@@ -404,6 +407,18 @@ public class RoomBottomView extends ConstraintLayout {
                 mSendVoiceMassageView.setVisibility(VISIBLE);
                 break;
         }
+    }
+
+    @Override
+    public void onCountChanged(int i) {
+        mPrivateMessageCountView.setVisibility(i > 0 ? VISIBLE : GONE);
+        mPrivateMessageCountView.setText(i < 99 ? String.valueOf(i) : "99+");
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        UnReadMessageManager.getInstance().removeObserver(this);
+        super.onDetachedFromWindow();
     }
 
     public interface OnBottomOptionClickListener {

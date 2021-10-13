@@ -25,6 +25,8 @@ public interface RadioRoomView extends IBaseView {
 
     void addToMessageList(MessageContent messageContent, boolean isRefresh);
 
+    void addAllToMessageList(List<MessageContent> messageContents, boolean isRefresh);
+
     void clearInput();
 
     void finish();
@@ -60,4 +62,6 @@ public interface RadioRoomView extends IBaseView {
     void showLikeAnimation();
 
     void showCreatorSetting(boolean isMute, boolean isPlayingMusic);
+
+    void showMusicDialog();
 }
