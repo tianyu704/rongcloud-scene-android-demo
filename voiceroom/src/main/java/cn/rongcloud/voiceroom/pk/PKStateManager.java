@@ -25,6 +25,7 @@ import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.PKState;
@@ -79,6 +80,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
 //        EventHelper.helper().unregeister();
         EventBus.get().off(EventBus.TAG.PK_STATE, this);
         EventBus.get().off(EventBus.TAG.PK_RESPONSE, this);
+        EventBus.get().off(EventBus.TAG.PK_GIFT, this);
     }
 
     private IEventHelp.Type pkState = IEventHelp.Type.PK_NONE;
@@ -94,6 +96,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         // 注册pk状态监听
         EventBus.get().on(EventBus.TAG.PK_STATE, this);
         EventBus.get().on(EventBus.TAG.PK_RESPONSE, this);
+        EventBus.get().on(EventBus.TAG.PK_GIFT, this);
         // 观众端 检查pk状态
         PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
@@ -249,9 +252,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     }
 
     @Override
-    public void onEvent(Object... args) {
-        if (args.length < 1) return;
-        if (args[0] instanceof IEventHelp.Type) {
+    public void onEvent(String tag, Object... args) {
+        if (EventBus.TAG.PK_STATE.equals(tag) && args[0] instanceof IEventHelp.Type) {
             pkState = (IEventHelp.Type) args[0];
             Log.e(TAG, "onEvent:" + pkState);
             // pk邀请成功 对方同意 进入pk开始阶段
@@ -301,13 +303,21 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 }
             }
             if (null != stateListener) stateListener.onPkState();
-        } else if (args[0] instanceof PKState) {
+        } else if (EventBus.TAG.PK_RESPONSE.equals(tag) && args[0] instanceof PKState) {
             PKState pkState = (PKState) args[0];
             if (pkState == PKState.reject) {
                 KToast.show("您的PK邀请被拒绝");
             } else if (pkState == PKState.ignore) {
                 KToast.show("您的PK邀请被忽略");
             }
+        } else if (EventBus.TAG.PK_GIFT.equals(tag)) {
+            Logger.e(TAG, "礼物消息");
+            IEventHelp.Type type = EventHelper.helper().getPKState();
+            if (IEventHelp.Type.PK_START != type) {
+                Logger.e(TAG, "PK状态异常");
+                return;
+            }
+            refreshPKGiftRank();
         }
     }
 

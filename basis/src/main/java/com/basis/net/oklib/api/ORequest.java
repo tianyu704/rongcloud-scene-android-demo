@@ -2,6 +2,7 @@ package com.basis.net.oklib.api;
 
 import android.text.TextUtils;
 
+import com.basis.CallHelper;
 import com.basis.net.oklib.api.core.Core;
 import com.basis.net.oklib.api.core.IOCallBack;
 import com.basis.net.oklib.wrapper.OkUtil;
@@ -67,6 +68,7 @@ public class ORequest<T> {
         } else if (Method.put == method) {
             Core.core().put(tag, url, param, callBack);
         }
+        CallHelper.getHelper().applyRequest(this);
         return this;
     }
 
@@ -124,7 +126,7 @@ public class ORequest<T> {
         public ORequest build() {
             ORequest ORequest = new ORequest();
             ORequest.method = method;
-            ORequest.tag = null != tag ? tag : url;
+            ORequest.tag = null != tag ? tag : url + method;
             ORequest.url = url;
             ORequest.param = param;
             ORequest.callBack = callBack;

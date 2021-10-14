@@ -83,6 +83,7 @@ public class UIStack {
             }
         }
         Logger.e(TAG, "remove : size = " + ibasiss.size() + " ibase:" + remove.getClass().getSimpleName());
+        CallHelper.getHelper().clear(remove);
     }
 
     public Activity getTopActivity() {
@@ -114,6 +115,14 @@ public class UIStack {
 
     public List<IBasis> getIbasiss() {
         return ibasiss;
+    }
+
+    public IBasis getLastBasis() {
+        int size = null != ibasiss ? ibasiss.size() : 0;
+        if (size > 0) {
+            return ibasiss.get(size - 1);
+        }
+        return null;
     }
 
     public synchronized void exit() {

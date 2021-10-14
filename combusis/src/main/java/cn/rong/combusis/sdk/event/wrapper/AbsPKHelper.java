@@ -7,6 +7,7 @@ import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.EventBus;
+import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.api.PKState;
@@ -32,7 +33,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         //由于手动调quitPK 不会回调onPkFinish，因此需要在调用api成功后修改current状态
         EventBus.get().on(EventBus.TAG.PK_INVITE_QUIT, new EventBus.EventCallback() {
             @Override
-            public void onEvent(Object... args) {
+            public void onEvent(String tag, Object... args) {
                 if (null != args && args.length == 1) {
                     current = (Type) args[0];
                 }
@@ -79,6 +80,8 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
                 current = Type.PK_STOP;
                 dispatchPKState(chatroomPK);
             }
+        } else if (message.getContent() instanceof RCChatroomGift) {
+            EventBus.get().emit(EventBus.TAG.PK_GIFT);
         }
     }
 

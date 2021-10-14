@@ -7,6 +7,7 @@ import com.basis.net.oklib.api.body.FileBody;
 import com.basis.net.oklib.api.callback.FileIOCallBack;
 import com.basis.net.oklib.api.core.Core;
 import com.basis.net.oklib.api.core.IOCallBack;
+import com.basis.ui.IBasis;
 
 import java.io.File;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import java.util.Map;
 import okhttp3.OkHttpClient;
 
 public class OkApi {
+
+    private final Map<IBasis, ORequest> requestMaps = new HashMap<>();
 
     /**
      * 设置配置信息
