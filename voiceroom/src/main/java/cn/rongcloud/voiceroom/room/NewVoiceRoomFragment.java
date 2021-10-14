@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.basis.UIStack;
+import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
@@ -312,7 +313,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     }
 
-    boolean isfirst = true;
     private PKView pkView;
     private View voiceRoom;
 
@@ -326,15 +326,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
         // init pk
         initPk();
-    }
-
-    @Override
-    public void leaveRoom() {
-        //离开房间的时候
-        present.leaveCurrentRoom();
-        isfirst = true;
-        // uninit pk
-        unInitPk();
     }
 
     private void initPk() {
@@ -360,6 +351,18 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     private void unInitPk() {
         PKStateManager.get().unInit();
+    }
+
+    /**
+     * pk禁止操作提示
+     */
+    private boolean checkPKState() {
+        boolean isPK = StateUtil.isPking();
+        if (isPK) {
+            KToast.show("当前PK中，无法镜像该操作");
+        }
+        Logger.e(TAG, "isPk = " + isPK);
+        return isPK;
     }
 
     @Override
@@ -463,7 +466,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void destroyRoom() {
-
+        //离开房间的时候
+        present.leaveCurrentRoom();
+        // uninit pk
+        unInitPk();
     }
 
     /**
@@ -488,7 +494,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
-        Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString());
+        Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
         if (uiSeatModel == null) {
             return;
         }
@@ -530,6 +536,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     /**
      * 设置公告的内容
      *
+     *
      * @param notice
      * @param isModify
      */
@@ -540,6 +547,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 点击消息列表中的用户名称
+     *
      *
      * @param userId
      */
@@ -723,17 +731,21 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickPrivateMessage() {
-        RouteUtils.routeToSubConversationListActivity(
-                requireActivity(),
-                Conversation.ConversationType.PRIVATE,
-                "消息"
-        );
+        if (!checkPKState()) {
+            RouteUtils.routeToSubConversationListActivity(
+                    requireActivity(),
+                    Conversation.ConversationType.PRIVATE,
+                    "消息"
+            );
+        }
     }
 
     @Override
     public void clickSeatOrder() {
-        //弹窗邀请弹窗 并且将申请的集合和可以被要求的传入
-        present.showSeatOperationViewPagerFragment(0);
+        if (!checkPKState()) {
+            //弹窗邀请弹窗 并且将申请的集合和可以被要求的传入
+            present.showSeatOperationViewPagerFragment(0);
+        }
     }
 
     /**
@@ -741,7 +753,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickSettings() {
-        present.showSettingDialog();
+        if (!checkPKState()) {
+            present.showSettingDialog();
+        }
     }
 
     /**
@@ -767,7 +781,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickRequestSeat() {
-        present.requestSeat(-1);
+        if (!checkPKState()) {
+            present.requestSeat(-1);
+        }
     }
 
     /**
@@ -848,6 +864,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     /**
      * 屏蔽词弹窗
      *
+     *
      * @param roomId
      */
     @Override
@@ -858,6 +875,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     /**
      * 房间背景弹窗
+     *
      *
      * @param url
      */

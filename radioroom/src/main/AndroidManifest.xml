@@ -9,7 +9,6 @@
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
             android:name=".ui.room.RadioRoomActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"/>
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

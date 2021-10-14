@@ -21,8 +21,10 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.common.ui.dialog.TipDialog;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.music.MusicDialog;
@@ -80,6 +82,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
+    private int bottomMargin = 0;
 
     public static Fragment getInstance() {
         return new RadioRoomFragment();
@@ -146,11 +149,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void joinRoom(VoiceRoomBean voiceRoomBean) {
         present.joinRoom(voiceRoomBean);
-    }
-
-    @Override
-    public void leaveRoom() {
-
     }
 
     /**
@@ -316,9 +314,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void showUserSetting(Member member) {
-        if (mMemberSettingFragment == null) {
-            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
-        }
+        mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
         mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }
 
@@ -339,6 +335,17 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mMusicDialog.show(getChildFragmentManager());
     }
 
+    @Override
+    public void showRoomCloseDialog() {
+        new TipDialog(
+                requireContext(),
+                "当前直播已结束",
+                "确定", "", () -> {
+            present.leaveRoom(false, false);
+            return null;
+        }).show();
+    }
+
     /**
      * 点击右上角菜单按钮
      */
@@ -356,13 +363,16 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
             @Override
             public void clickLeaveRoom() {
                 // 观众离开房间
-                present.leaveRoom();
+                present.leaveRoom(false, false);
             }
 
             @Override
             public void clickCloseRoom() {
-                // 房主关闭房间
-                present.closeRoom();
+                new ConfirmDialog(requireContext(), "确定结束本次直播吗？", true, "确定", "取消", () -> null, () -> {
+                    // 房主关闭房间
+                    present.leaveRoom(false, true);
+                    return null;
+                }).show();
             }
         });
         mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
@@ -377,7 +387,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void destroyRoom() {
-
+        present.leaveRoom(true, false);
     }
 
     @Override

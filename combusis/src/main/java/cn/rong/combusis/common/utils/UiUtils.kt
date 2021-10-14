@@ -4,12 +4,14 @@
 
 package com.rongcloud.common.utils
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
+
 
 /**
  * @author gusd
@@ -27,17 +29,33 @@ object UiUtils {
     }
 
     /**
-     * 获取屏幕高度
+     * 获取屏幕高度,包括状态栏
      */
-    fun getScreenHeight(activity: Activity): Int {
-        return activity.windowManager.defaultDisplay.height
+    fun getFullScreenHeight(context: Context): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val outMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(outMetrics)
+        return outMetrics.heightPixels
+    }
+
+    /**
+     * 获取屏幕高度,不包括状态栏
+     */
+    fun getScreenHeight(context: Context): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val outMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(outMetrics)
+        return outMetrics.heightPixels
     }
 
     /**
      * 获取屏幕宽度
      */
-    fun getScreenWidth(activity: Activity): Int {
-        return activity.windowManager.defaultDisplay.width
+    fun getScreenWidth(context: Context): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val outMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getRealMetrics(outMetrics)
+        return outMetrics.widthPixels
     }
 
     /**

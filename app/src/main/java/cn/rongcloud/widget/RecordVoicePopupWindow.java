@@ -236,8 +236,8 @@ public class RecordVoicePopupWindow {
     public final void show(View anchorView) {
         rootView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
         int mHeight = rootView.getMeasuredHeight();
-        UiUtils.INSTANCE.getScreenHeight((Activity) context);
-        int screenHeight = UiUtils.INSTANCE.getScreenHeight((Activity) context);
+        UiUtils.INSTANCE.getFullScreenHeight((Activity) context);
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight((Activity) context);
         // 获取锚点View在屏幕上的左上角坐标位置
         int anchorLoc[] = new int[2];
         anchorView.getLocationOnScreen(anchorLoc);
