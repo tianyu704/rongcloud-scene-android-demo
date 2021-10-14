@@ -6,9 +6,9 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Friend implements Serializable {
-    @SerializedName("uid")
+    @SerializedName("userId")
     private String uid;
-    @SerializedName("name")
+    @SerializedName("userName")
     private String name;
     @SerializedName("portrait")
     private String portrait;

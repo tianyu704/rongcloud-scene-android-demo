@@ -6,7 +6,7 @@ import android.widget.ImageView;
 
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
-import com.bumptech.glide.Glide;
+import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.ui.friend.model.Friend;
@@ -22,7 +22,7 @@ public class FriendAdapter extends RcySAdapter<Friend, RcyHolder> {
     @Override
     public void convert(RcyHolder holder, Friend friend, int position) {
         ImageView avatar = holder.getView(R.id.civ_avatar);
-        Glide.with(avatar).load(friend.getPortrait()).into(avatar);
+        ImageLoaderUtil.INSTANCE.loadImage(context, avatar, friend.getPortrait(), R.drawable.default_portrait);
         holder.setText(R.id.tv_name, friend.getName());
         holder.setChecked(R.id.btn_follow, friend.isChecked(type));
         CheckBox follow = holder.getView(R.id.btn_follow);

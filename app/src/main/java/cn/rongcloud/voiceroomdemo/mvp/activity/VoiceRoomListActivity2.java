@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
-import cn.rong.combusis.ui.friend.FriendFragment;
+import cn.rong.combusis.ui.friend.FriendListFragment;
 import cn.rong.combusis.ui.roomlist.AbsSwitchActivity;
 
 public class VoiceRoomListActivity2 extends AbsSwitchActivity {
@@ -16,11 +16,11 @@ public class VoiceRoomListActivity2 extends AbsSwitchActivity {
 
     @Override
     public Fragment onCreateLeftFragment() {
-        return FriendFragment.getInstance();
+        return FriendListFragment.getInstance();
     }
 
     @Override
     public Fragment onCreateRightFragment() {
-        return FriendFragment.getInstance();
+        return FriendListFragment.getInstance();
     }
 }
