@@ -83,8 +83,8 @@ public class VoiceRoomMiniManager {
         if (iFloatWindow!=null&&!iFloatWindow.isShowing()){
             iFloatWindow.show();
         }
-
     }
+
 
     /**
      * 动态去刷新当前用户的状态
@@ -122,8 +122,11 @@ public class VoiceRoomMiniManager {
      * 动态更改当前的背景色
      */
     public void setBackgroudPic(String url,Context context){
-        CircleImageView circleImageView=FloatWindow.get(TAG).getView().findViewById(R.id.iv_room_creator_portrait);
-        ImageLoaderUtil.INSTANCE.loadPortraitDef(context,circleImageView,url);
+        if (FloatWindow.get(TAG)!=null){
+            CircleImageView circleImageView=FloatWindow.get(TAG).getView().findViewById(R.id.iv_room_creator_portrait);
+            ImageLoaderUtil.INSTANCE.loadPortraitDef(context,circleImageView,url);
+        }
+
 
     }
     /**
@@ -177,8 +180,4 @@ public class VoiceRoomMiniManager {
 
         }
     };
-
-    public void ondestroy(){
-
-    }
 }

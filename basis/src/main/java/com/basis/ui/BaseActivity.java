@@ -100,4 +100,5 @@ public abstract class BaseActivity extends AppCompatActivity implements IBasis {
     public void onBackCode() {
         finish();
     }
+
 }

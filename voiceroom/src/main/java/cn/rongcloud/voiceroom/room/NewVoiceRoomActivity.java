@@ -3,9 +3,11 @@ package cn.rongcloud.voiceroom.room;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
+import com.basis.UIStack;
 import com.basis.net.LoadTag;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
@@ -32,6 +34,7 @@ import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
+import cn.rong.combusis.widget.VoiceRoomMiniManager;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -80,6 +83,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
                 RCChatroomVoice.class,
                 RCFollowMsg.class);
     }
+
 
     @Override
     protected int getCurrentItem() {

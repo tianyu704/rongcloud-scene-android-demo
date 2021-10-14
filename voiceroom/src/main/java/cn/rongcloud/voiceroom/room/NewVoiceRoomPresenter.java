@@ -19,6 +19,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
+import com.basis.UIStack;
 import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.OkParams;
@@ -838,23 +839,37 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     public void closeRoom() {
         mView.showLoading("正在关闭房间");
-        // 房主关闭房间，调用删除房间接口
-        OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "");
+        //先离开房间,离开以后，去删除房间
+        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
             @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    leaveRoom();
-                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "");
-                } else {
-                    mView.dismissLoading();
-                }
+            public void onSuccess() {
+                // 房主关闭房间，调用删除房间接口
+                MusicManager.get().stopPlayMusic();
+                OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mView.finish();
+                            mView.dismissLoading();
+                        } else {
+                            mView.dismissLoading();
+                        }
+                    }
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        mView.dismissLoading();
+                        mView.showToast(msg);
+                    }
+                });
             }
 
             @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
+            public void onError(int code, String message) {
                 mView.dismissLoading();
-                mView.showToast(msg);
+                mView.showToast(message);
             }
         });
     }

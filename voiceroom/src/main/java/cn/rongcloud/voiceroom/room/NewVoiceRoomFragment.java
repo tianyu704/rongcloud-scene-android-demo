@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.basis.UIStack;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
@@ -207,7 +208,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
                 //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                 requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 //设置一下当前的封面图
-                VoiceRoomMiniManager.getInstance().init(requireActivity(), requireActivity().getIntent());
+                VoiceRoomMiniManager.getInstance().init(requireContext(),requireActivity().getIntent());
                 VoiceRoomMiniManager.getInstance().refreshRoomOwner(mVoiceRoomBean.getRoomId());
                 VoiceRoomMiniManager.getInstance()
                         .setBackgroudPic(mVoiceRoomBean.getThemePictureUrl(), activity);
@@ -367,7 +368,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             @Override
             public void onSuccess() {
                 Log.d(TAG, "onSuccess: ");
-                getActivity().finish();
+                finish();
             }
 
             @Override
@@ -487,7 +488,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
-        Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString() );
+        Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString());
         if (uiSeatModel == null) {
             return;
         }
@@ -497,11 +498,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             mRoomSeatView.setRoomOwnerMute(false);
             mRoomSeatView.setGiftCount(0L);
         } else {
+            Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString());
             User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
             if (member != null) {
                 mRoomSeatView.setData(member.getUserName(), member.getPortrait());
             } else {
-                mRoomSeatView.setData("", null);
+                mRoomSeatView.setData("", "");
             }
             mRoomSeatView.setSpeaking(uiSeatModel.isSpeaking());
             mRoomSeatView.setRoomOwnerMute(uiSeatModel.isMute());
@@ -665,9 +667,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             case STATUS_ON_SEAT:
                 break;
             case STATUS_WAIT_FOR_SEAT:
-//                RevokeSeatRequestFragment(this).show(
-//                        this @VoiceRoomFragment.childFragmentManager
-//                )
                 present.showNewRevokeSeatRequestFragment();
                 break;
             case STATUS_NOT_ON_SEAT:
@@ -698,6 +697,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void finish() {
+        //在销毁之前提前出栈顶
+        UIStack.getInstance().remove(((NewVoiceRoomActivity) requireActivity()));
         requireActivity().finish();
     }
 
