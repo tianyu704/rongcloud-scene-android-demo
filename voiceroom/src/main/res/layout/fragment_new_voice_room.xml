@@ -55,14 +55,18 @@
             android:id="@+id/pk_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginStart="@dimen/dimen_room_padding"
+            android:layout_marginTop="38dp"
+            android:layout_marginEnd="@dimen/dimen_room_padding"
+            android:background="@drawable/shape_pk_bg"
             android:visibility="gone" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/voice_room"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="visible">
 
             <cn.rong.combusis.ui.room.widget.RoomSeatView
                 android:id="@+id/room_seat_view"

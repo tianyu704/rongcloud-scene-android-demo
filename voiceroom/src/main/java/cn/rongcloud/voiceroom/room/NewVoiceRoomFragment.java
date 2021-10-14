@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
@@ -361,6 +362,18 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         PKStateManager.get().unInit();
     }
 
+    /**
+     * pk禁止操作提示
+     */
+    private boolean checkPKState() {
+        boolean isPK = StateUtil.isPking();
+        if (isPK) {
+            KToast.show("当前PK中，无法镜像该操作");
+        }
+        Logger.e(TAG, "isPk = " + isPK);
+        return isPK;
+    }
+
     @Override
     public void onBackPressed() {
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
@@ -487,7 +500,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
-        Log.e(TAG, "refreshRoomOwner: "+uiSeatModel.toString() );
+        Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
         if (uiSeatModel == null) {
             return;
         }
@@ -722,17 +735,21 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickPrivateMessage() {
-        RouteUtils.routeToSubConversationListActivity(
-                requireActivity(),
-                Conversation.ConversationType.PRIVATE,
-                "消息"
-        );
+        if (!checkPKState()) {
+            RouteUtils.routeToSubConversationListActivity(
+                    requireActivity(),
+                    Conversation.ConversationType.PRIVATE,
+                    "消息"
+            );
+        }
     }
 
     @Override
     public void clickSeatOrder() {
-        //弹窗邀请弹窗 并且将申请的集合和可以被要求的传入
-        present.showSeatOperationViewPagerFragment(0);
+        if (!checkPKState()) {
+            //弹窗邀请弹窗 并且将申请的集合和可以被要求的传入
+            present.showSeatOperationViewPagerFragment(0);
+        }
     }
 
     /**
@@ -740,7 +757,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickSettings() {
-        present.showSettingDialog();
+        if (!checkPKState()) {
+            present.showSettingDialog();
+        }
     }
 
     /**
@@ -766,7 +785,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      */
     @Override
     public void clickRequestSeat() {
-        present.requestSeat(-1);
+        if (!checkPKState()) {
+            present.requestSeat(-1);
+        }
     }
 
     /**
