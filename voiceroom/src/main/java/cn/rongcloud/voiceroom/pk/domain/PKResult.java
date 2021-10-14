@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PKResult {
     private long timeDiff;
-    private boolean inPk;
+    private int statusMsg;
     private List<PKInfo> roomScores;
 
     public List<PKInfo> getRoomScores() {
@@ -15,7 +15,7 @@ public class PKResult {
         return timeDiff;
     }
 
-    public boolean isInPk() {
-        return inPk;
+    public int getStatusMsg() {
+        return statusMsg;
     }
 }
