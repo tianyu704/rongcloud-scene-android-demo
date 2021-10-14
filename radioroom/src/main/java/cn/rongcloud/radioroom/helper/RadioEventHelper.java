@@ -91,6 +91,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
             @Override
             public void onSuccess(Message message) {
                 onMessageReceived(message);
+                Logger.e("=============sendChatRoomMessage:success");
             }
 
             @Override

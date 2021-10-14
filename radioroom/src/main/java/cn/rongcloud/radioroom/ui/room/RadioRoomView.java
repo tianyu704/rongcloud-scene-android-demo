@@ -64,4 +64,6 @@ public interface RadioRoomView extends IBaseView {
     void showCreatorSetting(boolean isMute, boolean isPlayingMusic);
 
     void showMusicDialog();
+
+    void showRoomCloseDialog();
 }
