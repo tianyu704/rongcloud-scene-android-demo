@@ -19,4 +19,9 @@ public class PKInfo extends RCChatroomPK.RoomScore {
 //        return userInfoList;
 //    }
 
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
 }

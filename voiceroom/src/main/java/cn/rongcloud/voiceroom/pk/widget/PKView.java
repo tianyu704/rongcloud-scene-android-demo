@@ -81,7 +81,7 @@ public class PKView extends LinearLayout implements IPK {
         // sb pk
         pkProcessbar = view.findViewById(R.id.pk_sb);
         pkProcessbar.setBarResource(R.drawable.ic_sb_pk);
-        pkProcessbar.setPKValue(4, 10);
+        pkProcessbar.setPKValue(0, 0);
         rvSender = view.findViewById(R.id.rv_sender);
         rvReceiver = view.findViewById(R.id.rv_receiver);
         lAdapter = new PKAdapter(context, false);

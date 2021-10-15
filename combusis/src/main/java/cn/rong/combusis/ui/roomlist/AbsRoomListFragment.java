@@ -16,7 +16,6 @@ import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
-import cn.rong.combusis.ui.OnItemClickListener;
 import cn.rong.combusis.ui.OnItemClickRoomListListener;
 import io.rong.imkit.picture.tools.ToastUtils;
 
@@ -56,6 +55,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         getView(R.id.iv_create_room).setOnClickListener(v -> {
             createRoom();
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         loadRoomList(true);
     }
 
@@ -78,10 +82,6 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
             mRoomList.setNoMore(false);
         }
         VoiceRoomProvider.provider().loadPage(mCurrentPage, getRoomType(), voiceRoomBeans -> {
-//            List<VoiceRoomBean> list = new ArrayList<>();
-//            list.addAll(voiceRoomBeans);
-//            list.addAll(voiceRoomBeans);
-//            list.addAll(voiceRoomBeans);
             refresh(voiceRoomBeans, isRefresh);
             if (mCurrentPage == 1) {
                 mRoomList.refreshComplete();
@@ -118,7 +118,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         mRoomIdList.add(0, voiceRoomBean.getRoomId());
         mAdapter.getData().add(0, voiceRoomBean);
         mAdapter.notifyItemInserted(0);
-        clickItem(voiceRoomBean, 0,true);
+        clickItem(voiceRoomBean, 0, true);
     }
 
     @Override

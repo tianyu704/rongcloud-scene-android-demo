@@ -194,7 +194,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
     }
 
     @Override
-    public void onEvent(Object... args) {
+    public void onEvent(String tag, Object... args) {
         if (args.length < 1) return;
         if (args[0] instanceof IEventHelp.Type) {
             pkState = (IEventHelp.Type) args[0];
@@ -356,4 +356,5 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
             }
         });
     }
+
 }

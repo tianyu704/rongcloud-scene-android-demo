@@ -7,11 +7,11 @@ import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
+import cn.rong.combusis.ui.friend.FriendListFragment;
 import com.basis.UIStack;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
 
-import cn.rong.combusis.ui.friend.FriendFragment;
 import cn.rong.combusis.ui.roomlist.AbsSwitchActivity;
 import cn.rong.combusis.widget.VoiceRoomMiniManager;
 
@@ -46,7 +46,7 @@ public class VoiceRoomListActivity extends AbsSwitchActivity {
 
     @Override
     public Fragment onCreateRightFragment() {
-        return FriendFragment.getInstance();
+        return FriendListFragment.getInstance();
     }
 
     @Override

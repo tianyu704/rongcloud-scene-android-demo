@@ -25,6 +25,7 @@ import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.PKState;
@@ -79,6 +80,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
 //        EventHelper.helper().unregeister();
         EventBus.get().off(EventBus.TAG.PK_STATE, this);
         EventBus.get().off(EventBus.TAG.PK_RESPONSE, this);
+        EventBus.get().off(EventBus.TAG.PK_GIFT, this);
     }
 
     private IEventHelp.Type pkState = IEventHelp.Type.PK_NONE;
@@ -94,17 +96,45 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         // 注册pk状态监听
         EventBus.get().on(EventBus.TAG.PK_STATE, this);
         EventBus.get().on(EventBus.TAG.PK_RESPONSE, this);
+        EventBus.get().on(EventBus.TAG.PK_GIFT, this);
         // 观众端 检查pk状态
         PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
             public void onResult(PKResult pkResult) {
-                if (null == pkResult || !pkResult.isInPk()) {
+                if (null == pkResult || pkResult.getStatusMsg() == -1 || pkResult.getStatusMsg() == 2) {
                     Logger.e(TAG, "init: Not In PK");
                     return;
                 }
                 handleAudienceJoinPk(pkResult);
             }
         });
+    }
+
+    /**
+     * 格式化pk信息
+     *
+     * @return PKInfo[2]
+     * left：index = 0
+     * right：index = 1
+     */
+    private PKInfo[] formatPKInfo(PKResult pkResult) {
+        if (null == pkResult) {
+            return null;
+        }
+        List<PKInfo> pkInfos = pkResult.getRoomScores();
+        if (null == pkInfos || 2 != pkInfos.size()) {
+            return null;
+        }
+        PKInfo[] result = new PKInfo[2];
+        PKInfo first = pkInfos.get(0);
+        if (roomId.equals(first.getRoomId())) {
+            result[0] = first;
+            result[1] = pkInfos.get(1);
+        } else {
+            result[0] = pkInfos.get(1);
+            result[1] = first;
+        }
+        return result;
     }
 
     /**
@@ -115,9 +145,14 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "init JumpTo PK");
         if (null != stateListener) stateListener.onPkStart();
         // 观众端需要获取pk双方房间和房主信息
-        int state = 1;
+        int state = pkResult.getStatusMsg();
         if (null != pkView) {
-            pkView.setPKUserInfo("currentOwner", "pkUserId");
+            refreshPKInfo(pkResult);
+            //获取currentUserId
+            PKInfo[] pkInfos = formatPKInfo(pkResult);
+            if (null != pkInfos) {
+                pkView.setPKUserInfo(pkInfos[0].getUserId(), pkInfos[1].getUserId());
+            }
             long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
             if (0 == state) {// pk 阶段
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
@@ -207,36 +242,25 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     }
 
     void refreshPKInfo(PKResult pkResult) {
-        if (null == pkResult) return;
-        List<PKInfo> pkInfos = pkResult.getRoomScores();
-        if (null != pkInfos && 2 == pkInfos.size()) {
-            PKInfo left, right;
-            PKInfo first = pkInfos.get(0);
-            if (roomId.equals(first.getRoomId())) {
-                left = first;
-                right = pkInfos.get(1);
-            } else {
-                left = pkInfos.get(1);
-                right = first;
-            }
-            // set score
-            pkView.setPKScore(left.getScore(), right.getScore());
-            // left
-            List<String> lefts = new ArrayList<>();
-            List<User> lusers = left.getUserInfoList();
-            int ls = null == lusers ? 0 : lusers.size();
-            for (int i = 0; i < ls; i++) {
-                lefts.add(lusers.get(i).getPortrait());
-            }
-            // right
-            List<String> rights = new ArrayList<>();
-            List<User> rusers = right.getUserInfoList();
-            int rs = null == rusers ? 0 : rusers.size();
-            for (int i = 0; i < rs; i++) {
-                rights.add(rusers.get(i).getPortrait());
-            }
-            pkView.setGiftSenderRank(lefts, rights);
+        PKInfo[] pkInfos = formatPKInfo(pkResult);
+        if (null == pkInfos) return;
+        // set score
+        pkView.setPKScore(pkInfos[0].getScore(), pkInfos[1].getScore());
+        // left
+        List<String> lefts = new ArrayList<>();
+        List<User> lusers = pkInfos[0].getUserInfoList();
+        int ls = null == lusers ? 0 : lusers.size();
+        for (int i = 0; i < ls; i++) {
+            lefts.add(lusers.get(i).getPortrait());
         }
+        // right
+        List<String> rights = new ArrayList<>();
+        List<User> rusers = pkInfos[1].getUserInfoList();
+        int rs = null == rusers ? 0 : rusers.size();
+        for (int i = 0; i < rs; i++) {
+            rights.add(rusers.get(i).getPortrait());
+        }
+        pkView.setGiftSenderRank(lefts, rights);
     }
 
     /**
@@ -249,9 +273,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     }
 
     @Override
-    public void onEvent(Object... args) {
-        if (args.length < 1) return;
-        if (args[0] instanceof IEventHelp.Type) {
+    public void onEvent(String tag, Object... args) {
+        if (EventBus.TAG.PK_STATE.equals(tag) && args[0] instanceof IEventHelp.Type) {
             pkState = (IEventHelp.Type) args[0];
             Log.e(TAG, "onEvent:" + pkState);
             // pk邀请成功 对方同意 进入pk开始阶段
@@ -301,13 +324,21 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 }
             }
             if (null != stateListener) stateListener.onPkState();
-        } else if (args[0] instanceof PKState) {
+        } else if (EventBus.TAG.PK_RESPONSE.equals(tag) && args[0] instanceof PKState) {
             PKState pkState = (PKState) args[0];
             if (pkState == PKState.reject) {
                 KToast.show("您的PK邀请被拒绝");
             } else if (pkState == PKState.ignore) {
                 KToast.show("您的PK邀请被忽略");
             }
+        } else if (EventBus.TAG.PK_GIFT.equals(tag)) {
+            Logger.e(TAG, "礼物消息");
+            IEventHelp.Type type = EventHelper.helper().getPKState();
+            if (IEventHelp.Type.PK_START != type) {
+                Logger.e(TAG, "PK状态异常");
+                return;
+            }
+            refreshPKGiftRank();
         }
     }
 
