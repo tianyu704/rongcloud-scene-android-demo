@@ -320,7 +320,7 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
         if (mOnSendGiftListener != null) {
             mOnSendGiftListener.onSendGiftSuccess(messages);
         }
-        if (messages.size() == mSelectUserIds.size()) {
+        if (members.size() == mSelectUserIds.size()) {
             ToastUtils.s(getContext(), "赠送成功");
         } else {
             ToastUtils.s(getContext(), "赠送异常");

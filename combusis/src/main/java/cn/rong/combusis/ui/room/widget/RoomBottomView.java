@@ -189,9 +189,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
             @Override
             public boolean onDown(MotionEvent e) {
                 if (mInputBar.getVisibility() == VISIBLE) {
-                    mInputView.clearFocus();
-                    SoftKeyboardUtils.hideSoftKeyboard(mInputView);
-                    mInputBar.setVisibility(View.GONE);
+                    hideSoftKeyboardAndIntput();
                     return true;
                 } else {
                     return super.onDown(e);
@@ -274,6 +272,15 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
             mSeatOrderNumber.setVisibility(GONE);
         }
 
+    }
+
+    /**
+     * 隐藏输入框
+     */
+    public void hideSoftKeyboardAndIntput(){
+        mInputView.clearFocus();
+        SoftKeyboardUtils.hideSoftKeyboard(mInputView);
+        mInputBar.setVisibility(View.GONE);
     }
 
     /**

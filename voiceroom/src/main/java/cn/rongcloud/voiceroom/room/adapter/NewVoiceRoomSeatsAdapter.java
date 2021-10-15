@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +16,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.extension.ExtensKt;
+import com.rongcloud.common.utils.ImageLoaderUtil;
 
 
 import java.util.ArrayList;
@@ -23,9 +26,11 @@ import java.util.List;
 
 import cn.rong.combusis.common.ui.widget.WaveView;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
+import io.rong.imlib.model.UserInfo;
 
 /**
  * 语聊房麦位适配器
@@ -92,18 +97,24 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
                 } else {
                     holder.wv_seat_background.stop();
                 }
-                ExtensKt.loadPortrait(holder.iv_user_portrait,uiSeatModel.getPortrait());
                 holder.iv_user_portrait.setTag(uiSeatModel.getPortrait());
                 holder.iv_is_mute.setVisibility(uiSeatModel.isMute() ? View.VISIBLE : View.GONE);
                 holder.iv_seat_status.setVisibility(View.GONE);
                 //TODO 这里一下子如果拿不到怎么办
                 if (!TextUtils.isEmpty(uiSeatModel.getUserId())){
-                    User member = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
-                    if (member!=null&& !TextUtils.isEmpty(member.getUserName())){
-                        holder.tv_member_name.setText(member.getUserName());
-                    }else {
-                        holder.tv_member_name.setText("");
-                    }
+                    UserProvider.provider().getAsyn(uiSeatModel.getUserId(), new IResultBack<UserInfo>() {
+                        @Override
+                        public void onResult(UserInfo userInfo) {
+                            if (userInfo!=null&& !TextUtils.isEmpty(userInfo.getName())){
+                                holder.tv_member_name.setText(userInfo.getName());
+                            }else {
+                                holder.tv_member_name.setText("");
+                            }
+                            ImageLoaderUtil.INSTANCE.loadImage(context, holder.iv_user_portrait,
+                                    userInfo.getPortraitUri(), R.drawable.default_portrait);
+                        }
+                    });
+
                 }
                 holder.tv_gift_count.setText(uiSeatModel.getGiftCount()+"");
                 if (MemberCache.getInstance().isAdmin(uiSeatModel.getUserId())) {
@@ -120,6 +131,7 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
             case RCSeatStatusEmpty:
                 holder.iv_user_portrait.setVisibility(View.VISIBLE);
                 holder.tv_member_name.setVisibility(View.VISIBLE);
+                holder.tv_member_name.setGravity(Gravity.CENTER);
                 holder.iv_seat_status.setVisibility(View.VISIBLE);
                 holder.wv_seat_background.setVisibility(View.GONE);
                 holder.tv_gift_count.setVisibility(View.INVISIBLE);

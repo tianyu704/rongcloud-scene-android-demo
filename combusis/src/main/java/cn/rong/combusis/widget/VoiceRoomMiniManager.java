@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -47,10 +48,9 @@ public class VoiceRoomMiniManager {
      * @param context
      * @param intent
      */
-    public void init(Context context,Intent intent) {
+    public void init(Context context,Intent intent,PermissionListener permissionListener) {
         if (FloatWindow.get(TAG)==null){
             View miniWindows = LayoutInflater.from(context).inflate(R.layout.view_voice_room_mini, null);
-
             FloatWindow.with(context.getApplicationContext())
                     .setTag(TAG)
                     .setView(miniWindows)
@@ -169,15 +169,4 @@ public class VoiceRoomMiniManager {
         }
     };
 
-    private PermissionListener permissionListener=new PermissionListener() {
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onFail() {
-
-        }
-    };
 }

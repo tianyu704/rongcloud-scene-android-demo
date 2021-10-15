@@ -474,7 +474,7 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
         //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
         activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         //设置一下当前的封面图
-        VoiceRoomMiniManager.getInstance().init(activity, activity?.intent)
+        VoiceRoomMiniManager.getInstance().init(activity, activity?.intent,null)
         VoiceRoomMiniManager.getInstance().refreshRoomOwner(roomId)
         VoiceRoomMiniManager.getInstance()
             .setBackgroudPic(currentRole?.roomInfo.roomBean?.themePictureUrl, activity)

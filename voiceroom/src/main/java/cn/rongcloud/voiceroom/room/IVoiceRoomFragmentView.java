@@ -74,6 +74,8 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void clearInput();
 
+    void hideSoftKeyboardAndIntput();
+
     void showMessage(MessageContent messageContent, boolean isRefresh);
 
     void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList);

@@ -511,6 +511,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             }
                         });
                         confirmDialog.show();
+                    case EVENT_BACKGROUND_CHANGE :
+                        mView.setRoomBackground(stringArrayListPair.second.get(0));
                         break;
                 }
             }
@@ -570,15 +572,18 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         boolean isContains = false;
         if (shields != null) {
             for (Shield shield : shields) {
-                if (messageContent.toString().contains(shield.getName())) {
-                    isContains = true;
-                    break;
+                if (messageContent instanceof RCChatroomBarrage) {
+                    if (((RCChatroomBarrage) messageContent).getContent().contains(shield.getName())) {
+                        isContains = true;
+                        break;
+                    }
                 }
             }
             if (isContains) {
                 //如果是包含了敏感词'
                 mView.showMessage(messageContent, false);
                 mView.clearInput();
+                mView.hideSoftKeyboardAndIntput();
                 return;
             }
         }
@@ -586,6 +591,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 , new Function1<Integer, Unit>() {
                     @Override
                     public Unit invoke(Integer integer) {
+                        mView.clearInput();
+                        mView.hideSoftKeyboardAndIntput();
                         if (messageContent instanceof RCChatroomAdmin) {
                             //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
                             RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "");
