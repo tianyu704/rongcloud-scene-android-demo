@@ -95,7 +95,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             boolean isInRoom = RadioEventHelper.getInstance().isInRoom();
 
             // 注册房间事件监听
-            RadioEventHelper.getInstance().register(mRoomId);
+            if (!isInRoom) {
+                RadioEventHelper.getInstance().register(mRoomId);
+            }
             RadioEventHelper.getInstance().addRadioEventListener(this);
 
             mRoomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
@@ -119,6 +121,8 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             refreshRoomMemberCount();
             // 礼物数量
             getGiftCount();
+
+            refreshRoomInfo();
         }
     }
 
@@ -132,6 +136,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     public String getCreateUserId() {
         if (mVoiceRoomBean != null) {
             return mVoiceRoomBean.getCreateUserId();
+        }
+        return "";
+    }
+
+    public String getThemePictureUrl() {
+        if (mVoiceRoomBean != null) {
+            return mVoiceRoomBean.getThemePictureUrl();
         }
         return "";
     }
@@ -151,7 +162,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                     VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                     if (roomBean != null) {
                         mVoiceRoomBean = roomBean;
-                        mView.setRoomData(mVoiceRoomBean, mRoomOwnerType);
+                        if (mVoiceRoomBean.isStop()) {
+
+                        } else {
+                            mView.setRoomData(mVoiceRoomBean, mRoomOwnerType);
+                        }
                     }
                 }
             }

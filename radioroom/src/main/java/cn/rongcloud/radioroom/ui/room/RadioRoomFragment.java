@@ -17,6 +17,7 @@ import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
+import com.yhao.floatwindow.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -357,7 +358,17 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
-                finish();
+                RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent(), new PermissionListener() {
+                    @Override
+                    public void onSuccess() {
+                        finish();
+                    }
+
+                    @Override
+                    public void onFail() {
+                        showToast("请到设置开启悬浮框权限");
+                    }
+                });
             }
 
             @Override
