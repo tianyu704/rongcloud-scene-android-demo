@@ -31,6 +31,8 @@ import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -734,18 +736,30 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
      */
     public void sendGift() {
-        ArrayList<UiSeatModel> uiSeatModels = newVoiceRoomModel.getUiSeatModels();
         ArrayList<Member> memberArrayList = new ArrayList<>();
-        for (UiSeatModel uiSeatModel : uiSeatModels) {
-            String userId = uiSeatModel.getUserId();
-            if (!TextUtils.isEmpty(userId) && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-                User user = MemberCache.getInstance().getMember(userId);
-                Member member = new Member().toMember(user);
-                memberArrayList.add(member);
+        //房间内所有人
+        MutableLiveData<List<User>> memberList = MemberCache.getInstance().getMemberList();
+        for (User user : memberList.getValue()) {
+            UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
+            Member member = new Member().toMember(user);
+            if (uiSeatModel!=null&&uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+                //当前用户在麦位上
+                member.setSeatIndex(uiSeatModel.getIndex());
+            }else {
+                //当前用户不在麦位
+                member.setSeatIndex(Integer.MAX_VALUE);
             }
+            memberArrayList.add(member);
         }
+        //按照麦位从小到大拍讯
+        Collections.sort(memberArrayList, new Comparator<Member>() {
+            @Override
+            public int compare(Member o1, Member o2) {
+                return o1.getSeatIndex()-o2.getSeatIndex();
+            }
+        });
         mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(),
-                mVoiceRoomBean.getCreateUserId(), mVoiceRoomBean.getCreateUserId(), memberArrayList);
+                mVoiceRoomBean.getCreateUserId(), "", memberArrayList);
     }
 
     /**

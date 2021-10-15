@@ -136,7 +136,7 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
                 String name = "观众";
                 if (TextUtils.equals(mCreateUserId, member.getUserId())) {
                     name = "房主";
-                } else if (member.getSeatIndex() > 0) {
+                } else if (member.getSeatIndex() > 0&&member.getSeatIndex()<Integer.MAX_VALUE) {
                     name = member.getSeatIndex() + "";
                 }
                 holder.setText(R.id.tv_member_name, name);
