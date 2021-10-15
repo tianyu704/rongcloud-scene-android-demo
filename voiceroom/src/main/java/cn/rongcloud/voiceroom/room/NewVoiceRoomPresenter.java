@@ -316,14 +316,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     /**
      * 空座位被点击
      *
-     * @param position
+     * @param position  指的是麦位 Recyclerview的位置，真是的麦位应该是Position+1
      */
     @Override
     public void enterSeatViewer(int position) {
         //判断是否在麦位上
         if (newVoiceRoomModel.userInSeat()) {
             //在麦位上
-            RCVoiceRoomEngine.getInstance().switchSeatTo(position, new RCVoiceRoomCallback() {
+            RCVoiceRoomEngine.getInstance().switchSeatTo(position+1, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
                     AudioManagerUtil.INSTANCE.choiceAudioModel();
