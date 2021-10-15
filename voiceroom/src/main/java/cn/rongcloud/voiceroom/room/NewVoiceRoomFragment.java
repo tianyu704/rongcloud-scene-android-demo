@@ -770,8 +770,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void finish() {
         //在销毁之前提前出栈顶
-        UIStack.getInstance().remove(((NewVoiceRoomActivity) requireActivity()));
-        requireActivity().finish();
+        try {
+            UIStack.getInstance().remove(((NewVoiceRoomActivity) requireActivity()));
+            requireActivity().finish();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

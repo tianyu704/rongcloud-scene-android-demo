@@ -58,6 +58,7 @@ public class CallHelper {
             ORequest request = requests.get(i);
             request.cancel();
         }
+        if (requests!=null)
         requests.clear();
     }
 
