@@ -2,14 +2,9 @@ package cn.rongcloud.voiceroom.room;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
-import com.basis.UIStack;
-import com.basis.net.LoadTag;
-import com.kit.UIKit;
 import com.kit.utils.Logger;
 
 import java.util.ArrayList;
@@ -31,27 +26,22 @@ import cn.rong.combusis.message.RCChatroomUserUnBan;
 import cn.rong.combusis.message.RCChatroomUserUnBlock;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
-import cn.rong.combusis.widget.VoiceRoomMiniManager;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
-import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import dagger.hilt.android.AndroidEntryPoint;
-import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author 李浩  语聊房重构
  * @date 2021/9/24
  */
 @AndroidEntryPoint
-public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
+public class NewVoiceRoomActivity extends AbsRoomActivity {
     private static final String KEY_ROOM_IDS = "KEY_ROOM_IDS";
-    private static final String ISCREATE = "ROOM_IS_CREATE";
+    public static final String ISCREATE = "ROOM_IS_CREATE";
     private static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
-    private LoadTag mLoadTag;
+    private boolean isCreate;
 
     public static void startActivity(Activity activity, ArrayList<String> roomIds, int position, boolean isCreate) {
         Intent intent = new Intent(activity, NewVoiceRoomActivity.class);
@@ -64,7 +54,6 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
 
     @Override
     protected void initRoom() {
-        mLoadTag = new LoadTag(activity, "Loading...");
         RCMessager.getInstance().addMessageTypes(
                 RCChatroomAdmin.class,
                 RCChatroomBarrage.class,
@@ -82,6 +71,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
                 RCChatroomLike.class,
                 RCChatroomVoice.class,
                 RCFollowMsg.class);
+        isCreate = getIntent().getBooleanExtra(ISCREATE, false);
     }
 
 
@@ -95,8 +85,8 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
 
 
     @Override
-    public Fragment getFragment() {
-        return new NewVoiceRoomFragment();
+    public Fragment getFragment(String roomId) {
+        return NewVoiceRoomFragment.getInstance(roomId, isCreate);
     }
 
     @Override
@@ -106,75 +96,6 @@ public class NewVoiceRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
             return ids;
         }
         return null;
-    }
-
-    @Override
-    protected void switchRoom(String roomId) {
-        Logger.e("==============switchRoom");
-        mLoadTag.show();
-        // 先退出上个房间
-        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
-            @Override
-            public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
-                UIKit.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        joinRoom(roomId);
-                    }
-                }, 1000);
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
-                joinRoom(roomId);
-            }
-        });
-    }
-
-    private void joinRoom(String roomId) {
-        boolean isCreate = getIntent().getBooleanExtra(ISCREATE, false);
-        ((NewVoiceRoomFragment) getCurrentFragment()).prepareJoinRoom(roomId);
-        VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
-            if (isCreate) {
-                RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
-                rcVoiceRoomInfo.setRoomName(voiceRoomBean.getRoomName());
-                rcVoiceRoomInfo.setSeatCount(9);
-                rcVoiceRoomInfo.setFreeEnterSeat(false);
-                rcVoiceRoomInfo.setLockAll(false);
-                rcVoiceRoomInfo.setMuteAll(false);
-                RCVoiceRoomEngine.getInstance().createAndJoinRoom(roomId, rcVoiceRoomInfo, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Logger.e("==============createAndJoinRoom onSuccess");
-                        joinRoom(voiceRoomBean);
-                        mLoadTag.dismiss();
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        mLoadTag.dismiss();
-                        Logger.e("==============createAndJoinRoom onError,code:" + code + ",message:" + message);
-                    }
-                });
-            } else {
-                RCVoiceRoomEngine.getInstance().joinRoom(voiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        Logger.e("==============joinRoom onSuccess");
-                        joinRoom(voiceRoomBean);
-                        mLoadTag.dismiss();
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        Logger.e("==============joinRoom onError,code:" + code + ",message:" + message);
-                        mLoadTag.dismiss();
-                    }
-                });
-            }
-        });
     }
 
     @Override

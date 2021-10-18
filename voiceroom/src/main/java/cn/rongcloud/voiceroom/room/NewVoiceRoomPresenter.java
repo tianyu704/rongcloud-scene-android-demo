@@ -19,12 +19,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
-import com.basis.UIStack;
 import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
+import com.kit.UIKit;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
@@ -39,7 +39,6 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
-import cn.rong.combusis.common.ui.dialog.TipDialog;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
@@ -53,7 +52,9 @@ import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
@@ -71,14 +72,11 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMuteAllFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomMuteFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNameFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomNoticeFun;
-import cn.rong.combusis.ui.room.fragment.roomsetting.RoomPauseFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatModeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
-import cn.rongcloud.radioroom.IRCRadioRoomEngine;
-import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
@@ -125,6 +123,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     private ConfirmDialog confirmDialog;
 
+    private RoomOwnerType roomOwnerType;
+
     public int currentStatus = STATUS_NOT_ON_SEAT;
     private List<Shield> shields;
     private Disposable messageDisposable;
@@ -161,6 +161,158 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         super.onDestroy();
     }
 
+    public void init(String roomId, boolean isCreate) {
+        initListener(roomId);
+        // TODO 请求数据
+        getRoomInfo(roomId, isCreate);
+    }
+
+    /**
+     * 获取房间信息
+     */
+    public void getRoomInfo(String roomId, boolean isCreate) {
+        mView.showLoading("");
+        OkApi.get(VRApi.getRoomInfo(roomId), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        mVoiceRoomBean = roomBean;
+
+                        if (mVoiceRoomBean.isStop()) {
+                            mView.dismissLoading();
+                            // TODO 提示直播已经结束
+
+                        } else {
+                            leaveRoom(roomId, isCreate);
+                        }
+                    }
+                } else {
+                    mView.dismissLoading();
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+    }
+
+    private void leaveRoom(String roomId, boolean isCreate) {
+        // 先退出上个房间
+        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                Logger.e("==============leaveRoom onSuccess");
+                UIKit.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        joinRoom(roomId, isCreate);
+                    }
+                }, 1000);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
+                joinRoom(roomId, isCreate);
+            }
+        });
+    }
+
+    private void joinRoom(String roomId, boolean isCreate) {
+        if (isCreate) {
+            RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
+            rcVoiceRoomInfo.setRoomName(mVoiceRoomBean.getRoomName());
+            rcVoiceRoomInfo.setSeatCount(9);
+            rcVoiceRoomInfo.setFreeEnterSeat(false);
+            rcVoiceRoomInfo.setLockAll(false);
+            rcVoiceRoomInfo.setMuteAll(false);
+            RCVoiceRoomEngine.getInstance().createAndJoinRoom(roomId, rcVoiceRoomInfo, new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+                    Logger.e("==============createAndJoinRoom onSuccess");
+//                    joinRoom(mVoiceRoomBean);
+                    setCurrentRoom(mVoiceRoomBean);
+                    mView.dismissLoading();
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    Logger.e("==============createAndJoinRoom onError,code:" + code + ",message:" + message);
+                    mView.dismissLoading();
+                }
+            });
+        } else {
+            RCVoiceRoomEngine.getInstance().joinRoom(mVoiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
+                @Override
+                public void onSuccess() {
+                    Logger.e("==============joinRoom onSuccess");
+//                    joinRoom(mVoiceRoomBean);
+                    setCurrentRoom(mVoiceRoomBean);
+                    mView.dismissLoading();
+                }
+
+                @Override
+                public void onError(int code, String message) {
+                    Logger.e("==============joinRoom onError,code:" + code + ",message:" + message);
+                    mView.dismissLoading();
+                }
+            });
+        }
+    }
+
+    /**
+     * 进入房间后发送默认的消息
+     */
+    private void sendSystemMessage() {
+        if (mVoiceRoomBean != null) {
+            mView.showMessage(null, true);
+            // 默认消息
+            RCChatroomLocationMessage welcome = new RCChatroomLocationMessage();
+            welcome.setContent(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()));
+            mView.showMessage(welcome, false);
+            RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
+            tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
+            mView.showMessage(tips, false);
+            Logger.e("=================发送了默认消息");
+            // 广播消息
+            RCChatroomEnter enter = new RCChatroomEnter();
+            enter.setUserId(AccountStore.INSTANCE.getUserId());
+            enter.setUserName(AccountStore.INSTANCE.getUserName());
+            RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), enter, false,
+                    integer -> null, (coreErrorCode, integer) -> null);
+        }
+    }
+
+    public String getRoomId() {
+        if (mVoiceRoomBean != null) {
+            return mVoiceRoomBean.getRoomId();
+        }
+        return "";
+    }
+
+    public String getCreateUserId() {
+        if (mVoiceRoomBean != null) {
+            return mVoiceRoomBean.getCreateUserId();
+        }
+        return "";
+    }
+
+    public String getThemePictureUrl() {
+        if (mVoiceRoomBean != null) {
+            return mVoiceRoomBean.getThemePictureUrl();
+        }
+        return "";
+    }
+
+    public RoomOwnerType getRoomOwnerType() {
+        return roomOwnerType;
+    }
+
+
     /**
      * 消息接收
      *
@@ -183,7 +335,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public void setCurrentRoom(VoiceRoomBean mVoiceRoomBean) {
-        this.mVoiceRoomBean = mVoiceRoomBean;
+        roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(mVoiceRoomBean);
+        // 房主上麦
+        if (roomOwnerType == RoomOwnerType.VOICE_OWNER) {
+            roomOwnerEnterSeat();
+        }
+        // 发送默认消息
+        sendSystemMessage();
+
         //界面初始化成功的时候，要去请求网络
         newVoiceRoomModel.getRoomInfo(getmVoiceRoomBean().getRoomId()).subscribe();
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
@@ -204,6 +363,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         getShield();
         setObMessageListener();
         getGiftCount();
+        mView.setRoomData(mVoiceRoomBean);
     }
 
     @Override
@@ -234,6 +394,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 .subscribe(new Consumer<UiRoomModel>() {
                     @Override
                     public void accept(UiRoomModel uiRoomModel) throws Throwable {
+
                         String extra = "";
                         if (uiRoomModel.getRcRoomInfo() != null) {
                             extra = uiRoomModel.getRcRoomInfo().getExtra();
@@ -247,7 +408,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) throws Throwable {
-                        Log.e(TAG, "setObRoomInfoChange: " +throwable);
+                        Log.e(TAG, "setObRoomInfoChange: " + throwable);
                     }
                 }));
     }
@@ -316,14 +477,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     /**
      * 空座位被点击
      *
-     * @param position  指的是麦位 Recyclerview的位置，真是的麦位应该是Position+1
+     * @param position 指的是麦位 Recyclerview的位置，真是的麦位应该是Position+1
      */
     @Override
     public void enterSeatViewer(int position) {
         //判断是否在麦位上
         if (newVoiceRoomModel.userInSeat()) {
             //在麦位上
-            RCVoiceRoomEngine.getInstance().switchSeatTo(position+1, new RCVoiceRoomCallback() {
+            RCVoiceRoomEngine.getInstance().switchSeatTo(position + 1, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
                     AudioManagerUtil.INSTANCE.choiceAudioModel();
@@ -513,7 +674,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             }
                         });
                         confirmDialog.show();
-                    case EVENT_BACKGROUND_CHANGE :
+                    case EVENT_BACKGROUND_CHANGE:
                         mView.setRoomBackground(stringArrayListPair.second.get(0));
                         break;
                 }
@@ -521,7 +682,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Throwable {
-                Log.e(TAG, "setObRoomEventChange: "+throwable);
+                Log.e(TAG, "setObRoomEventChange: " + throwable);
             }
         }));
     }
@@ -742,10 +903,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         for (User user : memberList.getValue()) {
             UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
             Member member = new Member().toMember(user);
-            if (uiSeatModel!=null&&uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+            if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //当前用户在麦位上
                 member.setSeatIndex(uiSeatModel.getIndex());
-            }else {
+            } else {
                 //当前用户不在麦位
                 member.setSeatIndex(Integer.MAX_VALUE);
             }
@@ -755,7 +916,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         Collections.sort(memberArrayList, new Comparator<Member>() {
             @Override
             public int compare(Member o1, Member o2) {
-                return o1.getSeatIndex()-o2.getSeatIndex();
+                return o1.getSeatIndex() - o2.getSeatIndex();
             }
         });
         mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(),
@@ -1040,13 +1201,13 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 //设置4个座位
                 setSeatCount(5);
             }
-        }else if (fun instanceof RoomMusicFun){
+        } else if (fun instanceof RoomMusicFun) {
             //音乐 判断房主是否在麦位上
             UiSeatModel seatInfoByUserId = newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
-            if (seatInfoByUserId!=null&&seatInfoByUserId.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing){
+            if (seatInfoByUserId != null && seatInfoByUserId.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //在座位上，可以播放音乐
                 mView.showMusicDialog();
-            }else {
+            } else {
                 mView.showToast("请先上麦之后再播放音乐");
             }
         }
@@ -1205,7 +1366,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, new RCVoiceRoomCallback() {
                                 @Override
                                 public void onSuccess() {
-                                    Log.e(TAG, "onSuccess: " );
+                                    Log.e(TAG, "onSuccess: ");
                                 }
 
                                 @Override

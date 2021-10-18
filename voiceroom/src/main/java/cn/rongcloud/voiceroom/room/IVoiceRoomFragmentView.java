@@ -4,11 +4,11 @@ import android.graphics.Point;
 
 import androidx.lifecycle.MutableLiveData;
 
-import java.util.List;
-
 import com.basis.mvp.IBaseView;
 
-import cn.rong.combusis.provider.user.User;
+import java.util.List;
+
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
@@ -16,6 +16,8 @@ import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imlib.model.MessageContent;
 
 public interface IVoiceRoomFragmentView extends IBaseView {
+
+    void setRoomData(VoiceRoomBean voiceRoomBean);
 
     void onJoinRoomSuccess();
 

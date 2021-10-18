@@ -1,5 +1,8 @@
 package cn.rong.combusis.ui.room;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -7,6 +10,11 @@ import androidx.annotation.Nullable;
 import com.basis.mvp.BasePresenter;
 import com.basis.ui.BaseFragment;
 import com.kit.utils.Logger;
+
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import io.rong.imkit.utils.PermissionCheckUtil;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * @author gyn
@@ -70,4 +78,37 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
         super.onDestroyView();
     }
 
+
+    // 是否是请求开启悬浮窗权限的过程中
+    private boolean checkingOverlaysPermission;
+
+    public boolean checkDrawOverlaysPermission(boolean needOpenPermissionSetting) {
+        if (Build.BRAND.toLowerCase().contains("xiaomi") || Build.VERSION.SDK_INT >= 23) {
+            if (PermissionCheckUtil.canDrawOverlays(requireContext(), needOpenPermissionSetting)) {
+                checkingOverlaysPermission = false;
+                return true;
+            } else {
+                if (needOpenPermissionSetting && !Build.BRAND.toLowerCase().contains("xiaomi")) {
+                    checkingOverlaysPermission = true;
+                }
+                return false;
+            }
+        } else {
+            checkingOverlaysPermission = false;
+            return true;
+        }
+    }
+
+    public void showOpenOverlaysPermissionDialog() {
+        new ConfirmDialog(requireContext(), "前往设置打开悬浮窗权限",
+                true, "确定", "取消", null, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                Intent intent = new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION", Uri.parse("package:" + requireActivity().getPackageName()));
+                requireActivity().startActivity(intent);
+                return null;
+            }
+        }).show();
+    }
 }
+

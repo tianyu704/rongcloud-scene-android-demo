@@ -5,8 +5,6 @@ import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
-import com.basis.net.LoadTag;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +16,6 @@ import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCFollowMsg;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
@@ -27,10 +24,9 @@ import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
  * @author gyn
  * @date 2021/9/14
  */
-public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
+public class RadioRoomActivity extends AbsRoomActivity {
     private static final String KEY_ROOM_IDS = "KEY_ROOM_IDS";
     private static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
-    private LoadTag mLoadTag;
 
     public static void startActivity(Activity activity, ArrayList<String> roomIds, int position) {
         Intent intent = new Intent(activity, RadioRoomActivity.class);
@@ -41,7 +37,6 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
 
     @Override
     protected void initRoom() {
-        mLoadTag = new LoadTag(activity, "Loading...");
         RCMessager.getInstance().addMessageTypes(
                 RCChatroomEnter.class,
                 RCChatroomBarrage.class,

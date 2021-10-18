@@ -376,17 +376,21 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
-                RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent(), new PermissionListener() {
-                    @Override
-                    public void onSuccess() {
-                        finish();
-                    }
+                //最小化窗口,判断是否有权限
+                if (checkDrawOverlaysPermission(false)) {
+                    RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent(), new PermissionListener() {
+                        @Override
+                        public void onSuccess() {
+                            finish();
+                        }
 
-                    @Override
-                    public void onFail() {
-                        showToast("请到设置开启悬浮框权限");
-                    }
-                });
+                        @Override
+                        public void onFail() {
+                        }
+                    });
+                } else {
+                    showOpenOverlaysPermissionDialog();
+                }
             }
 
             @Override

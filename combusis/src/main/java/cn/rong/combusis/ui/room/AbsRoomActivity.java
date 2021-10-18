@@ -21,7 +21,7 @@ import io.rong.imkit.utils.StatusBarUtil;
  * @author gyn
  * @date 2021/9/14
  */
-public abstract class AbsRoomActivity<T> extends BaseActivity {
+public abstract class AbsRoomActivity extends BaseActivity {
 
     private ViewPager2 mViewPager;
     private RoomVPAdapter mRoomAdapter;

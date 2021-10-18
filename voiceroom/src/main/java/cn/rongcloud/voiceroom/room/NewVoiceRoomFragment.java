@@ -4,12 +4,9 @@ import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_NOT_ON_SE
 import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_ON_SEAT;
 import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_WAIT_FOR_SEAT;
 
-import android.Manifest;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.net.Uri;
-import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -43,17 +40,15 @@ import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomBarrage;
-import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomLike;
-import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
@@ -83,14 +78,12 @@ import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
-import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 
@@ -98,10 +91,10 @@ import kotlin.jvm.functions.Function2;
  * @author 李浩
  * @date 2021/9/24
  */
-public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoiceRoomPresenter>
+public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
         RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener {
-    private VoiceRoomBean mVoiceRoomBean;
+    //    private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
@@ -123,24 +116,54 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private GiftFragment mGiftFragment;
     private MusicDialog mMusicDialog;
     private ConfirmDialog confirmDialog;
+    private String mRoomId;
+    private boolean isCreate;
+    private PermissionListener permissionListener = new PermissionListener() {
+        @Override
+        public void onSuccess() {
+            //先做悬浮窗
+            requireActivity().moveTaskToBack(true);
+            //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-    public static Fragment getInstance() {
-        return new NewVoiceRoomFragment();
-    }
+            //如果最小化窗口权限拿到了，那么显示最小化窗口
+            VoiceRoomMiniManager.getInstance().refreshRoomOwner(present.getRoomId());
+            VoiceRoomMiniManager.getInstance()
+                    .setBackgroudPic(present.getThemePictureUrl(), activity);
+        }
+
+        @Override
+        public void onFail() {
+            EToast.showToast("没有获取到悬浮窗权限");
+            startActivity(requireActivity().getIntent());
+        }
+    };
 
     @Override
     public int setLayoutId() {
         return R.layout.fragment_new_voice_room;
     }
 
+    public static Fragment getInstance(String roomId, boolean isCreate) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ROOM_ID, roomId);
+        bundle.putBoolean(NewVoiceRoomActivity.ISCREATE, isCreate);
+        Fragment fragment = new NewVoiceRoomFragment();
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void init() {
+        mRoomId = getArguments().getString(ROOM_ID);
+        isCreate = getArguments().getBoolean(NewVoiceRoomActivity.ISCREATE);
+
         mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         mRoomTitleBar.setOnMemberClickListener(v -> {
-            mMemberListFragment = new MemberListFragment(mVoiceRoomBean.getRoomId(), this);
+            mMemberListFragment = new MemberListFragment(present.getRoomId(), this);
             mMemberListFragment.show(getChildFragmentManager());
         });
 
@@ -172,7 +195,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
         mRoomSeatView.setRoomOwnerHeadOnclickListener(v -> {
             //弹出
-            if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+            if (present.getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
                 //如果是房间所有者 ,如果在麦位上,那么弹出下麦和关闭麦克风弹窗，如果不在麦位上，那么直接上麦
                 present.onClickRoomOwnerView(getChildFragmentManager());
             }
@@ -185,6 +208,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
         mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
         mMessageView.setAdapter(mRoomMessageAdapter);
+
+        pkView = getView(R.id.pk_view);
+        voiceRoom = getView(R.id.voice_room);
     }
 
     /**
@@ -193,7 +219,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void showNoticeDialog() {
         boolean isEdit = false;
-        if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+        if (present.getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
             isEdit = true;
         } else {
             isEdit = false;
@@ -211,26 +237,15 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
-        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
+        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
                     VoiceRoomMiniManager.getInstance().init(requireContext(), requireActivity().getIntent(), permissionListener);
                     VoiceRoomMiniManager.getInstance().showMiniWindows();
-                }else {
-                    if (confirmDialog==null){
-                        confirmDialog = new ConfirmDialog(requireContext(), "前往设置打开悬浮窗权限",
-                                true, "确定", "取消", null, new Function0<Unit>() {
-                            @Override
-                            public Unit invoke() {
-                                Intent intent = new Intent("android.settings.action.MANAGE_OVERLAY_PERMISSION", Uri.parse("package:" + requireActivity().getPackageName()));
-                                requireActivity().startActivity(intent);
-                                return null;
-                            }
-                        });
-                    }
-                    confirmDialog.show();
+                } else {
+                    showOpenOverlaysPermissionDialog();
                 }
             }
 
@@ -250,48 +265,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         mExitRoomPopupWindow.showAtLocation(mBackgroundImageView, Gravity.TOP, 0, 0);
     }
 
-    // 是否是请求开启悬浮窗权限的过程中
-    private boolean checkingOverlaysPermission;
-
-    private boolean checkDrawOverlaysPermission(boolean needOpenPermissionSetting) {
-        if (Build.BRAND.toLowerCase().contains("xiaomi") || Build.VERSION.SDK_INT >= 23) {
-            if (PermissionCheckUtil.canDrawOverlays(requireContext(), needOpenPermissionSetting)) {
-                checkingOverlaysPermission = false;
-                return true;
-            } else {
-                if (needOpenPermissionSetting && !Build.BRAND.toLowerCase().contains("xiaomi")) {
-                    checkingOverlaysPermission = true;
-                }
-                return false;
-            }
-        } else {
-            checkingOverlaysPermission = false;
-            return true;
-        }
-    }
-
-
-    private PermissionListener permissionListener = new PermissionListener() {
-        @Override
-        public void onSuccess() {
-            //先做悬浮窗
-            requireActivity().moveTaskToBack(true);
-            //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
-            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-            //如果最小化窗口权限拿到了，那么显示最小化窗口
-            VoiceRoomMiniManager.getInstance().refreshRoomOwner(mVoiceRoomBean.getRoomId());
-            VoiceRoomMiniManager.getInstance()
-                    .setBackgroudPic(mVoiceRoomBean.getThemePictureUrl(), activity);
-        }
-
-        @Override
-        public void onFail() {
-            EToast.showToast("没有获取到悬浮窗权限");
-            startActivity(requireActivity().getIntent());
-        }
-    };
-
     /**
      * 麦位被点击的情况
      *
@@ -299,7 +272,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      * @param position
      */
     private void onClickVoiceRoomSeats(UiSeatModel seatModel, int position) {
-        switch (getRoomOwnerType()) {
+        switch (present.getRoomOwnerType()) {
             case VOICE_OWNER://房主
                 onClickVoiceRoomSeatsByOwner(seatModel, position);
                 break;
@@ -326,17 +299,17 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             if (seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                 // 点击自己头像
-                present.showNewSelfSettingFragment(seatModel, mVoiceRoomBean.getRoomId()).show(getChildFragmentManager());
+                present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
                 if (mMemberSettingFragment == null) {
-                    mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+                    mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
                 }
                 User user = MemberCache.getInstance().getMember(seatModel.getUserId());
                 mMemberSettingFragment.setMemberIsOnSeat(true);
                 mMemberSettingFragment.setSeatPosition(position + 1);
                 mMemberSettingFragment.setMute(seatModel.isMute());
-                mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
+                mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
             }
         }
     }
@@ -356,13 +329,13 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
             //弹窗设置弹窗
             // 点击别人头像
             if (mMemberSettingFragment == null) {
-                mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+                mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
             }
             User user = MemberCache.getInstance().getMember(seatModel.getUserId());
             mMemberSettingFragment.setMemberIsOnSeat(true);
             mMemberSettingFragment.setSeatPosition(position + 1);
             mMemberSettingFragment.setMute(seatModel.isMute());
-            mMemberSettingFragment.show(getChildFragmentManager(), user, mVoiceRoomBean.getCreateUserId());
+            mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
         }
     }
 
@@ -376,21 +349,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     private View voiceRoom;
 
     @Override
-    public void joinRoom(VoiceRoomBean voiceRoomBean) {
-        mVoiceRoomBean = voiceRoomBean;
-        setRoomData(mVoiceRoomBean);
-        present.setCurrentRoom(mVoiceRoomBean);
-        sendSystemMessage();
-        Log.e(TAG, "joinRoom: ");
-
+    public void joinRoom() {
+        present.init(mRoomId, isCreate);
         // init pk
         initPk();
     }
 
     private void initPk() {
-        pkView = getView(R.id.pk_view);
-        voiceRoom = getView(R.id.voice_room);
-        PKStateManager.get().init(mVoiceRoomBean.getRoomId(), pkView, new IPKState.VRStateListener() {
+        PKStateManager.get().init(mRoomId, pkView, new IPKState.VRStateListener() {
             @Override
             public void onPkStart() {
                 PKStateManager.get().enterPkWithAnimation(voiceRoom, pkView, 200);
@@ -440,33 +406,20 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         });
     }
 
+    @Override
+    public void addSwitchRoomListener() {
+        ((AbsRoomActivity) requireActivity()).addSwitchRoomListener(mRoomId, this);
+    }
+
+    @Override
+    public void removeSwitchRoomListener() {
+        ((AbsRoomActivity) requireActivity()).removeSwitchRoomListener(mRoomId);
+    }
+
 
     @Override
     public NewVoiceRoomPresenter createPresent() {
         return new NewVoiceRoomPresenter(this, getLifecycle());
-    }
-
-    /**
-     * 进入房间后发送默认的消息
-     */
-    private void sendSystemMessage() {
-        if (mVoiceRoomBean != null) {
-            showMessage(null, true);
-            // 默认消息
-            RCChatroomLocationMessage welcome = new RCChatroomLocationMessage();
-            welcome.setContent(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()));
-            showMessage(welcome, false);
-            RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-            tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
-            showMessage(tips, false);
-            Logger.e("=================发送了默认消息");
-            // 广播消息
-            RCChatroomEnter enter = new RCChatroomEnter();
-            enter.setUserId(AccountStore.INSTANCE.getUserId());
-            enter.setUserName(AccountStore.INSTANCE.getUserName());
-            RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), enter, false,
-                    integer -> null, (coreErrorCode, integer) -> null);
-        }
     }
 
     /**
@@ -498,27 +451,22 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
      *
      * @param voiceRoomBean
      */
-    private void setRoomData(VoiceRoomBean voiceRoomBean) {
-        // 设置房间类型
-        RoomOwnerType roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
-        setRoomOwnerType(roomOwnerType);
-        // 房主上麦
-        if (roomOwnerType == RoomOwnerType.VOICE_OWNER) {
-            present.roomOwnerEnterSeat();
-        }
+    @Override
+    public void setRoomData(VoiceRoomBean voiceRoomBean) {
+
         // 加载背景
-        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, mVoiceRoomBean.getBackgroundUrl(), R.color.black);
+        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, voiceRoomBean.getBackgroundUrl(), R.color.black);
         // 设置title数据
-        mRoomTitleBar.setData(mVoiceRoomBean.getRoomName(), mVoiceRoomBean.getId());
+        mRoomTitleBar.setData(voiceRoomBean.getRoomName(), voiceRoomBean.getId());
 
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), this, voiceRoomBean.getRoomId());
+        mRoomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
-        mRoomMessageAdapter.setRoomCreateId(mVoiceRoomBean.getCreateUserId());
+        mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
         /**
          * 设一个默认的公告
          */
-        showNotice(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()), false);
+        showNotice(String.format("欢迎来到 %s", voiceRoomBean.getRoomName()), false);
 
     }
 
@@ -529,16 +477,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         present.leaveCurrentRoom();
         // uninit pk
         unInitPk();
-    }
-
-    /**
-     * 加入房间之前的准备工作
-     *
-     * @param roomId
-     */
-    @Override
-    public void prepareJoinRoom(String roomId) {
-        present.initListener(roomId);
     }
 
     @Override
@@ -715,7 +653,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void showUnReadRequestNumber(int number) {
         //如果不是房主，不设置
-        if (getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
+        if (present.getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
             mRoomBottomView.setmSeatOrderNumber(number);
         }
     }
@@ -773,7 +711,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
         try {
             UIStack.getInstance().remove(((NewVoiceRoomActivity) requireActivity()));
             requireActivity().finish();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -869,7 +807,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
 
     @Override
     public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
-        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mVoiceRoomBean.getRoomId(), rcChatroomVoice, true, new Function1<Integer, Unit>() {
+        RCChatRoomMessageManager.INSTANCE.sendChatMessage(present.getRoomId(), rcChatroomVoice, true, new Function1<Integer, Unit>() {
             @Override
             public Unit invoke(Integer integer) {
                 //成功
@@ -966,14 +904,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<VoiceRoomBean, NewVoic
     @Override
     public void showUserSetting(Member member) {
         if (mMemberSettingFragment == null) {
-            mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+            mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
         }
-        mMemberSettingFragment.show(getChildFragmentManager(), member, mVoiceRoomBean.getCreateUserId());
+        mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }
 
     @Override
     public void showMusicDialog() {
-        mMusicDialog = new MusicDialog(mVoiceRoomBean.getRoomId());
+        mMusicDialog = new MusicDialog(present.getRoomId());
         mMusicDialog.show(getChildFragmentManager());
     }
 

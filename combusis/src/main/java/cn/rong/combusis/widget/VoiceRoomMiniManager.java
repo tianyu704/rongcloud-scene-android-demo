@@ -2,13 +2,9 @@ package cn.rong.combusis.widget;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
 import com.yhao.floatwindow.FloatWindow;
@@ -122,12 +118,10 @@ public class VoiceRoomMiniManager {
      * 动态更改当前的背景色
      */
     public void setBackgroudPic(String url,Context context){
-        if (FloatWindow.get(TAG)!=null){
-            CircleImageView circleImageView=FloatWindow.get(TAG).getView().findViewById(R.id.iv_room_creator_portrait);
-            ImageLoaderUtil.INSTANCE.loadPortraitDef(context,circleImageView,url);
+        if (FloatWindow.get(TAG) != null) {
+            CircleImageView circleImageView = FloatWindow.get(TAG).getView().findViewById(R.id.iv_room_creator_portrait);
+            ImageLoaderUtil.INSTANCE.loadImage(context, circleImageView, url, R.drawable.img_default_room_cover);
         }
-
-
     }
     /**
      * 滑动状态监听
