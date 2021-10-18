@@ -59,6 +59,8 @@ import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
 import cn.rongcloud.radioroom.helper.RadioEventHelper;
 import cn.rongcloud.radioroom.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
+import cn.rongcloud.radioroom.rroom.RCRadioRoomInfo;
+import cn.rongcloud.rtc.base.RCRTCLiveRole;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.ChatRoomInfo;
 import io.rong.imlib.model.Message;
@@ -74,57 +76,135 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
     private RoomOwnerType mRoomOwnerType;
+    // 是否在麦位上
     private boolean isInSeat = false;
+    // 是否静音
     private boolean isMute = false;
+    // 是否已经在房间
+    private boolean isInRoom = false;
 
     public RadioRoomPresenter(RadioRoomView mView, LifecycleOwner lifecycleOwner) {
         super(mView, lifecycleOwner.getLifecycle());
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    /**
+     * 初始化
+     *
+     * @param roomId
+     */
+    public void init(String roomId) {
+        this.mRoomId = roomId;
+        isInRoom = TextUtils.equals(RadioEventHelper.getInstance().getRoomId(), roomId);
+        Logger.d("==================================inRoom:" + isInRoom);
+        getRoomInfo();
     }
 
-    public void joinRoom(VoiceRoomBean voiceRoomBean) {
+    /**
+     * 获取房间信息
+     */
+    public void getRoomInfo() {
+        mView.showLoading("");
+        OkApi.get(VRApi.getRoomInfo(mRoomId), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        mVoiceRoomBean = roomBean;
+                        if (mVoiceRoomBean.isStop()) {
+                            mView.dismissLoading();
+                        } else {
+                            initRoomData(roomBean);
+                        }
+                    }
+                } else {
+                    mView.dismissLoading();
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+    }
+
+    /**
+     * 初始化房间数据
+     *
+     * @param voiceRoomBean
+     */
+    private void initRoomData(VoiceRoomBean voiceRoomBean) {
         Logger.e("================jjjjjjjjjjjjjjjj" + voiceRoomBean);
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
-            mRoomId = voiceRoomBean.getRoomId();
-            // 在注册前判断是否在在房间里
-            boolean isInRoom = RadioEventHelper.getInstance().isInRoom();
 
-            // 注册房间事件监听
-            if (!isInRoom) {
-                RadioEventHelper.getInstance().register(mRoomId);
-            }
+            RadioEventHelper.getInstance().register(mRoomId);
             RadioEventHelper.getInstance().addRadioEventListener(this);
 
             mRoomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
-
-            // 房主上麦
-            if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
-                if (isInRoom) {
-                    mView.setSeatState(RoomSeatView.SeatState.NORMAL);
-                } else {
-                    enterSeat();
-                }
-            }
             mView.setRoomData(voiceRoomBean, mRoomOwnerType);
-            if (!isInRoom) {
-                // 发送默认消息
-                sendDefaultMessage();
-            }
-            // 获取房间内成员和管理员列表
-            MemberCache.getInstance().fetchData(mRoomId);
-            // 在线人数
-            refreshRoomMemberCount();
-            // 礼物数量
-            getGiftCount();
 
-            refreshRoomInfo();
+            // 加入房间
+            if (!isInRoom) {
+                switchRoom();
+            } else {
+                mView.dismissLoading();
+            }
         }
     }
+
+    private void switchRoom() {
+        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                joinRoom();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                joinRoom();
+            }
+        });
+    }
+
+    private void joinRoom() {
+        RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId()) ? RCRTCLiveRole.BROADCASTER : RCRTCLiveRole.AUDIENCE);
+        roomInfo.setRoomId(mRoomId);
+        roomInfo.setRoomName(mVoiceRoomBean.getRoomName());
+        RCRadioRoomEngine.getInstance().joinRoom(roomInfo, new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                Logger.e("==============joinRoom onSuccess");
+                // 房主上麦
+                if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
+                    if (isInRoom) {
+                        mView.setSeatState(RoomSeatView.SeatState.NORMAL);
+                    } else {
+                        enterSeat();
+                    }
+                }
+                if (!isInRoom) {
+                    // 发送默认消息
+                    sendDefaultMessage();
+                }
+                // 获取房间内成员和管理员列表
+                MemberCache.getInstance().fetchData(mRoomId);
+                // 在线人数
+                refreshRoomMemberCount();
+                // 礼物数量
+                getGiftCount();
+                mView.dismissLoading();
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                Logger.e("==============joinRoom onError,code:" + code + ",message:" + message);
+                mView.dismissLoading();
+            }
+        });
+    }
+
 
     public String getRoomId() {
         if (mVoiceRoomBean != null) {
@@ -151,32 +231,10 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         return mVoiceRoomBean.getCreateUser();
     }
 
-    /**
-     * 刷新房间信息
-     */
-    public void refreshRoomInfo() {
-        OkApi.get(VRApi.getRoomInfo(mRoomId), null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
-                    if (roomBean != null) {
-                        mVoiceRoomBean = roomBean;
-                        if (mVoiceRoomBean.isStop()) {
-
-                        } else {
-                            mView.setRoomData(mVoiceRoomBean, mRoomOwnerType);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
-            }
-        });
+    public RoomOwnerType getRoomOwnerType() {
+        return mRoomOwnerType;
     }
+
 
     /**
      * 房主上麦
@@ -464,6 +522,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============leaveRoom onError");
+                mView.finish();
                 mView.dismissLoading();
                 mView.showToast(message);
             }

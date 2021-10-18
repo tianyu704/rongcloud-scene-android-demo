@@ -34,10 +34,16 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         return Holder.INSTANCE;
     }
 
+    public String getRoomId() {
+        return roomId;
+    }
+
     @Override
     public void register(String roomId) {
-        this.roomId = roomId;
-        RCRadioRoomEngine.getInstance().setRadioEventListener(this);
+        if (!TextUtils.equals(roomId, this.roomId)) {
+            this.roomId = roomId;
+            RCRadioRoomEngine.getInstance().setRadioEventListener(this);
+        }
     }
 
     @Override

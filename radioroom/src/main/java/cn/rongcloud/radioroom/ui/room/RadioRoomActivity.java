@@ -2,13 +2,10 @@ package cn.rongcloud.radioroom.ui.room;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.text.TextUtils;
 
 import androidx.fragment.app.Fragment;
 
 import com.basis.net.LoadTag;
-import com.kit.utils.Logger;
-import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +19,9 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.messager.RCMessager;
-import cn.rongcloud.radioroom.RCRadioRoomEngine;
-import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
-import cn.rongcloud.radioroom.rroom.RCRadioRoomInfo;
-import cn.rongcloud.rtc.base.RCRTCLiveRole;
 
 /**
  * @author gyn
@@ -71,8 +63,8 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
     }
 
     @Override
-    public Fragment getFragment() {
-        return RadioRoomFragment.getInstance();
+    public Fragment getFragment(String roomId) {
+        return RadioRoomFragment.getInstance(roomId);
     }
 
     @Override
@@ -84,49 +76,4 @@ public class RadioRoomActivity extends AbsRoomActivity<VoiceRoomBean> {
         return null;
     }
 
-    @Override
-    protected void switchRoom(String roomId) {
-        mLoadTag.show();
-        // 先退出上个房间
-        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
-                joinRadioRoom(roomId);
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
-                joinRadioRoom(roomId);
-            }
-        });
-    }
-
-    private void joinRadioRoom(String roomId) {
-        VoiceRoomProvider.provider().getAsyn(roomId, voiceRoomBean -> {
-            RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(TextUtils.equals(voiceRoomBean.getUserId(), AccountStore.INSTANCE.getUserId()) ? RCRTCLiveRole.BROADCASTER : RCRTCLiveRole.AUDIENCE);
-            roomInfo.setRoomId(voiceRoomBean.getRoomId());
-            roomInfo.setRoomName(voiceRoomBean.getRoomName());
-            RCRadioRoomEngine.getInstance().joinRoom(roomInfo, new RCRadioRoomCallback() {
-                @Override
-                public void onSuccess() {
-                    Logger.e("==============joinRoom onSuccess");
-                    joinRoom(voiceRoomBean);
-                    mLoadTag.dismiss();
-                }
-
-                @Override
-                public void onError(int code, String message) {
-                    Logger.e("==============joinRoom onError,code:" + code + ",message:" + message);
-                    mLoadTag.dismiss();
-                }
-            });
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
 }

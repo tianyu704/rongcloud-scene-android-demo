@@ -1,6 +1,7 @@
 package cn.rongcloud.radioroom.ui.room;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -33,6 +34,7 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
@@ -59,7 +61,7 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/17
  */
-public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomPresenter> implements
+public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> implements
         RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener,
         MemberListFragment.OnClickUserListener {
     private ImageView mBackgroundImageView;
@@ -83,10 +85,14 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
-    private int bottomMargin = 0;
+    private String mRoomId;
 
-    public static Fragment getInstance() {
-        return new RadioRoomFragment();
+    public static Fragment getInstance(String roomId) {
+        Bundle bundle = new Bundle();
+        bundle.putString(ROOM_ID, roomId);
+        Fragment fragment = new RadioRoomFragment();
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
@@ -101,6 +107,8 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void init() {
+        mRoomId = getArguments().getString(ROOM_ID);
+
         mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
 
@@ -144,12 +152,13 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void initListener() {
-
+        super.initListener();
     }
 
     @Override
-    public void joinRoom(VoiceRoomBean voiceRoomBean) {
-        present.joinRoom(voiceRoomBean);
+    public void joinRoom() {
+//        Logger.e("===================joinRoom" + mRoomId);
+        present.init(mRoomId);
     }
 
     /**
@@ -160,7 +169,6 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
      */
     @Override
     public void setRoomData(VoiceRoomBean voiceRoomBean, RoomOwnerType roomOwnerType) {
-        setRoomOwnerType(roomOwnerType);
         // 加载背景
         setRoomBackground(voiceRoomBean.getBackgroundUrl());
         // 设置title数据
@@ -169,7 +177,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
         // 设置房主麦位信息
         mRoomSeatView.setData(voiceRoomBean.getCreateUserName(), voiceRoomBean.getCreateUserPortrait());
         // 设置底部按钮
-        mRoomBottomView.setData(getRoomOwnerType(), this, voiceRoomBean.getRoomId());
+        mRoomBottomView.setData(roomOwnerType, this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
     }
@@ -177,6 +185,16 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
     @Override
     public void onBackPressed() {
         clickMenu();
+    }
+
+    @Override
+    public void addSwitchRoomListener() {
+        ((AbsRoomActivity) requireActivity()).addSwitchRoomListener(mRoomId, this);
+    }
+
+    @Override
+    public void removeSwitchRoomListener() {
+        ((AbsRoomActivity) requireActivity()).removeSwitchRoomListener(mRoomId);
     }
 
     @Override
@@ -315,7 +333,7 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void showUserSetting(Member member) {
-        mMemberSettingFragment = new MemberSettingFragment(getRoomOwnerType(), present);
+        mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
         mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }
 
@@ -351,11 +369,11 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
-        if (getRoomOwnerType() == null) {
+        if (present.getRoomOwnerType() == null) {
             finish();
             return;
         }
-        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
+        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
                 RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent(), new PermissionListener() {
@@ -398,12 +416,8 @@ public class RadioRoomFragment extends AbsRoomFragment<VoiceRoomBean, RadioRoomP
 
     @Override
     public void destroyRoom() {
+//        Logger.e("===================destroyRoom" + mRoomId);
         present.leaveRoom(true, false);
-    }
-
-    @Override
-    public void prepareJoinRoom(String roomId) {
-
     }
 
     @Override

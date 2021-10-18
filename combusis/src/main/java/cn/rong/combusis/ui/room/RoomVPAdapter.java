@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.kit.utils.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +14,9 @@ import java.util.List;
  * @author gyn
  * @date 2021/9/17
  */
-public class RoomVPAdapter<T> extends FragmentStateAdapter {
+public class RoomVPAdapter extends FragmentStateAdapter {
 
-    private List<T> mRoomList = new ArrayList<>();
+    private List<String> mRoomList = new ArrayList<>();
     private AbsRoomActivity mFragmentActivity;
 
     public RoomVPAdapter(@NonNull AbsRoomActivity fragmentActivity) {
@@ -22,7 +24,7 @@ public class RoomVPAdapter<T> extends FragmentStateAdapter {
         mFragmentActivity = fragmentActivity;
     }
 
-    public void setData(List<T> roomList) {
+    public void setData(List<String> roomList) {
         if (roomList != null) {
             this.mRoomList = roomList;
         }
@@ -31,7 +33,8 @@ public class RoomVPAdapter<T> extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        return mFragmentActivity.getFragment();
+        Logger.e("=================createFragment:" + position);
+        return mFragmentActivity.getFragment(getItemData(position));
     }
 
     @Override
@@ -39,7 +42,7 @@ public class RoomVPAdapter<T> extends FragmentStateAdapter {
         return mRoomList.size();
     }
 
-    public T getItemData(int position) {
+    public String getItemData(int position) {
         if (position >= 0 && position < mRoomList.size()) {
             return mRoomList.get(position);
         }

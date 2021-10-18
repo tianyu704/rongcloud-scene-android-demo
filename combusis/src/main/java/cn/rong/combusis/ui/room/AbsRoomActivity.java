@@ -10,6 +10,7 @@ import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.UiUtils;
 
+import java.util.HashMap;
 import java.util.List;
 
 import cn.rong.combusis.R;
@@ -23,10 +24,11 @@ import io.rong.imkit.utils.StatusBarUtil;
 public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     private ViewPager2 mViewPager;
-    private RoomVPAdapter<String> mRoomAdapter;
-    private AbsRoomFragment mCurrentFragment;
+    private RoomVPAdapter mRoomAdapter;
     private int mCurrentPosition;
     private int bottomMargin = 0;
+    private HashMap<String, SwitchRoomListener> switchRoomListenerMap = new HashMap<>();
+    private String currentRoomId;
 
     @Override
     public int setLayoutId() {
@@ -35,9 +37,9 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
 
     @Override
     public void init() {
+        initRoom();
         // 状态栏透明
         StatusBarUtil.setTranslucentStatus(this);
-        initRoom();
         getWrapBar().setHide(true).work();
         // 初始化viewpager并设置数据和监听
         mViewPager = getView(R.id.vp_room);
@@ -51,19 +53,20 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 mCurrentPosition = position;
-                // 当前显示
-                Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("f" + position);
-                if (currentFragment instanceof AbsRoomFragment && mCurrentFragment != currentFragment) {
-                    Logger.e("current page show");
-                    if (!TextUtils.equals(mCurrentFragment.getTag(), currentFragment.getTag())) {
-                        // 上一个滑走要销毁
-                        mCurrentFragment.destroyRoom();
-                        // 要显示的
-                        mCurrentFragment = (AbsRoomFragment) currentFragment;
-                        switchRoom(mRoomAdapter.getItemData(position));
+                String roomId = mRoomAdapter.getItemData(position);
+                if (!TextUtils.equals(roomId, currentRoomId)) {
+                    if (currentRoomId != null && switchRoomListenerMap.containsKey(currentRoomId)) {
+                        switchRoomListenerMap.get(currentRoomId).destroyRoom();
+                        Logger.d("==================destroyRoom:" + currentRoomId);
+                    }
+                    currentRoomId = roomId;
+                    Logger.d("==================joinRoom:" + switchRoomListenerMap.containsKey(currentRoomId));
+                    if (switchRoomListenerMap.containsKey(currentRoomId)) {
+                        switchRoomListenerMap.get(currentRoomId).joinRoom();
+                        Logger.e("==================joinRoom:" + currentRoomId);
                     }
                 }
-                Logger.e("==================选中了第几个：" + position + ",current:" + currentFragment);
+                Logger.d("==================end选中了第几个：" + position + ",current:" + currentRoomId);
             }
 
             @Override
@@ -71,19 +74,13 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
                 super.onPageScrollStateChanged(state);
             }
         });
-        // 第一次进入非选中第一页时onPageSelected获得不了fragment
-        getSupportFragmentManager().addFragmentOnAttachListener((fragmentManager, fragment) -> {
-            Logger.e("==========" + fragmentManager.getFragments().size() + "  " + fragment.getTag());
-            if (mCurrentFragment == null) {
-                mCurrentFragment = (AbsRoomFragment) fragment;
-                switchRoom(mRoomAdapter.getItemData(mCurrentPosition));
-            }
-        });
 
-        mRoomAdapter = new RoomVPAdapter<String>(this);
+        mRoomAdapter = new RoomVPAdapter(this);
         mViewPager.setAdapter(mRoomAdapter);
-        mRoomAdapter.setData(loadData());
-        mViewPager.setCurrentItem(getCurrentItem(), false);
+        List<String> roomIds = loadData();
+        mRoomAdapter.setData(roomIds);
+        mCurrentPosition = getCurrentItem();
+        mViewPager.setCurrentItem(mCurrentPosition, false);
 
         // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
         int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
@@ -108,35 +105,29 @@ public abstract class AbsRoomActivity<T> extends BaseActivity {
     // 当前页的位置
     protected abstract int getCurrentItem();
 
-    //当前页面的fragment
-    protected Fragment getCurrentFragment() {
-        return mCurrentFragment;
-    }
-
     // 返回要初始化的Fragment
-    protected abstract Fragment getFragment();
+    protected abstract Fragment getFragment(String roomId);
 
     // 加载数据
     protected abstract List<String> loadData();
 
-    // 切换房间，先退出上个房间，根据id查询当前房间数据，再切换房间
-    protected abstract void switchRoom(String roomId);
-
-    //加载房间之前需要先处理
-
-    // 处理完数据，把数据放到fragment中
-    public void joinRoom(T t) {
-        if (mCurrentFragment != null) {
-            mCurrentFragment.joinRoom(t);
-        }
-    }
-
     @Override
     public void onBackPressed() {
-        if (mCurrentFragment != null) {
-            mCurrentFragment.onBackPressed();
+        if (switchRoomListenerMap.containsKey(currentRoomId)) {
+            switchRoomListenerMap.get(currentRoomId).onBackPressed();
         } else {
             super.onBackPressed();
         }
     }
+
+    public void addSwitchRoomListener(String roomId, SwitchRoomListener switchRoomListener) {
+        switchRoomListenerMap.put(roomId, switchRoomListener);
+        Logger.e("=================addSwitchRoomListener");
+    }
+
+    public void removeSwitchRoomListener(String roomId) {
+        switchRoomListenerMap.remove(roomId);
+        Logger.e("=================removeSwitchRoomListener");
+    }
+
 }

@@ -31,7 +31,7 @@ import io.rong.imlib.model.Message;
  */
 public class RadioRoomMiniManager implements RadioRoomListener {
 
-    public static final String TAG = "RadioRoomMiniManager";
+    private static final String TAG = "RadioRoomMiniManager";
     private View miniWindows;
     private WaveView waveView;
     private ImageView bgView;
@@ -139,12 +139,11 @@ public class RadioRoomMiniManager implements RadioRoomListener {
                     .setDesktopShow(true)
                     .setViewStateListener(viewStateListener)
                     .setPermissionListener(permissionListener)
-                    .setFilter(false, RadioRoomActivity.class)
+//                    .setFilter(false, RadioRoomActivity.class)
                     .build();
 
             miniWindows.setOnClickListener(v -> {
                 RadioEventHelper.getInstance().removeRadioEventListener(this);
-                FloatWindow.destroy(TAG);
                 // TODO 打开电台房
                 context.startActivity(intent);
             });

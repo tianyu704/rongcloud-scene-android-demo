@@ -1,0 +1,17 @@
+package cn.rong.combusis.ui.room;
+
+/**
+ * @author gyn
+ * @date 2021/10/15
+ */
+public interface SwitchRoomListener {
+    void joinRoom();
+
+    void destroyRoom();
+
+    void onBackPressed();
+
+    void addSwitchRoomListener();
+
+    void removeSwitchRoomListener();
+}
