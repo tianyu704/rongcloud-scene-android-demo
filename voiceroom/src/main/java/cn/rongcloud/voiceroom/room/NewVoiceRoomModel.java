@@ -33,7 +33,6 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
-import cn.rongcloud.rtc.api.RCRTCAudioMixer;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -921,7 +920,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     public void enterSeatIfAvailable() {
         RCVoiceRoomEngine.getInstance()
-                .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+                .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.INSTANCE.getUserId(), null);
         int availableIndex = getAvailableIndex();
         if (availableIndex > 0) {
             RCVoiceRoomEngine
@@ -977,7 +976,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     public void refuseInvite(String userId) {
         RCVoiceRoomEngine.getInstance()
-                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId(), null);
     }
 
     /**

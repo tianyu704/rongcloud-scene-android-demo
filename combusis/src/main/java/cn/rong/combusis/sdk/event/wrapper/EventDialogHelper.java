@@ -13,8 +13,8 @@ import com.kit.wapper.IResultBack;
 import java.lang.ref.WeakReference;
 
 import cn.rong.combusis.VRCenterDialog;
-import cn.rongcloud.voiceroom.api.PKState;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rongcloud.voiceroom.model.PKResponse;
 import io.rong.imlib.model.UserInfo;
 
 
@@ -135,7 +135,7 @@ public class EventDialogHelper {
             }
             if (l < 1000) {
                 dismissDialog();
-                VoiceRoomApi.getApi().responsePKInvitation(roomId, userId, PKState.ignore, null);
+                VoiceRoomApi.getApi().responsePKInvitation(roomId, userId, PKResponse.ignore, null);
             }
         }
 

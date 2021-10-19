@@ -355,7 +355,8 @@ class VoiceRoomModel @Inject constructor(
                     }?.let { model ->
                         model.isAdmin = isAdmin
                     }
-                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "")
+                    RCVoiceRoomEngine.getInstance()
+                        .notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "", null)
                 }
                 return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
@@ -385,7 +386,7 @@ class VoiceRoomModel @Inject constructor(
             ).doOnSuccess {
                 refreshRoomInfo()
                 RCVoiceRoomEngine.getInstance()
-                    .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, backgroundUrl)
+                    .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, backgroundUrl, null)
             }.map {
                 return@map it.code == ApiConstant.REQUEST_SUCCESS_CODE
             }
@@ -497,7 +498,7 @@ class VoiceRoomModel @Inject constructor(
     fun setAllSeatMute(isMuteAll: Boolean): Completable {
         return Completable.create { emitter ->
             currentUIRoomInfo.rcRoomInfo?.let {
-                RCVoiceRoomEngine.getInstance().muteOtherSeats(isMuteAll)
+                RCVoiceRoomEngine.getInstance().muteOtherSeats(isMuteAll, null)
                 pushRoomSettingToServer(applyAllLockMic = isMuteAll)
                 emitter.onComplete()
             } ?: emitter.onError(Throwable("state error"))
@@ -508,7 +509,7 @@ class VoiceRoomModel @Inject constructor(
     fun setAllSeatLock(isLockAll: Boolean): Completable {
         return Completable.create { emitter ->
             currentUIRoomInfo.rcRoomInfo?.let {
-                RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll)
+                RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll, null)
                 pushRoomSettingToServer(applyAllLockSeat = isLockAll)
                 emitter.onComplete()
             } ?: emitter.onError(Throwable("state error"))

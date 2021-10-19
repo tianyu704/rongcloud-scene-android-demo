@@ -10,9 +10,9 @@ import com.kit.wapper.IResultBack;
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
-import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
+import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class VoiceRoomApi implements Api {
@@ -53,7 +53,7 @@ public class VoiceRoomApi implements Api {
      */
     @Override
     public void notifyRoom(String name, String content) {
-        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(name, content);
+        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(name, content, null);
     }
 
     /**
@@ -104,13 +104,13 @@ public class VoiceRoomApi implements Api {
 
     @Override
     public void lockAll(boolean locked) {
-        RCVoiceRoomEngine.getInstance().lockOtherSeats(locked);
+        RCVoiceRoomEngine.getInstance().lockOtherSeats(locked, null);
         KToast.show(locked ? "全麦锁定成功" : "全麦解锁成功");
     }
 
     @Override
     public void muteAll(boolean mute) {
-        RCVoiceRoomEngine.getInstance().muteOtherSeats(mute);
+        RCVoiceRoomEngine.getInstance().muteOtherSeats(mute, null);
         KToast.show(mute ? "全麦静音成功" : "全麦取消静音成功");
     }
 
@@ -321,8 +321,8 @@ public class VoiceRoomApi implements Api {
     }
 
     @Override
-    public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKState pkState, IResultBack<Boolean> resultBack) {
-        String action = (pkState == PKState.accept ? "同意" : pkState == PKState.reject ? "拒绝" : "忽略") + "K邀请";
+    public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKResponse pkState, IResultBack<Boolean> resultBack) {
+        String action = (pkState == PKResponse.accept ? "同意" : pkState == PKResponse.reject ? "拒绝" : "忽略") + "K邀请";
         RCVoiceRoomEngine.getInstance().responsePKInvitation(
                 inviterRoomId,
                 inviterUserId,

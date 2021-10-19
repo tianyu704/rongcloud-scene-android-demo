@@ -3,7 +3,7 @@ package cn.rong.combusis.sdk;
 import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
-import cn.rongcloud.voiceroom.api.PKState;
+import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 /**
@@ -213,7 +213,7 @@ public interface Api {
      * @param pkState       pk邀请的响应状态
      * @param resultBack    结果回调
      */
-    void responsePKInvitation(String inviterRoomId, String inviterUserId, PKState pkState, IResultBack<Boolean> resultBack);
+    void responsePKInvitation(String inviterRoomId, String inviterUserId, PKResponse pkState, IResultBack<Boolean> resultBack);
 
     /**
      * 屏蔽PK对象的语音

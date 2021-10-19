@@ -453,7 +453,7 @@ class VoiceRoomPresenter @Inject constructor(
 
     fun closeRoom() {
         view.showWaitingDialog()
-        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "")
+        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null)
         VoiceRoomNetManager
             .aRoomApi
             .deleteRoom(roomId)
@@ -585,12 +585,12 @@ class VoiceRoomPresenter @Inject constructor(
 
     fun refuseInvite(userId: String) {
         RCVoiceRoomEngine.getInstance()
-            .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.getUserId())
+            .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.getUserId(), null)
     }
 
     fun enterSeatIfAvailable() {
         RCVoiceRoomEngine.getInstance()
-            .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.getUserId())
+            .notifyVoiceRoom(EVENT_AGREE_MANAGE_PICK, AccountStore.getUserId(), null)
         val availableIndex = roomModel.getAvailableIndex()
         if (availableIndex > 0) {
             RCVoiceRoomEngine

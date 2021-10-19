@@ -30,7 +30,7 @@ import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.api.PKState;
+import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
 import cn.rongcloud.voiceroom.pk.widget.IPK;
@@ -213,11 +213,11 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
                 // 对方手动结束pk
                 handlePKStop();
             }
-        } else if (args[0] instanceof PKState) {
-            PKState pkState = (PKState) args[0];
-            if (pkState == PKState.reject) {
+        } else if (args[0] instanceof PKResponse) {
+            PKResponse pkState = (PKResponse) args[0];
+            if (pkState == PKResponse.reject) {
                 KToast.show("您的PK邀请被拒绝");
-            } else if (pkState == PKState.ignore) {
+            } else if (pkState == PKResponse.ignore) {
                 KToast.show("您的PK邀请被忽略");
             }
         }
