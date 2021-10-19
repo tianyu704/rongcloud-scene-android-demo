@@ -119,6 +119,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                     }
                 } else {
                     mView.dismissLoading();
+                    if (result.getCode()==30001){
+                        //房间不存在了
+                        mView.showFinishView();
+                        leaveRoom(true,false);
+                    }
                 }
             }
 

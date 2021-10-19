@@ -66,4 +66,6 @@ public interface RadioRoomView extends IBaseView {
     void showMusicDialog();
 
     void showRoomCloseDialog();
+
+    void showFinishView();
 }

@@ -92,7 +92,7 @@ public class LoadTag implements ILoadTag {
         try {
             if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
-                dialog = null;
+//                dialog = null;
             }
         } catch (Exception e) {
             e.printStackTrace();

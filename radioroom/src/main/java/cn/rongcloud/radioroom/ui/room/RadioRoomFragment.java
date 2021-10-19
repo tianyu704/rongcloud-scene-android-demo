@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -63,7 +65,7 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> implements
         RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener,
-        MemberListFragment.OnClickUserListener {
+        MemberListFragment.OnClickUserListener, View.OnClickListener {
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
@@ -86,6 +88,10 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
     private String mRoomId;
+
+    private ConstraintLayout clVoiceRoomView;
+    private RelativeLayout rlRoomFinishedId;
+    private Button btnGoBackList;
 
     public static Fragment getInstance(String roomId) {
         Bundle bundle = new Bundle();
@@ -111,7 +117,9 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
         mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
-
+        clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
+        rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
+        btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mRoomTitleBar.getLayoutParams();
@@ -152,6 +160,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void initListener() {
+        btnGoBackList.setOnClickListener(this::onClick);
         super.initListener();
     }
 
@@ -169,6 +178,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
      */
     @Override
     public void setRoomData(VoiceRoomBean voiceRoomBean, RoomOwnerType roomOwnerType) {
+        clVoiceRoomView.setVisibility(View.VISIBLE);
+        rlRoomFinishedId.setVisibility(View.GONE);
         // 加载背景
         setRoomBackground(voiceRoomBean.getBackgroundUrl());
         // 设置title数据
@@ -365,6 +376,12 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         }).show();
     }
 
+    @Override
+    public void showFinishView() {
+        clVoiceRoomView.setVisibility(View.INVISIBLE);
+        rlRoomFinishedId.setVisibility(View.VISIBLE);
+    }
+
     /**
      * 点击右上角菜单按钮
      */
@@ -421,6 +438,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     @Override
     public void destroyRoom() {
 //        Logger.e("===================destroyRoom" + mRoomId);
+        clVoiceRoomView.setVisibility(View.INVISIBLE);
+        rlRoomFinishedId.setVisibility(View.GONE);
         present.leaveRoom(true, false);
     }
 
@@ -495,5 +514,13 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
             return;
         }
         present.getUserInfo(user.getUserId());
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btn_go_back_list) {
+            //直接退出当前房间
+            present.leaveRoom(false,false);
+        }
     }
 }

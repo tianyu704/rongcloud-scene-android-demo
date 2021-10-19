@@ -114,4 +114,6 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
             }
         });
     }
+
+
 }

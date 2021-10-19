@@ -4,7 +4,10 @@ import android.content.Context;
 
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
+import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
+
+import java.util.ArrayList;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -37,7 +40,7 @@ public class RoomListAdapter extends RcySAdapter<VoiceRoomBean, RcyHolder> {
         holder.setVisible(R.id.iv_room_locked, voiceRoomBean.isPrivate());
         holder.itemView.setOnClickListener(v -> {
             if (mOnItemClickListener != null) {
-                mOnItemClickListener.clickItem(voiceRoomBean, position,false);
+                mOnItemClickListener.clickItem(voiceRoomBean, position,false,getData());
             }
         });
     }

@@ -9,6 +9,7 @@ import com.basis.ui.ListFragment;
 import com.bcq.refresh.XRecyclerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.rong.combusis.R;
@@ -29,7 +30,6 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     private int mCurrentPage = 1;
     private XRecyclerView mRoomList;
     private CreateRoomDialog mCreateRoomDialog;
-    private ArrayList<String> mRoomIdList = new ArrayList<>();
 
     private ActivityResultLauncher mLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result != null && result.getData() != null && result.getData().getData() != null && mCreateRoomDialog != null) {
@@ -98,27 +98,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     }
 
     @Override
-    public List<VoiceRoomBean> onPreSetData(List<VoiceRoomBean> netData) {
-        mRoomIdList.clear();
-        if (netData != null && netData.size() > 0) {
-            for (int i = 0; i < netData.size(); i++) {
-                mRoomIdList.add(netData.get(i).getRoomId());
-            }
-        }
-        return super.onPreSetData(netData);
-    }
-
-    public ArrayList<String> getRoomIdList() {
-        return mRoomIdList;
-    }
-
-    @Override
     public void onCreateSuccess(VoiceRoomBean voiceRoomBean) {
         mCreateRoomDialog.dismiss();
-        mRoomIdList.add(0, voiceRoomBean.getRoomId());
         mAdapter.getData().add(0, voiceRoomBean);
         mAdapter.notifyItemInserted(0);
-        clickItem(voiceRoomBean, 0, true);
+        clickItem(voiceRoomBean, 0, true, Arrays.asList(voiceRoomBean));
     }
 
     @Override

@@ -26,6 +26,7 @@ import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
@@ -156,13 +157,18 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     @Override
     public void onDestroy() {
-        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(null);
+        EventHelper.helper().unregeister();
         RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this);
         super.onDestroy();
     }
 
+    /**
+     * 初始化
+     *
+     * @param roomId
+     * @param isCreate
+     */
     public void init(String roomId, boolean isCreate) {
-        initListener(roomId);
         // TODO 请求数据
         getRoomInfo(roomId, isCreate);
     }
@@ -179,17 +185,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                     if (roomBean != null) {
                         mVoiceRoomBean = roomBean;
-
-                        if (mVoiceRoomBean.isStop()) {
-                            mView.dismissLoading();
-                            // TODO 提示直播已经结束
-
-                        } else {
-                            leaveRoom(roomId, isCreate);
-                        }
+                        leaveRoom(roomId, isCreate);
                     }
                 } else {
                     mView.dismissLoading();
+                    if (result.getCode() == 30001) {
+                        //房间不存在了
+                        mView.showFinishView();
+                        leaveRoom(roomId, isCreate);
+                    }
                 }
             }
 
@@ -223,6 +227,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     }
 
     private void joinRoom(String roomId, boolean isCreate) {
+        initListener(roomId);
         if (isCreate) {
             RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
             rcVoiceRoomInfo.setRoomName(mVoiceRoomBean.getRoomName());
@@ -234,7 +239,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 @Override
                 public void onSuccess() {
                     Logger.e("==============createAndJoinRoom onSuccess");
-//                    joinRoom(mVoiceRoomBean);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -250,7 +254,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 @Override
                 public void onSuccess() {
                     Logger.e("==============joinRoom onSuccess");
-//                    joinRoom(mVoiceRoomBean);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -375,7 +378,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void initListener(String roomId) {
         //设置界面监听
-//        RCVoiceRoomEngine.getInstance().setVoiceRoomEventListener(newVoiceRoomModel);
         EventHelper.helper().regeister(roomId, newVoiceRoomModel);
         RCVoiceRoomEngine.getInstance().addMessageReceiveListener(this);
         setObSeatListChange();
@@ -497,7 +499,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             });
         } else {
             //不在麦位上
-            requestSeat(position);
+            requestSeat(position + 1);
         }
     }
 
@@ -997,6 +999,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 调用离开房间
      */
     public void leaveRoom() {
+        mView.showLoading("");
         MusicManager.get().stopPlayMusic();
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
 
@@ -1104,7 +1107,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 切换房间的时候，对之前房间的操作
      */
     public void leaveCurrentRoom() {
-        if (messageDisposable != null && !messageDisposable.isDisposed()) {
+        if (messageDisposable != null) {
+            Log.e(TAG, "leaveCurrentRoom:");
             messageDisposable.dispose();
         }
     }

@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.basis.net.LoadTag;
 import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.UiUtils;
@@ -29,6 +30,8 @@ public abstract class AbsRoomActivity extends BaseActivity {
     private int bottomMargin = 0;
     private HashMap<String, SwitchRoomListener> switchRoomListenerMap = new HashMap<>();
     private String currentRoomId;
+
+    private LoadTag mLoadTag;
 
     @Override
     public int setLayoutId() {
@@ -110,6 +113,8 @@ public abstract class AbsRoomActivity extends BaseActivity {
 
     // 加载数据
     protected abstract List<String> loadData();
+
+
 
     @Override
     public void onBackPressed() {

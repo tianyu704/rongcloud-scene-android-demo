@@ -8,6 +8,8 @@ import com.basis.mvp.BasePresenter;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
@@ -29,7 +31,7 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
     private InputPasswordDialog inputPasswordDialog;
 
     @Override
-    public void clickItem(VoiceRoomBean item, int position ,boolean isCreate) {
+    public void clickItem(VoiceRoomBean item, int position , boolean isCreate, List<VoiceRoomBean> voiceRoomBeans) {
         if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
             ArrayList list = new ArrayList();
             list.add(item.getRoomId());
@@ -55,7 +57,13 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
             });
             inputPasswordDialog.show();
         } else {
-            RadioRoomActivity.startActivity(getActivity(), getRoomIdList(), position);
+            ArrayList<String> list = new ArrayList<>();
+            for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
+                if (!voiceRoomBean.getCreateUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                    list.add(voiceRoomBean.getRoomId());
+                }
+            }
+            RadioRoomActivity.startActivity(getActivity(), list, position);
         }
     }
 

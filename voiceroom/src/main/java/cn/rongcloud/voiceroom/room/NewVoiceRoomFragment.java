@@ -11,11 +11,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -26,6 +29,7 @@ import com.basis.UIStack;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.base.BaseActivity;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -47,6 +51,7 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
@@ -68,8 +73,6 @@ import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.VoiceRoomMiniManager;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.pk.IPKState;
 import cn.rongcloud.voiceroom.pk.PKStateManager;
@@ -93,7 +96,8 @@ import kotlin.jvm.functions.Function2;
  */
 public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
-        RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener {
+        RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
+        , View.OnClickListener {
     //    private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
@@ -138,6 +142,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             startActivity(requireActivity().getIntent());
         }
     };
+    private ConstraintLayout clVoiceRoomView;
+    private RelativeLayout rlRoomFinishedId;
+    private Button btnGoBackList;
 
     @Override
     public int setLayoutId() {
@@ -153,10 +160,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         return fragment;
     }
 
+
     @Override
     public void init() {
         mRoomId = getArguments().getString(ROOM_ID);
         isCreate = getArguments().getBoolean(NewVoiceRoomActivity.ISCREATE);
+        clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
+        rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
+        btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
 
         mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
@@ -190,6 +201,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
+        VoiceRoomProvider.provider().getAsyn(mRoomId, new IResultBack<VoiceRoomBean>() {
+            @Override
+            public void onResult(VoiceRoomBean voiceRoomBean) {
+                setRoomBackground(voiceRoomBean.getBackgroundUrl());
+            }
+        });
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
 
@@ -297,7 +314,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             //点击空座位 的时候
             present.enterSeatViewer(position);
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-            if (seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+            if (!TextUtils.isEmpty(seatModel.getUserId()) && seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                 // 点击自己头像
                 present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
             } else {
@@ -342,7 +359,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void initListener() {
-
+        super.initListener();
+        btnGoBackList.setOnClickListener(this::onClick);
     }
 
     private PKView pkView;
@@ -350,6 +368,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void joinRoom() {
+        super.joinRoom();
         present.init(mRoomId, isCreate);
         // init pk
         initPk();
@@ -392,18 +411,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void onBackPressed() {
-        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
-            @Override
-            public void onSuccess() {
-                Log.d(TAG, "onSuccess: ");
-                finish();
-            }
-
-            @Override
-            public void onError(int i, String s) {
-                Log.d(TAG, "onError: ");
-            }
-        });
+        clickMenu();
     }
 
     @Override
@@ -453,7 +461,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void setRoomData(VoiceRoomBean voiceRoomBean) {
-
+        clVoiceRoomView.setVisibility(View.VISIBLE);
+        rlRoomFinishedId.setVisibility(View.GONE);
         // 加载背景
         ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, voiceRoomBean.getBackgroundUrl(), R.color.black);
         // 设置title数据
@@ -474,6 +483,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void destroyRoom() {
         //离开房间的时候
+        clVoiceRoomView.setVisibility(View.INVISIBLE);
+        rlRoomFinishedId.setVisibility(View.GONE);
         present.leaveCurrentRoom();
         // uninit pk
         unInitPk();
@@ -483,6 +494,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     public void onSpeakingStateChanged(boolean isSpeaking) {
         mRoomSeatView.setSpeaking(isSpeaking);
     }
+
 
     /**
      * 刷新当前房主信息Ui
@@ -915,6 +927,15 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mMusicDialog.show(getChildFragmentManager());
     }
 
+    /**
+     * 当前房间直播已经结束
+     */
+    @Override
+    public void showFinishView() {
+        clVoiceRoomView.setVisibility(View.INVISIBLE);
+        rlRoomFinishedId.setVisibility(View.VISIBLE);
+    }
+
 
     @Override
     public void setVoiceName(String name) {
@@ -931,4 +952,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         voiceRoomSeatsAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.btn_go_back_list) {
+            //直接退出当前房间
+            finish();
+        }
+    }
 }

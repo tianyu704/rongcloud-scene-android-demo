@@ -5,13 +5,16 @@ import android.text.TextUtils;
 import androidx.fragment.app.Fragment;
 
 import com.basis.mvp.BasePresenter;
+import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
 import cn.rongcloud.voiceroom.room.NewVoiceRoomActivity;
 import io.rong.imkit.picture.tools.ToastUtils;
@@ -29,7 +32,7 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
     private InputPasswordDialog inputPasswordDialog;
 
     @Override
-    public void clickItem(VoiceRoomBean item, int position,boolean isCreate) {
+    public void clickItem(VoiceRoomBean item, int position, boolean isCreate, List<VoiceRoomBean> voiceRoomBeans) {
         if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
             ArrayList list = new ArrayList();
             list.add(item.getRoomId());
@@ -55,7 +58,13 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
             });
             inputPasswordDialog.show();
         } else {
-            NewVoiceRoomActivity.startActivity(getActivity(), getRoomIdList(), position,false);
+            ArrayList<String> list = new ArrayList<>();
+            for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
+                if (!voiceRoomBean.getCreateUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                    list.add(voiceRoomBean.getRoomId());
+                }
+            }
+            NewVoiceRoomActivity.startActivity(getActivity(), list, position,false);
         }
     }
 

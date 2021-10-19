@@ -103,4 +103,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showUserSetting(Member member);
 
     void showMusicDialog();
+
+    void showFinishView();
 }
