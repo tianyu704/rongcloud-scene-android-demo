@@ -65,7 +65,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
                     currentRoomId = roomId;
                     Logger.d("==================joinRoom:" + switchRoomListenerMap.containsKey(currentRoomId));
                     if (switchRoomListenerMap.containsKey(currentRoomId)) {
-                        switchRoomListenerMap.get(currentRoomId).joinRoom();
+                        switchRoomListenerMap.get(currentRoomId).preJoinRoom();
                         Logger.e("==================joinRoom:" + currentRoomId);
                     }
                 }

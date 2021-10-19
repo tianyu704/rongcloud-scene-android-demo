@@ -44,7 +44,10 @@ public class VRApi {
      * 更改用户所属房间
      */
     public static String USER_ROOM_CHANGE = HOST + "user/change";
-
+    /**
+     * 检查当前用户所属房间
+     */
+    public static String USER_ROOM_CHECK = HOST + "user/check";
     /**
      * 文件上传
      */

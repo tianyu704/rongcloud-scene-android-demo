@@ -5,6 +5,8 @@ package cn.rong.combusis.ui.room;
  * @date 2021/10/15
  */
 public interface SwitchRoomListener {
+    void preJoinRoom();
+
     void joinRoom();
 
     void destroyRoom();

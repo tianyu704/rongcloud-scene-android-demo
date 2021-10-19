@@ -39,8 +39,11 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
     }
 
     @Override
-    public void joinRoom() {
-        isExecuteJoinRoom = true;
+    public void preJoinRoom() {
+        if (!isExecuteJoinRoom) {
+            isExecuteJoinRoom = true;
+            joinRoom();
+        }
     }
 
     @Override
@@ -50,13 +53,16 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
     }
 
     @Override
+    public void destroyRoom() {
+        isExecuteJoinRoom = false;
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         // viewPager2的onPageSelected，当从列表点击最后一个时，viewpager2选中最后一个时，会先执行onPageSelected，才执行fragment的onCreate,
         // 导致addSwitchRoomListener没执行，joinRoom就不会执行，这里判断一下没执行再执行一下。
-        if (!isExecuteJoinRoom) {
-            joinRoom();
-        }
+        preJoinRoom();
         Logger.d("==================================onResume:" + getTag());
     }
 
