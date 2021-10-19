@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.manager.AllBroadcastManager;
 
 /**
  * @author gyn
@@ -45,11 +46,11 @@ public class RoomTitleBar extends ConstraintLayout {
         mMenuButton = mRootView.findViewById(R.id.btn_menu);
     }
 
-    public void setOnMemberClickListener(View.OnClickListener v) {
+    public void setOnMemberClickListener(OnClickListener v) {
         mLeftView.setOnClickListener(v);
     }
 
-    public void setOnMenuClickListener(View.OnClickListener v) {
+    public void setOnMenuClickListener(OnClickListener v) {
         mMenuButton.setOnClickListener(v);
     }
 
@@ -77,7 +78,7 @@ public class RoomTitleBar extends ConstraintLayout {
     public void setDelay(int delay, boolean isShow) {
         if (isShow) {
             mDelayTextView.setVisibility(View.VISIBLE);
-            mDelayTextView.setText(String.valueOf(delay)+"ms");
+            mDelayTextView.setText(String.valueOf(delay) + "ms");
             int leftPicId;
             if (delay < 100) {
                 leftPicId = R.drawable.ic_room_delay_1;
@@ -92,4 +93,9 @@ public class RoomTitleBar extends ConstraintLayout {
         }
     }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        AllBroadcastManager.getInstance().removeListener();
+        super.onDetachedFromWindow();
+    }
 }

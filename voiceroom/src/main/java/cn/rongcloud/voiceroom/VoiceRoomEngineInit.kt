@@ -8,7 +8,6 @@ import android.app.Application
 import android.content.Context
 import android.os.Looper
 import android.util.Log
-import cn.rong.combusis.manager.RCChatRoomMessageManager
 import cn.rongcloud.annotation.AutoInit
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
@@ -40,7 +39,6 @@ class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
         } catch (e: Exception) {
             Log.e(TAG, "onInit: e = " + e)
         }
-        RCChatRoomMessageManager.registerMessageTypes()
         if (!AccountStore.getImToken().isNullOrEmpty()) {
             Log.e(TAG, "onInit: mToken= " + AccountStore.getImToken())
             android.os.Handler(Looper.getMainLooper()).postDelayed(object : Runnable {

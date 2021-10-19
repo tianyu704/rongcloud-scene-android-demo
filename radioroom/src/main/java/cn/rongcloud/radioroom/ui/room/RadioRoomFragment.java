@@ -166,7 +166,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void joinRoom() {
-//        Logger.e("===================joinRoom" + mRoomId);
         present.init(mRoomId);
     }
 
@@ -331,8 +330,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     }
 
     @Override
-    public void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members) {
-        mGiftFragment = new GiftFragment(roomId, createUserId, selectUserId, present);
+    public void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members) {
+        mGiftFragment = new GiftFragment(voiceRoomBean, selectUserId, present);
         mGiftFragment.refreshMember(members);
         mGiftFragment.show(getChildFragmentManager());
     }

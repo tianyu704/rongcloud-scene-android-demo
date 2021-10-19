@@ -139,11 +139,12 @@ public class RadioRoomMiniManager implements RadioRoomListener {
                     .setDesktopShow(true)
                     .setViewStateListener(viewStateListener)
                     .setPermissionListener(permissionListener)
-//                    .setFilter(false, RadioRoomActivity.class)
+                    .setFilter(false, RadioRoomActivity.class)
                     .build();
 
             miniWindows.setOnClickListener(v -> {
                 RadioEventHelper.getInstance().removeRadioEventListener(this);
+                close();
                 // TODO 打开电台房
                 context.startActivity(intent);
             });

@@ -53,7 +53,7 @@ public interface RadioRoomView extends IBaseView {
 
     void showShieldDialog(String roomId);
 
-    void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members);
+    void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members);
 
     void setGiftCount(Long count);
 

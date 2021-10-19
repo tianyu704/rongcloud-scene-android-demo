@@ -98,7 +98,7 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void refreshSeat();
 
-    void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members);
+    void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members);
 
     void showUserSetting(Member member);
 

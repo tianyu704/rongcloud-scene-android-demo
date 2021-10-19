@@ -8,17 +8,7 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.message.RCChatroomAdmin;
-import cn.rong.combusis.message.RCChatroomBarrage;
-import cn.rong.combusis.message.RCChatroomEnter;
-import cn.rong.combusis.message.RCChatroomGift;
-import cn.rong.combusis.message.RCChatroomGiftAll;
-import cn.rong.combusis.message.RCChatroomKickOut;
-import cn.rong.combusis.message.RCChatroomLike;
-import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
-import cn.rongcloud.messager.RCMessager;
-import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
 
 /**
  * @author gyn
@@ -37,16 +27,6 @@ public class RadioRoomActivity extends AbsRoomActivity {
 
     @Override
     protected void initRoom() {
-        RCMessager.getInstance().addMessageTypes(
-                RCChatroomEnter.class,
-                RCChatroomBarrage.class,
-                RCChatroomGift.class,
-                RCChatroomGiftAll.class,
-                RCChatroomLike.class,
-                RCChatroomAdmin.class,
-                RCChatroomKickOut.class,
-                RCFollowMsg.class,
-                RCChatRoomLeave.class);
     }
 
     @Override

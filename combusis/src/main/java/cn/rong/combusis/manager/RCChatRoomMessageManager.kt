@@ -26,22 +26,6 @@ object RCChatRoomMessageManager {
 
     private val messageSubject: PublishSubject<MessageWrapperModel> = PublishSubject.create()
 
-    fun registerMessageTypes() {
-        RongCoreClient.registerMessageType(
-            listOf(
-               RCChatroomEnter::class.java,
-               RCChatroomBarrage::class.java,
-               RCChatroomKickOut::class.java,
-               RCChatroomGift::class.java,
-               RCChatroomGiftAll::class.java,
-               RCChatroomAdmin::class.java,
-               RCChatroomSeats::class.java,
-               RCChatroomLike::class.java,
-               RCChatroomVoice::class.java
-            )
-        )
-    }
-
     fun onReceiveMessage(roomId: String, messageContent: MessageContent) {
         messageSubject.onNext(MessageWrapperModel(roomId, messageContent))
     }

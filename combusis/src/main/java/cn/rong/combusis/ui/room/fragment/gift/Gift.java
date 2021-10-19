@@ -15,12 +15,14 @@ public class Gift implements Serializable {
     private int icon;
     private String name;
     private int price;
+    private boolean isAllBroadcast;
 
-    public Gift(int index, @DrawableRes int icon, String name, int price) {
+    public Gift(int index, @DrawableRes int icon, String name, int price, boolean isAllBroadcast) {
         this.index = index;
         this.icon = icon;
         this.name = name;
         this.price = price;
+        this.isAllBroadcast = isAllBroadcast;
     }
 
     public Gift() {
@@ -57,6 +59,14 @@ public class Gift implements Serializable {
 
     public void setPrice(int price) {
         this.price = price;
+    }
+
+    public boolean isAllBroadcast() {
+        return isAllBroadcast;
+    }
+
+    public void setAllBroadcast(boolean allBroadcast) {
+        isAllBroadcast = allBroadcast;
     }
 
     @Override

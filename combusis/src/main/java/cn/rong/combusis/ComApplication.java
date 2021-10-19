@@ -11,6 +11,7 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.HashMap;
 import java.util.Map;
 
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
@@ -27,6 +28,7 @@ import cn.rong.combusis.message.RCChatroomUserBlock;
 import cn.rong.combusis.message.RCChatroomUserUnBan;
 import cn.rong.combusis.message.RCChatroomUserUnBlock;
 import cn.rong.combusis.message.RCChatroomVoice;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rongcloud.messager.RCMessager;
 import okhttp3.Headers;
 
@@ -92,7 +94,9 @@ public class ComApplication extends Application {
                 RCChatroomUserUnBlock.class,
                 RCChatroomLike.class,
                 RCChatroomVoice.class,
-                RCChatroomPK.class
+                RCChatroomPK.class,
+                RCAllBroadcastMessage.class,
+                RCFollowMsg.class
         );
     }
 }

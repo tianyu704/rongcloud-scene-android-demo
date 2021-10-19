@@ -6,4 +6,5 @@
     <dimen name="friend_item_height">64dp</dimen>
     <dimen name="create_voice_room_radius">25dp</dimen>
     <dimen name="dimen_room_padding">12dp</dimen>
+    <dimen name="dimen_5dp">5dp</dimen>
 </resources>

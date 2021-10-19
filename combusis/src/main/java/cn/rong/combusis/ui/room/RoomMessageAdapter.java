@@ -6,10 +6,10 @@ import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -157,6 +157,7 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
                 0
         );
         messageTextView.setCompoundDrawablePadding(0);
+        messageTextView.setBackgroundResource(R.drawable.bg_voice_room_message_item);
         if (message instanceof RCChatroomBarrage) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomBarrage) message).getUserName()), ((RCChatroomBarrage) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(((RCChatroomBarrage) message).getContent(), "", false, 0, 0));
@@ -173,14 +174,14 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGiftAll) message).getUserName()), ((RCChatroomGiftAll) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(String.format("全麦打赏 %s x%s", ((RCChatroomGiftAll) message).getGiftName(), ((RCChatroomGiftAll) message).getNumber()), "", false, 0, 0));
             updateRole(((RCChatroomGiftAll) message).getUserId(), messageTextView);
-            messageTextView.setBackground(context.getDrawable(R.drawable.bg_voice_room_gift_message_item));
+            messageTextView.setBackgroundResource(R.drawable.bg_voice_room_gift_message_item);
         } else if (message instanceof RCChatroomGift) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomGift) message).getUserName()), ((RCChatroomGift) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(" 送给 ", "", false, 0, 0));
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGift) message).getTargetName()), ((RCChatroomGift) message).getTargetId(), true, 0, 0));
             list.add(new MsgInfo(String.format(" %s x%s", ((RCChatroomGift) message).getGiftName(), ((RCChatroomGift) message).getNumber()), "", false, 0, 0));
             updateRole(((RCChatroomGift) message).getUserId(), messageTextView);
-            messageTextView.setBackground(context.getDrawable(R.drawable.bg_voice_room_gift_message_item));
+            messageTextView.setBackgroundResource(R.drawable.bg_voice_room_gift_message_item);
         } else if (message instanceof RCChatroomAdmin) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomAdmin) message).getUserName()), ((RCChatroomAdmin) message).getUserId(), true, 0, 0));
             if (((RCChatroomAdmin) message).isAdmin()) {
@@ -242,13 +243,14 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
                     public void onClick(@NonNull View widget) {
                         mOnClickMessageUserListener.clickMessageUser(finalInfo.getClickId());
                     }
+
+                    @Override
+                    public void updateDrawState(@NonNull TextPaint ds) {
+                        super.updateDrawState(ds);
+                        ds.setUnderlineText(false);
+                        ds.setColor(Color.parseColor("#78FFFFFF"));
+                    }
                 }, info.start, info.end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                style.setSpan(
-                        new ForegroundColorSpan(Color.parseColor("#78FFFFFF")),
-                        info.start,
-                        info.end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
             }
         }
         return style;

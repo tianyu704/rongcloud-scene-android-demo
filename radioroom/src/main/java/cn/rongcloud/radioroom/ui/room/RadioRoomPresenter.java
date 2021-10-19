@@ -688,7 +688,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
      */
     public void sendGift() {
-        mView.showSendGiftDialog(mRoomId, getCreateUserId(), getCreateUserId(), Arrays.asList(new Member().toMember(getCreateRoomUser())));
+        mView.showSendGiftDialog(mVoiceRoomBean, getCreateUserId(), Arrays.asList(new Member().toMember(getCreateRoomUser())));
     }
 
     /**
@@ -698,7 +698,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      */
     @Override
     public void clickSendGift(User user) {
-        mView.showSendGiftDialog(mRoomId, getCreateUserId(), user.getUserId(), Arrays.asList(new Member().toMember(user)));
+        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
     }
 
     @Override

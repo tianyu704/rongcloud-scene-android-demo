@@ -27,8 +27,11 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.utils.HandlerUtils;
+import cn.rong.combusis.manager.AllBroadcastManager;
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.widget.page.CustomerPageLayoutManager;
 import cn.rong.combusis.widget.page.PagerSnapHelper;
@@ -50,20 +53,18 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
     private AppCompatButton mBtnSend;
 
     private List<Gift> giftList = Arrays.asList(
-            new Gift(1, R.drawable.ic_present_0, "小心心", 1),
-            new Gift(2, R.drawable.ic_present_1, "话筒", 2),
-            new Gift(3, R.drawable.ic_present_2, "麦克风", 5),
-            new Gift(4, R.drawable.ic_present_3, "萌小鸡", 10),
-            new Gift(5, R.drawable.ic_present_4, "手柄", 20),
-            new Gift(6, R.drawable.ic_present_5, "奖杯", 50),
-            new Gift(7, R.drawable.ic_present_6, "火箭", 100),
-            new Gift(8, R.drawable.ic_present_7, "礼花", 200),
-            new Gift(9, R.drawable.ic_present_8, "玫瑰花", 10),
-            new Gift(10, R.drawable.ic_present_9, "吉他", 20)
+            new Gift(1, R.drawable.ic_present_0, "小心心", 1, false),
+            new Gift(2, R.drawable.ic_present_1, "话筒", 2, false),
+            new Gift(3, R.drawable.ic_present_2, "麦克风", 5, false),
+            new Gift(4, R.drawable.ic_present_3, "萌小鸡", 10, false),
+            new Gift(5, R.drawable.ic_present_4, "手柄", 20, false),
+            new Gift(6, R.drawable.ic_present_5, "奖杯", 50, false),
+            new Gift(7, R.drawable.ic_present_6, "火箭", 100, true),
+            new Gift(8, R.drawable.ic_present_7, "礼花", 200, true),
+            new Gift(9, R.drawable.ic_present_8, "玫瑰花", 10, false),
+            new Gift(10, R.drawable.ic_present_9, "吉他", 20, false)
     );
-
-    private String mRoomId;
-    private String mCreateUserId;
+    private VoiceRoomBean mVoiceRoomBean;
     private List<Member> mMembers;
     private HashMap<String, Member> mMembersMap = new HashMap<>();
     private List<String> mSelectUserIds = new ArrayList<>();
@@ -75,10 +76,9 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
     private CountDownLatch latch;
     private List<Member> successMembers = new ArrayList<>();
 
-    public GiftFragment(String roomId, String createUserId, String selectUserId, OnSendGiftListener onSendGiftListener) {
+    public GiftFragment(VoiceRoomBean voiceRoomBean, String selectUserId, OnSendGiftListener onSendGiftListener) {
         super(R.layout.fragment_gift);
-        this.mRoomId = roomId;
-        this.mCreateUserId = createUserId;
+        this.mVoiceRoomBean = voiceRoomBean;
         this.mOnSendGiftListener = onSendGiftListener;
         mSelectUserIds.clear();
         if (!TextUtils.isEmpty(selectUserId)) {
@@ -134,9 +134,9 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
             public void convert(RcyHolder holder, Member member, int position) {
                 ImageLoaderUtil.INSTANCE.loadImage(context, holder.getView(R.id.iv_member_head), member.getPortrait(), R.drawable.default_portrait);
                 String name = "观众";
-                if (TextUtils.equals(mCreateUserId, member.getUserId())) {
+                if (TextUtils.equals(mVoiceRoomBean.getCreateUserId(), member.getUserId())) {
                     name = "房主";
-                } else if (member.getSeatIndex() > 0&&member.getSeatIndex()<Integer.MAX_VALUE) {
+                } else if (member.getSeatIndex() > 0 && member.getSeatIndex() < Integer.MAX_VALUE) {
                     name = member.getSeatIndex() + "";
                 }
                 holder.setText(R.id.tv_member_name, name);
@@ -158,6 +158,7 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
                 holder.setImageResource(R.id.iv_present, gift.getIcon());
                 holder.setText(R.id.tv_present_name, gift.getName());
                 holder.setText(R.id.tv_present_price, gift.getPrice() + "");
+                holder.setVisible(R.id.tv_all_broadcast, gift.isAllBroadcast());
                 holder.itemView.setOnClickListener(v -> {
                     if (gift.equals(mCurrentGift)) {
                         mCurrentGift = null;
@@ -246,6 +247,7 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
         successMembers.clear();
         for (String userId : mSelectUserIds) {
             sendGift(userId);
+            sendGiftBroadcast(userId, isAll);
         }
         boolean finalIsAll = isAll;
         new Thread(() -> {
@@ -262,7 +264,7 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
 
     private void sendGift(String userId) {
         Map<String, Object> params = new OkParams()
-                .add("roomId", mRoomId)
+                .add("roomId", mVoiceRoomBean.getRoomId())
                 .add("giftId", mCurrentGift.getIndex())
                 .add("toUid", userId)
                 .add("num", mGiftNum)
@@ -282,6 +284,47 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
                 latch.countDown();
             }
         });
+    }
+
+    private void sendGiftBroadcast(String userId, boolean isAll) {
+        if (mCurrentGift.isAllBroadcast()) {
+            RCAllBroadcastMessage message = new RCAllBroadcastMessage();
+            message.setUserId(AccountStore.INSTANCE.getUserId());
+            message.setUserName(AccountStore.INSTANCE.getUserName());
+            if (!isAll) {
+                Member member = mMembersMap.get(userId);
+                message.setTargetId(member.getUserId());
+                message.setTargetName(member.getUserName());
+            } else {
+                message.setTargetId("");
+                message.setTargetName("");
+            }
+            message.setGiftCount(mGiftNum + "");
+            message.setGiftId(mCurrentGift.getIndex() + "");
+            message.setGiftValue(mCurrentGift.getPrice() + "");
+            message.setGiftName(mCurrentGift.getName());
+            message.setRoomId(mVoiceRoomBean.getRoomId());
+            message.setRoomType(mVoiceRoomBean.getRoomType() + "");
+            message.setIsPrivate(mVoiceRoomBean.getIsPrivate() + "");
+            Map<String, Object> params = new OkParams()
+                    .add("fromUserId", AccountStore.INSTANCE.getUserId())
+                    .add("objectName", "RC:RCGiftBroadcastMsg")
+                    .add("content", message.toString())
+                    .build();
+            OkApi.post(VRApi.GIFT_BROADCAST, params, new WrapperCallBack() {
+                @Override
+                public void onResult(Wrapper result) {
+                    if (result.ok()) {
+                        AllBroadcastManager.getInstance().addMessage(message);
+                    }
+                }
+
+                @Override
+                public void onError(int code, String msg) {
+                    super.onError(code, msg);
+                }
+            });
+        }
     }
 
     /**

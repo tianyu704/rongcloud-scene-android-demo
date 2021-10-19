@@ -172,4 +172,9 @@ public class VRApi {
     public static String getGiftList(String roomId) {
         return HOST + "mic/room/" + roomId + "/gift/list";
     }
+
+    /**
+     * 发送全服广播的礼物
+     */
+    public static final String GIFT_BROADCAST = HOST + "mic/room/message/broadcast";
 }

@@ -39,7 +39,9 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
@@ -476,6 +478,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             getGiftCount();
+                        }
+                        if (messageContent instanceof RCAllBroadcastMessage) {
+                            AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
                         }
                         Log.e("TAG", "accept: " + messageContent);
                     }
@@ -928,8 +933,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 return o1.getSeatIndex() - o2.getSeatIndex();
             }
         });
-        mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(),
-                mVoiceRoomBean.getCreateUserId(), "", memberArrayList);
+        mView.showSendGiftDialog(mVoiceRoomBean, "", memberArrayList);
     }
 
     /**
@@ -939,7 +943,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public void clickSendGift(User user) {
-        mView.showSendGiftDialog(mVoiceRoomBean.getRoomId(), mVoiceRoomBean.getCreateUserId(), user.getUserId(), Arrays.asList(new Member().toMember(user)));
+        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
     }
 
     /**

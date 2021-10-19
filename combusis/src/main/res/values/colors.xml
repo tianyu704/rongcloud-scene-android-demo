@@ -25,4 +25,6 @@
     <color name="ActionbarColor">@color/colorPrimary</color>
 
     <color name="color_red">#EF499A</color>
+
+    <color name="bg_broadcast">#493C98</color>
 </resources>

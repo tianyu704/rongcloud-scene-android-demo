@@ -8,6 +8,9 @@ import com.kit.utils.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.common.utils.JsonUtils;
+import cn.rong.combusis.manager.AllBroadcastManager;
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.messager.SendMessageCallback;
@@ -110,6 +113,11 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
 
     @Override
     public void onMessageReceived(Message message) {
+        Logger.e("========================" + message.getContent() + JsonUtils.toJson(message.getContent()));
+        if (message.getContent() instanceof RCAllBroadcastMessage) {
+            AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) message.getContent());
+            return;
+        }
         messages.add(message);
         for (RCRadioEventListener l : listeners) {
             l.onMessageReceived(message);

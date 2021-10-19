@@ -5,10 +5,10 @@ import android.os.Parcel;
 import com.google.gson.annotations.SerializedName;
 import com.kit.cache.GsonUtil;
 
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 
 import cn.rong.combusis.common.utils.JsonUtils;
-import cn.rong.combusis.provider.user.User;
 import io.rong.imlib.MessageTag;
 import io.rong.imlib.model.MessageContent;
 
@@ -32,18 +32,17 @@ public class RCFollowMsg extends MessageContent {
     };
     private static final String TAG = "RCFollowMsg";
     @SerializedName("_userInfo")
-    private User user;
+    private User userInfoSelf;
     @SerializedName("_targetUserInfo")
-    private User targetUser;
+    private User targetUserInfo;
 
     public RCFollowMsg(byte[] data) {
         super(data);
         String jsonStr = new String(data, StandardCharsets.UTF_8);
-
-        RCFollowMsg temp = JsonUtils.fromJson(jsonStr, RCFollowMsg.class);
-        if (temp != null) {
-            this.user = temp.user;
-            this.targetUser = temp.targetUser;
+        RCFollowMsg msg = JsonUtils.fromJson(jsonStr, RCFollowMsg.class);
+        if (msg != null) {
+            userInfoSelf = msg.userInfoSelf;
+            targetUserInfo = msg.targetUserInfo;
         }
     }
 
@@ -51,8 +50,7 @@ public class RCFollowMsg extends MessageContent {
     }
 
     protected RCFollowMsg(Parcel in) {
-        this.user = GsonUtil.json2Obj(in.readString(), User.class);
-        this.targetUser = GsonUtil.json2Obj(in.readString(), User.class);
+        readFromParcel(in);
     }
 
     @Override
@@ -60,21 +58,6 @@ public class RCFollowMsg extends MessageContent {
         return JsonUtils.toJson(this).getBytes(StandardCharsets.UTF_8);
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getTargetUser() {
-        return targetUser;
-    }
-
-    public void setTargetUser(User targetUser) {
-        this.targetUser = targetUser;
-    }
 
     @Override
     public int describeContents() {
@@ -83,12 +66,88 @@ public class RCFollowMsg extends MessageContent {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(GsonUtil.obj2Json(this.user));
-        dest.writeString(GsonUtil.obj2Json(this.targetUser));
+        dest.writeString(GsonUtil.obj2Json(userInfoSelf));
+        dest.writeString(GsonUtil.obj2Json(targetUserInfo));
     }
 
     public void readFromParcel(Parcel source) {
-        this.user = GsonUtil.json2Obj(source.readString(), User.class);
-        this.targetUser = GsonUtil.json2Obj(source.readString(), User.class);
+        this.userInfoSelf = GsonUtil.json2Obj(source.readString(), User.class);
+        this.targetUserInfo = GsonUtil.json2Obj(source.readString(), User.class);
+    }
+
+    public User getUserInfoSelf() {
+        return userInfoSelf;
+    }
+
+    public void setUserInfoSelf(User userInfoSelf) {
+        this.userInfoSelf = userInfoSelf;
+    }
+
+    public cn.rong.combusis.provider.user.User getUser() {
+        return userInfoSelf.toUser();
+    }
+
+    public void setUser(cn.rong.combusis.provider.user.User user) {
+        this.userInfoSelf = new User();
+        userInfoSelf.setId(user.getUserId());
+        userInfoSelf.setName(user.getUserName());
+        userInfoSelf.setPortrait(user.getPortrait());
+    }
+
+    public cn.rong.combusis.provider.user.User getTargetUser() {
+        return targetUserInfo.toUser();
+    }
+
+    public void setTargetUser(cn.rong.combusis.provider.user.User user) {
+        this.targetUserInfo = new User();
+        targetUserInfo.setId(user.getUserId());
+        targetUserInfo.setName(user.getUserName());
+        targetUserInfo.setPortrait(user.getPortrait());
+    }
+
+    public User getTargetUserInfo() {
+        return targetUserInfo;
+    }
+
+    public void setTargetUserInfo(User targetUserInfo) {
+        this.targetUserInfo = targetUserInfo;
+    }
+
+    class User implements Serializable {
+        private String id;
+        private String name;
+        private String portrait;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getPortrait() {
+            return portrait;
+        }
+
+        public void setPortrait(String portrait) {
+            this.portrait = portrait;
+        }
+
+        public cn.rong.combusis.provider.user.User toUser() {
+            cn.rong.combusis.provider.user.User user = new cn.rong.combusis.provider.user.User();
+            user.setUserId(id);
+            user.setUserName(name);
+            user.setPortrait(portrait);
+            return user;
+        }
     }
 }

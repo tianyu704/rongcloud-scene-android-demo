@@ -905,8 +905,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     }
 
     @Override
-    public void showSendGiftDialog(String roomId, String createUserId, String selectUserId, List<Member> members) {
-        mGiftFragment = new GiftFragment(roomId, createUserId, selectUserId, present);
+    public void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members) {
+        mGiftFragment = new GiftFragment(voiceRoomBean, selectUserId, present);
         mGiftFragment.refreshMember(members);
         mGiftFragment.show(getChildFragmentManager());
     }
