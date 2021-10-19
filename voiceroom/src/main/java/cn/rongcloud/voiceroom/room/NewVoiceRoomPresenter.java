@@ -129,7 +129,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     private List<Shield> shields;
 
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
-    private List<Disposable> disposableList=new ArrayList<>();
+    private List<Disposable> disposableList = new ArrayList<>();
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -186,14 +186,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                     if (roomBean != null) {
                         mVoiceRoomBean = roomBean;
-                        leaveRoom(roomId, isCreate,true);
+                        leaveRoom(roomId, isCreate, true);
                     }
                 } else {
                     mView.dismissLoading();
                     if (result.getCode() == 30001) {
                         //房间不存在了
                         mView.showFinishView();
-                        leaveRoom(roomId, isCreate,false);
+                        leaveRoom(roomId, isCreate, false);
                     }
                 }
             }
@@ -205,14 +205,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         });
     }
 
-    private void leaveRoom(String roomId, boolean isCreate,boolean isExit) {
+    private void leaveRoom(String roomId, boolean isCreate, boolean isExit) {
         // 先退出上个房间
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
                 newVoiceRoomModel.changeUserRoom("");
-                if (isExit){
+                if (isExit) {
                     UIKit.postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -225,7 +225,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
-                if (isExit){
+                if (isExit) {
                     joinRoom(roomId, isCreate);
                 }
             }
@@ -347,15 +347,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void setCurrentRoom(VoiceRoomBean mVoiceRoomBean) {
         roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(mVoiceRoomBean);
-        // 房主上麦
-        if (roomOwnerType == RoomOwnerType.VOICE_OWNER) {
+        // 房主进入房间，如果不在麦位上那么自动上麦
+        if (roomOwnerType == RoomOwnerType.VOICE_OWNER && !newVoiceRoomModel.userInSeat()) {
             roomOwnerEnterSeat();
         }
         // 发送默认消息
         sendSystemMessage();
-
         //界面初始化成功的时候，要去请求网络
-        newVoiceRoomModel.getRoomInfo(getmVoiceRoomBean().getRoomId()).subscribe();
+        newVoiceRoomModel.getRoomInfo(mVoiceRoomBean.getRoomId()).subscribe();
+        //刷新房间信息
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
         //监听房间里面的人
         MemberCache.getInstance().getMemberList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<User>>() {
