@@ -767,7 +767,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         mView.hideSoftKeyboardAndIntput();
                         if (messageContent instanceof RCChatroomAdmin) {
                             //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
-                            RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "");
+                            RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_MANAGER_LIST_CHANGE, "", null);
                             MemberCache.getInstance().refreshAdminData(mVoiceRoomBean.getRoomId());
                         }
                         return null;
@@ -1032,7 +1032,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     public void closeRoom() {
         mView.showLoading("正在关闭房间");
-        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "");
+        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null);
         //先离开房间,离开以后，去删除房间
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
             @Override
@@ -1280,7 +1280,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 全麦锁座
      */
     private void lockOtherSeats(boolean isLockAll) {
-        RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll);
+        RCVoiceRoomEngine.getInstance().lockOtherSeats(isLockAll, null);
         if (isLockAll) {
             EToast.showToast("全部座位已锁定");
         } else {
@@ -1294,7 +1294,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param isMuteAll
      */
     private void setAllSeatLock(boolean isMuteAll) {
-        RCVoiceRoomEngine.getInstance().muteOtherSeats(isMuteAll);
+        RCVoiceRoomEngine.getInstance().muteOtherSeats(isMuteAll, null);
         if (isMuteAll) {
             EToast.showToast("全部麦位已静音");
         } else {
@@ -1413,7 +1413,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     mView.setRoomBackground(url);
                     //通知外部更改
                     RCVoiceRoomEngine.getInstance()
-                            .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, url);
+                            .notifyVoiceRoom(EVENT_BACKGROUND_CHANGE, url, null);
                     mView.showToast("设置成功");
                 } else {
                     mView.showToast("设置失败");

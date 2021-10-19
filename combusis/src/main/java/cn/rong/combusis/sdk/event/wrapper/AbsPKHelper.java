@@ -10,10 +10,10 @@ import cn.rong.combusis.EventBus;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rongcloud.voiceroom.api.PKState;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
+import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import io.rong.imlib.model.Message;
 
@@ -129,7 +129,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
             public void onResult(Boolean result) {
-                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKState.accept : PKState.reject, new RCVoiceRoomCallback() {
+                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKResponse.accept : PKResponse.reject, new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
                         EToast.showToastWithLag(TAG, result ? "同意PK成功" : "拒绝PK成功");
@@ -173,7 +173,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         IEventHelp.PKInvitee invitee = VoiceRoomApi.getApi().getPKInvitee();
         //判断是否是当前正在邀请的信息
         if (invitee.inviteeRoomId.equals(roomId) && invitee.inviteeId.equals(userId)) {
-            dispatchPKResponse(PKState.reject);
+            dispatchPKResponse(PKResponse.reject);
             //邀请被忽略 该邀请流程结束 释放被邀请信息
             VoiceRoomApi.getApi().releasePKInvitee();
         }
@@ -187,7 +187,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         IEventHelp.PKInvitee invitee = VoiceRoomApi.getApi().getPKInvitee();
         //判断是否是当前正在邀请的信息
         if (invitee.inviteeRoomId.equals(roomId) && invitee.inviteeId.equals(userId)) {
-            dispatchPKResponse(PKState.ignore);
+            dispatchPKResponse(PKResponse.ignore);
             //邀请被忽略 该邀请流程结束 释放被邀请信息
             VoiceRoomApi.getApi().releasePKInvitee();
         }
@@ -199,7 +199,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         EventBus.get().emit(EventBus.TAG.PK_STATE, current, extra);
     }
 
-    private void dispatchPKResponse(PKState pkState) {
+    private void dispatchPKResponse(PKResponse pkState) {
         EventBus.get().emit(EventBus.TAG.PK_RESPONSE, pkState);
     }
 }
