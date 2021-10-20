@@ -5,7 +5,6 @@ import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_ON_SEAT;
 import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_WAIT_FOR_SEAT;
 
 import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,7 +16,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
@@ -78,7 +76,6 @@ import cn.rongcloud.voiceroom.pk.PKStateManager;
 import cn.rongcloud.voiceroom.pk.StateUtil;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
-import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imlib.IRongCoreEnum;
@@ -317,14 +314,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
                 present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
-                if (mMemberSettingFragment == null) {
-                    mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
-                }
                 User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-                mMemberSettingFragment.setMemberIsOnSeat(true);
-                mMemberSettingFragment.setSeatPosition(position + 1);
-                mMemberSettingFragment.setMute(seatModel.isMute());
-                mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
+                Member member = new Member().toMember(user);
+                showUserSetting(member, seatModel);
             }
         }
     }
@@ -343,14 +335,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //弹窗设置弹窗
             // 点击别人头像
-            if (mMemberSettingFragment == null) {
-                mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
-            }
             User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-            mMemberSettingFragment.setMemberIsOnSeat(true);
-            mMemberSettingFragment.setSeatPosition(position + 1);
-            mMemberSettingFragment.setMute(seatModel.isMute());
-            mMemberSettingFragment.show(getChildFragmentManager(), user, present.getCreateUserId());
+            Member member = new Member().toMember(user);
+            showUserSetting(member, seatModel);
         }
     }
 
@@ -571,35 +558,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         });
     }
 
-    @Override
-    public void onJoinRoomSuccess() {
-
-    }
-
-    @Override
-    public void initRoleView(@NonNull UiRoomModel roomInfo) {
-
-    }
-
-    @Override
-    public void leaveRoomSuccess() {
-
-    }
-
-    @Override
-    public void onJoinNextRoom(boolean start) {
-
-    }
 
     @Override
     public void enterSeatSuccess() {
         showToast("上麦成功");
-    }
-
-
-    @Override
-    public void refreshOnlineUsersNumber(int onlineUsersNumber) {
-
     }
 
 
@@ -620,25 +582,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         refreshRoomOwner(uiSeatModelList.get(0));
     }
 
-    @Override
-    public void sendTextMessageSuccess(@NonNull String message) {
-
-    }
-
-    @Override
-    public void showChatRoomMessage(@NonNull MessageContent messageContent) {
-
-    }
-
-    @Override
-    public void showPickReceived(boolean isCreateReceive, @NonNull String userId) {
-
-    }
-
-    @Override
-    public void switchToAdminRole(boolean isAdmin, @NonNull UiRoomModel roomInfo) {
-
-    }
 
     @Override
     public void changeStatus(int status) {
@@ -668,15 +611,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         }
     }
 
-    @Override
-    public void showUnreadMessage(int count) {
-
-    }
-
-    @Override
-    public void showFov(@Nullable Point from) {
-
-    }
 
     /**
      * 显示撤销麦位申请的弹窗
@@ -695,15 +629,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         }
     }
 
-    @Override
-    public void showRoomClose() {
-
-    }
-
-    @Override
-    public void onMemberInfoChange() {
-
-    }
 
     @Override
     public void onNetworkStatus(int i) {
@@ -912,9 +837,17 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     }
 
     @Override
-    public void showUserSetting(Member member) {
+    public void showUserSetting(Member member, UiSeatModel uiSeatModel) {
         if (mMemberSettingFragment == null) {
             mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
+        }
+        if (uiSeatModel != null) {
+            //说明当前用户在麦位上
+            mMemberSettingFragment.setMemberIsOnSeat(uiSeatModel.getIndex() > -1);
+            mMemberSettingFragment.setSeatPosition(uiSeatModel.getIndex());
+            mMemberSettingFragment.setMute(uiSeatModel.isMute());
+        } else {
+            mMemberSettingFragment.setMemberIsOnSeat(false);
         }
         mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }

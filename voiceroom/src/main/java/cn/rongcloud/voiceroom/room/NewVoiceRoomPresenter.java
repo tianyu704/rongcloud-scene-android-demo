@@ -1475,7 +1475,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 if (result.ok()) {
                     List<Member> members = result.getList(Member.class);
                     if (members != null && members.size() > 0) {
-                        mView.showUserSetting(members.get(0));
+                        UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(members.get(0).getUserId());
+                        mView.showUserSetting(members.get(0),uiSeatModel);
                     }
                 }
             }
