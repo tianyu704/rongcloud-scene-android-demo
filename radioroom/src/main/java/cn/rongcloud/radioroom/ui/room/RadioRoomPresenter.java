@@ -1,6 +1,7 @@
 package cn.rongcloud.radioroom.ui.room;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
@@ -122,7 +123,18 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                     if (result.getCode()==30001){
                         //房间不存在了
                         mView.showFinishView();
-                        leaveRoom(true,false);
+                        removelistener();
+                        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                changeUserRoom("");
+                            }
+
+                            @Override
+                            public void onError(int code, String message) {
+
+                            }
+                        });
                     }
                 }
             }
@@ -163,6 +175,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
+                changeUserRoom("");
                 joinRoom();
             }
 
@@ -181,6 +194,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onSuccess() {
                 Logger.e("==============joinRoom onSuccess");
+                changeUserRoom(mRoomId);
                 // 房主上麦
                 if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
                     if (isInRoom) {
@@ -505,8 +519,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param isSwitchLeave 是否是上下滑动切换导致的离开房间，切换时有离开操作，所以不用再离开
      */
     public void leaveRoom(boolean isSwitchLeave, boolean isClose) {
-        MusicManager.get().stopPlayMusic();
-        RadioEventHelper.getInstance().unRegister();
+        removelistener();
         Logger.e("================llllllllllll");
         if (isSwitchLeave) {
             return;
@@ -515,6 +528,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
+                changeUserRoom("");
                 Logger.e("==============leaveRoom onSuccess");
                 if (isClose) {
                     deleteRoom();
@@ -532,6 +546,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 mView.showToast(message);
             }
         });
+    }
+
+    private void removelistener() {
+        MusicManager.get().stopPlayMusic();
+        RadioEventHelper.getInstance().unRegister();
     }
 
     /**
@@ -892,5 +911,20 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             contents.add(message.getContent());
         }
         mView.addAllToMessageList(contents, true);
+    }
+
+    //更改所属房间
+    public void changeUserRoom(String roomId){
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", roomId)
+                .build();
+        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()){
+                    Log.e("TAG", "changeUserRoom: "+result.getBody());
+                }
+            }
+        });
     }
 }

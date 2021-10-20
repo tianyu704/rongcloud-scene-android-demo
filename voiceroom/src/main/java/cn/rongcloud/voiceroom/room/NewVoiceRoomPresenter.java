@@ -127,7 +127,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     public int currentStatus = STATUS_NOT_ON_SEAT;
     private List<Shield> shields;
-    private Disposable messageDisposable;
+
+    //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
+    private List<Disposable> disposableList = new ArrayList<>();
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -184,14 +186,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                     if (roomBean != null) {
                         mVoiceRoomBean = roomBean;
-                        leaveRoom(roomId, isCreate);
+                        leaveRoom(roomId, isCreate, true);
                     }
                 } else {
                     mView.dismissLoading();
                     if (result.getCode() == 30001) {
                         //房间不存在了
                         mView.showFinishView();
-                        leaveRoom(roomId, isCreate);
+                        leaveRoom(roomId, isCreate, false);
                     }
                 }
             }
@@ -203,24 +205,29 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         });
     }
 
-    private void leaveRoom(String roomId, boolean isCreate) {
+    private void leaveRoom(String roomId, boolean isCreate, boolean isExit) {
         // 先退出上个房间
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
-                UIKit.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        joinRoom(roomId, isCreate);
-                    }
-                }, 1000);
+                newVoiceRoomModel.changeUserRoom("");
+                if (isExit) {
+                    UIKit.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            joinRoom(roomId, isCreate);
+                        }
+                    }, 1000);
+                }
             }
 
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============leaveRoom onError,code:" + code + ",message:" + message);
-                joinRoom(roomId, isCreate);
+                if (isExit) {
+                    joinRoom(roomId, isCreate);
+                }
             }
         });
     }
@@ -238,6 +245,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 @Override
                 public void onSuccess() {
                     Logger.e("==============createAndJoinRoom onSuccess");
+                    newVoiceRoomModel.changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -249,10 +257,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 }
             });
         } else {
-            RCVoiceRoomEngine.getInstance().joinRoom(mVoiceRoomBean.getRoomId(), new RCVoiceRoomCallback() {
+            RCVoiceRoomEngine.getInstance().joinRoom(roomId, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
                     Logger.e("==============joinRoom onSuccess");
+                    newVoiceRoomModel.changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -338,15 +347,15 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void setCurrentRoom(VoiceRoomBean mVoiceRoomBean) {
         roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(mVoiceRoomBean);
-        // 房主上麦
-        if (roomOwnerType == RoomOwnerType.VOICE_OWNER) {
+        // 房主进入房间，如果不在麦位上那么自动上麦
+        if (roomOwnerType == RoomOwnerType.VOICE_OWNER && !newVoiceRoomModel.userInSeat()) {
             roomOwnerEnterSeat();
         }
         // 发送默认消息
         sendSystemMessage();
-
         //界面初始化成功的时候，要去请求网络
-        newVoiceRoomModel.getRoomInfo(getmVoiceRoomBean().getRoomId()).subscribe();
+        newVoiceRoomModel.getRoomInfo(mVoiceRoomBean.getRoomId()).subscribe();
+        //刷新房间信息
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
         //监听房间里面的人
         MemberCache.getInstance().getMemberList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<User>>() {
@@ -391,7 +400,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 监听房间的信息
      */
     private void setObRoomInfoChange() {
-        addSubscription(newVoiceRoomModel.obRoomInfoChange()
+        disposableList.add(newVoiceRoomModel.obRoomInfoChange()
                 .subscribe(new Consumer<UiRoomModel>() {
                     @Override
                     public void accept(UiRoomModel uiRoomModel) throws Throwable {
@@ -418,7 +427,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 麦位信息改变监听
      */
     private void setObSeatInfoChange() {
-        addSubscription(newVoiceRoomModel.obSeatInfoChange().subscribe(new Consumer<UiSeatModel>() {
+        disposableList.add(newVoiceRoomModel.obSeatInfoChange().subscribe(new Consumer<UiSeatModel>() {
             @Override
             public void accept(UiSeatModel uiSeatModel) throws Throwable {
                 //根据位置去刷新波纹
@@ -451,7 +460,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * TODO 多次订阅导致了多次回调，导致消息重复
      */
     private void setObMessageListener() {
-        messageDisposable = RCChatRoomMessageManager.INSTANCE.obMessageReceiveByRoomId(mVoiceRoomBean.getRoomId())
+        disposableList.add(RCChatRoomMessageManager.INSTANCE.obMessageReceiveByRoomId(mVoiceRoomBean.getRoomId())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<MessageContent>() {
                     @Override
@@ -470,8 +479,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         }
                         Log.e("TAG", "accept: " + messageContent);
                     }
-                });
-        addSubscription(messageDisposable);
+                }));
     }
 
 
@@ -576,7 +584,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 监听麦位改变
      */
     private void setObSeatListChange() {
-        addSubscription(newVoiceRoomModel.obSeatListChange()
+        disposableList.add(newVoiceRoomModel.obSeatListChange()
                 .subscribe(new Consumer<List<UiSeatModel>>() {
                     @Override
                     public void accept(List<UiSeatModel> uiSeatModels) throws Throwable {
@@ -630,7 +638,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 监听房间的改变
      */
     private void setObRoomEventChange() {
-        addSubscription(newVoiceRoomModel.obRoomEventChange().subscribe(new Consumer<Pair<String, ArrayList<String>>>() {
+        disposableList.add(newVoiceRoomModel.obRoomEventChange().subscribe(new Consumer<Pair<String, ArrayList<String>>>() {
             @Override
             public void accept(Pair<String, ArrayList<String>> stringArrayListPair) throws Throwable {
                 switch (stringArrayListPair.first) {
@@ -1005,6 +1013,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             @Override
             public void onSuccess() {
                 Logger.e("==============leaveRoom onSuccess");
+                newVoiceRoomModel.changeUserRoom("");
                 mView.dismissLoading();
                 mView.finish();
             }
@@ -1030,6 +1039,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             public void onSuccess() {
                 // 房主关闭房间，调用删除房间接口
                 MusicManager.get().stopPlayMusic();
+                newVoiceRoomModel.changeUserRoom("");
                 OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
@@ -1106,10 +1116,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 切换房间的时候，对之前房间的操作
      */
     public void leaveCurrentRoom() {
-        if (messageDisposable != null) {
-            Log.e(TAG, "leaveCurrentRoom:");
-            messageDisposable.dispose();
+        for (Disposable disposable : disposableList) {
+            disposable.dispose();
         }
+        disposableList.clear();
     }
 
     /**

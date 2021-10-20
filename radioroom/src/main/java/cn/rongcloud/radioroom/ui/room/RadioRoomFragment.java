@@ -438,6 +438,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     @Override
     public void destroyRoom() {
 //        Logger.e("===================destroyRoom" + mRoomId);
+        super.destroyRoom();
         clVoiceRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
         present.leaveRoom(true, false);

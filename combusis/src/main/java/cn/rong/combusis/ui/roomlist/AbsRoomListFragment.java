@@ -57,10 +57,12 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         });
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
         loadRoomList(true);
+        //请求判断当时是否在房间内，如果弹窗不显示的话
     }
 
     public abstract RoomType getRoomType();

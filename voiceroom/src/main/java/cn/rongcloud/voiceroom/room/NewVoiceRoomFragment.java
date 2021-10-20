@@ -29,7 +29,6 @@ import com.basis.UIStack;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.base.BaseActivity;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -98,7 +97,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
         RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
         , View.OnClickListener {
-    //    private VoiceRoomBean mVoiceRoomBean;
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
@@ -368,7 +366,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void joinRoom() {
-        super.joinRoom();
         present.init(mRoomId, isCreate);
         // init pk
         initPk();
@@ -482,6 +479,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void destroyRoom() {
+        super.destroyRoom();
         //离开房间的时候
         clVoiceRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);

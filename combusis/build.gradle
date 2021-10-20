@@ -85,6 +85,5 @@ dependencies {
         println("------------------------>>>>use local module")
         api project(path: ':VoiceRoomSDK:RCVoiceRoom')
         api project(path: ':VoiceRoomSDK:RCRadioRoom')
-        api project(path: ':VoiceRoomSDK:messager')
     }
 }

@@ -18,12 +18,18 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import com.basis.mvp.BaseModel;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.utils.SharedPreferUtil;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomKickOut;
@@ -1015,5 +1021,20 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
             }
         }).subscribeOn(dataModifyScheduler)
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    //更改所属房间
+    public void changeUserRoom(String roomId){
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", roomId)
+                .build();
+        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()){
+                    Log.e(TAG, "onResult: "+result.getMessage() );
+                }
+            }
+        });
     }
 }

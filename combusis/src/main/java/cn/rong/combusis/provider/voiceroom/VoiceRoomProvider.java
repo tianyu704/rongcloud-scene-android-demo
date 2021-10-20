@@ -13,6 +13,7 @@ import com.kit.cache.GsonUtil;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.net.ApiConstant;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.LocalDataStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -98,6 +99,7 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
                 if (null != images && !images.isEmpty()) {
                     bgImages.clear();
                     bgImages.addAll(images);
+                    LocalDataStore.INSTANCE.saveBackGroundUrl(images);
                 }
                 Log.e(TAG, "provideFromService: size = " + (null == rooms ? 0 : rooms.size()));
                 updateCache(rooms);
