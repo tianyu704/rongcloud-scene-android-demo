@@ -1,4 +1,4 @@
-package cn.rongcloud.radioroom.ui.room;
+package cn.rongcloud.radio.ui.room;
 
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;

@@ -1,4 +1,4 @@
-package cn.rongcloud.radioroom.ui.room;
+package cn.rongcloud.radio.ui.room;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -53,12 +53,12 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
+import cn.rongcloud.radio.helper.RadioEventHelper;
+import cn.rongcloud.radio.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
-import cn.rongcloud.radioroom.helper.RadioEventHelper;
-import cn.rongcloud.radioroom.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.rroom.RCChatRoomLeave;
 import cn.rongcloud.radioroom.rroom.RCRadioRoomInfo;
 import cn.rongcloud.rtc.base.RCRTCLiveRole;

@@ -1,4 +1,4 @@
-package cn.rongcloud.radioroom.ui.room;
+package cn.rongcloud.radio.ui.room;
 
 import android.app.Activity;
 import android.content.Intent;

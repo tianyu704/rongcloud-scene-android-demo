@@ -9,9 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.MyApp
-import com.rongcloud.common.base.BaseLifeCyclePresenter
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
+import com.kit.cache.GsonUtil
+import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
@@ -75,30 +76,34 @@ class LoginPresenter @Inject constructor(
                         view.hideWaitingDialog()
                     }
                     .subscribe({ bean ->
-                        if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
-                            AccountStore.saveAccountInfo(bean.data?.apply {
-                                this.phone = phoneNumber
-                            })
-                            if (!AccountStore.getImToken().isNullOrBlank()) {
-                                RCVoiceRoomEngine
-                                    .getInstance()
-                                    .connectWithToken(
-                                        MyApp.context as Application,
-                                        AccountStore.getImToken(),
-                                        object : RCVoiceRoomCallback {
-                                            override fun onError(code: Int, message: String?) {
-                                                view.hideWaitingDialog()
-                                                view.showError(code, message)
-                                            }
-
-                                            override fun onSuccess() {
-                                                view.hideWaitingDialog()
-                                                view.onLoginSuccess()
-                                            }
-                                        })
-                            }
+                        com.kit.utils.Logger.e(TAG, GsonUtil.obj2Json(bean))
+                        if (null == bean) {
                         } else {
-                            view.showError(bean.code, bean.msg)
+                            if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
+                                AccountStore.saveAccountInfo(bean.data?.apply {
+                                    this.phone = phoneNumber
+                                })
+                                if (!AccountStore.getImToken().isNullOrBlank()) {
+                                    RCVoiceRoomEngine
+                                        .getInstance()
+                                        .connectWithToken(
+                                            MyApp.context as Application,
+                                            AccountStore.getImToken(),
+                                            object : RCVoiceRoomCallback {
+                                                override fun onError(code: Int, message: String?) {
+                                                    view.hideWaitingDialog()
+                                                    view.showError(code, message)
+                                                }
+
+                                                override fun onSuccess() {
+                                                    view.hideWaitingDialog()
+                                                    view.onLoginSuccess()
+                                                }
+                                            })
+                                }
+                            } else {
+                                view.showError(bean.code, bean.msg)
+                            }
                         }
                     }, { throwable ->
                         view.showError(-1, throwable.message)
