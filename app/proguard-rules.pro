@@ -36,3 +36,19 @@
 -keep class com.heytap.**{*;}
 -keep class a.**{*;}
 -keep class com.vivo.**{*;}
+
+-keep class android.support.** {*;}
+-keep class cn.rongcloud.rtc.core.** {*;}
+-keep class cn.rongcloud.rtc.api.** {*;}
+-keep class cn.rongcloud.rtc.base.** {*;}
+-keep class cn.rongcloud.rtc.utils.** {*;}
+-keep class cn.rongcloud.rtc.media.http.** {*;}
+-keep class cn.rongcloud.rtc.engine.view** {*;}
+-keep class cn.rongcloud.rtc.proxy.message.** {*;}
+-keep class cn.rongcloud.rtc.RongRTCExtensionModule {*;}
+-keep class cn.rongcloud.rtc.RongRTCMessageRouter {*;}
+# 保留api相关保
+-keep class cn.rongcloud.voiceroom.api.** {*;}
+-keep class cn.rongcloud.voiceroom.model.** {*;}
+-keep class cn.rongcloud.voiceroom.utils.** {*;}
+-keep class cn.rongcloud.messager.** {*;}
