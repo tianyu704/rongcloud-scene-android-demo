@@ -1,4 +1,4 @@
-package cn.rongcloud.radioroom.ui.roomlist;
+package cn.rongcloud.radio.ui.roomlist;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,7 +13,6 @@ import com.basis.net.oklib.wrapper.Wrapper;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
-import cn.rongcloud.radioroom.ui.room.RadioRoomActivity;
+import cn.rongcloud.radio.ui.room.RadioRoomActivity;
 import io.rong.imkit.picture.tools.ToastUtils;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;

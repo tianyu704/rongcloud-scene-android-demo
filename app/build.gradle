@@ -55,7 +55,6 @@ android {
     buildTypes {
         debug {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.debug
         }
         release {
@@ -93,7 +92,7 @@ android {
             buildConfigField("String", "APP_KEY", "\"pvxdm17jpw7ar\"")
             buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
 //            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
-            buildConfigField("String","BASE_SERVER_ADDRES","\"http://10.40.0.97:8081/\"")
+            buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://10.40.0.97:8081/\"")
         }
         releaseEnvironment {
             dimension 'environment'

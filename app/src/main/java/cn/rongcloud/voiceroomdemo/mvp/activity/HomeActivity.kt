@@ -14,7 +14,7 @@ import androidx.core.view.isVisible
 import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.radioroom.ui.roomlist.RadioRoomListActivity
+import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.R
