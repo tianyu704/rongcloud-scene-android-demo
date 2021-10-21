@@ -16,7 +16,6 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -533,7 +532,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void clickBroadcast(RCAllBroadcastMessage message) {
-        Logger.e("22222222222222222222222");
-        present.jumpOtherRoom(message);
+        present.jumpRoom(message);
     }
 }

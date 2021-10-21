@@ -1,24 +1,31 @@
 package cn.rong.combusis.ui.roomlist;
 
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.basis.adapter.interfaces.IAdapte;
 import com.basis.adapter.recycle.RcyHolder;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.ui.ListFragment;
 import com.bcq.refresh.XRecyclerView;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickRoomListListener;
-import io.rong.imkit.picture.tools.ToastUtils;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * @author gyn
@@ -30,7 +37,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     private int mCurrentPage = 1;
     private XRecyclerView mRoomList;
     private CreateRoomDialog mCreateRoomDialog;
-
+    private ConfirmDialog confirmDialog;
     private ActivityResultLauncher mLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result != null && result.getData() != null && result.getData().getData() != null && mCreateRoomDialog != null) {
             mCreateRoomDialog.setCoverUri(result.getData().getData());
@@ -55,6 +62,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         getView(R.id.iv_create_room).setOnClickListener(v -> {
             createRoom();
         });
+        checkUserRoom();
     }
 
 
@@ -111,7 +119,7 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     public void onCreateExist(VoiceRoomBean voiceRoomBean) {
         mCreateRoomDialog.dismiss();
         new ConfirmDialog(requireContext(), getString(R.string.text_you_have_created_room), true, "确定", "取消", () -> null, () -> {
-            ToastUtils.s(requireContext(), voiceRoomBean.getRoomId());
+            jumpRoom(voiceRoomBean);
             return null;
         }).show();
     }
@@ -121,4 +129,46 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
         mCreateRoomDialog.show();
     }
 
+    /**
+     * 检查用户之前是否在某个房间内
+     */
+    private void checkUserRoom() {
+        Map<String, Object> params = new HashMap<>(2);
+        OkApi.get(VRApi.USER_ROOM_CHECK, params, new WrapperCallBack() {
+
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean voiceRoomBean = result.get(VoiceRoomBean.class);
+                    if (voiceRoomBean != null) {
+                        //说明已经在房间内了，那么给弹窗
+                        confirmDialog = new ConfirmDialog(requireActivity(), "您正在直播的房间中\n是否返回？", true,
+                                "确定", "取消", new Function0<Unit>() {
+                            @Override
+                            public Unit invoke() {
+                                confirmDialog.dismiss();
+                                return null;
+                            }
+                        }, new Function0<Unit>() {
+                            @Override
+                            public Unit invoke() {
+                                jumpRoom(voiceRoomBean);
+                                return null;
+                            }
+                        });
+                        confirmDialog.show();
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * 跳转到相应的房间
+     *
+     * @param voiceRoomBean
+     */
+    private void jumpRoom(VoiceRoomBean voiceRoomBean) {
+        IntentWrap.launchRoom(requireContext(), voiceRoomBean.getRoomType(), voiceRoomBean.getRoomId());
+    }
 }

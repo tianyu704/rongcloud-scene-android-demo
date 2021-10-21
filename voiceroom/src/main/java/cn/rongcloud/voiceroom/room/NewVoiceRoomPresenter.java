@@ -39,6 +39,8 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
@@ -80,6 +82,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
@@ -1008,11 +1011,14 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         confirmDialog.show();
     }
 
+    public void leaveRoom() {
+        leaveRoom(null);
+    }
 
     /**
      * 调用离开房间
      */
-    public void leaveRoom() {
+    public void leaveRoom(CloseRoomCallback callback) {
         mView.showLoading("");
         MusicManager.get().stopPlayMusic();
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
@@ -1023,6 +1029,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 newVoiceRoomModel.changeUserRoom("");
                 mView.dismissLoading();
                 mView.finish();
+                if (callback != null) {
+                    callback.onSuccess();
+                }
             }
 
             @Override
@@ -1037,7 +1046,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     /**
      * 房主关闭房间
      */
-    public void closeRoom() {
+    public void closeRoom(CloseRoomCallback callback) {
         mView.showLoading("正在关闭房间");
         RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null);
         //先离开房间,离开以后，去删除房间
@@ -1053,6 +1062,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         if (result.ok()) {
                             mView.finish();
                             mView.dismissLoading();
+                            if (callback != null) {
+                                callback.onSuccess();
+                            }
                         } else {
                             mView.dismissLoading();
                         }
@@ -1479,10 +1491,81 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     List<Member> members = result.getList(Member.class);
                     if (members != null && members.size() > 0) {
                         UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(members.get(0).getUserId());
-                        mView.showUserSetting(members.get(0),uiSeatModel);
+                        mView.showUserSetting(members.get(0), uiSeatModel);
                     }
                 }
             }
         });
+    }
+
+    /**
+     * 点击全局广播后跳转到相应的房间
+     *
+     * @param message
+     */
+    public void jumpRoom(RCAllBroadcastMessage message) {
+        // 当前房间不跳转
+        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId()))
+            return;
+        OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        // 房间有密码需要弹框验证密码
+                        if (roomBean.isPrivate()) {
+                            new InputPasswordDialog(((NewVoiceRoomFragment) mView).requireContext(), false, () -> null, s -> {
+                                if (TextUtils.isEmpty(s)) {
+                                    return null;
+                                }
+                                if (s.length() < 4) {
+                                    mView.showToast(UIKit.getResources().getString(R.string.text_please_input_four_number));
+                                    return null;
+                                }
+                                if (TextUtils.equals(s, roomBean.getPassword())) {
+                                    exitRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                                } else {
+                                    mView.showToast("密码错误");
+                                }
+                                return null;
+                            }).show();
+                        } else {
+                            exitRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                        }
+                    }
+                } else {
+                    mView.dismissLoading();
+                    if (result.getCode() == 30001) {
+                        //房间不存在了
+                        mView.showToast("房间不存在了");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+
+
+    }
+
+    private void exitRoom(int roomType, final String roomId) {
+        boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
+        if (isClose) {
+            closeRoom(() -> {
+                IntentWrap.launchRoom(((NewVoiceRoomFragment) mView).requireContext(), roomType, roomId);
+            });
+        } else {
+            leaveRoom(() -> {
+                IntentWrap.launchRoom(((NewVoiceRoomFragment) mView).requireContext(), roomType, roomId);
+            });
+        }
+    }
+
+    interface CloseRoomCallback {
+        void onSuccess();
     }
 }

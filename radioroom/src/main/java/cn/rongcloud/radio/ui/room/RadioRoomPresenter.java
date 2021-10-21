@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.utils.JsonUtils;
+import cn.rong.combusis.common.utils.UIKit;
 import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomAdmin;
@@ -36,7 +38,6 @@ import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
-import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickListener;
@@ -59,6 +60,7 @@ import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radio.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
+import cn.rongcloud.radioroom.R;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
@@ -527,7 +529,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      */
     public void leaveRoom(boolean isSwitchLeave, boolean isClose, CloseRoomCallback closeRoomCallback) {
         removelistener();
-        Logger.e("================llllllllllll");
         if (isSwitchLeave) {
             return;
         }
@@ -540,7 +541,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 if (isClose) {
                     deleteRoom(closeRoomCallback);
                 } else {
-                    closeRoomCallback.onSuccess();
+                    if (closeRoomCallback != null) {
+                        closeRoomCallback.onSuccess();
+                    }
                     mView.dismissLoading();
                     mView.finish();
                 }
@@ -944,28 +947,57 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      *
      * @param message
      */
-    public void jumpOtherRoom(RCAllBroadcastMessage message) {
+    public void jumpRoom(RCAllBroadcastMessage message) {
         // 当前房间不跳转
         if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), mRoomId))
             return;
-        // 房间有密码需要弹框验证密码
-        if (TextUtils.equals(message.getIsPrivate(), "1")) {
-            return;
-        }
+        OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        // 房间有密码需要弹框验证密码
+                        if (roomBean.isPrivate()) {
+                            new InputPasswordDialog(((RadioRoomFragment) mView).requireContext(), false, () -> null, s -> {
+                                if (TextUtils.isEmpty(s)) {
+                                    return null;
+                                }
+                                if (s.length() < 4) {
+                                    mView.showToast(UIKit.getResources().getString(R.string.text_please_input_four_number));
+                                    return null;
+                                }
+                                if (TextUtils.equals(s, roomBean.getPassword())) {
+                                    jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                                } else {
+                                    mView.showToast("密码错误");
+                                }
+                                return null;
+                            }).show();
+                        } else {
+                            jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                        }
+                    }
+                } else {
+                    mView.dismissLoading();
+                    if (result.getCode() == 30001) {
+                        mView.showToast("房间不存在了");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+    }
+
+    private void jumpOtherRoom(int roomType, final String roomId) {
         boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
-        if (TextUtils.equals(message.getRoomType(), RoomType.RADIO_ROOM.getType() + "")) {
-            leaveRoom(false, isClose, () -> {
-                ArrayList<String> ids = new ArrayList<>();
-                ids.add(message.getRoomId());
-                IntentWrap.launchRadioRoom(((RadioRoomFragment) mView).requireContext(), ids, 0);
-            });
-        } else if (TextUtils.equals(message.getRoomType(), RoomType.VOICE_ROOM.getType() + "")) {
-            leaveRoom(false, isClose, () -> {
-                ArrayList<String> ids = new ArrayList<>();
-                ids.add(message.getRoomId());
-                IntentWrap.launchVoiceRoom(((RadioRoomFragment) mView).requireContext(), ids, 0, false);
-            });
-        }
+        leaveRoom(false, isClose, () -> {
+            IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
+        });
     }
 
     interface CloseRoomCallback {
