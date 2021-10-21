@@ -9,6 +9,11 @@
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
             android:name="cn.rongcloud.radio.ui.room.RadioRoomActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="cn.rongcloud.radio.ui.room.RadioRoomActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

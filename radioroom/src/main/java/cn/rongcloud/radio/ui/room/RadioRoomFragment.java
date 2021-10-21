@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -29,6 +30,7 @@ import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.ui.dialog.TipDialog;
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.music.MusicDialog;
@@ -50,6 +52,7 @@ import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
+import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -65,7 +68,7 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> implements
         RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener,
-        MemberListFragment.OnClickUserListener, View.OnClickListener {
+        MemberListFragment.OnClickUserListener, View.OnClickListener, AllBroadcastView.OnClickBroadcast {
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
@@ -73,6 +76,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private RoomBottomView mRoomBottomView;
     private RecyclerView mMessageView;
     private View mCoverView;
+    private AllBroadcastView mAllBroadcastView;
 
     private RoomMessageAdapter mRoomMessageAdapter;
     private ExitRoomPopupWindow mExitRoomPopupWindow;
@@ -120,6 +124,9 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
+        // 全局广播View
+        mAllBroadcastView = getView(R.id.view_all_broadcast);
+        mAllBroadcastView.setOnClickBroadcast(this::clickBroadcast);
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mRoomTitleBar.getLayoutParams();
@@ -520,7 +527,13 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     public void onClick(View v) {
         if (v.getId() == R.id.btn_go_back_list) {
             //直接退出当前房间
-            present.leaveRoom(false,false);
+            present.leaveRoom(false, false);
         }
+    }
+
+    @Override
+    public void clickBroadcast(RCAllBroadcastMessage message) {
+        Logger.e("22222222222222222222222");
+        present.jumpOtherRoom(message);
     }
 }

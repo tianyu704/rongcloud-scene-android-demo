@@ -10,8 +10,14 @@
             android:theme="@style/BasisTheme"/>
         <activity android:name=".roomlist.VoiceRoomListActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".room.NewVoiceRoomActivity"
+        <activity
+            android:name=".room.NewVoiceRoomActivity"
             android:launchMode="singleInstance"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="cn.rongcloud.voiceroom.room.NewVoiceRoomActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

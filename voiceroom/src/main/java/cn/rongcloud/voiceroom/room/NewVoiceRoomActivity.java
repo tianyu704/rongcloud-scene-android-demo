@@ -1,7 +1,6 @@
 package cn.rongcloud.voiceroom.room;
 
 import android.app.Activity;
-import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
@@ -10,6 +9,7 @@ import com.kit.utils.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -21,30 +21,23 @@ import dagger.hilt.android.AndroidEntryPoint;
  */
 @AndroidEntryPoint
 public class NewVoiceRoomActivity extends AbsRoomActivity {
-    private static final String KEY_ROOM_IDS = "KEY_ROOM_IDS";
-    public static final String ISCREATE = "ROOM_IS_CREATE";
-    private static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
     private boolean isCreate;
 
     public static void startActivity(Activity activity, ArrayList<String> roomIds, int position, boolean isCreate) {
-        Intent intent = new Intent(activity, NewVoiceRoomActivity.class);
-        intent.putStringArrayListExtra(KEY_ROOM_IDS, roomIds);
-        intent.putExtra(KEY_ROOM_POSITION, position);
-        intent.putExtra(ISCREATE, isCreate);
-        activity.startActivity(intent);
+        IntentWrap.launchVoiceRoom(activity, roomIds, position, isCreate);
     }
 
 
     @Override
     protected void initRoom() {
-        isCreate = getIntent().getBooleanExtra(ISCREATE, false);
+        isCreate = getIntent().getBooleanExtra(IntentWrap.KEY_IS_CREATE, false);
     }
 
 
     @Override
     protected int getCurrentItem() {
-        if (getIntent().hasExtra(KEY_ROOM_POSITION)) {
-            return getIntent().getIntExtra(KEY_ROOM_POSITION, 0);
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_POSITION)) {
+            return getIntent().getIntExtra(IntentWrap.KEY_ROOM_POSITION, 0);
         }
         return 0;
     }
@@ -57,8 +50,8 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
 
     @Override
     public List<String> loadData() {
-        if (getIntent().hasExtra(KEY_ROOM_IDS)) {
-            ArrayList<String> ids = getIntent().getStringArrayListExtra(KEY_ROOM_IDS);
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_IDS)) {
+            ArrayList<String> ids = getIntent().getStringArrayListExtra(IntentWrap.KEY_ROOM_IDS);
             return ids;
         }
         return null;

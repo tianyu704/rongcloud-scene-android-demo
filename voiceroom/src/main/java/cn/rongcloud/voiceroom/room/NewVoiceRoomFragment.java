@@ -40,6 +40,7 @@ import java.util.List;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomLike;
@@ -151,7 +152,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
         bundle.putString(ROOM_ID, roomId);
-        bundle.putBoolean(NewVoiceRoomActivity.ISCREATE, isCreate);
+        bundle.putBoolean(IntentWrap.KEY_IS_CREATE, isCreate);
         Fragment fragment = new NewVoiceRoomFragment();
         fragment.setArguments(bundle);
         return fragment;
@@ -161,7 +162,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void init() {
         mRoomId = getArguments().getString(ROOM_ID);
-        isCreate = getArguments().getBoolean(NewVoiceRoomActivity.ISCREATE);
+        isCreate = getArguments().getBoolean(IntentWrap.KEY_IS_CREATE);
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
 
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) clVoiceRoomView.getLayoutParams();
