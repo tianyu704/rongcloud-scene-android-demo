@@ -10,6 +10,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -78,6 +79,7 @@ import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.rong.imkit.utils.RouteUtils;
+import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
@@ -161,6 +163,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomId = getArguments().getString(ROOM_ID);
         isCreate = getArguments().getBoolean(NewVoiceRoomActivity.ISCREATE);
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
+
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) clVoiceRoomView.getLayoutParams();
+        layoutParams.topMargin=StatusBarUtil.getStatusBarHeight(requireContext());
+        clVoiceRoomView.setLayoutParams(layoutParams);
+
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
 
@@ -865,6 +872,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     public void showFinishView() {
         clVoiceRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showLikeAnimation() {
+        mRoomBottomView.showFov(null);
     }
 
 

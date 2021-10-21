@@ -48,6 +48,7 @@ import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomKickOut;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
@@ -478,8 +479,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             getGiftCount();
-                        }
-                        if (messageContent instanceof RCAllBroadcastMessage) {
+                        }else if (aClass.equals(RCChatroomLike.class)) {
+                            mView.showLikeAnimation();
+                            return;
+                        }else if (aClass.equals(RCAllBroadcastMessage.class)) {
                             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
                         }
                         Log.e("TAG", "accept: " + messageContent);

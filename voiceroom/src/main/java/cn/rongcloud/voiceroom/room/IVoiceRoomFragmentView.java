@@ -80,4 +80,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showMusicDialog();
 
     void showFinishView();
+
+    void showLikeAnimation();
 }
