@@ -91,7 +91,7 @@ public class RCFollowMsg extends MessageContent {
         this.userInfoSelf = new User();
         userInfoSelf.setId(user.getUserId());
         userInfoSelf.setName(user.getUserName());
-        userInfoSelf.setPortrait(user.getPortrait());
+        userInfoSelf.setPortrait(user.getPortraitUrl());
     }
 
     public cn.rong.combusis.provider.user.User getTargetUser() {
@@ -102,7 +102,7 @@ public class RCFollowMsg extends MessageContent {
         this.targetUserInfo = new User();
         targetUserInfo.setId(user.getUserId());
         targetUserInfo.setName(user.getUserName());
-        targetUserInfo.setPortrait(user.getPortrait());
+        targetUserInfo.setPortrait(user.getPortraitUrl());
     }
 
     public User getTargetUserInfo() {

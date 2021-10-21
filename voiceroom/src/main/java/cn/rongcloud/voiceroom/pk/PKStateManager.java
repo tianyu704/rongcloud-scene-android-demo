@@ -246,14 +246,14 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         List<User> lusers = pkInfos[0].getUserInfoList();
         int ls = null == lusers ? 0 : lusers.size();
         for (int i = 0; i < ls; i++) {
-            lefts.add(lusers.get(i).getPortrait());
+            lefts.add(lusers.get(i).getPortraitUrl());
         }
         // right
         List<String> rights = new ArrayList<>();
         List<User> rusers = pkInfos[1].getUserInfoList();
         int rs = null == rusers ? 0 : rusers.size();
         for (int i = 0; i < rs; i++) {
-            rights.add(rusers.get(i).getPortrait());
+            rights.add(rusers.get(i).getPortraitUrl());
         }
         pkView.setGiftSenderRank(lefts, rights);
     }

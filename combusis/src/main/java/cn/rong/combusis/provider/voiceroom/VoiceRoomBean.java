@@ -116,7 +116,7 @@ public class VoiceRoomBean implements Provide {
 
     public String getCreateUserPortrait() {
         if (createUser != null) {
-            return createUser.getPortrait();
+            return createUser.getPortraitUrl();
         } else {
             return "";
         }

@@ -177,7 +177,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
             List<User> users = lastLeftInfo.getUserInfoList();
             int ls = null == users ? 0 : users.size();
             for (int i = 0; i < ls; i++) {
-                lefts.add(users.get(i).getPortrait());
+                lefts.add(users.get(i).getPortraitUrl());
             }
         }
 
@@ -186,7 +186,7 @@ public class PKStateManager_ implements IPKState, EventBus.EventCallback, Dialog
             List<User> users = lastRightInfo.getUserInfoList();
             int ls = null == users ? 0 : users.size();
             for (int i = 0; i < ls; i++) {
-                rights.add(users.get(i).getPortrait());
+                rights.add(users.get(i).getPortraitUrl());
             }
         }
         // set sender rank

@@ -42,6 +42,10 @@ public class Member implements Serializable {
     }
 
     public String getPortrait() {
+        return portrait;
+    }
+
+    public String getPortraitUrl() {
         return TextUtils.isEmpty(portrait) ?
                 ApiConstant.INSTANCE.getDEFAULT_PORTRAIT_ULR()
                 : ApiConstant.INSTANCE.getFILE_URL() + portrait;
@@ -92,7 +96,7 @@ public class Member implements Serializable {
     }
 
     public UserInfo toUserInfo() {
-        return new UserInfo(userId, userName, Uri.parse(getPortrait()));
+        return new UserInfo(userId, userName, Uri.parse(getPortraitUrl()));
     }
 
     public User toUser() {
