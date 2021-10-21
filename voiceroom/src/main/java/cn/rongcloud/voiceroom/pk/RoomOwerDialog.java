@@ -54,7 +54,7 @@ public class RoomOwerDialog extends BottomDialog {
             public void convert(RcyHolder holder, VoiceRoomBean item, int position) {
                 holder.setText(R.id.tv_name, item.getCreateUser().getUserName());
                 ImageLoader.loadUrl(holder.getView(R.id.head),
-                        item.getCreateUser().getPortrait(),
+                        item.getCreateUser().getPortraitUrl(),
                         R.drawable.default_portrait,
                         ImageLoader.Size.SZ_200);
                 holder.rootView().setOnClickListener(new View.OnClickListener() {

@@ -214,7 +214,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         boolean memberIsOwner = TextUtils.equals(roomUserId, member.getUserId());
 
         // 头像和昵称
-        ImageLoaderUtil.INSTANCE.loadImage(getContext(), mIvMemberPortrait, member.getPortrait(), R.drawable.default_portrait);
+        ImageLoaderUtil.INSTANCE.loadImage(getContext(), mIvMemberPortrait, member.getPortraitUrl(), R.drawable.default_portrait);
         mTvMemberName.setText(member.getUserName());
         // 麦位信息显示
         setSeatPosition(memberIsOnSeat);

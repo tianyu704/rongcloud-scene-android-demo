@@ -46,7 +46,7 @@ public class MemberListFragment extends BaseBottomSheetDialogFragment {
             @Override
             public void convert(RcyHolder holder, User user, int position) {
                 holder.setText(R.id.tv_member_name, user.getUserName());
-                ImageLoaderUtil.INSTANCE.loadImage(getContext(), holder.getView(R.id.iv_member_portrait), user.getPortrait(), R.drawable.default_portrait);
+                ImageLoaderUtil.INSTANCE.loadImage(getContext(), holder.getView(R.id.iv_member_portrait), user.getPortraitUrl(), R.drawable.default_portrait);
                 holder.itemView.setOnClickListener(v -> {
                     if (mOnClickUserListener != null) {
 //                        dismiss();

@@ -2,6 +2,7 @@ package cn.rong.combusis.ui.room.fragment.gift;
 
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
@@ -132,7 +133,8 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
         mMemberAdapter = new RcySAdapter<Member, RcyHolder>(getContext(), R.layout.item_gift_member) {
             @Override
             public void convert(RcyHolder holder, Member member, int position) {
-                ImageLoaderUtil.INSTANCE.loadImage(context, holder.getView(R.id.iv_member_head), member.getPortrait(), R.drawable.default_portrait);
+                ImageView imageView=holder.getView(R.id.iv_member_head);
+                ImageLoaderUtil.INSTANCE.loadImage(context,imageView , member.getPortraitUrl(),R.drawable.default_portrait);
                 String name = "观众";
                 if (TextUtils.equals(mVoiceRoomBean.getCreateUserId(), member.getUserId())) {
                     name = "房主";

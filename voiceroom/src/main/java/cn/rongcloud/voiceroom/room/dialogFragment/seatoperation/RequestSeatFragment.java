@@ -94,7 +94,7 @@ public class RequestSeatFragment extends BaseFragment {
                 ImageView iv_user_portrait = itemView.findViewById(R.id.iv_user_portrait);
                 TextView tv_member_name = itemView.findViewById(R.id.tv_member_name);
                 TextView tv_operation = itemView.findViewById(R.id.tv_operation);
-                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortrait());
+                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortraitUrl());
                 tv_member_name.setText(uiMemberModel.getUserName());
                 tv_operation.setText("接受");
                 tv_operation.setOnClickListener(new View.OnClickListener() {
