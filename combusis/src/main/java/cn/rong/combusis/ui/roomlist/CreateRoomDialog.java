@@ -201,7 +201,7 @@ public class CreateRoomDialog extends BottomDialog {
         params.put("name", roomName);
         params.put("themePictureUrl", themeUrl);
         params.put("isPrivate", mPrivateButton.isChecked() ? 1 : 0);
-        params.put("password", MD5.encrypt(mPassword));
+        params.put("password", mPassword);
         params.put("backgroundUrl", mRoomBackground);
         params.put("kv", new ArrayList());
         params.put("roomType", mRoomType.getType());
