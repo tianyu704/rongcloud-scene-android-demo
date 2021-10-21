@@ -62,17 +62,18 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     override fun getContentView(): Int = R.layout.activity_home
 
     override fun initView() {
+//        iv_voice_room.setOnClickListener {
+//            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
+//                if (accept) {
+//                    UmengHelper.get().event(RcUmEvent.VoiceRoom)
+//                    VoiceRoomListActivity.startActivity(this)
+//                } else {
+//                    showToast("请赋予必要权限！")
+//                }
+//            }
+//        }
+        tv_new_roomList.visibility=View.GONE;
         iv_voice_room.setOnClickListener {
-            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
-                if (accept) {
-                    UmengHelper.get().event(RcUmEvent.VoiceRoom)
-                    VoiceRoomListActivity.startActivity(this)
-                } else {
-                    showToast("请赋予必要权限！")
-                }
-            }
-        }
-        tv_new_roomList.setOnClickListener {
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VoiceRoom)
