@@ -45,7 +45,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void refreshRoomOwner(UiSeatModel uiSeatModel);
 
-    void refreshSeatIndex(int index, UiSeatModel uiSeatModel);
 
     void showNotice(String notice, boolean isModify);
 
@@ -82,4 +81,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showFinishView();
 
     void showLikeAnimation();
+
+    void setOnlineCount(int OnlineCount);
 }

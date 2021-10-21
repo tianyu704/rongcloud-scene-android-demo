@@ -330,9 +330,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
                 present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
-                User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-                Member member = new Member().toMember(user);
-                showUserSetting(member, seatModel);
+                present.getUserInfo(seatModel.getUserId());
             }
         }
     }
@@ -351,9 +349,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //弹窗设置弹窗
             // 点击别人头像
-            User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-            Member member = new Member().toMember(user);
-            showUserSetting(member, seatModel);
+            present.getUserInfo(seatModel.getUserId());
         }
     }
 
@@ -529,22 +525,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             mRoomSeatView.setRoomOwnerMute(uiSeatModel.isMute());
             mRoomSeatView.setGiftCount((long) uiSeatModel.getGiftCount());
         }
-    }
-
-    /**
-     * 刷新当前麦位信息UI
-     *
-     * @param index
-     * @param uiSeatModel
-     */
-    @Override
-    public void refreshSeatIndex(int index, UiSeatModel uiSeatModel) {
-        mRoomSeatView.post(new Runnable() {
-            @Override
-            public void run() {
-                voiceRoomSeatsAdapter.refreshIndex(index, uiSeatModel);
-            }
-        });
     }
 
     /**
@@ -888,6 +868,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void showLikeAnimation() {
         mRoomBottomView.showFov(null);
+    }
+
+    @Override
+    public void setOnlineCount(int OnlineCount) {
+        mRoomTitleBar.setOnlineNum(OnlineCount);
     }
 
 

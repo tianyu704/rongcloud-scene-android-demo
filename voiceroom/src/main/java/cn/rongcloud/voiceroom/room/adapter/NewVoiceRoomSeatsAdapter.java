@@ -4,7 +4,6 @@ package cn.rongcloud.voiceroom.room.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kit.wapper.IResultBack;
-import com.rongcloud.common.extension.ExtensKt;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
 
@@ -25,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.common.ui.widget.WaveView;
-import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.voiceroom.R;
@@ -54,23 +51,10 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
      * @param seatList
      */
     public void refreshData(List<UiSeatModel> seatList) {
-        // TODO: 2021/6/21 后期需添加上 DiffUtil
+        // TODO: 2021/6/21 后期需添加上 DiffUtil 避免出现每次都刷全部麦位的情况，可以实现局部刷新
         seatData.clear();
         seatData.addAll(seatList);
         notifyDataSetChanged();
-    }
-
-    /**
-     * 刷新单个数据
-     *
-     * @return
-     */
-    public void refreshIndex(int index, UiSeatModel uiSeatModel) {
-        if (seatData.get(index) != null) {
-            seatData.set(index, uiSeatModel);
-            Log.e("TAG", "refreshIndex: "+index+":"+uiSeatModel.isSpeaking() );
-            notifyDataSetChanged();
-        }
     }
 
 
