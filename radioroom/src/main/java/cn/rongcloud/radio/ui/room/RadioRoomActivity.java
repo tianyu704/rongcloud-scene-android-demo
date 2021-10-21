@@ -1,13 +1,13 @@
 package cn.rongcloud.radio.ui.room;
 
 import android.app.Activity;
-import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 
 /**
@@ -15,14 +15,9 @@ import cn.rong.combusis.ui.room.AbsRoomActivity;
  * @date 2021/9/14
  */
 public class RadioRoomActivity extends AbsRoomActivity {
-    private static final String KEY_ROOM_IDS = "KEY_ROOM_IDS";
-    private static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
 
     public static void startActivity(Activity activity, ArrayList<String> roomIds, int position) {
-        Intent intent = new Intent(activity, RadioRoomActivity.class);
-        intent.putStringArrayListExtra(KEY_ROOM_IDS, roomIds);
-        intent.putExtra(KEY_ROOM_POSITION, position);
-        activity.startActivity(intent);
+        IntentWrap.launchRadioRoom(activity, roomIds, position);
     }
 
     @Override
@@ -31,8 +26,8 @@ public class RadioRoomActivity extends AbsRoomActivity {
 
     @Override
     protected int getCurrentItem() {
-        if (getIntent().hasExtra(KEY_ROOM_POSITION)) {
-            return getIntent().getIntExtra(KEY_ROOM_POSITION, 0);
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_POSITION)) {
+            return getIntent().getIntExtra(IntentWrap.KEY_ROOM_POSITION, 0);
         }
         return 0;
     }
@@ -44,8 +39,8 @@ public class RadioRoomActivity extends AbsRoomActivity {
 
     @Override
     public List<String> loadData() {
-        if (getIntent().hasExtra(KEY_ROOM_IDS)) {
-            ArrayList<String> ids = getIntent().getStringArrayListExtra(KEY_ROOM_IDS);
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_IDS)) {
+            ArrayList<String> ids = getIntent().getStringArrayListExtra(IntentWrap.KEY_ROOM_IDS);
             return ids;
         }
         return null;

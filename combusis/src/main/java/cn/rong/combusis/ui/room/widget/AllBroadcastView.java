@@ -8,6 +8,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
@@ -16,6 +17,8 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
+
+import com.kit.utils.Logger;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.manager.AllBroadcastManager;
@@ -39,6 +42,7 @@ public class AllBroadcastView extends AppCompatTextView {
 
     public AllBroadcastView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setClickable(true);
         setAlpha(0);
         setVisibility(INVISIBLE);
         setBackgroundResource(R.color.bg_broadcast);
@@ -65,6 +69,7 @@ public class AllBroadcastView extends AppCompatTextView {
         } else {
             animation(true);
             setText(buildMessage(message));
+            setMovementMethod(LinkMovementMethod.getInstance());
             setEllipsize(TextUtils.TruncateAt.MARQUEE);
             setSingleLine();
             setSelected(true);
@@ -112,21 +117,6 @@ public class AllBroadcastView extends AppCompatTextView {
                 String gift = String.format(" 全麦打赏 %sx%s ", message.getGiftName(), message.getGiftCount());
                 builder.append(gift);
                 start = end + gift.length();
-                String clickStr = "点击进入房间围观";
-                builder.append(clickStr);
-                end = start + clickStr.length();
-                builder.setSpan(new ForegroundColorSpan(Color.parseColor("#FFEB61")),
-                        start,
-                        end,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                builder.setSpan(new ClickableSpan() {
-                    @Override
-                    public void onClick(@NonNull View widget) {
-                        if (onClickBroadcast != null) {
-                            onClickBroadcast.clickBroadcast(message);
-                        }
-                    }
-                }, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             } else {
                 String userName = message.getUserName();
                 builder.append(userName);
@@ -155,6 +145,7 @@ public class AllBroadcastView extends AppCompatTextView {
             builder.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
+                    Logger.e("12312312312312312312312313123123213");
                     if (onClickBroadcast != null) {
                         onClickBroadcast.clickBroadcast(message);
                     }
