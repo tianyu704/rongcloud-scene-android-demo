@@ -100,7 +100,7 @@ dependencies {
     // rongcloud
     api "cn.rongcloud.sdk:im_lib:$rongcloudSdkVersion"
 //    api "cn.rongcloud.sdk:call_lib:$rongcloudSdkVersion"
-    api "cn.rongcloud.sdk:call_lib:5.1.8"
+    api "cn.rongcloud.sdk:call_lib:5.1.10"
     api "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
     api "cn.rongcloud.sdk:player:$rongcloudSdkVersion"
 
