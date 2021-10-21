@@ -520,22 +520,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     }
 
     /**
-     * 刷新当前麦位信息UI
-     *
-     * @param index
-     * @param uiSeatModel
-     */
-    @Override
-    public void refreshSeatIndex(int index, UiSeatModel uiSeatModel) {
-        mRoomSeatView.post(new Runnable() {
-            @Override
-            public void run() {
-                voiceRoomSeatsAdapter.refreshIndex(index, uiSeatModel);
-            }
-        });
-    }
-
-    /**
      * 设置公告的内容
      *
      * @param notice

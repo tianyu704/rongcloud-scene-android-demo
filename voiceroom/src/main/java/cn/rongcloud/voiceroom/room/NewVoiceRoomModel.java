@@ -217,7 +217,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        Log.e(TAG, "onSeatInfoUpdate: "+list.get(1).getStatus());
+        Log.e(TAG, "onSeatInfoUpdate: "+list.get(1));
         synchronized (this){
             uiSeatModels.clear();
             for (int i = 0; i < list.size(); i++) {
@@ -315,12 +315,10 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     @Override
     public void onSpeakingStateChanged(int i, boolean b) {
-//        Log.e(TAG, "onSpeakingStateChanged: " + i + ":" + b);
         if (uiSeatModels.size() > i) {
             UiSeatModel uiSeatModel = uiSeatModels.get(i);
             uiSeatModel.setSpeaking(b);
         }
-
     }
 
     @Override
@@ -648,7 +646,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * 取消上麦
      */
     public void cancelRequestSeat(ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance().cancelRequestSeat(new RCVoiceRoomCallback() {
@@ -675,7 +673,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * 同意上麦
      */
     public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 int availableIndex = getAvailableIndex();
@@ -710,7 +708,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * @param callback
      */
     public void clickInviteSeat(String userId, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 if (getAvailableIndex() < 0) {
@@ -752,7 +750,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * @param callback
      */
     public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCVoiceRoomCallback() {
@@ -814,7 +812,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * @param callback
      */
     public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance().kickUserFromSeat(user.getUserId(), new RCVoiceRoomCallback() {
@@ -847,7 +845,8 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * 座位禁麦，根据点击的位置来禁止
      */
     public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        Log.e(TAG, "clickMuteSeat: "+isMute );
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance()
@@ -889,7 +888,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * 根据麦位的位置去关闭座位
      */
     public void clickCloseSeatByIndex(int index, boolean isClose, ClickCallback<Boolean> callback) {
-        addSubscription(Completable.create(new CompletableOnSubscribe() {
+        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance().lockSeat(index, isClose, new RCVoiceRoomCallback() {

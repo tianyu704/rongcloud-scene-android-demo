@@ -42,8 +42,11 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
     private String roomId;
     private NewVoiceRoomModel newVoiceRoomModel;
 
-    public NewEmptySeatFragment(UiSeatModel uiSeatModel, String roomId, NewVoiceRoomModel newVoiceRoomModel) {
+    public NewEmptySeatFragment() {
         super(R.layout.fragment_new_empty_seat_setting);
+    }
+
+    public void setData(String roomId, UiSeatModel uiSeatModel,NewVoiceRoomModel newVoiceRoomModel) {
         this.uiSeatModel=uiSeatModel;
         this.roomId=roomId;
         this.newVoiceRoomModel=newVoiceRoomModel;
@@ -99,7 +102,7 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
      * 禁麦或者开麦ß
      */
     private void muteOrUnMuteSeat() {
-        newVoiceRoomModel.present.clickMuteSeatByIndex(uiSeatModel.getIndex(), !uiSeatModel.isMute(), new ClickCallback<Boolean>() {
+        newVoiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 if (result){

@@ -133,6 +133,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
     private List<Disposable> disposableList = new ArrayList<>();
+    private NewEmptySeatFragment newEmptySeatFragment;
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -164,6 +165,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         EventHelper.helper().unregeister();
         RCVoiceRoomEngine.getInstance().removeMessageReceiveListener(this);
         super.onDestroy();
+    }
+
+    public void addDisposable(Disposable disposable){
+        disposableList.add(disposable);
     }
 
     /**
@@ -438,8 +443,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 int index = uiSeatModel.getIndex();
                 if (index == 0) {
                     mView.refreshRoomOwner(uiSeatModel);
-                } else {
-                    mView.refreshSeatIndex(index - 1, uiSeatModel);
+                }else {
+                    //刷新别的地方的波纹
+                    mView.onSeatListChange(newVoiceRoomModel.getUiSeatModels());
                 }
             }
         }));
@@ -582,7 +588,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty || seatModel.getSeatStatus() ==
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
             //如果当前是空座位或者是上锁的座位
-            new NewEmptySeatFragment(seatModel, mVoiceRoomBean.getRoomId(), newVoiceRoomModel).show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
+            if (newEmptySeatFragment==null){
+                newEmptySeatFragment = new NewEmptySeatFragment();
+            }
+            newEmptySeatFragment.setData(getRoomId(),seatModel,newVoiceRoomModel);
+            newEmptySeatFragment.show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //如果座位正在使用中
 
@@ -871,13 +881,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public void clickMuteSeat(User user, ClickCallback<Boolean> callback) {
         clickMuteSeatByUser(user, callback);
-    }
-
-    /**
-     * 座位开麦或者闭麦，通过麦位的位置
-     */
-    public void clickMuteSeatByIndex(int index, boolean isMute, ClickCallback<Boolean> callback) {
-        newVoiceRoomModel.clickMuteSeat(index, isMute, callback);
     }
 
     /**
