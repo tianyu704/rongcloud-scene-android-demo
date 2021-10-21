@@ -2,7 +2,6 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
-    id 'kotlin-kapt'
 }
 apply from: rootProject.file("ext.gradle")
 
@@ -47,13 +46,6 @@ dependencies {
     // rxjava 相关
     api "io.reactivex.rxjava3:rxjava:3.0.2"
     api 'io.reactivex.rxjava3:rxandroid:3.0.0'
-
-    // room
-    api("androidx.room:room-runtime:$room_version")
-    annotationProcessor "androidx.room:room-compiler:$room_version"
-    kapt("androidx.room:room-compiler:$room_version")
-    api("androidx.room:room-ktx:$room_version")
-    api "androidx.room:room-rxjava3:$room_version"
 
     // rxjava 相关
     api "io.reactivex.rxjava3:rxjava:3.0.2"
