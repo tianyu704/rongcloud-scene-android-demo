@@ -16,6 +16,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.basis.UIStack;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -240,7 +241,13 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void finish() {
-        requireActivity().finish();
+        //在销毁之前提前出栈顶
+        try {
+            UIStack.getInstance().remove(((RadioRoomActivity) requireActivity()));
+            requireActivity().finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
