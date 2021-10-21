@@ -322,9 +322,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
                 present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
-                User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-                Member member = new Member().toMember(user);
-                showUserSetting(member, seatModel);
+                present.getUserInfo(seatModel.getUserId());
             }
         }
     }
@@ -343,9 +341,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //弹窗设置弹窗
             // 点击别人头像
-            User user = MemberCache.getInstance().getMember(seatModel.getUserId());
-            Member member = new Member().toMember(user);
-            showUserSetting(member, seatModel);
+            present.getUserInfo(seatModel.getUserId());
         }
     }
 
@@ -878,6 +874,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void showLikeAnimation() {
         mRoomBottomView.showFov(null);
+    }
+
+    @Override
+    public void setOnlineCount(int OnlineCount) {
+        mRoomTitleBar.setOnlineNum(OnlineCount);
     }
 
 

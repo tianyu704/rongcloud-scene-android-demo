@@ -82,4 +82,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void showFinishView();
 
     void showLikeAnimation();
+
+    void setOnlineCount(int OnlineCount);
 }

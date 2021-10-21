@@ -364,6 +364,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         MemberCache.getInstance().getMemberList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
+                mView.setOnlineCount(users.size());
                 newVoiceRoomModel.onMemberListener(users);
             }
         });
@@ -691,6 +692,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             }
                         });
                         confirmDialog.show();
+                        break;
                     case EVENT_BACKGROUND_CHANGE:
                         mView.setRoomBackground(stringArrayListPair.second.get(0));
                         break;
@@ -1484,5 +1486,12 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 }
             }
         });
+    }
+
+    /**
+     * 请求房间用户人数
+     */
+    public void refreshRoomMember() {
+        MemberCache.getInstance().fetchData(getRoomId());
     }
 }

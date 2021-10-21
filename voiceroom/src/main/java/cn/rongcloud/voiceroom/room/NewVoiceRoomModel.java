@@ -243,7 +243,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onUserEnterSeat(int i, String s) {
         Log.e(TAG, "onUserEnterSeat: ");
-        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        present.refreshRoomMember();
     }
 
     /**
@@ -256,7 +256,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     public void onUserLeaveSeat(int i, String s) {
         Log.e(TAG, "onUserLeaveSeat: ");
         //如果是房主的话，那么去更新房主的信息
-        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        present.refreshRoomMember();
     }
 
     /**
@@ -281,7 +281,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onSeatLock(int i, boolean b) {
         //锁住的位置，和状态
-        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        present.refreshRoomMember();
         Log.e(TAG, "onSeatLock: ");
     }
 
@@ -293,7 +293,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onAudienceEnter(String s) {
         Log.e(TAG, "onAudienceEnter: ");
-        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        present.refreshRoomMember();
     }
 
     /**
@@ -304,7 +304,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onAudienceExit(String s) {
         Log.e(TAG, "onAudienceExit: ");
-        MemberCache.getInstance().fetchData(present.getmVoiceRoomBean().getRoomId());
+        present.refreshRoomMember();
     }
 
     /**
