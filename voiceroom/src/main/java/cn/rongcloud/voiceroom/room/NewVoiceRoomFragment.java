@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -42,6 +41,7 @@ import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
@@ -66,6 +66,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
@@ -96,7 +97,7 @@ import kotlin.jvm.functions.Function2;
 public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
         RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
-        , View.OnClickListener {
+        , View.OnClickListener, AllBroadcastView.OnClickBroadcast {
     private ImageView mBackgroundImageView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
@@ -104,6 +105,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private RoomBottomView mRoomBottomView;
     private RecyclerViewAtVP2 mMessageView;
     private RoomMessageAdapter mRoomMessageAdapter;
+    private AllBroadcastView mAllBroadcastView;
     private RecyclerView rv_seat_list;
     private NewVoiceRoomSeatsAdapter voiceRoomSeatsAdapter;
     private MemberSettingFragment mMemberSettingFragment;
@@ -172,8 +174,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
 
-        mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
+        // 全局广播View
+        mAllBroadcastView = getView(R.id.view_all_broadcast);
+        mAllBroadcastView.setOnClickBroadcast(this::clickBroadcast);
+
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
         mRoomTitleBar.setOnMemberClickListener(v -> {
@@ -244,6 +249,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         } else {
             isEdit = false;
         }
+        if (null == mNoticeDialog) {
+            mNoticeDialog = new RoomNoticeDialog(activity);
+        }
         mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
             public void saveNotice(String notice) {
@@ -278,7 +286,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             @Override
             public void clickCloseRoom() {
                 // 房主关闭房间
-                present.closeRoom();
+                present.closeRoom(null);
             }
         });
         mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
@@ -527,7 +535,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void showNotice(String notice, boolean isModify) {
-        mNoticeDialog.setNotice(notice);
+        if (null != mNoticeDialog) {
+            mNoticeDialog.setNotice(notice);
+        }
     }
 
     /**
@@ -887,5 +897,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             //直接退出当前房间
             finish();
         }
+    }
+
+    @Override
+    public void clickBroadcast(RCAllBroadcastMessage message) {
+        present.jumpRoom(message);
     }
 }

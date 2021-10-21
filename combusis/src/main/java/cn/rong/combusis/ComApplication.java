@@ -22,6 +22,7 @@ import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomPK;
+import cn.rong.combusis.message.RCChatroomPKGift;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomUserBan;
 import cn.rong.combusis.message.RCChatroomUserBlock;
@@ -95,6 +96,7 @@ public class ComApplication extends Application {
                 RCChatroomLike.class,
                 RCChatroomVoice.class,
                 RCChatroomPK.class,
+                RCChatroomPKGift.class,
                 RCAllBroadcastMessage.class,
                 RCFollowMsg.class
         );

@@ -89,48 +89,6 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
         </FrameLayout>
 
-        <!--    <androidx.constraintlayout.widget.Group-->
-        <!--        android:id="@+id/fl_seat"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        app:constraint_referenced_ids="pk_view,voice_room"-->
-        <!--        app:layout_constraintBottom_toTopOf="@id/rv_message"-->
-        <!--        app:layout_constraintTop_toBottomOf="@id/room_title_bar" />-->
-
-        <!--    <cn.rongcloud.voiceroom.pk.widget.PKView-->
-        <!--        android:id="@+id/pk_view"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        app:layout_constraintBottom_toTopOf="@id/rv_message"-->
-        <!--        app:layout_constraintEnd_toEndOf="parent"-->
-        <!--        app:layout_constraintStart_toStartOf="parent"-->
-        <!--        android:visibility="gone"-->
-        <!--        app:layout_constraintTop_toBottomOf="@id/room_title_bar" />-->
-
-        <!--    <androidx.constraintlayout.widget.Group-->
-        <!--        android:id="@+id/voice_room"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        app:constraint_referenced_ids="room_seat_view,rv_seat_list" />-->
-
-        <!--    <cn.rong.combusis.ui.room.widget.RoomSeatView-->
-        <!--        android:id="@+id/room_seat_view"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        app:layout_constraintTop_toBottomOf="@id/room_title_bar" />-->
-
-        <!--    <androidx.recyclerview.widget.RecyclerView-->
-        <!--        android:id="@+id/rv_seat_list"-->
-        <!--        android:layout_width="match_parent"-->
-        <!--        android:layout_height="wrap_content"-->
-        <!--        android:layout_marginTop="12dp"-->
-        <!--        android:overScrollMode="never"-->
-        <!--        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"-->
-        <!--        app:layout_constraintEnd_toEndOf="parent"-->
-        <!--        app:layout_constraintStart_toStartOf="parent"-->
-        <!--        app:layout_constraintTop_toBottomOf="@+id/room_seat_view"-->
-        <!--        app:spanCount="4" />-->
-
         <cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2
             android:id="@+id/rv_message"
             android:layout_width="match_parent"
@@ -151,6 +109,7 @@
             tools:listitem="@layout/item_message_system" />
 
         <cn.rong.combusis.ui.room.widget.AllBroadcastView
+            android:id="@+id/view_all_broadcast"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"

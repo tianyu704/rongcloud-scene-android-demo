@@ -18,8 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.kit.utils.Logger;
-
 import cn.rong.combusis.R;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
@@ -145,7 +143,6 @@ public class AllBroadcastView extends AppCompatTextView {
             builder.setSpan(new ClickableSpan() {
                 @Override
                 public void onClick(@NonNull View widget) {
-                    Logger.e("12312312312312312312312313123123213");
                     if (onClickBroadcast != null) {
                         onClickBroadcast.clickBroadcast(message);
                     }

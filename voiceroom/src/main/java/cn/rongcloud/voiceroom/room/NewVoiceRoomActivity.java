@@ -13,13 +13,11 @@ import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
-import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * @author 李浩  语聊房重构
  * @date 2021/9/24
  */
-@AndroidEntryPoint
 public class NewVoiceRoomActivity extends AbsRoomActivity {
     private boolean isCreate;
 
