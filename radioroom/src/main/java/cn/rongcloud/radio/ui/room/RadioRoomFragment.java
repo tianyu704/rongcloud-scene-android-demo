@@ -117,8 +117,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     @Override
     public void init() {
         mRoomId = getArguments().getString(ROOM_ID);
-
-        mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
@@ -257,6 +255,9 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void showNotice(String notice, boolean isModify) {
+        if (null == mNoticeDialog) {
+            mNoticeDialog = new RoomNoticeDialog(activity);
+        }
         mNoticeDialog.show(notice, isModify, newNotice -> {
             present.modifyNotice(newNotice);
         });

@@ -25,7 +25,6 @@ import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.PKResponse;
@@ -148,11 +147,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         int state = pkResult.getStatusMsg();
         if (null != pkView) {
             refreshPKInfo(pkResult);
-            //获取currentUserId
-            PKInfo[] pkInfos = formatPKInfo(pkResult);
-            if (null != pkInfos) {
-                pkView.setPKUserInfo(pkInfos[0].getUserId(), pkInfos[1].getUserId());
-            }
             long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
             if (0 == state) {// pk 阶段
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
@@ -244,6 +238,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     void refreshPKInfo(PKResult pkResult) {
         PKInfo[] pkInfos = formatPKInfo(pkResult);
         if (null == pkInfos) return;
+        pkView.setPKUserInfo(pkInfos[0].getUserId(), pkInfos[1].getUserId());
         // set score
         pkView.setPKScore(pkInfos[0].getScore(), pkInfos[1].getScore());
         // left
@@ -333,11 +328,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             }
         } else if (EventBus.TAG.PK_GIFT.equals(tag)) {
             Logger.e(TAG, "礼物消息");
-            IEventHelp.Type type = EventHelper.helper().getPKState();
-            if (IEventHelp.Type.PK_START != type) {
-                Logger.e(TAG, "PK状态异常");
-                return;
-            }
             refreshPKGiftRank();
         }
     }
@@ -354,31 +344,16 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
             public void onResult(PKResult pkResult) {
-                refreshPkResult(pkResult);
+                refreshPKInfo(pkResult);
+                long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
+                pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
+                    @Override
+                    public void onTimerEnd() {
+                        // 等待服务端分发pk惩罚消息
+                    }
+                });
             }
         });
-    }
-
-    /**
-     * 根据pk状态进入
-     *
-     * @param pkResult
-     */
-    void refreshPkResult(PKResult pkResult) {
-        refreshPKInfo(pkResult);
-        // pk记时
-        if (null != pkView && null != rcpkInfo) {
-            String local = AccountStore.INSTANCE.getUserId();
-            String otherId = local.equals(rcpkInfo.getInviterId()) ? rcpkInfo.getInviteeId() : rcpkInfo.getInviterId();
-            long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
-            pkView.setPKUserInfo(local, otherId);
-            pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
-                @Override
-                public void onTimerEnd() {
-                    // 等待服务端分发pk惩罚消息
-                }
-            });
-        }
     }
 
     /**

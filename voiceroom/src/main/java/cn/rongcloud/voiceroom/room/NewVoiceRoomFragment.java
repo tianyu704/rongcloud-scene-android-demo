@@ -10,7 +10,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -175,7 +174,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
 
-        mNoticeDialog = new RoomNoticeDialog(getContext());
         mRoomSettingFragment = new RoomSettingFragment(present);
         // 全局广播View
         mAllBroadcastView = getView(R.id.view_all_broadcast);
@@ -250,6 +248,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             isEdit = true;
         } else {
             isEdit = false;
+        }
+        if (null == mNoticeDialog) {
+            mNoticeDialog = new RoomNoticeDialog(activity);
         }
         mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
@@ -554,7 +555,9 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void showNotice(String notice, boolean isModify) {
-        mNoticeDialog.setNotice(notice);
+        if (null != mNoticeDialog) {
+            mNoticeDialog.setNotice(notice);
+        }
     }
 
     /**

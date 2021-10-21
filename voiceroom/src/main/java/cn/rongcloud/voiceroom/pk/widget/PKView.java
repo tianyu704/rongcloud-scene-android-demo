@@ -189,8 +189,8 @@ public class PKView extends LinearLayout implements IPK {
             timer.cancel();
             timer = null;
         }
-        // 开启 惩罚记时
-        timer = new Timer(tvTime, timeDiff, listener);
+        // 开启 惩罚记时  移除开启阶段的180s的差值
+        timer = new Timer(tvTime, timeDiff - MAX * 1000, listener);
         timer.start();
         refreshPkResult();
     }

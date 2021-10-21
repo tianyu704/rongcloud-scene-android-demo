@@ -7,8 +7,8 @@ import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.EventBus;
-import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomPK;
+import cn.rong.combusis.message.RCChatroomPKGift;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -80,7 +80,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
                 current = Type.PK_STOP;
                 dispatchPKState(chatroomPK);
             }
-        } else if (message.getContent() instanceof RCChatroomGift) {
+        } else if (message.getContent() instanceof RCChatroomPKGift) {
             EventBus.get().emit(EventBus.TAG.PK_GIFT);
         }
     }
