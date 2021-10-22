@@ -265,7 +265,9 @@ public class RealtimeBlurView extends View {
     }
 
     protected void blur(Bitmap bitmapToBlur, Bitmap blurredBitmap) {
-        mBlurImpl.blur(bitmapToBlur, blurredBitmap);
+        if (null != bitmapToBlur && null != blurredBitmap) {
+            mBlurImpl.blur(bitmapToBlur, blurredBitmap);
+        }
     }
 
     private final ViewTreeObserver.OnPreDrawListener preDrawListener = new ViewTreeObserver.OnPreDrawListener() {

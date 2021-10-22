@@ -10,8 +10,6 @@ import cn.rong.combusis.EventBus;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.message.RCChatroomPKGift;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
@@ -128,18 +126,8 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         dispatchPKState(null);
         onShowTipDialog(inviterRoomId, inviterUserId, TipType.InvitedPK, new IResultBack<Boolean>() {
             @Override
-            public void onResult(Boolean result) {
-                RCVoiceRoomEngine.getInstance().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKResponse.accept : PKResponse.reject, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        EToast.showToastWithLag(TAG, result ? "同意PK成功" : "拒绝PK成功");
-                    }
-
-                    @Override
-                    public void onError(int code, String message) {
-                        EToast.showToastWithLag(TAG, (result ? "同意PK失败" : "拒绝PK失败") + " code = " + code + " message = " + message);
-                    }
-                });
+            public void onResult(Boolean result) {// true:同意  false：拒绝
+                VoiceRoomApi.getApi().responsePKInvitation(inviterRoomId, inviterUserId, result ? PKResponse.accept : PKResponse.reject, null);
             }
         });
     }

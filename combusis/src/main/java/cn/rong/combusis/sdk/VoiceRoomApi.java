@@ -322,7 +322,7 @@ public class VoiceRoomApi implements Api {
 
     @Override
     public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKResponse pkState, IResultBack<Boolean> resultBack) {
-        String action = (pkState == PKResponse.accept ? "同意" : pkState == PKResponse.reject ? "拒绝" : "忽略") + "K邀请";
+        String action = (pkState == PKResponse.accept ? "同意" : pkState == PKResponse.reject ? "拒绝" : "忽略") + "PK邀请";
         RCVoiceRoomEngine.getInstance().responsePKInvitation(
                 inviterRoomId,
                 inviterUserId,
@@ -338,6 +338,10 @@ public class VoiceRoomApi implements Api {
                         if (pkInviter.inviterId.equals(inviterUserId) && pkInviter.inviterRoomId.equals(inviterRoomId)) {
                             //处理成功后 该邀请流程结束 释放被邀请信息
                             EventHelper.helper().releasePKInviter();
+                        }
+                        //修改当前pk状态:拒绝和忽略需重置状态none
+                        if (PKResponse.ignore == pkState || PKResponse.reject == pkState) {
+                            EventBus.get().emit(EventBus.TAG.PK_INVITE_QUIT, IEventHelp.Type.PK_NONE);
                         }
                     }
 
