@@ -37,7 +37,6 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.ui.miniroom.MiniRoomManager;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
@@ -56,6 +55,7 @@ import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radioroom.R;
 import io.rong.imkit.utils.RouteUtils;
@@ -407,7 +407,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
-//                    RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent());
                     RadioEventHelper.getInstance().setMiniRoomListener(MiniRoomManager.getInstance());
                     MiniRoomManager.getInstance().show(requireContext(), present.getRoomId(), present.getThemePictureUrl(), requireActivity().getIntent(), RadioEventHelper.getInstance());
                     finish();

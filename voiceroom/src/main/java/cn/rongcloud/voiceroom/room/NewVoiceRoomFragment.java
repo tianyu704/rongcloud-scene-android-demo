@@ -31,7 +31,6 @@ import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
-import com.yhao.floatwindow.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,8 +50,6 @@ import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
-import cn.rong.combusis.sdk.event.wrapper.EToast;
-import cn.rong.combusis.ui.miniroom.MiniRoomManager;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
@@ -71,7 +68,7 @@ import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
-import cn.rong.combusis.widget.VoiceRoomMiniManager;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.pk.IPKState;
@@ -122,26 +119,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private ConfirmDialog confirmDialog;
     private String mRoomId;
     private boolean isCreate;
-    private PermissionListener permissionListener = new PermissionListener() {
-        @Override
-        public void onSuccess() {
-            //先做悬浮窗
-            requireActivity().moveTaskToBack(true);
-            //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
-            requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-            //如果最小化窗口权限拿到了，那么显示最小化窗口
-            VoiceRoomMiniManager.getInstance().refreshRoomOwner(present.getRoomId());
-            VoiceRoomMiniManager.getInstance()
-                    .setBackgroudPic(present.getThemePictureUrl(), activity);
-        }
-
-        @Override
-        public void onFail() {
-            EToast.showToast("没有获取到悬浮窗权限");
-            startActivity(requireActivity().getIntent());
-        }
-    };
     private ConstraintLayout clVoiceRoomView;
     private RelativeLayout rlRoomFinishedId;
     private Button btnGoBackList;
@@ -270,24 +248,13 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
-//                    VoiceRoomMiniManager.getInstance().init(requireContext(), requireActivity().getIntent(), permissionListener);
-//                    VoiceRoomMiniManager.getInstance().showMiniWindows();
-
 
                     //先做悬浮窗
-                    boolean a = requireActivity().moveTaskToBack(true);
-                    Logger.e("=====================" + a);
+                    requireActivity().moveTaskToBack(true);
                     //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                     requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
                     MiniRoomManager.getInstance().show(requireContext(), present.getRoomId(), present.getThemePictureUrl(), requireActivity().getIntent(), present);
-
-//                    //如果最小化窗口权限拿到了，那么显示最小化窗口
-//                    VoiceRoomMiniManager.getInstance().refreshRoomOwner(present.getRoomId());
-//                    VoiceRoomMiniManager.getInstance()
-//                            .setBackgroudPic(present.getThemePictureUrl(), activity);
-
-
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }

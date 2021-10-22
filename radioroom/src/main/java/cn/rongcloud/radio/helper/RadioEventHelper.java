@@ -1,23 +1,32 @@
 package cn.rongcloud.radio.helper;
 
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.utils.JsonUtils;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
-import cn.rong.combusis.ui.miniroom.OnCloseMiniRoomListener;
-import cn.rong.combusis.ui.miniroom.OnMiniRoomListener;
+import cn.rong.combusis.music.MusicManager;
+import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
+import cn.rong.combusis.widget.miniroom.OnMiniRoomListener;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
+import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.rroom.RCRadioEventListener;
 import io.rong.imkit.picture.tools.ToastUtils;
 import io.rong.imlib.model.Message;
@@ -90,6 +99,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         isInSeat = false;
         isSuspend = false;
         isMute = false;
+        onMiniRoomListener = null;
     }
 
     @Override
@@ -186,20 +196,48 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
             if (updateKey == IRCRadioRoomEngine.UpdateKey.RC_SPEAKING) {
                 onMiniRoomListener.onSpeak(TextUtils.equals(s, "1"));
             }
-            if (updateKey == IRCRadioRoomEngine.UpdateKey.RC_BGNAME) {
-                onMiniRoomListener.onThemChange(s);
-            }
         }
     }
 
     @Override
     public void onCloseMiniRoom(CloseResult closeResult) {
         onMiniRoomListener = null;
-        if (closeResult != null) {
-            closeResult.onClose();
-        }
-        // TODO need leave room
-//        RCRadioRoomEngine.getInstance().leaveRoom(null);
+        // need leave room
+        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                changeUserRoom("");
+                MusicManager.get().stopPlayMusic();
+                unRegister();
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                MusicManager.get().stopPlayMusic();
+                unRegister();
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
+            }
+        });
+    }
+
+    //更改所属房间
+    private void changeUserRoom(String roomId) {
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", roomId)
+                .build();
+        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    Log.e("TAG", "changeUserRoom: " + result.getBody());
+                }
+            }
+        });
     }
 
     private static class Holder {

@@ -54,6 +54,7 @@ public class IntentWrap {
             intent.putExtra(KEY_ROOM_IDS, roomIds);
             intent.putExtra(KEY_ROOM_POSITION, position);
             intent.putExtra(KEY_IS_CREATE, isCreate);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         } catch (Exception e) {
 

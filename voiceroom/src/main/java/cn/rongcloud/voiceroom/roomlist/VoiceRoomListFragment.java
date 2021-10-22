@@ -14,8 +14,8 @@ import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.ui.miniroom.MiniRoomManager;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.voiceroom.room.NewVoiceRoomActivity;
 import io.rong.imkit.picture.tools.ToastUtils;
 

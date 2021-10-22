@@ -1,4 +1,4 @@
-package cn.rong.combusis.ui.miniroom;
+package cn.rong.combusis.widget.miniroom;
 
 public interface OnCloseMiniRoomListener {
 

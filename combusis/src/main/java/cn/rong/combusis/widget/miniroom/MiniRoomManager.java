@@ -1,4 +1,4 @@
-package cn.rong.combusis.ui.miniroom;
+package cn.rong.combusis.widget.miniroom;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,11 +19,11 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
 
 /**
- * 房间的最小窗口管理器
+ * 语聊房的最小窗口管理器
  */
 public class MiniRoomManager implements OnMiniRoomListener {
 
-    private static final String TAG = "MiniRoomManager";
+    public static final String TAG = "MiniRoomManager";
     private View miniWindows;
     private WaveView waveView;
     private ImageView bgView;
@@ -70,38 +70,40 @@ public class MiniRoomManager implements OnMiniRoomListener {
     };
 
     public static MiniRoomManager getInstance() {
-        return Holder.INSTANCE;
+        return MiniRoomManager.Holder.INSTANCE;
     }
 
     public void show(Context context, String roomId, String background, Intent intent, OnCloseMiniRoomListener onCloseMiniRoomListener) {
         this.roomId = roomId;
         this.onCloseMiniRoomListener = onCloseMiniRoomListener;
-        IFloatWindow iFloatWindow = FloatWindow.get(TAG);
-//        Context context = UIKit.getContext();
-        if (iFloatWindow == null) {
-            miniWindows = LayoutInflater.from(context.getApplicationContext()).inflate(R.layout.view_voice_room_mini, null);
-            waveView = miniWindows.findViewById(R.id.wv_creator_background);
-            bgView = miniWindows.findViewById(R.id.iv_room_creator_portrait);
-            FloatWindow.with(context.getApplicationContext())
-                    .setTag(TAG)
-                    .setView(miniWindows)
-                    .setWidth(UiUtils.INSTANCE.dp2Px(context, 120))
-                    .setHeight(UiUtils.INSTANCE.dp2Px(context, 120))
-                    .setX(Screen.width, 0.7f)
-                    .setY(Screen.height, 0.75f)
-                    .setMoveType(MoveType.active)
-                    .setDesktopShow(true)
-                    .setViewStateListener(viewStateListener)
-                    .build();
+        miniWindows = LayoutInflater.from(context.getApplicationContext()).inflate(R.layout.view_voice_room_mini, null);
+        waveView = miniWindows.findViewById(R.id.wv_creator_background);
+        bgView = miniWindows.findViewById(R.id.iv_room_creator_portrait);
+        FloatWindow.with(context.getApplicationContext())
+                .setTag(TAG)
+                .setView(miniWindows)
+                .setWidth(UiUtils.INSTANCE.dp2Px(context, 120))
+                .setHeight(UiUtils.INSTANCE.dp2Px(context, 120))
+                .setX(Screen.width, 0.7f)
+                .setY(Screen.height, 0.75f)
+                .setMoveType(MoveType.active)
+                .setDesktopShow(true)
+                .setViewStateListener(viewStateListener)
+                .build();
 
-            miniWindows.setOnClickListener(v -> {
-                finish(null, null);
-                // TODO 打开房间
+        miniWindows.setOnClickListener(v -> {
+//                finish(null, null);
+            close();
+            // TODO 打开房间
 //                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
                 context.startActivity(intent);
-            });
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         ImageLoaderUtil.INSTANCE.loadImage(bgView.getContext(), bgView, background, R.drawable.img_default_room_cover);
+        IFloatWindow iFloatWindow = FloatWindow.get(TAG);
         if (iFloatWindow != null && !iFloatWindow.isShowing()) {
             iFloatWindow.show();
         }
@@ -156,17 +158,8 @@ public class MiniRoomManager implements OnMiniRoomListener {
         }
     }
 
-    @Override
-    public void onThemChange(String themUrl) {
-        if (bgView == null) {
-            return;
-        }
-        ImageLoaderUtil.INSTANCE.loadImage(bgView.getContext(), bgView, themUrl, R.color.black);
-    }
-
     private static class Holder {
         private final static MiniRoomManager INSTANCE = new MiniRoomManager();
     }
-
 
 }

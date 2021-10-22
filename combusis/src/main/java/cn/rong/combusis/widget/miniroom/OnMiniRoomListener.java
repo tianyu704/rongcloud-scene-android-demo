@@ -1,4 +1,4 @@
-package cn.rong.combusis.ui.miniroom;
+package cn.rong.combusis.widget.miniroom;
 
 /**
  * @author gyn
@@ -6,6 +6,4 @@ package cn.rong.combusis.ui.miniroom;
  */
 public interface OnMiniRoomListener {
     void onSpeak(boolean isSpeaking);
-
-    void onThemChange(String themUrl);
 }
