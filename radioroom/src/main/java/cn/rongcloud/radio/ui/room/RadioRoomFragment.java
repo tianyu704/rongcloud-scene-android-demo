@@ -76,6 +76,9 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private RecyclerView mMessageView;
     private View mCoverView;
     private AllBroadcastView mAllBroadcastView;
+    private ConstraintLayout clVoiceRoomView;
+    private RelativeLayout rlRoomFinishedId;
+    private Button btnGoBackList;
 
     private RoomMessageAdapter mRoomMessageAdapter;
     private ExitRoomPopupWindow mExitRoomPopupWindow;
@@ -90,11 +93,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
-    private String mRoomId;
 
-    private ConstraintLayout clVoiceRoomView;
-    private RelativeLayout rlRoomFinishedId;
-    private Button btnGoBackList;
+    private String mRoomId;
 
     public static Fragment getInstance(String roomId) {
         Bundle bundle = new Bundle();
@@ -261,9 +261,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void showNotice(String notice, boolean isModify) {
-        if (null == mNoticeDialog) {
-            mNoticeDialog = new RoomNoticeDialog(activity);
-        }
+        mNoticeDialog = new RoomNoticeDialog(activity);
         mNoticeDialog.show(notice, isModify, newNotice -> {
             present.modifyNotice(newNotice);
         });
