@@ -30,6 +30,7 @@ import cn.rong.combusis.message.RCChatroomUserUnBan;
 import cn.rong.combusis.message.RCChatroomUserUnBlock;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
+import cn.rong.combusis.message.RCRRCloseMessage;
 import cn.rongcloud.messager.RCMessager;
 import okhttp3.Headers;
 
@@ -98,7 +99,8 @@ public class ComApplication extends Application {
                 RCChatroomPK.class,
                 RCChatroomPKGift.class,
                 RCAllBroadcastMessage.class,
-                RCFollowMsg.class
+                RCFollowMsg.class,
+                RCRRCloseMessage.class
         );
     }
 }

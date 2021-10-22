@@ -13,7 +13,6 @@ import com.rongcloud.common.utils.UiUtils;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
 import com.yhao.floatwindow.MoveType;
-import com.yhao.floatwindow.PermissionListener;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
 
@@ -121,7 +120,7 @@ public class RadioRoomMiniManager implements RadioRoomListener {
         }
     }
 
-    public void show(Context context, String background, Intent intent, PermissionListener permissionListener) {
+    public void show(Context context, String background, Intent intent) {
         IFloatWindow iFloatWindow = FloatWindow.get(TAG);
         if (iFloatWindow == null) {
 
@@ -138,7 +137,6 @@ public class RadioRoomMiniManager implements RadioRoomListener {
                     .setMoveType(MoveType.active)
                     .setDesktopShow(true)
                     .setViewStateListener(viewStateListener)
-                    .setPermissionListener(permissionListener)
                     .setFilter(false, RadioRoomActivity.class)
                     .build();
 

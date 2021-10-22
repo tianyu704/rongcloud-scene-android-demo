@@ -133,11 +133,11 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
 
     @Override
     public void joinRoom(RCRadioRoomInfo roomInfo, final RCRadioRoomCallback callback) {
-        this.mRadioRoom = roomInfo;
-        if (null == mRadioRoom || !mRadioRoom.check()) {
+        if (null == roomInfo || !roomInfo.check()) {
             onErrorWithCheck(callback, -1, "RoomInfo is Check Null");
             return;
         }
+        this.mRadioRoom = roomInfo;
         if (!RCMessager.getInstance().isConnected()) {
             onErrorWithCheck(callback, -2, "Not Connected ");
             return;
@@ -468,8 +468,8 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
 
     @Override
     public void onChatRoomKVUpdate(String roomId, final Map<String, String> chatRoomKvMap) {
-        VMLog.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + " size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
-        if (null == chatRoomKvMap && chatRoomKvMap.isEmpty()) {
+        VMLog.d(TAG, "onChatRoomKVUpdate1111111 : " + "roomId = " + roomId + " size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
+        if (null == chatRoomKvMap || chatRoomKvMap.isEmpty()) {
             VMLog.d(TAG, "onChatRoomKVUpdate: KV is Empty");
             return;
         }
@@ -477,11 +477,14 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
             VMLog.d(TAG, "onChatRoomKVUpdate: mRadioRoom is null");
             return;
         }
-        if (!TextUtils.equals(roomId, mRcrtcRoom.getRoomId())) {
+        if (!TextUtils.equals(roomId, mRadioRoom.getRoomId())) {
             VMLog.d(TAG, "onChatRoomKVUpdate: roomId not equal");
             return;
         }
-        if (null == listener) return;
+        if (null == listener) {
+            VMLog.d(TAG, "onChatRoomKVUpdate: listener is null");
+            return;
+        }
         final Map<String, String> map = new HashMap<>();
         map.putAll(chatRoomKvMap);
         main.post(new Runnable() {

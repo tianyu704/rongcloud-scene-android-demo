@@ -146,13 +146,16 @@ public class RoomSeatView extends ConstraintLayout {
                 break;
             case OWNER_PAUSE:
                 mClSelfPause.setVisibility(VISIBLE);
+                setSpeaking(false);
                 break;
             case VIEWER_PAUSE:
                 mClViewerPause.setVisibility(VISIBLE);
+                setSpeaking(false);
                 break;
             case LEAVE_SEAT:
                 mClSeat.setVisibility(VISIBLE);
                 refreshHead("", "");
+                setSpeaking(false);
                 break;
         }
     }

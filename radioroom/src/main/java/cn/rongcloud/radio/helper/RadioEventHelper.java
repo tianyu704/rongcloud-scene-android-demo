@@ -32,6 +32,12 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
     private List<RadioRoomListener> listeners = new ArrayList<>();
     private List<Message> messages = new ArrayList<>();
     private String roomId;
+    // 是否在麦位上
+    private boolean isInSeat = false;
+    // 是否暂停
+    private boolean isSuspend = false;
+    // 是否静音
+    private boolean isMute = false;
 
     public static RadioEventHelper getInstance() {
         return Holder.INSTANCE;
@@ -39,6 +45,30 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
 
     public String getRoomId() {
         return roomId;
+    }
+
+    public boolean isInSeat() {
+        return isInSeat;
+    }
+
+    public void setInSeat(boolean inSeat) {
+        isInSeat = inSeat;
+    }
+
+    public boolean isSuspend() {
+        return isSuspend;
+    }
+
+    public void setSuspend(boolean suspend) {
+        isSuspend = suspend;
+    }
+
+    public boolean isMute() {
+        return isMute;
+    }
+
+    public void setMute(boolean mute) {
+        isMute = mute;
     }
 
     @Override
@@ -54,7 +84,6 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         this.roomId = null;
         listeners.clear();
         messages.clear();
-        Logger.e("==============RadioEventHelper:unRegister");
     }
 
     @Override

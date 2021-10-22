@@ -21,7 +21,6 @@ import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
-import com.yhao.floatwindow.PermissionListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -408,16 +407,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
-                    RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent(), new PermissionListener() {
-                        @Override
-                        public void onSuccess() {
-                            finish();
-                        }
-
-                        @Override
-                        public void onFail() {
-                        }
-                    });
+                    RadioRoomMiniManager.getInstance().show(requireContext(), present.getThemePictureUrl(), requireActivity().getIntent());
+                    finish();
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }
