@@ -78,4 +78,12 @@ public class IntentWrap {
             launchVoiceRoom(context, ids, 0, false);
         }
     }
+
+    public static void launchRoom(Context context, int roomType, ArrayList<String> roomIds, int position) {
+        if (roomType == RoomType.RADIO_ROOM.getType()) {
+            launchRadioRoom(context, roomIds, position);
+        } else if (roomType == RoomType.VOICE_ROOM.getType()) {
+            launchVoiceRoom(context, roomIds, position, false);
+        }
+    }
 }

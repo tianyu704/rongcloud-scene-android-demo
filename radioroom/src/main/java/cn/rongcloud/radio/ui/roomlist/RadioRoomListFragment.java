@@ -10,11 +10,13 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.miniroom.MiniRoomManager;
+import cn.rong.combusis.ui.miniroom.OnCloseMiniRoomListener;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
+import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radio.ui.room.RadioRoomActivity;
 import io.rong.imkit.picture.tools.ToastUtils;
 
@@ -24,8 +26,6 @@ import io.rong.imkit.picture.tools.ToastUtils;
  */
 public class RadioRoomListFragment extends AbsRoomListFragment {
 
-    private ConfirmDialog confirmDialog;
-
     public static Fragment getInstance() {
         return new RadioRoomListFragment();
     }
@@ -33,41 +33,51 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
     private InputPasswordDialog inputPasswordDialog;
 
     @Override
-    public void clickItem(VoiceRoomBean item, int position , boolean isCreate, List<VoiceRoomBean> voiceRoomBeans) {
-        if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
-            ArrayList list = new ArrayList();
-            list.add(item.getRoomId());
-            RadioRoomActivity.startActivity(getActivity(), list, 0);
-        } else if (item.isPrivate()) {
-            inputPasswordDialog = new InputPasswordDialog(requireContext(), false, () -> null, s -> {
-                if (TextUtils.isEmpty(s)) {
+    public void clickItem(VoiceRoomBean item, int position, boolean isCreate, List<VoiceRoomBean> voiceRoomBeans) {
+        checkInMiniRoom(item.getRoomId(), () -> {
+            if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
+                ArrayList list = new ArrayList();
+                list.add(item.getRoomId());
+                RadioRoomActivity.startActivity(getActivity(), list, 0);
+            } else if (item.isPrivate()) {
+                inputPasswordDialog = new InputPasswordDialog(requireContext(), false, () -> null, s -> {
+                    if (TextUtils.isEmpty(s)) {
+                        return null;
+                    }
+                    if (s.length() < 4) {
+                        ToastUtils.s(requireContext(), requireContext().getString(cn.rong.combusis.R.string.text_please_input_four_number));
+                        return null;
+                    }
+                    if (TextUtils.equals(s, item.getPassword())) {
+                        inputPasswordDialog.dismiss();
+                        RadioEventHelper.getInstance().unRegister();
+                        ArrayList list = new ArrayList();
+                        list.add(item.getRoomId());
+                        RadioRoomActivity.startActivity(getActivity(), list, 0);
+                    } else {
+                        showToast("密码错误");
+                    }
                     return null;
+                });
+                inputPasswordDialog.show();
+            } else {
+                ArrayList<String> list = new ArrayList<>();
+                for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
+                    if (!voiceRoomBean.getCreateUserId().equals(AccountStore.INSTANCE.getUserId()) && !voiceRoomBean.isPrivate()) {
+                        //过滤掉上锁的房间和自己创建的房间
+                        list.add(voiceRoomBean.getRoomId());
+                    }
                 }
-                if (s.length() < 4) {
-                    ToastUtils.s(requireContext(), requireContext().getString(cn.rong.combusis.R.string.text_please_input_four_number));
-                    return null;
-                }
-                if (TextUtils.equals(s, item.getPassword())) {
-                    inputPasswordDialog.dismiss();
-                    ArrayList list = new ArrayList();
-                    list.add(item.getRoomId());
-                    RadioRoomActivity.startActivity(getActivity(), list, 0);
-                } else {
-                    showToast("密码错误");
-                }
-                return null;
-            });
-            inputPasswordDialog.show();
-        } else {
-            ArrayList<String> list = new ArrayList<>();
-            for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
-                if (!voiceRoomBean.getCreateUserId().equals(AccountStore.INSTANCE.getUserId())&&!voiceRoomBean.isPrivate()) {
-                    //过滤掉上锁的房间和自己创建的房间
-                    list.add(voiceRoomBean.getRoomId());
-                }
+                RadioRoomActivity.startActivity(getActivity(), list, position);
             }
-            RadioRoomActivity.startActivity(getActivity(), list, position);
+        });
+    }
+
+    private void checkInMiniRoom(String roomId, OnCloseMiniRoomListener.CloseResult closeResult) {
+        if (!TextUtils.equals(roomId, RadioEventHelper.getInstance().getRoomId())) {
+            RadioEventHelper.getInstance().unRegister();
         }
+        MiniRoomManager.getInstance().finish(roomId, closeResult);
     }
 
     @Override

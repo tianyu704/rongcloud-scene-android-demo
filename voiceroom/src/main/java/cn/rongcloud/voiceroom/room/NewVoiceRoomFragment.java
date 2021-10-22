@@ -52,6 +52,7 @@ import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.miniroom.MiniRoomManager;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
@@ -65,7 +66,6 @@ import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
-import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
@@ -168,7 +168,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
 
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) clVoiceRoomView.getLayoutParams();
-        layoutParams.topMargin=StatusBarUtil.getStatusBarHeight(requireContext());
+        layoutParams.topMargin = StatusBarUtil.getStatusBarHeight(requireContext());
         clVoiceRoomView.setLayoutParams(layoutParams);
 
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
@@ -270,8 +270,24 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
-                    VoiceRoomMiniManager.getInstance().init(requireContext(), requireActivity().getIntent(), permissionListener);
-                    VoiceRoomMiniManager.getInstance().showMiniWindows();
+//                    VoiceRoomMiniManager.getInstance().init(requireContext(), requireActivity().getIntent(), permissionListener);
+//                    VoiceRoomMiniManager.getInstance().showMiniWindows();
+
+
+                    //先做悬浮窗
+                    boolean a = requireActivity().moveTaskToBack(true);
+                    Logger.e("=====================" + a);
+                    //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+                    requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+                    MiniRoomManager.getInstance().show(requireContext(), present.getRoomId(), present.getThemePictureUrl(), requireActivity().getIntent(), present);
+
+//                    //如果最小化窗口权限拿到了，那么显示最小化窗口
+//                    VoiceRoomMiniManager.getInstance().refreshRoomOwner(present.getRoomId());
+//                    VoiceRoomMiniManager.getInstance()
+//                            .setBackgroudPic(present.getThemePictureUrl(), activity);
+
+
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }

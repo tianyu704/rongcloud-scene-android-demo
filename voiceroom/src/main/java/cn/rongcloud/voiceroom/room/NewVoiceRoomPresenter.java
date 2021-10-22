@@ -63,6 +63,7 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
+import cn.rong.combusis.ui.miniroom.OnCloseMiniRoomListener;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
@@ -111,7 +112,7 @@ import kotlin.jvm.functions.Function2;
  */
 public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
         IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
-        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener {
+        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, OnCloseMiniRoomListener {
 
     private String TAG = "NewVoiceRoomPresenter";
 
@@ -170,7 +171,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         super.onDestroy();
     }
 
-    public void addDisposable(Disposable disposable){
+    public void addDisposable(Disposable disposable) {
         disposableList.add(disposable);
     }
 
@@ -446,7 +447,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 int index = uiSeatModel.getIndex();
                 if (index == 0) {
                     mView.refreshRoomOwner(uiSeatModel);
-                }else {
+                } else {
                     //刷新别的地方的波纹
                     mView.onSeatListChange(newVoiceRoomModel.getUiSeatModels());
                 }
@@ -489,10 +490,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             getGiftCount();
-                        }else if (aClass.equals(RCChatroomLike.class)) {
+                        } else if (aClass.equals(RCChatroomLike.class)) {
                             mView.showLikeAnimation();
                             return;
-                        }else if (aClass.equals(RCAllBroadcastMessage.class)) {
+                        } else if (aClass.equals(RCAllBroadcastMessage.class)) {
                             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
                         }
                         Log.e("TAG", "accept: " + messageContent);
@@ -591,10 +592,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty || seatModel.getSeatStatus() ==
                 RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
             //如果当前是空座位或者是上锁的座位
-            if (newEmptySeatFragment==null){
+            if (newEmptySeatFragment == null) {
                 newEmptySeatFragment = new NewEmptySeatFragment();
             }
-            newEmptySeatFragment.setData(getRoomId(),seatModel,newVoiceRoomModel);
+            newEmptySeatFragment.setData(getRoomId(), seatModel, newVoiceRoomModel);
             newEmptySeatFragment.show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //如果座位正在使用中
@@ -1573,6 +1574,24 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         } else {
             leaveRoom(() -> {
                 IntentWrap.launchRoom(((NewVoiceRoomFragment) mView).requireContext(), roomType, roomId);
+            });
+        }
+    }
+
+    @Override
+    public void onCloseMiniRoom(CloseResult closeResult) {
+        boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
+        if (isClose) {
+            closeRoom(() -> {
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
+            });
+        } else {
+            leaveRoom(() -> {
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
             });
         }
     }

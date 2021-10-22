@@ -12,6 +12,8 @@ import cn.rong.combusis.common.utils.JsonUtils;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.ui.miniroom.OnCloseMiniRoomListener;
+import cn.rong.combusis.ui.miniroom.OnMiniRoomListener;
 import cn.rongcloud.messager.RCMessager;
 import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
@@ -27,10 +29,11 @@ import io.rong.imlib.model.MessageContent;
  * <p>
  * 维护一个监听的单例，方便房间最小化后状态的监听
  */
-public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener {
+public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener, OnCloseMiniRoomListener {
 
     private List<RadioRoomListener> listeners = new ArrayList<>();
     private List<Message> messages = new ArrayList<>();
+    private OnMiniRoomListener onMiniRoomListener;
     private String roomId;
     // 是否在麦位上
     private boolean isInSeat = false;
@@ -84,6 +87,9 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         this.roomId = null;
         listeners.clear();
         messages.clear();
+        isInSeat = false;
+        isSuspend = false;
+        isMute = false;
     }
 
     @Override
@@ -95,6 +101,10 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
                 listener.onLoadMessageHistory(messages);
             }
         }
+    }
+
+    public void setMiniRoomListener(OnMiniRoomListener onMiniRoomListener) {
+        this.onMiniRoomListener = onMiniRoomListener;
     }
 
     @Override
@@ -172,6 +182,24 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         for (RCRadioEventListener l : listeners) {
             l.onRadioRoomKVUpdate(updateKey, s);
         }
+        if (onMiniRoomListener != null) {
+            if (updateKey == IRCRadioRoomEngine.UpdateKey.RC_SPEAKING) {
+                onMiniRoomListener.onSpeak(TextUtils.equals(s, "1"));
+            }
+            if (updateKey == IRCRadioRoomEngine.UpdateKey.RC_BGNAME) {
+                onMiniRoomListener.onThemChange(s);
+            }
+        }
+    }
+
+    @Override
+    public void onCloseMiniRoom(CloseResult closeResult) {
+        onMiniRoomListener = null;
+        if (closeResult != null) {
+            closeResult.onClose();
+        }
+        // TODO need leave room
+//        RCRadioRoomEngine.getInstance().leaveRoom(null);
     }
 
     private static class Holder {
