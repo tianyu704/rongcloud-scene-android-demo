@@ -2,12 +2,12 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rong.combusis.common.ui.widget;
+package cn.rong.combusis.common.ui.widget.blurImpl;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 
-interface BlurImpl {
+public interface BlurImpl {
 
 	boolean prepare(Context context, Bitmap buffer, float radius);
 

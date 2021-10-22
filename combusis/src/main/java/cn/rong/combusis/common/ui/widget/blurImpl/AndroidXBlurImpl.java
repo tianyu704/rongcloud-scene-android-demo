@@ -7,7 +7,7 @@
 // (powered by FernFlower decompiler)
 //
 
-package cn.rong.combusis.common.ui.widget;
+package cn.rong.combusis.common.ui.widget.blurImpl;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -73,10 +73,12 @@ public class AndroidXBlurImpl implements BlurImpl {
     }
 
     public void blur(Bitmap input, Bitmap output) {
-        this.mBlurInput.copyFrom(input);
-        this.mBlurScript.setInput(this.mBlurInput);
-        this.mBlurScript.forEach(this.mBlurOutput);
-        this.mBlurOutput.copyTo(output);
+        if (null != mBlurInput && null != mBlurScript && null != mBlurOutput) {
+            this.mBlurInput.copyFrom(input);
+            this.mBlurScript.setInput(this.mBlurInput);
+            this.mBlurScript.forEach(this.mBlurOutput);
+            this.mBlurOutput.copyTo(output);
+        }
     }
 
     static boolean isDebug(Context ctx) {
