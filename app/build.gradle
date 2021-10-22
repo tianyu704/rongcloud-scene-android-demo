@@ -21,12 +21,13 @@ android {
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.5.0"
+        versionCode 3
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters "armeabi-v7a", "x86"
+//            abiFilters "armeabi-v7a", "x86"
+            abiFilters "armeabi-v7a"
         }
 
         renderscriptTargetApi 14
@@ -83,8 +84,6 @@ android {
         abortOnError false
     }
     flavorDimensions("environment")
-    //线上地址：10.120.6.162    UCBJ2-RTC-Web-Prod-App-6-162
-    //测试地址：10.40.0.97         UCBJ2-RTC-Web-Test-App-0-97
     productFlavors {
         developerEnvironment {
             dimension 'environment'
