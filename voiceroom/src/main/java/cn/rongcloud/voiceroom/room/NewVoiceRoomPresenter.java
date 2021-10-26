@@ -63,7 +63,6 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
-import cn.rong.combusis.ui.miniroom.OnCloseMiniRoomListener;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.BackgroundSettingFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
@@ -83,6 +82,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -1580,20 +1580,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     @Override
     public void onCloseMiniRoom(CloseResult closeResult) {
-        boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
-        if (isClose) {
-            closeRoom(() -> {
-                if (closeResult != null) {
-                    closeResult.onClose();
-                }
-            });
-        } else {
-            leaveRoom(() -> {
-                if (closeResult != null) {
-                    closeResult.onClose();
-                }
-            });
-        }
+        leaveRoom(() -> {
+            if (closeResult != null) {
+                closeResult.onClose();
+            }
+        });
     }
 
     interface CloseRoomCallback {

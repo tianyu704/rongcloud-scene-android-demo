@@ -12,6 +12,7 @@ import com.basis.ui.BaseFragment;
 import com.kit.utils.Logger;
 
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -49,6 +50,7 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
     @Override
     public void onStart() {
         super.onStart();
+        MiniRoomManager.getInstance().close();
         Logger.d("==================================onStart:" + getTag());
     }
 

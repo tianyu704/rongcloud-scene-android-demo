@@ -3,17 +3,16 @@ package cn.rongcloud.voiceroom.roomlist;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 
-import cn.rong.combusis.ui.friend.FriendListFragment;
 import com.basis.UIStack;
 import com.yhao.floatwindow.FloatWindow;
 import com.yhao.floatwindow.IFloatWindow;
 
+import cn.rong.combusis.ui.friend.FriendListFragment;
 import cn.rong.combusis.ui.roomlist.AbsSwitchActivity;
-import cn.rong.combusis.widget.VoiceRoomMiniManager;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 
 /**
  * @author gyn
@@ -26,7 +25,7 @@ public class VoiceRoomListActivity extends AbsSwitchActivity {
     }
     @Override
     protected void onStart() {
-        IFloatWindow iFloatWindow = FloatWindow.get(VoiceRoomMiniManager.TAG);
+        IFloatWindow iFloatWindow = FloatWindow.get(MiniRoomManager.TAG);
         if (UIStack.getInstance().isTaskTop(this)||iFloatWindow!=null) {
             //当前用户是否在顶部，如果在不做任何操作
             //如果不在顶部，但是当前是顶部窗口是最小化的，那么也不做判断

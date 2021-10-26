@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.intent.IntentWrap;
 import io.rong.imkit.utils.StatusBarUtil;
 
 
@@ -69,6 +70,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
                         Logger.e("==================joinRoom:" + currentRoomId);
                     }
                 }
+                getIntent().putExtra(IntentWrap.KEY_ROOM_POSITION, position);
                 Logger.d("==================end选中了第几个：" + position + ",current:" + currentRoomId);
             }
 
@@ -113,7 +115,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
 
     // 加载数据
     protected abstract List<String> loadData();
-
 
 
     @Override

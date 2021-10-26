@@ -59,7 +59,6 @@ import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_NOT_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_ON_SEAT
 import cn.rongcloud.voiceroomdemo.mvp.presenter.STATUS_WAIT_FOR_SEAT
-import cn.rong.combusis.widget.VoiceRoomMiniManager
 import com.rongcloud.common.base.BaseFragment
 import com.rongcloud.common.extension.loadImageView
 import com.rongcloud.common.extension.loadPortrait
@@ -470,15 +469,15 @@ class VoiceRoomFragment : BaseFragment(R.layout.fragment_voice_room), IVoiceRoom
 
     override fun packupRoom() {
         //先做悬浮窗
-        activity?.moveTaskToBack(true)
-        //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
-        activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        //设置一下当前的封面图
-        VoiceRoomMiniManager.getInstance().init(activity, activity?.intent,null)
-        VoiceRoomMiniManager.getInstance().refreshRoomOwner(roomId)
-        VoiceRoomMiniManager.getInstance()
-            .setBackgroudPic(currentRole?.roomInfo.roomBean?.themePictureUrl, activity)
-        VoiceRoomMiniManager.getInstance().showMiniWindows()
+//        activity?.moveTaskToBack(true)
+//        //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+//        activity?.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+//        //设置一下当前的封面图
+//        VoiceRoomMiniManager.getInstance().init(activity, activity?.intent,null)
+//        VoiceRoomMiniManager.getInstance().refreshRoomOwner(roomId)
+//        VoiceRoomMiniManager.getInstance()
+//            .setBackgroudPic(currentRole?.roomInfo.roomBean?.themePictureUrl, activity)
+//        VoiceRoomMiniManager.getInstance().showMiniWindows()
     }
 
     override fun refreshOnlineUsersNumber(onlineUsersNumber: Int) {

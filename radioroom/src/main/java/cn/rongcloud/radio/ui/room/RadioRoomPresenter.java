@@ -127,7 +127,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                     if (result.getCode() == 30001) {
                         //房间不存在了
                         mView.showFinishView();
-                        removelistener();
+                        removeListener();
                         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
                             @Override
                             public void onSuccess() {
@@ -536,7 +536,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (isClose) {
             sendMessage(new RCRRCloseMessage());
         }
-        removelistener();
+        removeListener();
         if (isSwitchLeave) {
             return;
         }
@@ -567,7 +567,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         });
     }
 
-    private void removelistener() {
+    private void removeListener() {
         MusicManager.get().stopPlayMusic();
         RadioEventHelper.getInstance().unRegister();
     }
