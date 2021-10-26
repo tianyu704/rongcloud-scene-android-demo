@@ -4,11 +4,9 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
-import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import cn.rongcloud.voiceroomdemo.MyApp
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
 import com.kit.cache.GsonUtil
@@ -87,7 +85,6 @@ class LoginPresenter @Inject constructor(
                                     RCVoiceRoomEngine
                                         .getInstance()
                                         .connectWithToken(
-                                            MyApp.context as Application,
                                             AccountStore.getImToken(),
                                             object : RCVoiceRoomCallback {
                                                 override fun onError(code: Int, message: String?) {
