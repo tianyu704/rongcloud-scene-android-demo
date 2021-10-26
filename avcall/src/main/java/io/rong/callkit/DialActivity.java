@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -22,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bcq.adapter.recycle.RcyHolder;
 import com.bcq.adapter.recycle.RcySAdapter;
 import com.bumptech.glide.Glide;
+import com.kit.UIKit;
+import com.kit.utils.Logger;
 import com.rongcloud.common.dao.database.DatabaseManager;
 import com.rongcloud.common.dao.entities.CallRecordEntityKt;
 import com.rongcloud.common.dao.model.query.CallRecordModel;
@@ -57,6 +60,8 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
     private FloatingActionButtonController mFloatingActionButtonController;
     private ImageButton floatingActionButton;
     private RecyclerView recyclerView;
+    private TextView tvTip;
+    private View emptyTip;
     private boolean isVideo = false;
     private String userId;
     private List<DialInfo> records = new ArrayList<>();
@@ -103,7 +108,6 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
                                 dialInfo.setDate(model.getDate());
                                 dialInfo.setHead(model.getCallPortrait());
                             }
-
                             records.add(dialInfo);
                         }
                         refreshRecords(records);
@@ -116,12 +120,23 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         if (null != records && null != recyclerView.getAdapter()) {
             ((RcySAdapter) recyclerView.getAdapter()).setData(records, true);
         }
+        refreshViewByRecord(records != null && !records.isEmpty());
+    }
+
+    private void refreshViewByRecord(boolean hasRecord) {
+        Logger.e(TAG, "refreshViewByRecord:hasRecord = " + hasRecord);
+        UIKit.setVisiable(recyclerView, hasRecord);
+        UIKit.setVisiable(emptyTip, !hasRecord);
+        if (null != tvTip)
+            tvTip.setText(isVideo ? R.string.video_no_record_tip : R.string.audio_no_record_tip);
     }
 
     private void initView() {
         findViewById(R.id.ll_customer).setOnClickListener(this);
         final View floatingActionButtonContainer = findViewById(
                 R.id.floating_action_button_container);
+        emptyTip = findViewById(R.id.layout_empty);
+        tvTip = findViewById(R.id.tv_no_record_tip);
         floatingActionButton = findViewById(R.id.floating_action_button);
         floatingActionButton.setOnClickListener(this);
         mFloatingActionButtonController = new FloatingActionButtonController(this,
@@ -166,6 +181,7 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         });
         //默认显示弹框
         showDialpadFragment("");
+        refreshViewByRecord(false);
     }
 
     private void onRecordItemClick(String phone) {
