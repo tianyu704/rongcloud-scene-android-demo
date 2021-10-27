@@ -317,7 +317,22 @@ public class VoiceRoomApi implements Api {
         RCVoiceRoomEngine.getInstance().cancelPKInvitation(
                 pkInvitee.inviteeRoomId,
                 pkInvitee.inviteeId,
-                new DefaultRoomCallback("cancelPKInvitation", "取消PK邀请", resultBack));
+                new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        KToast.show("取消PK邀请成功");
+                        // 邀请成功 修改pk状态
+                        EventBus.get().emit(EventBus.TAG.PK_INVITE_QUIT, IEventHelp.Type.PK_NONE);
+                        if (null != resultBack) resultBack.onResult(true);
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        KToast.show("取消PK邀请失败");
+                        Log.e(TAG, "cancelPKInvitation#onError [" + i + "]:" + s);
+                        if (null != resultBack) resultBack.onResult(false);
+                    }
+                });
     }
 
     @Override

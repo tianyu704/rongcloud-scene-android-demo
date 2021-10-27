@@ -34,6 +34,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
             public void onEvent(String tag, Object... args) {
                 if (null != args && args.length == 1) {
                     current = (Type) args[0];
+                    dispatchPKState(null);
                 }
             }
         });

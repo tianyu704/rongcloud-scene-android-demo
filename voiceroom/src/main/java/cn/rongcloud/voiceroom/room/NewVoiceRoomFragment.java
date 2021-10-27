@@ -50,6 +50,8 @@ import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.sdk.event.EventHelper;
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
@@ -374,7 +376,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
             @Override
             public void onPkState() {
-                mRoomBottomView.setPkState(StateUtil.isPking());
+                StateUtil.isPking();
+                mRoomBottomView.refreshPkState();
             }
         });
     }
@@ -389,7 +392,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private boolean checkPKState() {
         boolean isPK = StateUtil.isPking();
         if (isPK) {
-            KToast.show("当前PK中，无法镜像该操作");
+            KToast.show("当前PK中，无法进行该操作");
         }
         Logger.e(TAG, "isPk = " + isPK);
         return isPK;
@@ -689,19 +692,28 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     /**
      * PK
-     *
-     * @param view
      */
     @Override
-    public void clickPk(View view) {
-        if (view.isSelected()) {// 关闭pk
-            PKStateManager.get().quitPK(activity);
-        } else {// 发起pk
+    public void clickPk() {
+        IEventHelp.Type type = EventHelper.helper().getPKState();
+        if (IEventHelp.Type.PK_NONE == type
+                || IEventHelp.Type.PK_FINISH == type) {
             PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
                 @Override
                 public void onResult(Boolean aBoolean) {
                 }
             });
+        } else if (IEventHelp.Type.PK_INVITE == type) {
+            PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
+                @Override
+                public void onResult(Boolean aBoolean) {
+                }
+            });
+        } else if (IEventHelp.Type.PK_GOING == type
+                || IEventHelp.Type.PK_PUNISH == type
+                || IEventHelp.Type.PK_START == type
+                || IEventHelp.Type.PK_STOP == type) {// pk中
+            PKStateManager.get().quitPK(activity);
         }
     }
 
