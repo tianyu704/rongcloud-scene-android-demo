@@ -392,7 +392,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private boolean checkPKState() {
         boolean isPK = StateUtil.isPking();
         if (isPK) {
-            KToast.show("当前PK中，无法镜像该操作");
+            KToast.show("当前PK中，无法进行该操作");
         }
         Logger.e(TAG, "isPk = " + isPK);
         return isPK;
