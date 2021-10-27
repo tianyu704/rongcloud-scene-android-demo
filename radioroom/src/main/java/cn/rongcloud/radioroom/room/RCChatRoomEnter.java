@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.radioroom.rroom;
+package cn.rongcloud.radioroom.room;
 
 import android.os.Parcel;
 import android.text.TextUtils;

@@ -68,7 +68,7 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
                         list.add(voiceRoomBean.getRoomId());
                     }
                 }
-                NewVoiceRoomActivity.startActivity(getActivity(), list, position, false);
+                NewVoiceRoomActivity.startActivity(getActivity(), list, list.indexOf(item.getRoomId()), false);
             }
         });
     }

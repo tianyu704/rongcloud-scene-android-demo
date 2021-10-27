@@ -1,6 +1,9 @@
 package cn.rongcloud.voiceroom.room;
 
+import static cn.rong.combusis.EventBus.TAG.UPDATE_SHIELD;
+import static cn.rong.combusis.sdk.Api.EVENT_ADD_SHIELD;
 import static cn.rong.combusis.sdk.Api.EVENT_BACKGROUND_CHANGE;
+import static cn.rong.combusis.sdk.Api.EVENT_DELETE_SHIELD;
 import static cn.rong.combusis.sdk.Api.EVENT_KICKED_OUT_OF_ROOM;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_MANAGER_LIST_CHANGE;
@@ -34,9 +37,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.EventBus;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
@@ -133,7 +138,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     private RoomOwnerType roomOwnerType;
 
     public int currentStatus = STATUS_NOT_ON_SEAT;
-    private List<Shield> shields;
+    private List<Shield> shields =new ArrayList<>();
 
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
     private List<Disposable> disposableList = new ArrayList<>();
@@ -373,6 +378,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         MemberCache.getInstance().getMemberList().observe(((NewVoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<User>>() {
             @Override
             public void onChanged(List<User> users) {
+                //人数
                 mView.setOnlineCount(users.size());
                 newVoiceRoomModel.onMemberListener(users);
             }
@@ -406,6 +412,20 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         setRequestSeatListener();
         setObSeatInfoChange();
         setObRoomInfoChange();
+        setObShieldListener();
+
+    }
+
+    /**
+     * 监听自己删除或者添加屏蔽词
+     */
+    private void setObShieldListener() {
+        EventBus.get().on(UPDATE_SHIELD, new EventBus.EventCallback() {
+            @Override
+            public void onEvent(String tag, Object... args) {
+                getShield();
+            }
+        });
     }
 
 
@@ -665,6 +685,22 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             @Override
             public void accept(Pair<String, ArrayList<String>> stringArrayListPair) throws Throwable {
                 switch (stringArrayListPair.first) {
+                    case EVENT_ADD_SHIELD:
+                        Shield shield = new Shield();
+                        String name = stringArrayListPair.second.get(0);
+                        shield.setName(name);
+                        shields.add(shield);
+                        break;
+                    case EVENT_DELETE_SHIELD:
+                        Iterator<Shield> iterator = shields.iterator();
+                        String shile = stringArrayListPair.second.get(0);
+                        while(iterator.hasNext()){
+                            Shield x = iterator.next();
+                            if(x.getName().equals(shile)){
+                                iterator.remove();
+                            }
+                        }
+                        break;
                     case EVENT_REQUEST_SEAT_AGREE://请求麦位被允许
                         currentStatus = STATUS_ON_SEAT;
                         //加入麦位
@@ -744,18 +780,19 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 房间所有者点击自己的头像
      */
     public void onClickRoomOwnerView(FragmentManager fragmentManager) {
-        UiSeatModel uiSeatModel = newVoiceRoomModel.getUiSeatModels().get(0);
-        if (uiSeatModel != null) {
-            if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
-                //如果在麦位上
-                NewCreatorSettingFragment newCreatorSettingFragment = new NewCreatorSettingFragment(newVoiceRoomModel, uiSeatModel);
-                newCreatorSettingFragment.show(fragmentManager);
-            } else {
-                //如果不在麦位上，直接上麦
-                roomOwnerEnterSeat();
+        if (newVoiceRoomModel.getUiSeatModels().size()>0){
+            UiSeatModel uiSeatModel = newVoiceRoomModel.getUiSeatModels().get(0);
+            if (uiSeatModel != null) {
+                if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                    //如果在麦位上
+                    NewCreatorSettingFragment newCreatorSettingFragment = new NewCreatorSettingFragment(newVoiceRoomModel, uiSeatModel);
+                    newCreatorSettingFragment.show(fragmentManager);
+                } else {
+                    //如果不在麦位上，直接上麦
+                    roomOwnerEnterSeat();
+                }
             }
         }
-
     }
 
     /**
@@ -822,7 +859,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             @Override
             public void onResult(Wrapper result) {
                 if (result.ok()) {
-                    shields = result.getList(Shield.class);
+                    List<Shield> list = result.getList(Shield.class);
+                    shields.clear();
+                    if (list!=null){
+                        shields.addAll(list);
+                    }
                 }
             }
         });
@@ -1118,6 +1159,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param notice
      */
     public void modifyNotice(String notice) {
+        //判断公告是否有显示
         UiRoomModel currentUIRoomInfo = newVoiceRoomModel.currentUIRoomInfo;
         RCVoiceRoomInfo rcRoomInfo = currentUIRoomInfo.getRcRoomInfo();
         rcRoomInfo.setExtra(notice);
@@ -1145,6 +1187,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             disposable.dispose();
         }
         disposableList.clear();
+        EventBus.get().off(UPDATE_SHIELD, null);
     }
 
     /**

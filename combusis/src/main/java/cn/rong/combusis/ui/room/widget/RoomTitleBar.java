@@ -11,8 +11,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.jakewharton.rxbinding4.view.RxView;
+
+import java.util.concurrent.TimeUnit;
+
 import cn.rong.combusis.R;
 import cn.rong.combusis.manager.AllBroadcastManager;
+import io.reactivex.rxjava3.core.Observable;
+import kotlin.Unit;
 
 /**
  * @author gyn
@@ -46,12 +52,12 @@ public class RoomTitleBar extends ConstraintLayout {
         mMenuButton = mRootView.findViewById(R.id.btn_menu);
     }
 
-    public void setOnMemberClickListener(OnClickListener v) {
-        mLeftView.setOnClickListener(v);
+    public Observable setOnMemberClickListener() {
+        return RxView.clicks(mLeftView).throttleFirst(1, TimeUnit.SECONDS);
     }
 
-    public void setOnMenuClickListener(OnClickListener v) {
-        mMenuButton.setOnClickListener(v);
+    public Observable setOnMenuClickListener() {
+        return RxView.clicks(mMenuButton).throttleFirst(1, TimeUnit.SECONDS);
     }
 
     public void setData(String name, int id) {

@@ -55,17 +55,23 @@ public class EditorDialog extends Dialog {
             public void onClick(View view) {
                 String text = editText.getText().toString().trim();
                 dismiss();
+                editText.setText("");
                 if (null != resultBack) resultBack.onResult(text);
             }
         });
         editText.requestFocus();
         editText.setFocusable(true);
         inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-        editText.post(new Runnable() {
+    }
+
+    @Override
+    public void show() {
+        editText.postDelayed(new Runnable() {
             @Override
             public void run() {
-                inputMethodManager.showSoftInput(editText, -1);
+                inputMethodManager.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
             }
-        });
+        },300);
+        super.show();
     }
 }

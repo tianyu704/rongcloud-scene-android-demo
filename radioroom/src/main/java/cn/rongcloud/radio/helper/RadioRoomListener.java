@@ -2,7 +2,7 @@ package cn.rongcloud.radio.helper;
 
 import java.util.List;
 
-import cn.rongcloud.radioroom.rroom.RCRadioEventListener;
+import cn.rongcloud.radioroom.room.RCRadioEventListener;
 import io.rong.imlib.model.Message;
 
 /**
