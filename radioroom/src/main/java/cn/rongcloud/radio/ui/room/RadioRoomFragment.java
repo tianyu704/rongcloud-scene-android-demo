@@ -485,7 +485,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     }
 
     @Override
-    public void clickPk(View view) {
+    public void clickPk() {
 
     }
 
