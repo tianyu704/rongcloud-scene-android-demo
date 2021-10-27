@@ -4,7 +4,7 @@
 
 package cn.rongcloud.radioroom;
 
-import cn.rongcloud.radioroom.rroom.RCRadioRoomEngineImpl;
+import cn.rongcloud.radioroom.room.RCRadioRoomEngineImpl;
 
 /**
  * 语聊房引擎接口

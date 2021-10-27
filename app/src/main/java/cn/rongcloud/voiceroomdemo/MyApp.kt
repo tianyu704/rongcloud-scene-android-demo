@@ -17,6 +17,8 @@ import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
 import com.rongcloud.common.base.IBaseView
 import com.rongcloud.common.utils.AccountStore
+import com.tencent.bugly.Bugly
+import com.tencent.bugly.crashreport.CrashReport
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlin.properties.Delegates
@@ -47,7 +49,8 @@ class MyApp : ComApplication() {
             "rcrtc",
             BuildConfig.BASE_SERVER_ADDRES
         )
-
+        //初始化 bugly
+        Bugly.init(applicationContext, "8e485ac7b5", true);
         var process = UIKit.getCurrentProcessName()
         Log.d(TAG, "process : $process")
         if (applicationContext.packageName != process) {

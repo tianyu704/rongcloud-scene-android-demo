@@ -79,6 +79,7 @@ import cn.rongcloud.voiceroom.pk.StateUtil;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.IRongCoreEnum;
@@ -161,11 +162,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
-        mRoomTitleBar.setOnMemberClickListener(v -> {
-            mMemberListFragment = new MemberListFragment(present.getRoomId(), this);
-            mMemberListFragment.show(getChildFragmentManager());
+        mRoomTitleBar.setOnMemberClickListener().subscribe(new Consumer<Unit>() {
+            @Override
+            public void accept(Unit unit) throws Throwable {
+                //添加防抖动
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), NewVoiceRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
+            }
         });
-
         //麦位
         rv_seat_list = getView(R.id.rv_seat_list);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
@@ -178,9 +182,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         });
         voiceRoomSeatsAdapter.setHasStableIds(true);
         rv_seat_list.setAdapter(voiceRoomSeatsAdapter);
-
-        mRoomTitleBar.setOnMenuClickListener(v -> {
-            clickMenu();
+        mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                clickMenu();
+            }
         });
 
         mNoticeView = getView(R.id.tv_notice);
@@ -216,6 +222,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
         pkView = getView(R.id.pk_view);
         voiceRoom = getView(R.id.voice_room);
+
+        if (null == mNoticeDialog) {
+            mNoticeDialog = new RoomNoticeDialog(activity);
+        }
     }
 
     /**
@@ -228,9 +238,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             isEdit = true;
         } else {
             isEdit = false;
-        }
-        if (null == mNoticeDialog) {
-            mNoticeDialog = new RoomNoticeDialog(activity);
         }
         mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
@@ -454,11 +461,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
-        /**
-         * 设一个默认的公告
-         */
-        showNotice(String.format("欢迎来到 %s", voiceRoomBean.getRoomName()), false);
-
     }
 
 

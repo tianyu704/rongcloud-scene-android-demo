@@ -11,8 +11,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import cn.rong.combusis.sdk.event.wrapper.EToast
 import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
+import cn.rong.combusis.widget.miniroom.MiniRoomManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -100,6 +102,10 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
         }
 
         iv_video_call.setOnClickListener {
+            if (MiniRoomManager.getInstance().isShowing) {
+                EToast.showToast("请先退出房间，再进行通话!")
+                return@setOnClickListener
+            }
             checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VideoCall)
@@ -110,6 +116,10 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
             }
         }
         iv_audio_call.setOnClickListener {
+            if (MiniRoomManager.getInstance().isShowing) {
+                EToast.showToast("请先退出房间，再进行通话!")
+                return@setOnClickListener
+            }
             checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.AudioCall)

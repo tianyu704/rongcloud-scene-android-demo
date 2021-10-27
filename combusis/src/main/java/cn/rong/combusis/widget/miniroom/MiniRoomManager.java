@@ -92,7 +92,6 @@ public class MiniRoomManager implements OnMiniRoomListener {
                 .build();
 
         miniWindows.setOnClickListener(v -> {
-//                finish(null, null);
             close();
             // TODO 打开房间
 //                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -151,11 +150,17 @@ public class MiniRoomManager implements OnMiniRoomListener {
         if (waveView == null) {
             return;
         }
-        if (isSpeaking) {
-            waveView.start();
-        } else {
-            waveView.stop();
-        }
+        waveView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isSpeaking) {
+                    waveView.start();
+                } else {
+                    waveView.stop();
+                }
+            }
+        });
+
     }
 
     private static class Holder {
