@@ -88,10 +88,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         this.roomId = roomId;
         this.pkView = pkView;
         this.stateListener = listener;
-        // 注册房间事件监听
-//        if (!EventHelper.helper().isInitlaized()) {
-//            EventHelper.helper().regeister(roomId, null);
-//        }
         // 注册pk状态监听
         EventBus.get().on(EventBus.TAG.PK_STATE, this);
         EventBus.get().on(EventBus.TAG.PK_RESPONSE, this);
@@ -146,9 +142,16 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         // 观众端需要获取pk双方房间和房主信息
         int state = pkResult.getStatusMsg();
         if (null != pkView) {
+            List<PKInfo> pkInfos = pkResult.getRoomScores();
+            String currentId = AccountStore.INSTANCE.getUserId();
+            if (2 == pkInfos.size()) {
+                pkView.reset(TextUtils.equals(currentId, pkInfos.get(0).getUserId())
+                        && TextUtils.equals(currentId, pkInfos.get(1).getUserId()));
+            }
             refreshPKInfo(pkResult);
             long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
             if (0 == state) {// pk 阶段
+                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_START);
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
                     @Override
                     public void onTimerEnd() {
@@ -156,6 +159,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                     }
                 });
             } else if (1 == state) {// pk 惩罚阶段
+                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_PUNISH);
                 pkView.pkPunish(timeDiff, new IPK.OnTimerEndListener() {
                     @Override
                     public void onTimerEnd() {
@@ -164,6 +168,12 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 });
             }
         }
+        UIKit.runOnUiTherad(new Runnable() {
+            @Override
+            public void run() {
+                if (null != stateListener) stateListener.onPkState();
+            }
+        });
     }
 
     private BottomDialog dialog;
@@ -344,6 +354,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
             public void onResult(PKResult pkResult) {
+                if (null == pkView) return;
+                pkView.reset(true);
                 refreshPKInfo(pkResult);
                 long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {

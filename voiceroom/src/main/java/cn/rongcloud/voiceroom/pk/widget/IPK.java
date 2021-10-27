@@ -13,6 +13,11 @@ import java.util.List;
  */
 public interface IPK {
     /**
+     * 状态重置
+     */
+    void reset(boolean broadcast);
+
+    /**
      * pk 开始
      *
      * @param localId 当前人的id

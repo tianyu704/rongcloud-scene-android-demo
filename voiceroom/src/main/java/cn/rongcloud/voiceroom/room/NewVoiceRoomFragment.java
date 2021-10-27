@@ -252,6 +252,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
+        if (checkPKState()) {
+            return;
+        }
+
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
@@ -358,8 +362,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void joinRoom() {
         present.init(mRoomId, isCreate);
-        // init pk
-        initPk();
     }
 
     private void initPk() {
@@ -376,7 +378,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
             @Override
             public void onPkState() {
-                StateUtil.isPking();
                 mRoomBottomView.refreshPkState();
             }
         });
@@ -461,6 +462,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
+        // init
+        initPk();
     }
 
 
@@ -697,7 +700,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     public void clickPk() {
         IEventHelp.Type type = EventHelper.helper().getPKState();
         if (IEventHelp.Type.PK_NONE == type
-                || IEventHelp.Type.PK_FINISH == type) {
+                || IEventHelp.Type.PK_FINISH == type
+                || IEventHelp.Type.PK_STOP == type) {
             PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
                 @Override
                 public void onResult(Boolean aBoolean) {
@@ -711,8 +715,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             });
         } else if (IEventHelp.Type.PK_GOING == type
                 || IEventHelp.Type.PK_PUNISH == type
-                || IEventHelp.Type.PK_START == type
-                || IEventHelp.Type.PK_STOP == type) {// pk中
+                || IEventHelp.Type.PK_START == type) {// pk中
             PKStateManager.get().quitPK(activity);
         }
     }

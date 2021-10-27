@@ -80,6 +80,7 @@ public class EventBus {
         public final static String PK_GIFT = "pk_gift";// pk礼物
         public final static String PK_RESPONSE = "pk_response"; // pk邀请响应状态
         public final static String PK_INVITE_QUIT = "pk_intivite_or_quit"; // 用户发起邀请和退出pk 修改状态
+        public final static String PK_AUTO_MODIFY = "pk_outo_modify"; // 用户主动修改状态
         public final static String UPDATE_SHIELD = "UPDATE_SHIELD"; // 更新屏蔽词
     }
 }

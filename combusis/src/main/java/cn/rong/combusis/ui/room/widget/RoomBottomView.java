@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
-import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiPopup;
@@ -372,14 +371,15 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
             IEventHelp.Type type = EventHelper.helper().getPKState();
             Logger.e("refreshPkState", "state = " + type);
             if (IEventHelp.Type.PK_NONE == type
-                    || IEventHelp.Type.PK_FINISH == type) {// 可以发起邀请
+                    || IEventHelp.Type.PK_FINISH == type
+                    || IEventHelp.Type.PK_STOP == type) {// 可以发起邀请
                 mPkView.setImageResource(R.drawable.ic_request_pk);
             } else if (IEventHelp.Type.PK_INVITE == type) {//邀请等 ->待
                 mPkView.setImageResource(R.drawable.ic_wait_enter_seat);
             } else if (IEventHelp.Type.PK_GOING == type
                     || IEventHelp.Type.PK_PUNISH == type
                     || IEventHelp.Type.PK_START == type
-                    || IEventHelp.Type.PK_STOP == type) {// pk中
+            ) {// pk中
                 mPkView.setImageResource(R.drawable.ic_pk_close);
             }
         }
