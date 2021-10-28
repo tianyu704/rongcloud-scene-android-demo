@@ -972,14 +972,29 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         for (UiSeatModel uiSeatModel : uiSeatModels) {
             if (uiSeatModel.getIndex() == 0) {
                 //如果是房主麦位，不用管房主是否存在
-                Member member = new Member().toMember(MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId()));
+                User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
+                Member member =null;
+                if (user==null){
+                    member=new Member();
+                    member.setUserName(mVoiceRoomBean.getCreateUserName());
+                    member.setUserId(mVoiceRoomBean.getCreateUserId());
+                }else {
+                    member=new Member().toMember(user);
+                }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
                 continue;
             }
             if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //当前用户在麦位上
-                Member member = new Member().toMember(MemberCache.getInstance().getMember(uiSeatModel.getUserId()));
+                User user = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
+                Member member =null;
+                if (user==null){
+                    member=new Member();
+                    member.setUserId(uiSeatModel.getUserId());
+                }else {
+                    member=new Member().toMember(user);
+                }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
             }
