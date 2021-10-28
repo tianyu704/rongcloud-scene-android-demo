@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import cn.rong.combusis.message.RCAllBroadcastMessage;
+import cn.rong.combusis.message.RCChatSeatRemove;
 import cn.rong.combusis.message.RCChatroomAdmin;
 import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomEnter;
@@ -42,6 +43,7 @@ public class ComApplication extends Application {
         super.onCreate();
         initBasis();
         CrashReport.initCrashReport(this);
+        int i = 1 / 0;
     }
 
     private void initBasis() {
@@ -102,7 +104,8 @@ public class ComApplication extends Application {
                 RCChatroomPKGift.class,
                 RCAllBroadcastMessage.class,
                 RCFollowMsg.class,
-                RCRRCloseMessage.class
+                RCRRCloseMessage.class,
+                RCChatSeatRemove.class
         );
     }
 }
