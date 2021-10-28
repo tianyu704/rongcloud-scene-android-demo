@@ -117,6 +117,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
 
     public void close() {
         FloatWindow.destroy(TAG);
+        onCloseMiniRoomListener=null;
     }
 
     /**
@@ -134,7 +135,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
     }
 
     public void finish(String roomId, OnCloseMiniRoomListener.CloseResult closeResult) {
-        close();
+        FloatWindow.destroy(TAG);
         if (!isSameRoom(roomId) && onCloseMiniRoomListener != null) {
             onCloseMiniRoomListener.onCloseMiniRoom(closeResult);
         } else if (closeResult != null) {
