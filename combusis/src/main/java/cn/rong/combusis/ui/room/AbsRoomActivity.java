@@ -3,19 +3,31 @@ package cn.rong.combusis.ui.room;
 import android.graphics.Rect;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.basis.net.LoadTag;
 import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.UiUtils;
+import com.scwang.smart.refresh.footer.ClassicsFooter;
+import com.scwang.smart.refresh.header.ClassicsHeader;
+import com.scwang.smart.refresh.layout.SmartRefreshLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.intent.IntentWrap;
+import cn.rong.combusis.provider.voiceroom.RoomType;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import io.rong.imkit.utils.StatusBarUtil;
 
 
@@ -31,8 +43,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
     private int bottomMargin = 0;
     private HashMap<String, SwitchRoomListener> switchRoomListenerMap = new HashMap<>();
     private String currentRoomId;
-
-    private LoadTag mLoadTag;
+    private SmartRefreshLayout refreshLayout;
 
     @Override
     public int setLayoutId() {
@@ -45,6 +56,24 @@ public abstract class AbsRoomActivity extends BaseActivity {
         // 状态栏透明
         StatusBarUtil.setTranslucentStatus(this);
         getWrapBar().setHide(true).work();
+        // 下拉刷新和加载更多
+        refreshLayout = getView(R.id.layout_refresh);
+        refreshLayout.setRefreshHeader(new ClassicsHeader(this));
+        refreshLayout.setRefreshFooter(new ClassicsFooter(this));
+        refreshLayout.setEnableAutoLoadMore(false);
+        refreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                refresh();
+            }
+        });
+        refreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                loadMore();
+            }
+        });
+
         // 初始化viewpager并设置数据和监听
         mViewPager = getView(R.id.vp_room);
         mViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
@@ -57,21 +86,12 @@ public abstract class AbsRoomActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 mCurrentPosition = position;
-                String roomId = mRoomAdapter.getItemData(position);
-                if (!TextUtils.equals(roomId, currentRoomId)) {
-                    if (currentRoomId != null && switchRoomListenerMap.containsKey(currentRoomId)) {
-                        switchRoomListenerMap.get(currentRoomId).destroyRoom();
-                        Logger.d("==================destroyRoom:" + currentRoomId);
-                    }
-                    currentRoomId = roomId;
-                    Logger.d("==================joinRoom:" + switchRoomListenerMap.containsKey(currentRoomId));
-                    if (switchRoomListenerMap.containsKey(currentRoomId)) {
-                        switchRoomListenerMap.get(currentRoomId).preJoinRoom();
-                        Logger.e("==================joinRoom:" + currentRoomId);
-                    }
-                }
+                refreshLayout.setEnableLoadMore(mCurrentPosition == mRoomAdapter.getItemCount() - 1);
+                refreshLayout.setEnableRefresh(mCurrentPosition == 0);
                 getIntent().putExtra(IntentWrap.KEY_ROOM_POSITION, position);
-                Logger.d("==================end选中了第几个：" + position + ",current:" + currentRoomId);
+                String roomId = mRoomAdapter.getItemData(position);
+                Logger.d("==================end选中了第几个：" + position + ",current:" + roomId);
+                switchViewPager(roomId);
             }
 
             @Override
@@ -103,6 +123,83 @@ public abstract class AbsRoomActivity extends BaseActivity {
                 getLayout().setPadding(0, 0, 0, bottomMargin);
             }
         });
+
+    }
+
+
+    protected void refresh() {
+        VoiceRoomProvider.provider().loadPage(true, getRoomType(), voiceRoomBeans -> {
+            if (voiceRoomBeans == null) {
+                getRefreshLayout().finishRefresh(false);
+            } else {
+                List<String> ids = new ArrayList<>();
+                for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
+                    if (!voiceRoomBean.isPrivate() && !TextUtils.equals(voiceRoomBean.getCreateUserId(), AccountStore.INSTANCE.getUserId())) {
+                        ids.add(voiceRoomBean.getRoomId());
+                    }
+                }
+                refreshViewPagerFinished(ids);
+            }
+        });
+    }
+
+    protected void loadMore() {
+        VoiceRoomProvider.provider().loadPage(false, getRoomType(), voiceRoomBeans -> {
+            if (voiceRoomBeans == null) {
+                getRefreshLayout().finishLoadMore();
+                getRefreshLayout().setNoMoreData(true);
+            } else {
+                List<String> ids = new ArrayList<>();
+                for (VoiceRoomBean voiceRoomBean : voiceRoomBeans) {
+                    if (!voiceRoomBean.isPrivate() && !TextUtils.equals(voiceRoomBean.getCreateUserId(), AccountStore.INSTANCE.getUserId())) {
+                        ids.add(voiceRoomBean.getRoomId());
+                    }
+                }
+                loadMoreViewPagerFinished(ids);
+            }
+        });
+    }
+
+    private void switchViewPager(String roomId) {
+        if (!TextUtils.equals(roomId, currentRoomId)) {
+            if (currentRoomId != null && switchRoomListenerMap.containsKey(currentRoomId)) {
+                switchRoomListenerMap.get(currentRoomId).destroyRoom();
+                Logger.d("==================destroyRoom:" + currentRoomId);
+            }
+            currentRoomId = roomId;
+            Logger.d("==================joinRoom:" + switchRoomListenerMap.containsKey(currentRoomId));
+            if (switchRoomListenerMap.containsKey(currentRoomId)) {
+                switchRoomListenerMap.get(currentRoomId).preJoinRoom();
+                Logger.e("==================joinRoom:" + currentRoomId);
+            }
+        }
+    }
+
+    protected void refreshViewPagerFinished(List<String> ids) {
+        if (ids == null) return;
+        if (ids.size() > 0) {
+            String roomId = ids.get(0);
+            if (!TextUtils.equals(roomId, currentRoomId)) {
+                if (currentRoomId != null && switchRoomListenerMap.containsKey(currentRoomId)) {
+                    switchRoomListenerMap.get(currentRoomId).destroyRoom();
+                    Logger.d("==================destroyRoom:" + currentRoomId);
+                }
+                currentRoomId = roomId;
+                mRoomAdapter.setData(ids);
+            }
+        }
+        refreshLayout.finishRefresh();
+        refreshLayout.setNoMoreData(false);
+    }
+
+    protected void loadMoreViewPagerFinished(List<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            refreshLayout.finishLoadMore();
+            refreshLayout.setNoMoreData(true);
+            return;
+        }
+        mRoomAdapter.addData(ids);
+        refreshLayout.finishLoadMore();
     }
 
     protected abstract void initRoom();
@@ -116,6 +213,11 @@ public abstract class AbsRoomActivity extends BaseActivity {
     // 加载数据
     protected abstract List<String> loadData();
 
+    protected abstract RoomType getRoomType();
+
+    protected SmartRefreshLayout getRefreshLayout() {
+        return refreshLayout;
+    }
 
     @Override
     public void onBackPressed() {
@@ -128,12 +230,13 @@ public abstract class AbsRoomActivity extends BaseActivity {
 
     public void addSwitchRoomListener(String roomId, SwitchRoomListener switchRoomListener) {
         switchRoomListenerMap.put(roomId, switchRoomListener);
-        Logger.e("=================addSwitchRoomListener");
+        Logger.d("=================addSwitchRoomListener");
     }
 
     public void removeSwitchRoomListener(String roomId) {
         switchRoomListenerMap.remove(roomId);
-        Logger.e("=================removeSwitchRoomListener");
+        Logger.d("=================removeSwitchRoomListener");
     }
+
 
 }

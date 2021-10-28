@@ -34,7 +34,6 @@ import kotlin.jvm.functions.Function0;
 public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickRoomListListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
 
     private RoomListAdapter mAdapter;
-    private int mCurrentPage = 1;
     private XRecyclerView mRoomList;
     private CreateRoomDialog mCreateRoomDialog;
     private ConfirmDialog confirmDialog;
@@ -88,19 +87,17 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
      */
     private void loadRoomList(boolean isRefresh) {
         if (isRefresh) {
-            mCurrentPage = 1;
             mRoomList.setNoMore(false);
         }
-        VoiceRoomProvider.provider().loadPage(mCurrentPage, getRoomType(), voiceRoomBeans -> {
+        VoiceRoomProvider.provider().loadPage(isRefresh, getRoomType(), voiceRoomBeans -> {
             refresh(voiceRoomBeans, isRefresh);
-            if (mCurrentPage == 1) {
+            if (VoiceRoomProvider.provider().getPage() <= 2) {
                 mRoomList.refreshComplete();
             } else {
                 mRoomList.loadComplete();
             }
 
             if (voiceRoomBeans != null && !voiceRoomBeans.isEmpty()) {
-                mCurrentPage++;
             } else {
                 mRoomList.setNoMore(true);
             }
@@ -170,5 +167,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
      */
     private void jumpRoom(VoiceRoomBean voiceRoomBean) {
         IntentWrap.launchRoom(requireContext(), voiceRoomBean.getRoomType(), voiceRoomBean.getRoomId());
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        VoiceRoomProvider.provider().clear();
     }
 }

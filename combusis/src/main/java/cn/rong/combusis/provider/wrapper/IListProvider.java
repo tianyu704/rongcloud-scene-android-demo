@@ -17,9 +17,9 @@ public interface IListProvider<T> {
     /**
      * load by page
      *
-     * @param page
+     * @param isRefresh
      * @param roomType
      * @param resultBack
      */
-    void loadPage(int page, RoomType roomType, IResultBack<List<T>> resultBack);
+    void loadPage(boolean isRefresh, RoomType roomType, IResultBack<List<T>> resultBack);
 }

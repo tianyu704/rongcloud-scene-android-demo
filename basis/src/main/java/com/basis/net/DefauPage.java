@@ -8,7 +8,7 @@ import com.basis.net.oklib.net.Page;
 public class DefauPage implements Page {
     private String keySize = "pageSize";
     private String keyPage = "pageNo";
-    int size = 15;//每页显示的记录数据 默认15条
+    int size = 10;//每页显示的记录数据 默认15条
     int first = 1;//第一页的索引 0 或者 1
 
     @Override

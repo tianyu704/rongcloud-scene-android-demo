@@ -1,13 +1,19 @@
 package cn.rongcloud.radio.ui.room;
 
 import android.app.Activity;
+import android.text.TextUtils;
 
 import androidx.fragment.app.Fragment;
+
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.intent.IntentWrap;
+import cn.rong.combusis.provider.voiceroom.RoomType;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 
 /**
@@ -44,6 +50,10 @@ public class RadioRoomActivity extends AbsRoomActivity {
             return ids;
         }
         return null;
+    }
+    @Override
+    protected RoomType getRoomType() {
+        return RoomType.RADIO_ROOM;
     }
 
 }

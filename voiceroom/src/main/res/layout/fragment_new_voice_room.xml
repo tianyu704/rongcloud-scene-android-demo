@@ -19,17 +19,6 @@
         android:layout_height="match_parent"
         android:visibility="invisible">
 
-        <cn.rong.combusis.ui.room.widget.RoomBottomView
-            android:id="@+id/room_bottom_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
-
-        <cn.rong.combusis.ui.room.widget.RoomTitleBar
-            android:id="@+id/room_title_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_notice"
@@ -107,6 +96,18 @@
             app:layout_constraintWidth_percent="0.7"
             tools:itemCount="20"
             tools:listitem="@layout/item_message_system" />
+
+        <cn.rong.combusis.ui.room.widget.RoomBottomView
+            android:id="@+id/room_bottom_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <cn.rong.combusis.ui.room.widget.RoomTitleBar
+            android:id="@+id/room_title_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <cn.rong.combusis.ui.room.widget.AllBroadcastView
             android:id="@+id/view_all_broadcast"

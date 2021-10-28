@@ -98,4 +98,9 @@ dependencies {
         api project(path: ':VoiceRoomSDK:RCVoiceRoom')
         api project(path: ':VoiceRoomSDK:RCRadioRoom')
     }
+    // SmartRefreshLayout
+    // https://github.com/scwang90/SmartRefreshLayout
+    api "com.scwang.smart:refresh-layout-kernel:2.0.3"
+    api "com.scwang.smart:refresh-header-classics:2.0.3"
+    api "com.scwang.smart:refresh-footer-classics:2.0.3"
 }

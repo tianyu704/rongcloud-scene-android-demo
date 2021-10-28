@@ -39,7 +39,6 @@ public class RecyclerViewAtVP2 extends RecyclerView {
                 int endY = (int) ev.getY();
                 int disX = Math.abs(endX - startX);
                 int disY = Math.abs(endY - startY);
-                Log.d(TAG, "DispatchTouchEvent disX=" + disX + "; disY" + disY + "; canScrollHorizontally(startX - endX) = " + canScrollHorizontally(startX - endX) + "; canScrollVertically(startY - endY)" + canScrollVertically(startY - endY));
                 if (disX > disY) {
                     //如果是纵向滑动，告知父布局不进行时间拦截，交由子布局消费，　requestDisallowInterceptTouchEvent(true)
                     getParent().requestDisallowInterceptTouchEvent(canScrollHorizontally(startX - endX));
@@ -48,7 +47,6 @@ public class RecyclerViewAtVP2 extends RecyclerView {
                 }
                 break;
             case MotionEvent.ACTION_UP:
-//            case MotionEvent.ACTION_CANCEL:
                 getParent().requestDisallowInterceptTouchEvent(false);
                 break;
         }
