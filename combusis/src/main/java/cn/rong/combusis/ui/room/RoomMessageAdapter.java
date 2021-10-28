@@ -65,7 +65,7 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
 
     @Override
     public int getItemLayoutId(MessageContent item, int position) {
-        if (item instanceof RCChatroomLocationMessage) {
+        if (item instanceof RCChatroomLocationMessage || item instanceof TextMessage) {
             return R.layout.item_message_system;
         } else if (item instanceof RCChatroomVoice) {
             return R.layout.item_message_voice;
@@ -92,7 +92,12 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
      * @param messageContent messageContent
      */
     private void setSystemMessage(RcyHolder holder, MessageContent messageContent) {
-        holder.setText(R.id.tv_message_system, messageContent.toString());
+        if (messageContent instanceof RCChatroomLocationMessage){
+            holder.setText(R.id.tv_message_system, ((RCChatroomLocationMessage) messageContent).getContent());
+        }else if (messageContent instanceof TextMessage){
+            holder.setText(R.id.tv_message_system, ((TextMessage) messageContent).getContent());
+        }
+
     }
 
     /**

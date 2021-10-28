@@ -1199,9 +1199,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 发送公告更新的
      */
     private void sendNoticeModifyMessage() {
-        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-        tips.setContent("房间公告已更新！");
-        mView.showMessage(tips, false);
+        TextMessage tips = TextMessage.obtain("房间公告已更新!");
+        sendMessage(tips);
     }
 
     /**
