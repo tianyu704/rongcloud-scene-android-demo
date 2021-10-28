@@ -93,10 +93,12 @@ public class MiniRoomManager implements OnMiniRoomListener {
 
         miniWindows.setOnClickListener(v -> {
             close();
-            // TODO 打开房间
-//                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
-                context.getApplicationContext().startActivity(intent);
+                if (intent.getFlags()== Intent.FLAG_ACTIVITY_NEW_TASK) {
+                    context.getApplicationContext().startActivity(intent);
+                }else {
+                    context.startActivity(intent);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
