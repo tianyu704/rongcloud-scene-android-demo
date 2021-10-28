@@ -1,7 +1,6 @@
 package cn.rong.combusis.sdk;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
@@ -13,6 +12,7 @@ import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.PKResponse;
+import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class VoiceRoomApi implements Api {
@@ -301,7 +301,7 @@ public class VoiceRoomApi implements Api {
                     @Override
                     public void onError(int i, String s) {
                         KToast.show("发送PK邀请失败");
-                        Log.e(TAG, "sendPKInvitation#onError [" + i + "]:" + s);
+                        Logger.e(TAG, "sendPKInvitation#onError [" + i + "]:" + s);
                         if (null != resultBack) resultBack.onResult(false);
                     }
                 });
@@ -329,7 +329,7 @@ public class VoiceRoomApi implements Api {
                     @Override
                     public void onError(int i, String s) {
                         KToast.show("取消PK邀请失败");
-                        Log.e(TAG, "cancelPKInvitation#onError [" + i + "]:" + s);
+                        Logger.e(TAG, "cancelPKInvitation#onError [" + i + "]:" + s);
                         if (null != resultBack) resultBack.onResult(false);
                     }
                 });
@@ -363,7 +363,7 @@ public class VoiceRoomApi implements Api {
                     @Override
                     public void onError(int i, String s) {
                         KToast.show(action + "失败");
-                        Log.e(TAG, "responsePKInvitation#onError [" + i + "]:" + s);
+                        Logger.e(TAG, "responsePKInvitation#onError [" + i + "]:" + s);
                         if (null != resultBack) resultBack.onResult(false);
                     }
                 });
@@ -382,7 +382,7 @@ public class VoiceRoomApi implements Api {
                 new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
-                        Log.e(TAG, "quitPK#onSuccess ");
+                        Logger.e(TAG, "quitPK#onSuccess ");
                         //修改pk状态
                         EventBus.get().emit(EventBus.TAG.PK_INVITE_QUIT, IEventHelp.Type.PK_NONE);
                         if (null != resultBack) resultBack.onResult(true);
@@ -390,11 +390,26 @@ public class VoiceRoomApi implements Api {
 
                     @Override
                     public void onError(int i, String s) {
-                        Log.e(TAG, "quitPK#onError [" + i + "]:" + s);
+                        Logger.e(TAG, "quitPK#onError [" + i + "]:" + s);
                         if (null != resultBack) resultBack.onResult(false);
                     }
                 });
 
+    }
+
+    public void quickStartPk(RCPKInfo rcpkInfo, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                if (null != resultBack) resultBack.onResult(true);
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                Logger.e(TAG, "quitPK#onError [" + i + "]:" + s);
+                if (null != resultBack) resultBack.onResult(true);
+            }
+        });
     }
 
     @Override

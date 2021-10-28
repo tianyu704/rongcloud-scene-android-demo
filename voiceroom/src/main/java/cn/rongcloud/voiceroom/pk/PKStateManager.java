@@ -27,8 +27,6 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
@@ -104,6 +102,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 // 观众端需要获取pk双方房间和房主信息
                 PKInfo[] pkInfos = formatPKInfo(pkResult);
                 if (null == pkInfos || 2 != pkInfos.length) {
+                    Logger.e(TAG, "pkInfos is ill ");
                     return;
                 }
                 String currentId = AccountStore.INSTANCE.getUserId();
@@ -117,16 +116,15 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                     rcpkInfo.setInviterId(pkInfos[0].getUserId());
                     rcpkInfo.setInviteeRoomId(pkInfos[1].getRoomId());//被邀请
                     rcpkInfo.setInviteeId(pkInfos[1].getUserId());
-                    RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
+                    VoiceRoomApi.getApi().quickStartPk(rcpkInfo, new IResultBack<Boolean>() {
                         @Override
-                        public void onSuccess() {
-                            pkView.reset(true);
-                            handleAudienceJoinPk(pkResult);
-                        }
-
-                        @Override
-                        public void onError(int i, String s) {
-
+                        public void onResult(Boolean aBoolean) {
+                            if (aBoolean) {
+                                pkView.reset(true);
+                                handleAudienceJoinPk(pkResult);
+                            } else {
+                                Logger.e(TAG, "Quick Start Pk Fail");
+                            }
                         }
                     });
                 } else {
@@ -169,7 +167,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
      * 根据pk状态jump 不同阶段
      */
     void handleAudienceJoinPk(PKResult pkResult) {
-        Logger.e(TAG, "init JumpTo PK");
+        Logger.e(TAG, "handleAudienceJoinPk");
         if (null != stateListener) stateListener.onPkStart();
         // 观众端需要获取pk双方房间和房主信息
         int state = pkResult.getStatusMsg();
