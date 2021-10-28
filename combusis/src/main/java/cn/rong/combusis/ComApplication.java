@@ -43,7 +43,6 @@ public class ComApplication extends Application {
         super.onCreate();
         initBasis();
         CrashReport.initCrashReport(this);
-        int i = 1 / 0;
     }
 
     private void initBasis() {
