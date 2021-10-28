@@ -40,6 +40,7 @@ import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.TextMessage;
 
 /**
  * @author gyn
@@ -75,8 +76,8 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
 
     @Override
     public void convert(RcyHolder holder, MessageContent messageContent, int position, int layoutId) {
-        if (messageContent instanceof RCChatroomLocationMessage) {
-            setSystemMessage(holder, (RCChatroomLocationMessage) messageContent);
+        if (messageContent instanceof RCChatroomLocationMessage ||messageContent instanceof TextMessage) {
+            setSystemMessage(holder, messageContent);
         } else if (messageContent instanceof RCChatroomVoice) {
             setVoiceMessage(holder, (RCChatroomVoice) messageContent);
         } else {
@@ -90,8 +91,8 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
      * @param holder         holder
      * @param messageContent messageContent
      */
-    private void setSystemMessage(RcyHolder holder, RCChatroomLocationMessage messageContent) {
-        holder.setText(R.id.tv_message_system, messageContent.getContent());
+    private void setSystemMessage(RcyHolder holder, MessageContent messageContent) {
+        holder.setText(R.id.tv_message_system, messageContent.toString());
     }
 
     /**

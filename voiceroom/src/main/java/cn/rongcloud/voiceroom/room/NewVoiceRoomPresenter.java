@@ -107,6 +107,7 @@ import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.TextMessage;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -506,7 +507,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
-                                || RCFollowMsg.class.equals(aClass)) {
+                                || RCFollowMsg.class.equals(aClass)|| TextMessage.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {

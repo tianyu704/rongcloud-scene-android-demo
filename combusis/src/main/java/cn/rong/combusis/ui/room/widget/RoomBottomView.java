@@ -159,7 +159,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         mSendMessageView.setOnClickListener(v -> {
             mInputBar.setVisibility(VISIBLE);
             mInputView.requestFocus();
-            SoftKeyboardUtils.showSoftKeyboard(mInputView);
         });
         // 点击emoji
         mEmojiView.setOnClickListener(v -> {
