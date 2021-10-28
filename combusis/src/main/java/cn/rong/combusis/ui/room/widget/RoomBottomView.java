@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
+import com.kit.utils.Logger;
 import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiPopup;
 
@@ -31,7 +32,9 @@ import cn.rong.combusis.manager.AudioRecordManager;
 import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.ui.room.widget.like.FavAnimation;
 import io.rong.imkit.manager.UnReadMessageManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
@@ -271,13 +274,12 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         } else {
             mSeatOrderNumber.setVisibility(GONE);
         }
-
     }
 
     /**
      * 隐藏输入框
      */
-    public void hideSoftKeyboardAndIntput(){
+    public void hideSoftKeyboardAndIntput() {
         mInputView.clearFocus();
         SoftKeyboardUtils.hideSoftKeyboard(mInputView);
         mInputBar.setVisibility(View.GONE);
@@ -356,14 +358,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 onBottomOptionClickListener.clickSendMessage(msg.toString().trim());
             });
             mPkView.setOnClickListener(v -> {
-//                isInPk = !isInPk;
-//                if (isInPk) {
-//                    mPkView.setImageResource(R.drawable.ic_pk_close);
-//                } else {
-//                    mPkView.setImageResource(R.drawable.ic_request_pk);
-//                }
-//                mPkView.setSelected(!mPkView.isSelected());
-                onBottomOptionClickListener.clickPk(v);
+                onBottomOptionClickListener.clickPk();
             });
             mSendGiftView.setOnClickListener(v -> {
                 onBottomOptionClickListener.onSendGift();
@@ -371,8 +366,23 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         }
     }
 
-    public void setPkState(boolean isInPk) {
-        if (null != mPkView) mPkView.setSelected(isInPk);
+    public void refreshPkState() {
+        if (null != mPkView) {
+            IEventHelp.Type type = EventHelper.helper().getPKState();
+            Logger.e("refreshPkState", "state = " + type);
+            if (IEventHelp.Type.PK_NONE == type
+                    || IEventHelp.Type.PK_FINISH == type
+                    || IEventHelp.Type.PK_STOP == type) {// 可以发起邀请
+                mPkView.setImageResource(R.drawable.ic_request_pk);
+            } else if (IEventHelp.Type.PK_INVITE == type) {//邀请等 ->待
+                mPkView.setImageResource(R.drawable.ic_wait_enter_seat);
+            } else if (IEventHelp.Type.PK_GOING == type
+                    || IEventHelp.Type.PK_PUNISH == type
+                    || IEventHelp.Type.PK_START == type
+            ) {// pk中
+                mPkView.setImageResource(R.drawable.ic_pk_close);
+            }
+        }
     }
 
     /**
@@ -442,7 +452,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
 
         void clickSettings();
 
-        void clickPk(View view);
+        void clickPk();
 
         void clickRequestSeat();
 

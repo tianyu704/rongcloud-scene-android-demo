@@ -33,7 +33,18 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
             @Override
             public void onEvent(String tag, Object... args) {
                 if (null != args && args.length == 1) {
+                    Logger.e(TAG, "on: current = " + current);
                     current = (Type) args[0];
+                    dispatchPKState(null);
+                }
+            }
+        });
+        EventBus.get().on(EventBus.TAG.PK_AUTO_MODIFY, new EventBus.EventCallback() {
+            @Override
+            public void onEvent(String tag, Object... args) {
+                if (null != args && args.length == 1) {
+                    current = (Type) args[0];
+                    Logger.e(TAG, "on: current = " + current);
                 }
             }
         });
@@ -44,6 +55,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         super.unInit();
         current = Type.PK_NONE;
         EventBus.get().off(EventBus.TAG.PK_INVITE_QUIT, null);
+        EventBus.get().off(EventBus.TAG.PK_AUTO_MODIFY, null);
     }
 
     @Override

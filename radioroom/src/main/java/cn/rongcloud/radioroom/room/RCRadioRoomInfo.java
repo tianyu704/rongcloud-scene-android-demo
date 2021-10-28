@@ -1,4 +1,4 @@
-package cn.rongcloud.radioroom.rroom;
+package cn.rongcloud.radioroom.room;
 
 import android.text.TextUtils;
 

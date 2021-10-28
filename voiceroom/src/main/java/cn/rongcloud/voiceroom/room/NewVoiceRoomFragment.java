@@ -50,6 +50,8 @@ import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.sdk.event.EventHelper;
+import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
@@ -77,6 +79,7 @@ import cn.rongcloud.voiceroom.pk.StateUtil;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.IRongCoreEnum;
@@ -159,11 +162,14 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
         // 头部
         mRoomTitleBar = getView(R.id.room_title_bar);
-        mRoomTitleBar.setOnMemberClickListener(v -> {
-            mMemberListFragment = new MemberListFragment(present.getRoomId(), this);
-            mMemberListFragment.show(getChildFragmentManager());
+        mRoomTitleBar.setOnMemberClickListener().subscribe(new Consumer<Unit>() {
+            @Override
+            public void accept(Unit unit) throws Throwable {
+                //添加防抖动
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), NewVoiceRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
+            }
         });
-
         //麦位
         rv_seat_list = getView(R.id.rv_seat_list);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
@@ -176,9 +182,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         });
         voiceRoomSeatsAdapter.setHasStableIds(true);
         rv_seat_list.setAdapter(voiceRoomSeatsAdapter);
-
-        mRoomTitleBar.setOnMenuClickListener(v -> {
-            clickMenu();
+        mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                clickMenu();
+            }
         });
 
         mNoticeView = getView(R.id.tv_notice);
@@ -214,6 +222,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
         pkView = getView(R.id.pk_view);
         voiceRoom = getView(R.id.voice_room);
+
+        if (null == mNoticeDialog) {
+            mNoticeDialog = new RoomNoticeDialog(activity);
+        }
     }
 
     /**
@@ -226,9 +238,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             isEdit = true;
         } else {
             isEdit = false;
-        }
-        if (null == mNoticeDialog) {
-            mNoticeDialog = new RoomNoticeDialog(activity);
         }
         mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
@@ -243,6 +252,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
+        if (checkPKState()) {
+            return;
+        }
+
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
@@ -349,8 +362,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void joinRoom() {
         present.init(mRoomId, isCreate);
-        // init pk
-        initPk();
     }
 
     private void initPk() {
@@ -367,7 +378,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
             @Override
             public void onPkState() {
-                mRoomBottomView.setPkState(StateUtil.isPking());
+                mRoomBottomView.refreshPkState();
             }
         });
     }
@@ -382,7 +393,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private boolean checkPKState() {
         boolean isPK = StateUtil.isPking();
         if (isPK) {
-            KToast.show("当前PK中，无法镜像该操作");
+            KToast.show("当前PK中，无法进行该操作");
         }
         Logger.e(TAG, "isPk = " + isPK);
         return isPK;
@@ -451,11 +462,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
-        /**
-         * 设一个默认的公告
-         */
-        showNotice(String.format("欢迎来到 %s", voiceRoomBean.getRoomName()), false);
-
+        // init
+        initPk();
     }
 
 
@@ -687,19 +695,28 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     /**
      * PK
-     *
-     * @param view
      */
     @Override
-    public void clickPk(View view) {
-        if (view.isSelected()) {// 关闭pk
-            PKStateManager.get().quitPK(activity);
-        } else {// 发起pk
+    public void clickPk() {
+        IEventHelp.Type type = EventHelper.helper().getPKState();
+        if (IEventHelp.Type.PK_NONE == type
+                || IEventHelp.Type.PK_FINISH == type
+                || IEventHelp.Type.PK_STOP == type) {
             PKStateManager.get().sendPkInvitation(activity, new IResultBack<Boolean>() {
                 @Override
                 public void onResult(Boolean aBoolean) {
                 }
             });
+        } else if (IEventHelp.Type.PK_INVITE == type) {
+            PKStateManager.get().cancelPkInvitation(activity, new IResultBack<Boolean>() {
+                @Override
+                public void onResult(Boolean aBoolean) {
+                }
+            });
+        } else if (IEventHelp.Type.PK_GOING == type
+                || IEventHelp.Type.PK_PUNISH == type
+                || IEventHelp.Type.PK_START == type) {// pk中
+            PKStateManager.get().quitPK(activity);
         }
     }
 

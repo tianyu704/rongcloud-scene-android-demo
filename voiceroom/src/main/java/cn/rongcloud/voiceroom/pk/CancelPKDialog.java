@@ -23,7 +23,6 @@ public class CancelPKDialog extends BottomDialog implements View.OnClickListener
         initView();
     }
 
-
     private void initView() {
         UIKit.getView(getContentView(), R.id.cancele_pk).setOnClickListener(this);
         UIKit.getView(getContentView(), R.id.cancel_dialog).setOnClickListener(this);
@@ -34,6 +33,7 @@ public class CancelPKDialog extends BottomDialog implements View.OnClickListener
         int id = view.getId();
         if (R.id.cancele_pk == id) {
             VoiceRoomApi.getApi().cancelPKInvitation(resultBack);
+            dismiss();
         } else if (R.id.cancel_dialog == id) {
             dismiss();
             if (null != resultBack) resultBack.onResult(false);

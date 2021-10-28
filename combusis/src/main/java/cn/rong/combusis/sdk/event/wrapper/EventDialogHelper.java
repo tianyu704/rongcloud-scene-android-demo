@@ -120,7 +120,7 @@ public class EventDialogHelper {
         private String userId;
 
         Timer(TextView textView, String roomId, UserInfo userInfo) {
-            super(60 * 1000, 1000);
+            super(10 * 1000, 1000);
             this.preInfo = "房主 " + userInfo.getName() + " 邀请您进行PK，是否同意？";
             this.reference = new WeakReference<>(textView);
             this.roomId = roomId;

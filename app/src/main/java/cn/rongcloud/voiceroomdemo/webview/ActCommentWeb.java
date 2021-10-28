@@ -3,6 +3,7 @@ package cn.rongcloud.voiceroomdemo.webview;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +17,6 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.rongcloud.common.base.BaseActivity;
 
 import cn.rongcloud.voiceroomdemo.R;
 
@@ -135,15 +134,15 @@ public class ActCommentWeb extends BaseActionBarActivity {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             Log.e("shouldOverride", "url = " + url);
-//            if (url.contains(MOFW.MODIFY_TRANS_PSWD_URL)) {//从定向登录
-//                reLoadUrl = url;
-//                mActivity.startActivityForResult(new Intent(mActivity, ActLogin.class), _codeLogin);
-//            } else if (url.contains("user/center/")) {
-//                //从定向个人中（修改交易密码 充值后自动跳转）点击回到个人中心 https://test36wx.mofangworld.com/user/center/
-//                finish();
-//            } else {
+            if (url.startsWith("tel")) {
+                // 修改web拨号跳异常界面的审核问题
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                Uri data = Uri.parse(url);
+                intent.setData(data);
+                startActivity(intent);
+                return true;
+            }
             view.loadUrl(url);
-//            }
             return true;
         }
 

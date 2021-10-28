@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
@@ -58,12 +59,25 @@ public class RealPathFromUriUtils {
         if (DocumentsContract.isDocumentUri(context, uri)) {
             // 如果是document类型的 uri, 则通过document id来进行处理
             String documentId = DocumentsContract.getDocumentId(uri);
-            if (isMediaDocument(uri)) { // MediaProvider
-                // 使用':'分割
-                String id = documentId.split(":")[1];
+            final String[] split = documentId.split(":"); // 使用':'分割
+            final String type = split[0];
+            String id = split[1];
+            if (isExternalStorageDocument(uri)) {
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + id;
+                }
+            } else if (isMediaDocument(uri)) { // MediaProvider
                 String selection = MediaStore.Images.Media._ID + "=?";
                 String[] selectionArgs = {id};
-                filePath = getDataColumn(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection, selectionArgs);
+                Uri contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                filePath = getDataColumn(context, contentUri, selection, selectionArgs);
             } else if (isDownloadsDocument(uri)) { // DownloadsProvider
                 Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(documentId));
                 filePath = getDataColumn(context, contentUri, null, null);
@@ -99,6 +113,10 @@ public class RealPathFromUriUtils {
             }
         }
         return path;
+    }
+
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
     /**

@@ -11,8 +11,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import cn.rong.combusis.sdk.event.wrapper.EToast
 import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
+import cn.rong.combusis.widget.miniroom.MiniRoomManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -53,6 +55,11 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
         }
     }
 
+    override fun onSetPermissions(): Array<String>? {
+        // 处理vivo 登录前申请权限的审核问题
+        return LAUNCHER_PERMISSIONS
+    }
+
     @Inject
     lateinit var presenter: HomePresenter
 
@@ -72,7 +79,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
 //                }
 //            }
 //        }
-        tv_new_roomList.visibility=View.GONE;
+        tv_new_roomList.visibility = View.GONE;
         iv_voice_room.setOnClickListener {
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
@@ -95,6 +102,10 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
         }
 
         iv_video_call.setOnClickListener {
+            if (MiniRoomManager.getInstance().isShowing) {
+                EToast.showToast("请先退出房间，再进行通话!")
+                return@setOnClickListener
+            }
             checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VideoCall)
@@ -105,6 +116,10 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
             }
         }
         iv_audio_call.setOnClickListener {
+            if (MiniRoomManager.getInstance().isShowing) {
+                EToast.showToast("请先退出房间，再进行通话!")
+                return@setOnClickListener
+            }
             checkAndRequestPermissions(CALL_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.AudioCall)

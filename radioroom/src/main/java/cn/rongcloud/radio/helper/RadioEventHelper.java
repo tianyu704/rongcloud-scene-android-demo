@@ -27,7 +27,7 @@ import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
-import cn.rongcloud.radioroom.rroom.RCRadioEventListener;
+import cn.rongcloud.radioroom.room.RCRadioEventListener;
 import io.rong.imkit.picture.tools.ToastUtils;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;

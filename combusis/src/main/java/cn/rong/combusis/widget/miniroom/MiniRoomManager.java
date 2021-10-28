@@ -1,8 +1,12 @@
 package cn.rong.combusis.widget.miniroom;
 
+import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,6 +18,8 @@ import com.yhao.floatwindow.IFloatWindow;
 import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
+
+import java.util.List;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
@@ -92,12 +98,11 @@ public class MiniRoomManager implements OnMiniRoomListener {
                 .build();
 
         miniWindows.setOnClickListener(v -> {
-//                finish(null, null);
             close();
             // TODO 打开房间
 //                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             try {
-                context.startActivity(intent);
+                context.getApplicationContext().startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -108,6 +113,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
             iFloatWindow.show();
         }
     }
+
 
     public void close() {
         FloatWindow.destroy(TAG);
@@ -151,11 +157,17 @@ public class MiniRoomManager implements OnMiniRoomListener {
         if (waveView == null) {
             return;
         }
-        if (isSpeaking) {
-            waveView.start();
-        } else {
-            waveView.stop();
-        }
+        waveView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (isSpeaking) {
+                    waveView.start();
+                } else {
+                    waveView.stop();
+                }
+            }
+        });
+
     }
 
     private static class Holder {

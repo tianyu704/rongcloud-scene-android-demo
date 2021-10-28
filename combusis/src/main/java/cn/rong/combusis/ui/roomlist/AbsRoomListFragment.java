@@ -24,6 +24,7 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickRoomListListener;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
@@ -130,6 +131,10 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
      * 检查用户之前是否在某个房间内
      */
     private void checkUserRoom() {
+        if (MiniRoomManager.getInstance().isShowing()) {
+            //如果有小窗口存在的情况下，不显示
+            return;
+        }
         Map<String, Object> params = new HashMap<>(2);
         OkApi.get(VRApi.USER_ROOM_CHECK, params, new WrapperCallBack() {
 

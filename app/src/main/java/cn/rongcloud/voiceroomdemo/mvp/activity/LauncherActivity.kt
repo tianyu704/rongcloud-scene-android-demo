@@ -21,7 +21,9 @@ class LauncherActivity : PermissionActivity() {
     }
 
     override fun onSetPermissions(): Array<String>? {
-        return LAUNCHER_PERMISSIONS
+        // 移到主界面申请
+//        return LAUNCHER_PERMISSIONS
+        return null
     }
 
     override fun onAccept(accept: Boolean) {

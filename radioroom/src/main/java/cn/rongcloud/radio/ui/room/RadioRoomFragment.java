@@ -58,6 +58,7 @@ import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radioroom.R;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.RouteUtils;
 import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.model.Conversation;
@@ -131,12 +132,18 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mRoomTitleBar.getLayoutParams();
         params.topMargin = StatusBarUtil.getStatusBarHeight(requireContext());
         mRoomTitleBar.setLayoutParams(params);
-        mRoomTitleBar.setOnMenuClickListener(v -> {
-            clickMenu();
+        mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                clickMenu();
+            }
         });
-        mRoomTitleBar.setOnMemberClickListener(v -> {
-            mMemberListFragment = new MemberListFragment(present.getRoomId(), this);
-            mMemberListFragment.show(getChildFragmentManager());
+        mRoomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), RadioRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
+            }
         });
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
@@ -485,7 +492,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     }
 
     @Override
-    public void clickPk(View view) {
+    public void clickPk() {
 
     }
 

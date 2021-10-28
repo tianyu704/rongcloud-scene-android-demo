@@ -46,10 +46,8 @@ dependencies {
     // rxjava 相关
     api "io.reactivex.rxjava3:rxjava:3.0.2"
     api 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    api 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
 
-    // rxjava 相关
-    api "io.reactivex.rxjava3:rxjava:3.0.2"
-    api 'io.reactivex.rxjava3:rxandroid:3.0.0'
     // retrofit 相关
     api 'com.squareup.retrofit2:retrofit:2.9.0'
     api 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
@@ -96,5 +94,6 @@ dependencies {
     api "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
     api "cn.rongcloud.sdk:player:$rongcloudSdkVersion"
 
-
+    api 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
+//    api 'com.tencent.bugly:nativecrashreport:latest.release'
 }

@@ -54,4 +54,8 @@
     <string name="description_dial_button" translatable="false">dial</string>
     <string name="action_menu_dialpad_button" translatable="false">dial pad</string>
 
+    <string name="audio_no_record_tip" translatable="false">拨号给已注册用户，发起RTC语音通话</string>
+    <string name="video_no_record_tip" translatable="false">拨号给已注册用户，发起RTC视频通话</string>
+
+
 </resources>

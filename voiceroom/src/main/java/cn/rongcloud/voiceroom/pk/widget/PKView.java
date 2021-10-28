@@ -150,6 +150,11 @@ public class PKView extends LinearLayout implements IPK {
     }
 
     @Override
+    public void reset(boolean broadcast) {
+
+    }
+
+    @Override
     public void setPKUserInfo(String localId, String pkId) {
         UserProvider.provider().getAsyn(localId, new IResultBack<UserInfo>() {
             @Override
@@ -170,6 +175,7 @@ public class PKView extends LinearLayout implements IPK {
             }
         });
     }
+
 
     @Override
     public synchronized void pkStart(long timeDiff, OnTimerEndListener listener) {

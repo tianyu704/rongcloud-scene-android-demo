@@ -44,7 +44,6 @@ class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
             android.os.Handler(Looper.getMainLooper()).postDelayed(object : Runnable {
                 override fun run() {
                     RCVoiceRoomEngine.getInstance().connectWithToken(
-                        application,
                         AccountStore.getImToken(),
                         object : RCVoiceRoomCallback {
                             override fun onError(code: Int, message: String?) {

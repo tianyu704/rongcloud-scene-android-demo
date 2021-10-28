@@ -340,7 +340,8 @@ public class AudioRecordManager implements Handler.Callback {
             android.os.Message message = android.os.Message.obtain();
             message.what = AUDIO_RECORD_EVENT_TIME_OUT;
             message.obj = 10;
-            mHandler.sendMessageDelayed(message, RECORD_INTERVAL * 1000 - 10 * 1000);
+            //因为延迟500毫秒才消失，所以这边延迟到最后9秒就可以发送了，这样两边加起来也相当于10秒倒计时了
+            mHandler.sendMessageDelayed(message, RECORD_INTERVAL * 1000 - 11 * 1000);
         } catch (Exception e) {
             RLog.e(TAG, "startRec", e);
         }
@@ -407,19 +408,6 @@ public class AudioRecordManager implements Handler.Callback {
                         if (onSendVoiceMessageClickListener!=null){
                             onSendVoiceMessageClickListener.onSendVoiceMessage(rcvrVoiceMessage);
                         }
-//                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(mTargetId, rcvrVoiceMessage, true, new Function1<Integer, Unit>() {
-//                            @Override
-//                            public Unit invoke(Integer integer) {
-//                                //成功
-//                                return null;
-//                            }
-//                        }, new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
-//                            @Override
-//                            public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
-//                                //失败
-//                                return null;
-//                            }
-//                        });
                     } else {
                         Log.e(TAG, "onResult: ");
                     }
@@ -690,6 +678,7 @@ public class AudioRecordManager implements Handler.Callback {
                         message.obj = counter - 1;
                         mHandler.sendMessageDelayed(message, 1000);
                     } else {
+                        //这里会导致消息时机录制超过最大时间长度
                         mHandler.postDelayed(new Runnable() {
                             @Override
                             public void run() {

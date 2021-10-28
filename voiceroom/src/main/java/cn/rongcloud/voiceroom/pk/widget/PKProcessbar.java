@@ -275,14 +275,14 @@ public class PKProcessbar extends ProgressBar {
             }
         }
         //draw left text
-        String text = leftValue + "";//设置文本
+        String text = "我方 " + leftValue;//设置文本
         mPaint.setColor(mTextColor);
         mPaint.setTextSize(sp2px(14));
         float leftWidth = mPaint.measureText(text);//返回文本的宽度
         float textHeight = (mPaint.descent() + mPaint.ascent()) / 2;//设置文本的高度
         canvas.drawText(text, mRealheigth / 3, mRealheigth / 2 - textHeight, mPaint);
         //draw right text
-        text = rightValue + "";//设置文本
+        text = "对方 " + leftValue;//设置文本
         float rightWidth = mPaint.measureText(text);//返回文本的宽度
         canvas.drawText(text, mRealWidth - rightWidth - mRealheigth / 3, mRealheigth / 2 - textHeight, mPaint);
         canvas.restore();

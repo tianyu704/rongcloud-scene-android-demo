@@ -1,5 +1,9 @@
 package cn.rong.combusis.ui.room.dialog.shield;
 
+import static cn.rong.combusis.EventBus.TAG.UPDATE_SHIELD;
+import static cn.rong.combusis.sdk.Api.EVENT_ADD_SHIELD;
+import static cn.rong.combusis.sdk.Api.EVENT_DELETE_SHIELD;
+
 import android.app.Activity;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,9 +22,11 @@ import com.kit.wapper.IResultBack;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.rong.combusis.EventBus;
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.widget.FlowLayout;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
@@ -38,8 +44,9 @@ public class ShieldDialog extends BottomDialog {
     private List<Shield> shields = new ArrayList<>();
     private int max_tag = 10;
     private ViewGroup flowLayout;
-    private EditorDialog editorDialog;
+//    private EditorDialog editorDialog;
     private String mRoomId;
+    private EditorDialog editorDialog;
 
     public ShieldDialog(Activity activity, String roomId, int max) {
         super(activity);
@@ -131,30 +138,27 @@ public class ShieldDialog extends BottomDialog {
     }
 
     private void showAddTag() {
-        if (null != editorDialog) {
-            editorDialog.dismiss();
-        }
-        editorDialog = new EditorDialog(mActivity, new IResultBack<String>() {
-            @Override
-            public void onResult(String s) {
-                editorDialog.dismiss();
-                editorDialog = null;
-                if (!TextUtils.isEmpty(s)) {
-                    boolean isContains = false;
-                    for (Shield shield : shields) {
-                        if (TextUtils.equals(shield.getName(), s)) {
-                            isContains = true;
-                            break;
+        if (editorDialog==null){
+            editorDialog = new EditorDialog(mActivity, new IResultBack<String>() {
+                @Override
+                public void onResult(String s) {
+                    if (!TextUtils.isEmpty(s)) {
+                        boolean isContains = false;
+                        for (Shield shield : shields) {
+                            if (TextUtils.equals(shield.getName(), s)) {
+                                isContains = true;
+                                break;
+                            }
+                        }
+                        if (isContains) {
+                            ToastUtils.s(getDialog().getContext(), "该屏蔽词已添加！");
+                        } else {
+                            addShield(s);
                         }
                     }
-                    if (isContains) {
-                        ToastUtils.s(getDialog().getContext(), "该屏蔽词已添加！");
-                    } else {
-                        addShield(s);
-                    }
                 }
-            }
-        });
+            });
+        }
         editorDialog.show();
     }
 
@@ -169,6 +173,10 @@ public class ShieldDialog extends BottomDialog {
                     if (shield != null) {
                         shields.add(shield);
                         addView();
+                        //添加屏蔽词成功，通知房间其他人去获取屏蔽词
+                        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ADD_SHIELD,s,null);
+                        //通知自己获取屏蔽词
+                        EventBus.get().emit(UPDATE_SHIELD,"添加屏蔽词成功");
                     }
                 } else {
                     ToastUtils.s(getDialog().getContext(), "添加敏感词失败");
@@ -190,7 +198,15 @@ public class ShieldDialog extends BottomDialog {
             public void onResult(Wrapper result) {
                 if (result.ok()) {
                     shields.remove(shield);
+                    if (shields.size() < max_tag) {
+                        if (shields.size()>0&&!shields.get(0).isDefault()) {
+                            //第一个不是默认加的情况下，添加上
+                            ShieldDialog.this.shields.add(0,Shield.buildDefault());
+                        }
+                    }
                     addView();
+                    RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_DELETE_SHIELD,shield.getName(),null);
+                    EventBus.get().emit(UPDATE_SHIELD,"删除屏蔽词成功");
                 } else {
                     ToastUtils.s(getDialog().getContext(), "删除敏感词失败");
                 }
