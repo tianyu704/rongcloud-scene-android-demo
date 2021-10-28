@@ -33,6 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.callkit.DialActivity
 import io.rong.imkit.manager.UnReadMessageManager
 import io.rong.imkit.utils.RouteUtils
+import io.rong.imkit.utils.StatusBarUtil
 import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
@@ -69,6 +70,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     override fun getContentView(): Int = R.layout.activity_home
 
     override fun initView() {
+        StatusBarUtil.setStatusBarFontIconDark(this, StatusBarUtil.TYPE_M, true)
 //        iv_voice_room.setOnClickListener {
 //            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
 //                if (accept) {
