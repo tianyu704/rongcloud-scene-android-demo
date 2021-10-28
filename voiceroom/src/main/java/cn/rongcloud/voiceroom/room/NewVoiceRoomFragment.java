@@ -268,6 +268,10 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
+        if (present.getRoomOwnerType() == null) {
+            finish();
+            return;
+        }
         if (checkPKState()) {
             return;
         }
