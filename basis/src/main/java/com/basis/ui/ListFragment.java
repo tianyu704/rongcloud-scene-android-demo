@@ -30,10 +30,20 @@ public abstract class ListFragment<ND, AD, VH extends IHolder> extends BaseFragm
         return new LinearLayoutManager(activity);
     }
 
+
+    protected int onSetNoneLayoutId() {
+        return 0;
+    }
+
     @Override
     public final void init() {
         tClass = (Class<ND>) ObjUtil.getTType(getClass())[0];
-        RHolder holder = new RHolder(getLayout());
+        RHolder holder = new RHolder(getLayout()) {
+            @Override
+            public int onSetNoneLayoutId() {
+                return ListFragment.this.onSetNoneLayoutId() > 0 ? ListFragment.this.onSetNoneLayoutId() : super.onSetNoneLayoutId();
+            }
+        };
         controller = new Controller(holder, tClass, this) {
             @Override
             protected RecyclerView.LayoutManager onSetLayoutManager() {

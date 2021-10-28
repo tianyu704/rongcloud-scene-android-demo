@@ -27,6 +27,8 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
+import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
@@ -76,7 +78,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
 
     public void unInit() {
         roomId = null;
-//        EventHelper.helper().unregeister();
         EventBus.get().off(EventBus.TAG.PK_STATE, this);
         EventBus.get().off(EventBus.TAG.PK_RESPONSE, this);
         EventBus.get().off(EventBus.TAG.PK_GIFT, this);
@@ -100,7 +101,38 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                     Logger.e(TAG, "init: Not In PK");
                     return;
                 }
-                handleAudienceJoinPk(pkResult);
+                // 观众端需要获取pk双方房间和房主信息
+                PKInfo[] pkInfos = formatPKInfo(pkResult);
+                if (null == pkInfos || 2 != pkInfos.length) {
+                    return;
+                }
+                String currentId = AccountStore.INSTANCE.getUserId();
+                //当前房间主播 可能pk主播退出进入pk方的房间会引起问题
+                boolean isBroadcast = TextUtils.equals(currentId, pkInfos[0].getUserId());
+                if (null != pkView) pkView.reset(isBroadcast);
+                if (isBroadcast) {
+                    // 走到这里 说明主播是退出后 又进自己房间
+                    RCPKInfo rcpkInfo = new RCPKInfo();
+                    rcpkInfo.setInviterRoomId(pkInfos[0].getRoomId());//邀请人
+                    rcpkInfo.setInviterId(pkInfos[0].getUserId());
+                    rcpkInfo.setInviteeRoomId(pkInfos[1].getRoomId());//被邀请
+                    rcpkInfo.setInviteeId(pkInfos[1].getUserId());
+                    RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
+                        @Override
+                        public void onSuccess() {
+                            pkView.reset(true);
+                            handleAudienceJoinPk(pkResult);
+                        }
+
+                        @Override
+                        public void onError(int i, String s) {
+
+                        }
+                    });
+                } else {
+                    pkView.reset(false);
+                    handleAudienceJoinPk(pkResult);
+                }
             }
         });
     }
@@ -142,16 +174,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         // 观众端需要获取pk双方房间和房主信息
         int state = pkResult.getStatusMsg();
         if (null != pkView) {
-            List<PKInfo> pkInfos = pkResult.getRoomScores();
-            String currentId = AccountStore.INSTANCE.getUserId();
-            if (2 == pkInfos.size()) {
-                pkView.reset(TextUtils.equals(currentId, pkInfos.get(0).getUserId())
-                        && TextUtils.equals(currentId, pkInfos.get(1).getUserId()));
-            }
             refreshPKInfo(pkResult);
             long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
             if (0 == state) {// pk 阶段
-                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_START);
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
                     @Override
                     public void onTimerEnd() {
@@ -159,7 +184,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                     }
                 });
             } else if (1 == state) {// pk 惩罚阶段
-                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_PUNISH);
                 pkView.pkPunish(timeDiff, new IPK.OnTimerEndListener() {
                     @Override
                     public void onTimerEnd() {
@@ -168,13 +192,72 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 });
             }
         }
-        UIKit.runOnUiTherad(new Runnable() {
-            @Override
-            public void run() {
-                if (null != stateListener) stateListener.onPkState();
-            }
-        });
     }
+
+//    /**
+//     * 处理观众/异常退出的主播
+//     * 根据当前pk状态 进入不同pk阶段
+//     * 根据pk状态jump 不同阶段
+//     */
+//    void handleAudienceJoinPk(PKResult pkResult) {
+//        Logger.e(TAG, "init JumpTo PK");
+//        if (null != stateListener) stateListener.onPkStart();
+//        // 观众端需要获取pk双方房间和房主信息
+//        int state = pkResult.getStatusMsg();
+//        List<PKInfo> pkInfos = pkResult.getRoomScores();
+//        if (null != pkView && 2 == pkInfos.size()) {
+//            String currentId = AccountStore.INSTANCE.getUserId();
+//            boolean isBroadcast = TextUtils.equals(currentId, pkInfos.get(0).getUserId())
+//                    && TextUtils.equals(currentId, pkInfos.get(1).getUserId());
+//            pkView.reset(isBroadcast);
+//            PKInfo[] infos = refreshPKInfo(pkResult);
+//            if (isBroadcast && 2 == infos.length) {
+//                // 走到这里 说明主播是退出后 又进来
+//                RCPKInfo rcpkInfo = new RCPKInfo();
+//                rcpkInfo.setInviterRoomId(infos[0].getRoomId());//邀请人
+//                rcpkInfo.setInviterId(infos[0].getUserId());
+//                rcpkInfo.setInviteeRoomId(infos[1].getRoomId());//被邀请
+//                rcpkInfo.setInviteeId(infos[1].getUserId());
+//                RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
+//                    @Override
+//                    public void onSuccess() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(int i, String s) {
+//
+//                    }
+//                });
+//            } else {
+//
+//            }
+//            long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
+//            if (0 == state) {// pk 阶段
+//                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_START);
+//                pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
+//                    @Override
+//                    public void onTimerEnd() {
+//                        // 等待服务端分发pk惩罚消息
+//                    }
+//                });
+//            } else if (1 == state) {// pk 惩罚阶段
+//                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_PUNISH);
+//                pkView.pkPunish(timeDiff, new IPK.OnTimerEndListener() {
+//                    @Override
+//                    public void onTimerEnd() {
+//                        // 等待服务端分发pk结束消息
+//                    }
+//                });
+//            }
+//        }
+//        UIKit.runOnUiTherad(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (null != stateListener) stateListener.onPkState();
+//            }
+//        });
+//    }
 
     private BottomDialog dialog;
 
@@ -245,27 +328,29 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         });
     }
 
-    void refreshPKInfo(PKResult pkResult) {
+    PKInfo[] refreshPKInfo(PKResult pkResult) {
         PKInfo[] pkInfos = formatPKInfo(pkResult);
-        if (null == pkInfos) return;
-        pkView.setPKUserInfo(pkInfos[0].getUserId(), pkInfos[1].getUserId());
-        // set score
-        pkView.setPKScore(pkInfos[0].getScore(), pkInfos[1].getScore());
-        // left
-        List<String> lefts = new ArrayList<>();
-        List<User> lusers = pkInfos[0].getUserInfoList();
-        int ls = null == lusers ? 0 : lusers.size();
-        for (int i = 0; i < ls; i++) {
-            lefts.add(lusers.get(i).getPortraitUrl());
+        if (null != pkInfos) {
+            pkView.setPKUserInfo(pkInfos[0].getUserId(), pkInfos[1].getUserId());
+            // set score
+            pkView.setPKScore(pkInfos[0].getScore(), pkInfos[1].getScore());
+            // left
+            List<String> lefts = new ArrayList<>();
+            List<User> lusers = pkInfos[0].getUserInfoList();
+            int ls = null == lusers ? 0 : lusers.size();
+            for (int i = 0; i < ls; i++) {
+                lefts.add(lusers.get(i).getPortraitUrl());
+            }
+            // right
+            List<String> rights = new ArrayList<>();
+            List<User> rusers = pkInfos[1].getUserInfoList();
+            int rs = null == rusers ? 0 : rusers.size();
+            for (int i = 0; i < rs; i++) {
+                rights.add(rusers.get(i).getPortraitUrl());
+            }
+            pkView.setGiftSenderRank(lefts, rights);
         }
-        // right
-        List<String> rights = new ArrayList<>();
-        List<User> rusers = pkInfos[1].getUserInfoList();
-        int rs = null == rusers ? 0 : rusers.size();
-        for (int i = 0; i < rs; i++) {
-            rights.add(rusers.get(i).getPortraitUrl());
-        }
-        pkView.setGiftSenderRank(lefts, rights);
+        return pkInfos;
     }
 
     /**
