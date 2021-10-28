@@ -406,8 +406,8 @@ public class VoiceRoomApi implements Api {
 
             @Override
             public void onError(int i, String s) {
-                Logger.e(TAG, "quitPK#onError [" + i + "]:" + s);
-                if (null != resultBack) resultBack.onResult(true);
+                Logger.e(TAG, "quickStartPk#onError [" + i + "]:" + s);
+                if (null != resultBack) resultBack.onResult(false);
             }
         });
     }

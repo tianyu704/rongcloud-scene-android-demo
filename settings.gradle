@@ -25,17 +25,7 @@ include ':radioroom'
 
 if (!(USE_AAR).toBoolean()) {
     println("------------------>>>>load local sdk module")
-    include ':RCVoiceRoomLib-Android'
-    includeFlat 'VoiceRoomSDK'
-    include ':VoiceRoomSDK:RCVoiceRoom'
-    include ':VoiceRoomSDK:RCRadioRoom'
-//
-//
-    Properties properties = new Properties()
-    File propertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
-    properties.load(propertyFile.newDataInputStream())
-
-    project(':VoiceRoomSDK').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}")
-    project(':VoiceRoomSDK:RCVoiceRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/voiceroom")
-    project(':VoiceRoomSDK:RCRadioRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/radio-lib")
+    include ':RCVoiceRoom'
+    // 替换voiceroom的绝对路径
+    project(':RCVoiceRoom').projectDir = new File(RCVoiceRoom_Path)
 }

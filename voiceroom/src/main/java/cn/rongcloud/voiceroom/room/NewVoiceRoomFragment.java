@@ -507,7 +507,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
-        Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
         if (uiSeatModel == null) {
             return;
         }
