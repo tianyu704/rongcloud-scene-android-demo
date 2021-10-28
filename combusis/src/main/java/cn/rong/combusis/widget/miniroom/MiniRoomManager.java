@@ -1,12 +1,8 @@
 package cn.rong.combusis.widget.miniroom;
 
-import android.annotation.TargetApi;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,8 +14,6 @@ import com.yhao.floatwindow.IFloatWindow;
 import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
-
-import java.util.List;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
@@ -117,6 +111,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
 
     public void close() {
         FloatWindow.destroy(TAG);
+        onCloseMiniRoomListener = null;
     }
 
     /**
@@ -134,7 +129,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
     }
 
     public void finish(String roomId, OnCloseMiniRoomListener.CloseResult closeResult) {
-        close();
+        FloatWindow.destroy(TAG);
         if (!isSameRoom(roomId) && onCloseMiniRoomListener != null) {
             onCloseMiniRoomListener.onCloseMiniRoom(closeResult);
         } else if (closeResult != null) {

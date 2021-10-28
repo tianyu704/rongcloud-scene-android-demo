@@ -505,7 +505,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomVoice.class.equals(aClass) || RCChatroomBarrage.class.equals(aClass)
                                 || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
-                                || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
+                                || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
+                                || RCFollowMsg.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
@@ -961,23 +962,26 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     }
 
     /**
-     * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
+     * 点击底部送礼物，礼物可以送给麦位和房主，无论房主是否在房间
      */
     public void sendGift() {
         ArrayList<Member> memberArrayList = new ArrayList<>();
         //房间内所有人
-        MutableLiveData<List<User>> memberList = MemberCache.getInstance().getMemberList();
-        for (User user : memberList.getValue()) {
-            UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(user.getUserId());
-            Member member = new Member().toMember(user);
+        ArrayList<UiSeatModel> uiSeatModels = newVoiceRoomModel.getUiSeatModels();
+        for (UiSeatModel uiSeatModel : uiSeatModels) {
+            if (uiSeatModel.getIndex() == 0) {
+                //如果是房主麦位，不用管房主是否存在
+                Member member = new Member().toMember(MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId()));
+                member.setSeatIndex(uiSeatModel.getIndex());
+                memberArrayList.add(member);
+                continue;
+            }
             if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //当前用户在麦位上
+                Member member = new Member().toMember(MemberCache.getInstance().getMember(uiSeatModel.getUserId()));
                 member.setSeatIndex(uiSeatModel.getIndex());
-            } else {
-                //当前用户不在麦位
-                member.setSeatIndex(Integer.MAX_VALUE);
+                memberArrayList.add(member);
             }
-            memberArrayList.add(member);
         }
         //按照麦位从小到大拍讯
         Collections.sort(memberArrayList, new Comparator<Member>() {

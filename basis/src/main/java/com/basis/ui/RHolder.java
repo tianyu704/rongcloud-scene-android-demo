@@ -83,9 +83,13 @@ public class RHolder implements IRHolder {
      * @param parent show的父控件
      */
     private void initializeNone(ViewGroup parent) {
-        this.none = UIKit.inflate(R.layout.basis_none);
+        this.none = UIKit.inflate(onSetNoneLayoutId());
         Logger.e(TAG, "none/show parent:" + parent.getClass().getSimpleName());
         parent.addView(none, FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+    }
+
+    public int onSetNoneLayoutId() {
+        return R.layout.basis_none;
     }
 
     public void reset() {
