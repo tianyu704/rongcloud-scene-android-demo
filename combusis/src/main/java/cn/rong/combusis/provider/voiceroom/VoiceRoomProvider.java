@@ -30,6 +30,7 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
     private final static String API_ROOMS = ApiConstant.INSTANCE.getBASE_URL() + "mic/room/list";
     private final static VoiceRoomProvider _provider = new VoiceRoomProvider();
     private List<String> bgImages = new ArrayList<>();
+    private int page = 1;
 
     private VoiceRoomProvider() {
         super(-1);
@@ -80,7 +81,10 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
     }
 
     @Override
-    public void loadPage(int page, RoomType roomType, IResultBack<List<VoiceRoomBean>> resultBack) {
+    public void loadPage(boolean isRefresh, RoomType roomType, IResultBack<List<VoiceRoomBean>> resultBack) {
+        if (isRefresh) {
+            page = 1;
+        }
         if (page < 1) page = 1;
         Map<String, Object> params = new HashMap<>();
         params.put("page", page);
@@ -103,9 +107,16 @@ public class VoiceRoomProvider extends AbsProvider<VoiceRoomBean> implements ILi
                 }
                 Log.e(TAG, "provideFromService: size = " + (null == rooms ? 0 : rooms.size()));
                 updateCache(rooms);
+                if (rooms != null && !rooms.isEmpty()) {
+                    page++;
+                }
                 if (null != resultBack) resultBack.onResult(rooms);
             }
         });
+    }
+
+    public int getPage() {
+        return page;
     }
 
     /**

@@ -160,8 +160,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
 
-            RadioEventHelper.getInstance().register(mRoomId);
-            RadioEventHelper.getInstance().addRadioEventListener(this);
 
             mRoomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
             mView.setRoomData(voiceRoomBean, mRoomOwnerType);
@@ -169,32 +167,44 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             // 之前不在房间，加入房间
             if (!isInRoom) {
                 switchRoom();
+                Logger.e("=================== leave room and join room");
             } else {
+                addListener();
                 // 从最小化回来后刷新状态
                 refreshMute();
                 refreshSeatView();
                 refreshRoomData();
                 mView.dismissLoading();
+                Logger.e("=================== refresh room");
             }
         }
+    }
+
+    private void addListener() {
+        RadioEventHelper.getInstance().register(mRoomId);
+        RadioEventHelper.getInstance().addRadioEventListener(this);
     }
 
     private void switchRoom() {
         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
+                Logger.d("==============leave room success");
                 changeUserRoom("");
                 joinRoom();
             }
 
             @Override
             public void onError(int i, String s) {
+                Logger.d("==============leave room error " + i + "-" + s);
                 joinRoom();
             }
         });
     }
 
     private void joinRoom() {
+        addListener();
+
         RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId()) ? RCRTCLiveRole.BROADCASTER : RCRTCLiveRole.AUDIENCE);
         roomInfo.setRoomId(mRoomId);
         roomInfo.setRoomName(mVoiceRoomBean.getRoomName());
@@ -533,6 +543,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param isSwitchLeave 是否是上下滑动切换导致的离开房间，切换时有离开操作，所以不用再离开
      */
     public void leaveRoom(boolean isSwitchLeave, boolean isClose, CloseRoomCallback closeRoomCallback) {
+        Logger.e("==============leaveRoom isSwitchLeave:" + isSwitchLeave + " isClose:" + isClose);
         if (isClose) {
             sendMessage(new RCRRCloseMessage());
         }
@@ -927,7 +938,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onDestroy() {
         RadioEventHelper.getInstance().removeRadioEventListener(this);
-        Logger.e("====================" + "radio room destroy, remove listener");
+        Logger.e("====================" + "radio room destroy, remove listener" + mView);
         super.onDestroy();
     }
 

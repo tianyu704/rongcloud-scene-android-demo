@@ -56,7 +56,7 @@ public class ComApplication extends Application {
 
             @Override
             public int geSize() {
-                return 12;
+                return 10;
             }
 
             @Override

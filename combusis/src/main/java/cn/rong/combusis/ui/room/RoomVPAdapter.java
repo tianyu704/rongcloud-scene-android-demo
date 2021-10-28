@@ -27,19 +27,32 @@ public class RoomVPAdapter extends FragmentStateAdapter {
     public void setData(List<String> roomList) {
         if (roomList != null) {
             this.mRoomList = roomList;
+            notifyDataSetChanged();
+        }
+    }
+
+    public void addData(List<String> roomList) {
+        if (roomList != null) {
+            this.mRoomList.addAll(roomList);
+            notifyDataSetChanged();
         }
     }
 
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Logger.e("=================createFragment:" + position);
+        Logger.d("=================createFragment:" + position);
         return mFragmentActivity.getFragment(getItemData(position));
     }
 
     @Override
     public int getItemCount() {
         return mRoomList.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mRoomList.get(position).hashCode();
     }
 
     public String getItemData(int position) {

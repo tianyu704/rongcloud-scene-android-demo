@@ -106,7 +106,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
     public void addRadioEventListener(RadioRoomListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
-            Logger.e("==============addRadioEventListener:messages-" + messages.size());
+            Logger.e("==============addRadioEventListener:messages-" + messages.size() + " listener size:" + listeners.size());
             if (!messages.isEmpty()) {
                 listener.onLoadMessageHistory(messages);
             }

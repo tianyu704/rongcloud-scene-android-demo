@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.rong.combusis.intent.IntentWrap;
+import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -53,6 +54,11 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
             return ids;
         }
         return null;
+    }
+
+    @Override
+    protected RoomType getRoomType() {
+        return RoomType.VOICE_ROOM;
     }
 
     @Override
