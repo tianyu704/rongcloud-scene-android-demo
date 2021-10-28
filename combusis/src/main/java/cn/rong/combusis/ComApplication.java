@@ -43,6 +43,7 @@ public class ComApplication extends Application {
         super.onCreate();
         initBasis();
         CrashReport.initCrashReport(this);
+        // test 异常
     }
 
     private void initBasis() {
