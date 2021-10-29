@@ -57,6 +57,11 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     }
 
     @Override
+    protected int onSetNoneLayoutId() {
+        return R.layout.layout_room_empty;
+    }
+
+    @Override
     public void initView() {
         mRoomList = (XRecyclerView) getView(R.id.xrv_room);
         getView(R.id.iv_create_room).setOnClickListener(v -> {
