@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -146,9 +147,24 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                     mEmojiView.setImageResource(R.drawable.ic_voice_room_emoji);
                 }).build(mInputView);
         // 点击消息区域
+        mInputView.setOnFocusChangeListener(new OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus){
+                    mInputView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.showSoftInput(mInputView, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    }, 200);
+                }
+            }
+        });
         mSendMessageView.setOnClickListener(v -> {
             mInputBar.setVisibility(VISIBLE);
             mInputView.requestFocus();
+
         });
         // 点击emoji
         mEmojiView.setOnClickListener(v -> {
