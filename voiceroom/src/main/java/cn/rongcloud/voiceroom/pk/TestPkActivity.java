@@ -80,6 +80,11 @@ public class TestPkActivity extends BaseActivity implements View.OnClickListener
             public void onPkState() {
 
             }
+
+            @Override
+            public void onSendPKMessage(String content) {
+
+            }
         });
         // click
         pkButton.setOnClickListener(this);

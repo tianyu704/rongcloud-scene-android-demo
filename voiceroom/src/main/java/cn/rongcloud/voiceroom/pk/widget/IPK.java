@@ -49,6 +49,13 @@ public interface IPK {
     void setPKScore(int left, int right);
 
     /**
+     * 获取pk结果
+     *
+     * @return 1：成功 0：平局 -1：失败
+     */
+    int getPKResult();
+
+    /**
      * 设置pk 双方礼物赠送者排行榜
      *
      * @param lefts  左侧排行榜
