@@ -53,7 +53,5 @@ dependencies {
     annotationProcessor project(path: ':processor')
     kapt project(path: ':processor')
 
-//    implementation project(path: ':common')
-    api project(path: ':combusis')
     api project(path: ':combusis')
 }

@@ -95,7 +95,8 @@ dependencies {
         api fileTree(includes: ['*.jar', '*.aar'], dir: 'libs')
     } else {
         println("------------------------>>>>use local module")
-        api project(path: ':RCVoiceRoom')
+        api project(path: ':VoiceRoomSDK:RCVoiceRoom')
+        api project(path: ':VoiceRoomSDK:RCRadioRoom')
     }
     // SmartRefreshLayout
     // https://github.com/scwang90/SmartRefreshLayout
