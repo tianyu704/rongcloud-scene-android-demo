@@ -18,7 +18,14 @@ import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.utils.JsonUtils;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
+import cn.rong.combusis.message.RCChatroomAdmin;
+import cn.rong.combusis.message.RCChatroomBarrage;
+import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.message.RCChatroomGift;
+import cn.rong.combusis.message.RCChatroomGiftAll;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rong.combusis.widget.miniroom.OnMiniRoomListener;
@@ -167,10 +174,23 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) message.getContent());
             return;
         }
-        messages.add(message);
+        if (isShowingMessage(message)) {
+            messages.add(message);
+        }
         for (RCRadioEventListener l : listeners) {
             l.onMessageReceived(message);
         }
+    }
+
+    public boolean isShowingMessage(Message message) {
+        MessageContent content = message.getContent();
+        if (content instanceof RCChatroomBarrage || content instanceof RCChatroomEnter
+                || content instanceof RCChatroomKickOut || content instanceof RCChatroomGiftAll
+                || content instanceof RCChatroomGift || content instanceof RCChatroomAdmin
+                || content instanceof RCChatroomLocationMessage || content instanceof RCFollowMsg) {
+            return true;
+        }
+        return false;
     }
 
     @Override
