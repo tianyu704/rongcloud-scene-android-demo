@@ -11,8 +11,6 @@ import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.UiUtils;
-import com.scwang.smart.refresh.footer.ClassicsFooter;
-import com.scwang.smart.refresh.header.ClassicsHeader;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
@@ -68,8 +66,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
         getWrapBar().setHide(true).work();
         // 下拉刷新和加载更多
         refreshLayout = getView(R.id.layout_refresh);
-        refreshLayout.setRefreshHeader(new ClassicsHeader(this));
-        refreshLayout.setRefreshFooter(new ClassicsFooter(this));
         refreshLayout.setEnableAutoLoadMore(false);
         refreshLayout.setOnRefreshListener(new OnRefreshListener() {
             @Override
