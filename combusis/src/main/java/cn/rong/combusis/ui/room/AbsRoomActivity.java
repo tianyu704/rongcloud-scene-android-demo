@@ -250,6 +250,18 @@ public abstract class AbsRoomActivity extends BaseActivity {
         }
     }
 
+    // 控制是否可以上下滑动，不能上下滑动也不能刷新和加载
+    public void setCanSwitch(boolean canSwitch) {
+        mViewPager.setUserInputEnabled(canSwitch);
+        if (canSwitch) {
+            refreshLayout.setEnableRefresh(canRefreshAndLoadMore);
+            refreshLayout.setEnableLoadMore(canRefreshAndLoadMore);
+        } else {
+            refreshLayout.setEnableRefresh(false);
+            refreshLayout.setEnableLoadMore(false);
+        }
+    }
+
     @Override
     public void onBackPressed() {
         if (switchRoomListenerMap.containsKey(currentRoomId)) {

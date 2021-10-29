@@ -10,8 +10,10 @@ import android.graphics.Color
 import android.os.CountDownTimer
 import android.text.Spannable
 import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
-import android.util.Log
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.View
 import androidx.core.widget.addTextChangedListener
 import cn.rong.combusis.common.utils.UIKit
 import cn.rongcloud.annotation.HiltBinding
@@ -82,20 +84,37 @@ class LoginActivity : BaseActivity(), ILoginView {
             checked = view.isSelected
         }
         var style = SpannableStringBuilder()
-        style.append("同意《注册条款》并新登录即注册开通融云开发者账号")
-        style.setSpan(
-            ForegroundColorSpan(Color.parseColor("#0099FF")), 2, 8,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        style.append("同意《注册条款》和《隐私政策》并新登录即注册开通融云开发者账号")
+        style.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                ActCommentWeb.openCommentWeb(
+                    this@LoginActivity,
+                    "file:///android_asset/agreement_zh.html", "注册条款"
+                )
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.parseColor("#0099FF")
+            }
+        }, 2, 8, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        style.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                ActCommentWeb.openCommentWeb(
+                    this@LoginActivity,
+                    "file:///android_asset/privacy_zh.html", "隐私政策"
+                )
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                super.updateDrawState(ds)
+                ds.color = Color.parseColor("#0099FF")
+            }
+        }, 9, 15, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         bottom_info.text = style
-        bottom_info.setOnClickListener { view ->
-            //注册条款
-            Log.e(TAG, "注册条款")
-            ActCommentWeb.openCommentWeb(
-                this@LoginActivity,
-                "file:///android_asset/agreement_zh.html", "注册条款"
-            )
-        }
+        bottom_info.movementMethod = LinkMovementMethod.getInstance()
+
         var vs = UIKit.getVerName()
         bottom_version.text = "融云 RTC ${vs}"
     }
