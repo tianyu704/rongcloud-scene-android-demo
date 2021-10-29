@@ -86,6 +86,7 @@ import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
+import io.rong.message.TextMessage;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
@@ -398,6 +399,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             @Override
             public void onPkState() {
                 mRoomBottomView.refreshPkState();
+            }
+
+            @Override
+            public void onSendPKMessage(String content) {
+                present.sendMessage(TextMessage.obtain(content));
             }
         });
     }

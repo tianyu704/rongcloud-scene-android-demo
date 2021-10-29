@@ -116,6 +116,17 @@ public class PKView extends LinearLayout implements IPK {
         });
     }
 
+    @Override
+    public int getPKResult() {
+        if (leftValue == rightValue) {
+            return 0;
+        } else if (leftValue > rightValue) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
     /**
      * 刷新pk结果
      */

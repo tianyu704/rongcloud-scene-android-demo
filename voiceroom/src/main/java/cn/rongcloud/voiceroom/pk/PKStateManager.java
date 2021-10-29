@@ -24,6 +24,7 @@ import cn.rong.combusis.EventBus;
 import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.sdk.StateUtil;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
@@ -33,6 +34,7 @@ import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKResult;
 import cn.rongcloud.voiceroom.pk.widget.IPK;
+import io.rong.imlib.model.UserInfo;
 
 /**
  * PK主播端
@@ -404,9 +406,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                             KToast.show("本轮PK结束");
                         } else {
                             if (TextUtils.equals(stopId, roomId)) {// 当前房主结束
-                                KToast.show("我方挂端，本轮PK结束");
+                                KToast.show("我方挂断，本轮PK结束");
                             } else {
-                                KToast.show("对方挂端，本轮PK结束");
+                                KToast.show("对方挂断，本轮PK结束");
                             }
                         }
                     }
@@ -429,6 +431,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     /**
      * 接收到服务下发的pk开启消息 执行
      * 处理pk开始阶段
+     * <p>
      * 注意：pkResult 不为空说明是init check inPK 传过来的 不需要再获取pkinfo
      */
     void handlePKStart() {
@@ -440,7 +443,10 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             public void onResult(PKResult pkResult) {
                 if (null == pkView) return;
                 pkView.reset(true);
-                refreshPKInfo(pkResult);
+                PKInfo[] pkInfos = refreshPKInfo(pkResult);
+                if (null != pkInfos) {
+                    sendPKStartMessage(pkInfos[1].getUserId());
+                }
                 long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
                     @Override
@@ -460,6 +466,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "PK Punish");
         //惩罚记时
         if (null != pkView) {
+            int pk = pkView.getPKResult();
+            if (null != stateListener)
+                stateListener.onSendPKMessage(pk == 0 ? "平局" : (pk > 0 ? "我方 PK 胜利" : "我方 PK 失败"));
             pkView.pkPunish(-1, new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
@@ -479,6 +488,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "PK Stop");
         if (null != stateListener) stateListener.onPkStop();
         if (null != pkView) pkView.pkStop();
+        if (null != stateListener) stateListener.onSendPKMessage("本轮PK结束");
         if (isInviter()) {
             //约定邀请者 quitpk
             VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
@@ -490,6 +500,16 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         } else {
             // 受邀者 修改惩罚结束标识 等待pkFinish回调
         }
+    }
+
+    private void sendPKStartMessage(String pkId) {
+        UserProvider.provider().getAsyn(pkId, new IResultBack<UserInfo>() {
+            @Override
+            public void onResult(UserInfo userInfo) {
+                String pkInfo = null != userInfo ? userInfo.getName() : pkId;
+                if (null != stateListener) stateListener.onSendPKMessage("与" + pkInfo + "的PK即将开始");
+            }
+        });
     }
 
     @Override
