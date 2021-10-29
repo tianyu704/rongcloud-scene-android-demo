@@ -43,13 +43,18 @@ public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> 
             }
         });
         sendPrivateMessageFragment = new SendPrivateMessageFragment();
-        loadData();
     }
 
     private void loadData() {
         Map<String, Object> params = new HashMap<>(8);
         params.put("type", mType);
         request("Loading...", VRApi.FOLLOW_LIST, params, Method.get, true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
     }
 
     @Override

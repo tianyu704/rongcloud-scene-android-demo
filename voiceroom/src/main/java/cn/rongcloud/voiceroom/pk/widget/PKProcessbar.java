@@ -282,7 +282,7 @@ public class PKProcessbar extends ProgressBar {
         float textHeight = (mPaint.descent() + mPaint.ascent()) / 2;//设置文本的高度
         canvas.drawText(text, mRealheigth / 5, mRealheigth / 2 - textHeight, mPaint);
         //draw right text
-        text = "对方 " + leftValue;//设置文本
+        text = "对方 " + rightValue;//设置文本
         float rightWidth = mPaint.measureText(text);//返回文本的宽度
         canvas.drawText(text, mRealWidth - rightWidth - mRealheigth / 5, mRealheigth / 2 - textHeight, mPaint);
         canvas.restore();

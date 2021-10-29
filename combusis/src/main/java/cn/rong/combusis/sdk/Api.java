@@ -4,7 +4,6 @@ import com.kit.wapper.IResultBack;
 
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.model.PKResponse;
-import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 /**
@@ -233,10 +232,11 @@ public interface Api {
     /**
      * 快速加入pk
      *
-     * @param rcpkInfo   pk信息
+     * @param pkRoomId   pk房间
+     * @param pkUserId   pkId
      * @param resultBack 结果回调
      */
-    void quickStartPk(RCPKInfo rcpkInfo, IResultBack<Boolean> resultBack);
+    void resumePk(String pkRoomId, String pkUserId, IResultBack<Boolean> resultBack);
 
     /**
      * 释放pk被邀请者

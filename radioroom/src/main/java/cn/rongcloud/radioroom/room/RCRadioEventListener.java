@@ -13,20 +13,6 @@ public interface RCRadioEventListener {
     void onMessageReceived(Message message);
 
     /**
-     * 观众进入房间
-     *
-     * @param userId
-     */
-    void onAudienceEnter(String userId);
-
-    /**
-     * 观众离开房间
-     *
-     * @param userId
-     */
-    void onAudienceLeave(String userId);
-
-    /**
      * 房间KV更新回调
      *
      * @param key

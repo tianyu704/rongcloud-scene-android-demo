@@ -393,12 +393,12 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
         RCVoiceRoomEngine.getInstance().getRequestSeatUserIds(new RCVoiceRoomResultCallback<List<String>>() {
             @Override
             public void onSuccess(List<String> requestUserIds) {
-                //获取到当前房间所有用户
+                //获取到当前房间所有用户,申请人需要在房间，并且不在麦位上
                 List<User> users = MemberCache.getInstance().getMemberList().getValue();
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
                     for (User user : users) {
-                        if (user.getUserId().equals(requestUserId)) {
+                        if (user.getUserId().equals(requestUserId)&&getSeatInfoByUserId(user.getUserId())==null) {
                             requestSeats.add(user);
                             break;
                         }
@@ -574,6 +574,9 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      * @param users
      */
     public void onMemberListener(List<User> users) {
+        //房间观众发生变化
+        getRequestSeatUserIds();
+
         //只要不在麦位的人都可以被邀请
         inviteSeats.clear();
         for (User user : users) {

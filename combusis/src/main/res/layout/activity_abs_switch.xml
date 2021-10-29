@@ -54,7 +54,7 @@
             android:padding="10dp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.viewpager.widget.ViewPager
+    <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/vp_switch"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

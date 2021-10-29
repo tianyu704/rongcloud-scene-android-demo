@@ -87,11 +87,13 @@
 
     <LinearLayout
         android:id="@+id/bottom"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
         android:layout_marginBottom="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/cl_phone_number"
+        app:layout_constraintStart_toStartOf="@+id/cl_phone_number"
         app:layout_constraintBottom_toTopOf="@+id/bottom_version">
 
         <ImageView

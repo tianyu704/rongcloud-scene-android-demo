@@ -603,6 +603,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             case STATUS_NOT_ON_SEAT:
                 //申请中
                 mRoomBottomView.setRequestSeatImage(R.drawable.ic_request_enter_seat);
+                ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
                 break;
             case STATUS_WAIT_FOR_SEAT:
                 //等待中
@@ -611,6 +612,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             case STATUS_ON_SEAT:
                 //已经在麦上
                 mRoomBottomView.setRequestSeatImage(R.drawable.ic_on_seat);
+                ((AbsRoomActivity) requireActivity()).setCanSwitch(false);
                 break;
         }
 

@@ -16,12 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.message.RCChatroomEnter;
+import cn.rong.combusis.message.RCChatroomLeave;
 import cn.rongcloud.messager.ConnectCallback;
 import cn.rongcloud.messager.IResultBack;
 import cn.rongcloud.messager.RCMessager;
-import cn.rongcloud.messager.SendMessageCallback;
 import cn.rongcloud.messager.VRKVStatusListener;
-import cn.rongcloud.messager.utils.MLog;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomBaseCallback;
@@ -50,10 +50,8 @@ import cn.rongcloud.rtc.base.RTCErrorCode;
 import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
-import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.chatroom.base.RongChatRoomClient;
 import io.rong.imlib.model.Message;
-import io.rong.imlib.model.MessageContent;
 
 /**
  * 电台房的控制
@@ -73,7 +71,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
 
     private RCRadioRoomEngineImpl() {
         RCMessager.getInstance().addOnReceiveMessageListener(this);
-        RCMessager.getInstance().addMessageTypes(RCChatRoomEnter.class, RCChatRoomLeave.class);
+        RCMessager.getInstance().addMessageTypes(RCChatroomEnter.class, RCChatroomLeave.class);
         RCMessager.getInstance().addKVStatusListener(this);
     }
 
@@ -146,7 +144,6 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         RongChatRoomClient.getInstance().joinChatRoom(mRadioRoom.getRoomId(), -1, new IRongCoreCallback.OperationCallback() {
             @Override
             public void onSuccess() {
-                notifyEnterOrLeave(true, null);
                 if (RCRTCLiveRole.BROADCASTER == mRadioRoom.getRole()) {
                     updateRadioRoomKV(UpdateKey.RC_ROOM_NAME, mRadioRoom.getRoomName(), new RCRadioRoomCallback() {
                         @Override
@@ -180,20 +177,6 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         }
         VMLog.d(TAG, "leaveRoom#roomId:" + mRadioRoom.getRoomId());
         leaveSeat(null);
-        notifyEnterOrLeave(false, new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                quitRoom(callback);
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                quitRoom(callback);
-            }
-        });
-    }
-
-    private void quitRoom(final RCRadioRoomCallback callback) {
         //离开聊天室 无论成功与否 都执行leaveRTCRoom
         RongChatRoomClient.getInstance().quitChatRoom(mRadioRoom.getRoomId(), new IRongCoreCallback.OperationCallback() {
             @Override
@@ -428,39 +411,6 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         RCRTCEngine.getInstance().init(RCMessager.getInstance().getApplication(), config);
     }
 
-    private void notifyEnterOrLeave(boolean enter, final RCRadioRoomCallback callback) {
-        MessageContent content;
-        if (enter) {
-            RCChatRoomEnter en = new RCChatRoomEnter();
-            en.setUserId(RongCoreClient.getInstance().getCurrentUserId());
-            en.setUserName("");
-            content = en;
-        } else {
-            RCChatRoomLeave leave = new RCChatRoomLeave();
-            leave.setUserId(RongCoreClient.getInstance().getCurrentUserId());
-            leave.setUserName("");
-            content = leave;
-        }
-        MLog.d(TAG, "notifyEnterOrLeave#roomId:" + mRadioRoom.getRoomId());
-        RCMessager.getInstance().sendChatRoomMessage(mRadioRoom.getRoomId(), content, new SendMessageCallback() {
-            @Override
-            public void onAttached(Message message) {
-
-            }
-
-            @Override
-            public void onSuccess(Message message) {
-                onSuccessWithCheck(callback);
-                VMLog.d(TAG, "notifyEnterOrLeave#onSuccess");
-            }
-
-            @Override
-            public void onError(Message message, int code, String reason) {
-                onErrorWithCheck(callback, code, reason);
-            }
-        });
-    }
-
     @Override
     public void onChatRoomKVSync(String roomId) {
         VMLog.d(TAG, "onChatRoomKVSync: " + roomId);
@@ -512,15 +462,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         if (null != listener) main.post(new Runnable() {
             @Override
             public void run() {
-                if (message.getContent() instanceof RCChatRoomEnter) {
-                    RCChatRoomEnter enter = (RCChatRoomEnter) message.getContent();
-                    listener.onAudienceEnter(enter.getUserId());
-                } else if (message.getContent() instanceof RCChatRoomLeave) {
-                    RCChatRoomLeave leave = (RCChatRoomLeave) message.getContent();
-                    listener.onAudienceLeave(leave.getUserId());
-                } else {
-                    listener.onMessageReceived(message);
-                }
+                listener.onMessageReceived(message);
             }
         });
         return false;

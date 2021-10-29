@@ -341,7 +341,7 @@ public class MusicManager implements IMusic {
             stopPlayMusic();
             Message msg = Message.obtain();
             msg.what = WHAT_PLAY;
-            msg.obj = userMusics.get(0);
+            msg.obj = music;//播放当前
             handler.sendMessage(msg);
         }
         int toId = 0;

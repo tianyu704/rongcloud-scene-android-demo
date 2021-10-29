@@ -21,8 +21,8 @@ public class StateUtil {
         }
         if (IEventHelp.Type.PK_GOING == type
                 || IEventHelp.Type.PK_PUNISH == type
-                || IEventHelp.Type.PK_START == type
-                || IEventHelp.Type.PK_STOP == type) {
+                || IEventHelp.Type.PK_START == type) {
+//                || IEventHelp.Type.PK_STOP == type) {
             KToast.show("您当前正在PK中");
             return false;
         }

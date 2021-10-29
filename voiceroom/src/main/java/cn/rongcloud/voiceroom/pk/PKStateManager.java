@@ -113,20 +113,16 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 boolean isBroadcast = TextUtils.equals(currentId, pkInfos[0].getUserId());
                 if (null != pkView) pkView.reset(isBroadcast);
                 if (isBroadcast) {
+                    VoiceRoomApi.getApi().muteAll(true);
                     // 走到这里 说明主播是退出后 又进自己房间
-                    RCPKInfo rcpkInfo = new RCPKInfo();
-                    rcpkInfo.setInviterRoomId(pkInfos[0].getRoomId());//邀请人
-                    rcpkInfo.setInviterId(pkInfos[0].getUserId());
-                    rcpkInfo.setInviteeRoomId(pkInfos[1].getRoomId());//被邀请
-                    rcpkInfo.setInviteeId(pkInfos[1].getUserId());
-                    VoiceRoomApi.getApi().quickStartPk(rcpkInfo, new IResultBack<Boolean>() {
+                    VoiceRoomApi.getApi().resumePk(pkInfos[1].getRoomId(), pkInfos[1].getUserId(), new IResultBack<Boolean>() {
                         @Override
                         public void onResult(Boolean aBoolean) {
                             if (aBoolean) {
                                 pkView.reset(true);
                                 handleAudienceJoinPk(pkResult);
                             } else {
-                                Logger.e(TAG, "Quick Start Pk Fail");
+                                Logger.e(TAG, "resume Pk Fail");
                             }
                         }
                     });
@@ -195,70 +191,6 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         }
     }
 
-//    /**
-//     * 处理观众/异常退出的主播
-//     * 根据当前pk状态 进入不同pk阶段
-//     * 根据pk状态jump 不同阶段
-//     */
-//    void handleAudienceJoinPk(PKResult pkResult) {
-//        Logger.e(TAG, "init JumpTo PK");
-//        if (null != stateListener) stateListener.onPkStart();
-//        // 观众端需要获取pk双方房间和房主信息
-//        int state = pkResult.getStatusMsg();
-//        List<PKInfo> pkInfos = pkResult.getRoomScores();
-//        if (null != pkView && 2 == pkInfos.size()) {
-//            String currentId = AccountStore.INSTANCE.getUserId();
-//            boolean isBroadcast = TextUtils.equals(currentId, pkInfos.get(0).getUserId())
-//                    && TextUtils.equals(currentId, pkInfos.get(1).getUserId());
-//            pkView.reset(isBroadcast);
-//            PKInfo[] infos = refreshPKInfo(pkResult);
-//            if (isBroadcast && 2 == infos.length) {
-//                // 走到这里 说明主播是退出后 又进来
-//                RCPKInfo rcpkInfo = new RCPKInfo();
-//                rcpkInfo.setInviterRoomId(infos[0].getRoomId());//邀请人
-//                rcpkInfo.setInviterId(infos[0].getUserId());
-//                rcpkInfo.setInviteeRoomId(infos[1].getRoomId());//被邀请
-//                rcpkInfo.setInviteeId(infos[1].getUserId());
-//                RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
-//                    @Override
-//                    public void onSuccess() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(int i, String s) {
-//
-//                    }
-//                });
-//            } else {
-//
-//            }
-//            long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
-//            if (0 == state) {// pk 阶段
-//                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_START);
-//                pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
-//                    @Override
-//                    public void onTimerEnd() {
-//                        // 等待服务端分发pk惩罚消息
-//                    }
-//                });
-//            } else if (1 == state) {// pk 惩罚阶段
-//                EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY, IEventHelp.Type.PK_PUNISH);
-//                pkView.pkPunish(timeDiff, new IPK.OnTimerEndListener() {
-//                    @Override
-//                    public void onTimerEnd() {
-//                        // 等待服务端分发pk结束消息
-//                    }
-//                });
-//            }
-//        }
-//        UIKit.runOnUiTherad(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (null != stateListener) stateListener.onPkState();
-//            }
-//        });
-//    }
 
     private BottomDialog dialog;
 
@@ -355,12 +287,19 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     }
 
     /**
-     * 判断是否是邀请者
-     *
      * @return 是否是邀请者
      */
     boolean isInviter() {
         return null != rcpkInfo && AccountStore.INSTANCE.getUserId().equals(rcpkInfo.getInviterId());
+    }
+
+    /**
+     * @return 是否是PKer
+     */
+    boolean isPKer() {
+        String currentId = AccountStore.INSTANCE.getUserId();
+        return null != rcpkInfo && ((TextUtils.equals(roomId, rcpkInfo.getInviteeRoomId()) && TextUtils.equals(currentId, rcpkInfo.getInviteeId())) ||
+                (TextUtils.equals(roomId, rcpkInfo.getInviterRoomId()) && TextUtils.equals(currentId, rcpkInfo.getInviterId())));
     }
 
     @Override
@@ -420,7 +359,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             if (pkState == PKResponse.reject) {
                 KToast.show("您的PK邀请被拒绝");
             } else if (pkState == PKResponse.ignore) {
-                KToast.show("您的PK邀请被忽略");
+                KToast.show("对方无响应，发起PK 失败");
             }
         } else if (EventBus.TAG.PK_GIFT.equals(tag)) {
             Logger.e(TAG, "礼物消息");
@@ -444,8 +383,11 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 if (null == pkView) return;
                 pkView.reset(true);
                 PKInfo[] pkInfos = refreshPKInfo(pkResult);
-                if (null != pkInfos) {
+                if (null != pkInfos && isPKer()) {
                     sendPKStartMessage(pkInfos[1].getUserId());
+                }
+                if (isPKer()) {//静麦所有
+                    VoiceRoomApi.getApi().muteAll(true);
                 }
                 long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
@@ -467,8 +409,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         //惩罚记时
         if (null != pkView) {
             int pk = pkView.getPKResult();
-            if (null != stateListener)
+            if (null != stateListener && isPKer()) {
                 stateListener.onSendPKMessage(pk == 0 ? "平局" : (pk > 0 ? "我方 PK 胜利" : "我方 PK 失败"));
+            }
             pkView.pkPunish(-1, new IPK.OnTimerEndListener() {
                 @Override
                 public void onTimerEnd() {
@@ -488,7 +431,12 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         Logger.e(TAG, "PK Stop");
         if (null != stateListener) stateListener.onPkStop();
         if (null != pkView) pkView.pkStop();
-        if (null != stateListener) stateListener.onSendPKMessage("本轮PK结束");
+        if (null != stateListener && isPKer()) {
+            stateListener.onSendPKMessage("本轮PK结束");
+        }
+        if (isPKer()) {//取消静麦
+            VoiceRoomApi.getApi().muteAll(false);
+        }
         if (isInviter()) {
             //约定邀请者 quitpk
             VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {

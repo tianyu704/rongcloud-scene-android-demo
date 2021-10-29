@@ -105,6 +105,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
@@ -252,6 +253,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     private void joinRoom(String roomId, boolean isCreate) {
         initListener(roomId);
+        //重置底部状态
+        currentStatus = STATUS_NOT_ON_SEAT;
+        mView.changeStatus(currentStatus);
         if (isCreate) {
             RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
             rcVoiceRoomInfo.setRoomName(mVoiceRoomBean.getRoomName());
@@ -351,7 +355,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public boolean onReceived(Message message, int i) {
-        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())) {
+        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())
+                && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(mVoiceRoomBean.getRoomId(), message.getContent());
         }
         return true;
@@ -517,6 +522,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             return;
                         } else if (aClass.equals(RCAllBroadcastMessage.class)) {
                             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
+                        } else if (aClass.equals(RCChatroomSeats.class)) {
+                            refreshRoomMember();
                         }
                         Log.e("TAG", "accept: " + messageContent);
                     }
@@ -661,14 +668,16 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     break;
                 }
             }
-            if (currentStatus == STATUS_WAIT_FOR_SEAT) {
-                //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
-
-            } else {
-                if (inseat) {//在麦位上
-                    currentStatus = STATUS_ON_SEAT;
+            if (inseat) {
+                //当前用户已经在麦位上
+                currentStatus = STATUS_ON_SEAT;
+                mView.changeStatus(currentStatus);
+            }else {
+                //当前用户不在麦位上
+                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+                    //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
                 } else {
-                    //不在麦位上
+                    //当前用户不在麦位上
                     currentStatus = STATUS_NOT_ON_SEAT;
                 }
             }

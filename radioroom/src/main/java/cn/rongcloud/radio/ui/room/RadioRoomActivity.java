@@ -46,6 +46,7 @@ public class RadioRoomActivity extends AbsRoomActivity {
         }
         return null;
     }
+
     @Override
     protected RoomType getRoomType() {
         return RoomType.RADIO_ROOM;

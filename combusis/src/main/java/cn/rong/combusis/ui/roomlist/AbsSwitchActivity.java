@@ -7,11 +7,13 @@ package cn.rong.combusis.ui.roomlist;
 
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.basis.ui.BaseActivity;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.Arrays;
 
@@ -30,7 +32,7 @@ public class AbsSwitchActivity extends BaseActivity implements View.OnClickListe
         initView();
     }
 
-    private ViewPager vp_switch;
+    private ViewPager2 vp_switch;
     private TabLayout tab_switch;
     private int currentIndex = 0;
 
@@ -41,28 +43,14 @@ public class AbsSwitchActivity extends BaseActivity implements View.OnClickListe
         tab_switch = findViewById(R.id.tab_switch);
 
         vp_switch.setCurrentItem(currentIndex);
-        vp_switch.setAdapter(new VPAdapter(getSupportFragmentManager(), Arrays.asList(onCreateLeftFragment(), onCreateRightFragment()), onSetSwitchTitle()));
+        vp_switch.setAdapter(new VPAdapter(AbsSwitchActivity.this, Arrays.asList(onCreateLeftFragment(), onCreateRightFragment())));
 
-        tab_switch.setupWithViewPager(vp_switch);
-//        tab_switch.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-//                TextView textView = new TextView(AbsSwitchActivity.this);
-//                textView.setText(tab.getText());
-//                textView.setTextSize(19);
-//                tab.setCustomView(textView);
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//                tab.setCustomView(null);
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//
-//            }
-//        });
+        new TabLayoutMediator(tab_switch, vp_switch, new TabLayoutMediator.TabConfigurationStrategy() {
+            @Override
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                tab.setText(onSetSwitchTitle()[position]);
+            }
+        }).attach();
 
         getView(R.id.fl_back).setOnClickListener(this);
 
