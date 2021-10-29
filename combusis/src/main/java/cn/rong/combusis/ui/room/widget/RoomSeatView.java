@@ -37,6 +37,7 @@ public class RoomSeatView extends ConstraintLayout {
     private ConstraintLayout mClViewerPause;
     private String roomOwnerName;
     private String roomOwnerPortrait;
+    private SeatState seatState;
 
     public RoomSeatView(@NonNull Context context) {
         this(context, null);
@@ -110,6 +111,10 @@ public class RoomSeatView extends ConstraintLayout {
      * @param isSpeaking 是否正在讲话
      */
     public void setSpeaking(boolean isSpeaking) {
+        if (seatState != SeatState.NORMAL) {
+            mWaveView.stop();
+            return;
+        }
         if (isMute) {
             mWaveView.stop();
             return;
@@ -136,6 +141,7 @@ public class RoomSeatView extends ConstraintLayout {
      * @param seatState
      */
     public void refreshSeatState(SeatState seatState) {
+        this.seatState = seatState;
         mClSeat.setVisibility(INVISIBLE);
         mClSelfPause.setVisibility(GONE);
         mClViewerPause.setVisibility(GONE);

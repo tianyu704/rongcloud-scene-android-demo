@@ -6,7 +6,6 @@ import android.graphics.Point;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,13 +28,11 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.common.utils.SoftKeyboardUtils;
 import cn.rong.combusis.manager.AudioPlayManager;
 import cn.rong.combusis.manager.AudioRecordManager;
-import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
-import cn.rong.combusis.ui.room.widget.like.FavAnimation;
 import io.rong.imkit.manager.UnReadMessageManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imkit.utils.RongUtils;
@@ -49,8 +46,6 @@ import io.rong.imlib.model.HardwareResource;
  */
 public class RoomBottomView extends ConstraintLayout implements UnReadMessageManager.IUnReadMessageObserver {
     private View mRootView;
-
-    private ConstraintLayout mOptionContainer;
     /**
      * 发送文字的view
      */
@@ -111,10 +106,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
      * emoji选择框
      */
     private EmojiPopup mEmojiPopup;
-    // 动画
-    private FavAnimation mFavAnimation;
-    private GestureDetector mGestureDetector;
-//    private boolean isInPk;
 
     private OnBottomOptionClickListener mOnBottomOptionClickListener;
     private AudioRecordManager audioRecordManager;
@@ -130,7 +121,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     }
 
     private void initView() {
-        mOptionContainer = mRootView.findViewById(R.id.cl_option);
         mSendMessageView = mRootView.findViewById(R.id.rl_send_message_id);
         mSendVoiceMassageView = mRootView.findViewById(R.id.iv_send_voice_message_id);
         mSeatOrder = mRootView.findViewById(R.id.btn_seat_order);
@@ -159,47 +149,12 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         mSendMessageView.setOnClickListener(v -> {
             mInputBar.setVisibility(VISIBLE);
             mInputView.requestFocus();
-            SoftKeyboardUtils.showSoftKeyboard(mInputView);
         });
         // 点击emoji
         mEmojiView.setOnClickListener(v -> {
             mEmojiPopup.toggle();
         });
-        // 喜欢的动画
-        mFavAnimation = new FavAnimation(getContext());
-        mFavAnimation.addLikeImages(
-                R.drawable.ic_present_0,
-                R.drawable.ic_present_1,
-                R.drawable.ic_present_2,
-                R.drawable.ic_present_3,
-                R.drawable.ic_present_4,
-                R.drawable.ic_present_5,
-                R.drawable.ic_present_6,
-                R.drawable.ic_present_7,
-                R.drawable.ic_present_8,
-                R.drawable.ic_present_9);
-        // 手势监听
-        mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                showFov(new Point((int) e.getX(), (int) e.getY()));
-                if (mOnBottomOptionClickListener != null) {
-                    mOnBottomOptionClickListener.onSendLikeMessage(new RCChatroomLike());
-                }
-                return true;
-            }
 
-            @Override
-            public boolean onDown(MotionEvent e) {
-                if (mInputBar.getVisibility() == VISIBLE) {
-                    hideSoftKeyboardAndIntput();
-                    return true;
-                } else {
-                    return super.onDown(e);
-                }
-            }
-        });
-        mGestureDetector.setIsLongpressEnabled(false);
         audioRecordManager = new AudioRecordManager();
         audioRecordManager.setOnSendVoiceMessageClickListener(new AudioRecordManager.OnSendVoiceMessageClickListener() {
             @Override
@@ -279,10 +234,12 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     /**
      * 隐藏输入框
      */
-    public void hideSoftKeyboardAndIntput() {
-        mInputView.clearFocus();
-        SoftKeyboardUtils.hideSoftKeyboard(mInputView);
-        mInputBar.setVisibility(View.GONE);
+    public void hideSoftKeyboardAndInput() {
+        if (mInputBar.getVisibility() == VISIBLE) {
+            mInputView.clearFocus();
+            SoftKeyboardUtils.hideSoftKeyboard(mInputView);
+            mInputBar.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -290,39 +247,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
      */
     public void setRequestSeatImage(int drawable) {
         mRequestSeatView.setImageResource(drawable);
-    }
-
-    /**
-     * 显示礼物动画
-     *
-     * @param from
-     */
-    public void showFov(Point from) {
-        if (from != null) {
-            mFavAnimation.addFavor(this, 300, 1500, from, null);
-        } else {
-            int[] location = UiUtils.INSTANCE.getLocation(mSendGiftView);
-            from = new Point(location[0], location[1] - mSendGiftView.getHeight() / 2);
-            Point to = new Point(from.x + 200, from.y - 200);
-            mFavAnimation.addFavor(this, 300, 1200, from, to);
-        }
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (audioRecordManager.isRecording()) {
-            return super.dispatchTouchEvent(ev);
-        }
-        int safeHeight = mOptionContainer.getTop();
-        if (mInputBar.getVisibility() == VISIBLE) {
-            safeHeight = mInputBar.getTop();
-        }
-        if (ev.getY() > safeHeight) {
-            return super.dispatchTouchEvent(ev);
-        } else {
-            mGestureDetector.onTouchEvent(ev);
-            return true;
-        }
     }
 
     public void clearInput() {
@@ -443,6 +367,11 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         super.onDetachedFromWindow();
     }
 
+    public Point getGiftViewPoint() {
+        int[] location = UiUtils.INSTANCE.getLocation(mSendGiftView);
+        return new Point(location[0], location[1] - mSendGiftView.getHeight() / 2);
+    }
+
     public interface OnBottomOptionClickListener {
         void clickSendMessage(String message);
 
@@ -459,7 +388,5 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         void onSendGift();
 
         void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice);
-
-        void onSendLikeMessage(RCChatroomLike rcChatroomLike);
     }
 }

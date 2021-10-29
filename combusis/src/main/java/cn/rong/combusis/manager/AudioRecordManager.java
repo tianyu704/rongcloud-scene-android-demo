@@ -139,6 +139,7 @@ public class AudioRecordManager implements Handler.Callback {
                 mStateTV.setText(R.string.rc_voice_rec);
                 mStateTV.setBackgroundResource(android.R.color.transparent);
                 mTimerTV.setText(String.format("%s", counter));
+                Log.e(TAG, "setTimeoutView: "+counter );
                 mTimerTV.setVisibility(View.VISIBLE);
             }
         } else {

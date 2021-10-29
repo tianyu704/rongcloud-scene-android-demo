@@ -479,7 +479,6 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onNetworkStatus(int i) {
         present.onNetworkStatus(i);
-        Log.d(TAG, "onNetworkStatus: ");
     }
 
     @Override

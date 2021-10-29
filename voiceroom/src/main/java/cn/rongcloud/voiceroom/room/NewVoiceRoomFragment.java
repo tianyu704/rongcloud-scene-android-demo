@@ -66,6 +66,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
+import cn.rong.combusis.ui.room.widget.GiftAnimationView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
@@ -99,6 +100,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
         , View.OnClickListener, AllBroadcastView.OnClickBroadcast {
     private ImageView mBackgroundImageView;
+    private GiftAnimationView mGiftAnimationView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
     private RoomSeatView mRoomSeatView;
@@ -147,6 +149,20 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomId = getArguments().getString(ROOM_ID);
         isCreate = getArguments().getBoolean(IntentWrap.KEY_IS_CREATE);
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
+
+        // 双击点赞的view
+        mGiftAnimationView = getView().findViewById(R.id.gift_view);
+        mGiftAnimationView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
+            @Override
+            public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
+                present.sendMessage(rcChatroomLike);
+            }
+
+            @Override
+            public void onSingleTap() {
+                mRoomBottomView.hideSoftKeyboardAndInput();
+            }
+        });
 
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) clVoiceRoomView.getLayoutParams();
         layoutParams.topMargin = StatusBarUtil.getStatusBarHeight(requireContext());
@@ -491,7 +507,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void refreshRoomOwner(UiSeatModel uiSeatModel) {
-        Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
         if (uiSeatModel == null) {
             return;
         }
@@ -657,7 +672,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void hideSoftKeyboardAndIntput() {
-        mRoomBottomView.hideSoftKeyboardAndIntput();
+        mRoomBottomView.hideSoftKeyboardAndInput();
     }
 
 
@@ -753,11 +768,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
                 return null;
             }
         });
-    }
-
-    @Override
-    public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
-        present.sendMessage(rcChatroomLike);
     }
 
     @Override
@@ -867,7 +877,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void showLikeAnimation() {
-        mRoomBottomView.showFov(null);
+        mGiftAnimationView.showFov(mRoomBottomView.getGiftViewPoint());
     }
 
     @Override

@@ -107,6 +107,7 @@ import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.TextMessage;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 import kotlin.jvm.functions.Function1;
@@ -506,7 +507,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
-                                || RCFollowMsg.class.equals(aClass)) {
+                                || RCFollowMsg.class.equals(aClass)|| TextMessage.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
@@ -971,14 +972,29 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         for (UiSeatModel uiSeatModel : uiSeatModels) {
             if (uiSeatModel.getIndex() == 0) {
                 //如果是房主麦位，不用管房主是否存在
-                Member member = new Member().toMember(MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId()));
+                User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
+                Member member =null;
+                if (user==null){
+                    member=new Member();
+                    member.setUserName(mVoiceRoomBean.getCreateUserName());
+                    member.setUserId(mVoiceRoomBean.getCreateUserId());
+                }else {
+                    member=new Member().toMember(user);
+                }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
                 continue;
             }
             if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //当前用户在麦位上
-                Member member = new Member().toMember(MemberCache.getInstance().getMember(uiSeatModel.getUserId()));
+                User user = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
+                Member member =null;
+                if (user==null){
+                    member=new Member();
+                    member.setUserId(uiSeatModel.getUserId());
+                }else {
+                    member=new Member().toMember(user);
+                }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
             }
@@ -1198,9 +1214,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 发送公告更新的
      */
     private void sendNoticeModifyMessage() {
-        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-        tips.setContent("房间公告已更新！");
-        mView.showMessage(tips, false);
+        TextMessage tips = TextMessage.obtain("房间公告已更新!");
+        sendMessage(tips);
     }
 
     /**
@@ -1565,7 +1580,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     public void jumpRoom(RCAllBroadcastMessage message) {
         // 当前房间不跳转
-        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId()))
+        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId())
+                ||newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId())!=null
+                ||TextUtils.equals(AccountStore.INSTANCE.getUserId(),mVoiceRoomBean.getCreateUserId()))
             return;
         OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
             @Override

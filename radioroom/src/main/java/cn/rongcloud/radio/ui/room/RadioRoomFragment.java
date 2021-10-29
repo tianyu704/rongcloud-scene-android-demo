@@ -52,6 +52,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
+import cn.rong.combusis.ui.room.widget.GiftAnimationView;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -72,6 +73,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         RoomMessageAdapter.OnClickMessageUserListener, RadioRoomView, RoomBottomView.OnBottomOptionClickListener,
         MemberListFragment.OnClickUserListener, View.OnClickListener, AllBroadcastView.OnClickBroadcast {
     private ImageView mBackgroundImageView;
+    private GiftAnimationView mGiftAnimationView;
     private RoomTitleBar mRoomTitleBar;
     private TextView mNoticeView;
     private RoomSeatView mRoomSeatView;
@@ -121,6 +123,9 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     public void init() {
         mRoomId = getArguments().getString(ROOM_ID);
         mRoomSettingFragment = new RoomSettingFragment(present);
+        // 双击点赞的view
+        mGiftAnimationView = getView().findViewById(R.id.gift_view);
+
         clVoiceRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_voice_room_view);
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
@@ -132,33 +137,14 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) mRoomTitleBar.getLayoutParams();
         params.topMargin = StatusBarUtil.getStatusBarHeight(requireContext());
         mRoomTitleBar.setLayoutParams(params);
-        mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
-            @Override
-            public void accept(Object o) throws Throwable {
-                clickMenu();
-            }
-        });
-        mRoomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
-            @Override
-            public void accept(Object o) throws Throwable {
-                mMemberListFragment = new MemberListFragment(present.getRoomId(), RadioRoomFragment.this);
-                mMemberListFragment.show(getChildFragmentManager());
-            }
-        });
+
         mNoticeView = getView(R.id.tv_notice);
-        mNoticeView.setOnClickListener(v -> {
-            present.getNotice(false);
-        });
+
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
         // 房主座位
         mRoomSeatView = getView(R.id.room_seat_view);
-        mRoomSeatView.setResumeLiveClickListener(v -> {
-            present.enterSeat();
-        });
-        mRoomSeatView.setRoomOwnerHeadOnclickListener(v -> {
-            present.clickRoomSeat();
-        });
+
         // 底部操作按钮和双击送礼物
         mRoomBottomView = getView(R.id.room_bottom_view);
         // 弹幕消息列表
@@ -173,8 +159,41 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void initListener() {
-        btnGoBackList.setOnClickListener(this::onClick);
         super.initListener();
+        btnGoBackList.setOnClickListener(this::onClick);
+        mGiftAnimationView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
+            @Override
+            public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
+                present.sendMessage(rcChatroomLike);
+            }
+
+            @Override
+            public void onSingleTap() {
+                mRoomBottomView.hideSoftKeyboardAndInput();
+            }
+        });
+        mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                clickMenu();
+            }
+        });
+        mRoomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), RadioRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
+            }
+        });
+        mNoticeView.setOnClickListener(v -> {
+            present.getNotice(false);
+        });
+        mRoomSeatView.setRoomOwnerHeadOnclickListener(v -> {
+            present.clickRoomSeat();
+        });
+        mRoomSeatView.setResumeLiveClickListener(v -> {
+            present.enterSeat();
+        });
     }
 
     @Override
@@ -369,7 +388,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void showLikeAnimation() {
-        mRoomBottomView.showFov(null);
+        mGiftAnimationView.showFov(mRoomBottomView.getGiftViewPoint());
     }
 
     @Override
@@ -514,11 +533,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     @Override
     public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
         present.sendMessage(rcChatroomVoice);
-    }
-
-    @Override
-    public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
-        present.sendMessage(rcChatroomLike);
     }
 
     @Override

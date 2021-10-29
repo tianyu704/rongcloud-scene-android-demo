@@ -95,5 +95,5 @@ dependencies {
     api "cn.rongcloud.sdk:player:$rongcloudSdkVersion"
 
     api 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
-//    api 'com.tencent.bugly:nativecrashreport:latest.release'
+    api 'com.tencent.bugly:nativecrashreport:latest.release'
 }
