@@ -356,7 +356,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     @Override
     public boolean onReceived(Message message, int i) {
         if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())
-                &&message.getConversationType()== Conversation.ConversationType.CHATROOM) {
+                && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(mVoiceRoomBean.getRoomId(), message.getContent());
         }
         return true;
@@ -522,7 +522,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                             return;
                         } else if (aClass.equals(RCAllBroadcastMessage.class)) {
                             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
-                        }else if (aClass.equals(RCChatroomSeats.class)){
+                        } else if (aClass.equals(RCChatroomSeats.class)) {
                             refreshRoomMember();
                         }
                         Log.e("TAG", "accept: " + messageContent);
@@ -668,14 +668,16 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     break;
                 }
             }
-            if (currentStatus == STATUS_WAIT_FOR_SEAT) {
-                //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
-
-            } else {
-                if (inseat) {//在麦位上
-                    currentStatus = STATUS_ON_SEAT;
+            if (inseat) {
+                //当前用户已经在麦位上
+                currentStatus = STATUS_ON_SEAT;
+                mView.changeStatus(currentStatus);
+            }else {
+                //当前用户不在麦位上
+                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+                    //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
                 } else {
-                    //不在麦位上
+                    //当前用户不在麦位上
                     currentStatus = STATUS_NOT_ON_SEAT;
                 }
             }
