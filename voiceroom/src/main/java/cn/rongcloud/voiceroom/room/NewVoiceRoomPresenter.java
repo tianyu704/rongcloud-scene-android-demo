@@ -139,7 +139,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     private RoomOwnerType roomOwnerType;
 
     public int currentStatus = STATUS_NOT_ON_SEAT;
-    private List<Shield> shields =new ArrayList<>();
+    private List<Shield> shields = new ArrayList<>();
 
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
     private List<Disposable> disposableList = new ArrayList<>();
@@ -507,7 +507,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
-                                || RCFollowMsg.class.equals(aClass)|| TextMessage.class.equals(aClass)) {
+                                || RCFollowMsg.class.equals(aClass) || TextMessage.class.equals(aClass)) {
                             mView.showMessage(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
@@ -696,9 +696,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                     case EVENT_DELETE_SHIELD:
                         Iterator<Shield> iterator = shields.iterator();
                         String shile = stringArrayListPair.second.get(0);
-                        while(iterator.hasNext()){
+                        while (iterator.hasNext()) {
                             Shield x = iterator.next();
-                            if(x.getName().equals(shile)){
+                            if (x.getName().equals(shile)) {
                                 iterator.remove();
                             }
                         }
@@ -782,7 +782,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * 房间所有者点击自己的头像
      */
     public void onClickRoomOwnerView(FragmentManager fragmentManager) {
-        if (newVoiceRoomModel.getUiSeatModels().size()>0){
+        if (newVoiceRoomModel.getUiSeatModels().size() > 0) {
             UiSeatModel uiSeatModel = newVoiceRoomModel.getUiSeatModels().get(0);
             if (uiSeatModel != null) {
                 if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
@@ -863,7 +863,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 if (result.ok()) {
                     List<Shield> list = result.getList(Shield.class);
                     shields.clear();
-                    if (list!=null){
+                    if (list != null) {
                         shields.addAll(list);
                     }
                 }
@@ -973,13 +973,13 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             if (uiSeatModel.getIndex() == 0) {
                 //如果是房主麦位，不用管房主是否存在
                 User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
-                Member member =null;
-                if (user==null){
-                    member=new Member();
+                Member member = null;
+                if (user == null) {
+                    member = new Member();
                     member.setUserName(mVoiceRoomBean.getCreateUserName());
                     member.setUserId(mVoiceRoomBean.getCreateUserId());
-                }else {
-                    member=new Member().toMember(user);
+                } else {
+                    member = new Member().toMember(user);
                 }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
@@ -988,12 +988,12 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                 //当前用户在麦位上
                 User user = MemberCache.getInstance().getMember(uiSeatModel.getUserId());
-                Member member =null;
-                if (user==null){
-                    member=new Member();
+                Member member = null;
+                if (user == null) {
+                    member = new Member();
                     member.setUserId(uiSeatModel.getUserId());
-                }else {
-                    member=new Member().toMember(user);
+                } else {
+                    member = new Member().toMember(user);
                 }
                 member.setSeatIndex(uiSeatModel.getIndex());
                 memberArrayList.add(member);
@@ -1630,11 +1630,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     }
 
     private void exitRoom(int roomType, final String roomId) {
-        boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
-        if (isClose) {
-            closeRoom(() -> {
-                IntentWrap.launchRoom(((NewVoiceRoomFragment) mView).requireContext(), roomType, roomId);
-            });
+        if (VoiceRoomProvider.provider().contains(roomId)) {
+            mView.switchOtherRoom(roomId);
         } else {
             leaveRoom(() -> {
                 IntentWrap.launchRoom(((NewVoiceRoomFragment) mView).requireContext(), roomType, roomId);

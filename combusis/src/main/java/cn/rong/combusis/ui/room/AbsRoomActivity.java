@@ -43,6 +43,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
     private HashMap<String, SwitchRoomListener> switchRoomListenerMap = new HashMap<>();
     private String currentRoomId;
     private SmartRefreshLayout refreshLayout;
+    private boolean canRefreshAndLoadMore;
 
     @Override
     public int setLayoutId() {
@@ -72,6 +73,9 @@ public abstract class AbsRoomActivity extends BaseActivity {
                 loadMore();
             }
         });
+        initRefreshAndLoadMore();
+        refreshLayout.setEnableRefresh(canRefreshAndLoadMore);
+        refreshLayout.setEnableLoadMore(canRefreshAndLoadMore);
 
         // 初始化viewpager并设置数据和监听
         mViewPager = getView(R.id.vp_room);
@@ -85,8 +89,10 @@ public abstract class AbsRoomActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
                 mCurrentPosition = position;
-                refreshLayout.setEnableLoadMore(mCurrentPosition == mRoomAdapter.getItemCount() - 1);
-                refreshLayout.setEnableRefresh(mCurrentPosition == 0);
+                if (canRefreshAndLoadMore) {
+                    refreshLayout.setEnableLoadMore(mCurrentPosition == mRoomAdapter.getItemCount() - 1);
+                    refreshLayout.setEnableRefresh(mCurrentPosition == 0);
+                }
                 getIntent().putExtra(IntentWrap.KEY_ROOM_POSITION, position);
                 String roomId = mRoomAdapter.getItemData(position);
                 Logger.d("==================end选中了第几个：" + position + ",current:" + roomId);
@@ -218,6 +224,26 @@ public abstract class AbsRoomActivity extends BaseActivity {
         return refreshLayout;
     }
 
+    protected void initRefreshAndLoadMore() {
+        canRefreshAndLoadMore = false;
+        List<String> ids = loadData();
+        if (ids != null && ids.size() > 0) {
+            // 要打开的房间id
+            String targetId = ids.get(getCurrentItem());
+            // 从缓存中拿voiceRoomBean，判断是不是房主自己
+            VoiceRoomBean bean = VoiceRoomProvider.provider().getSync(targetId);
+            if (bean != null) {
+                if (TextUtils.equals(bean.getCreateUserId(), AccountStore.INSTANCE.getUserId()) || bean.isPrivate()) {
+                    canRefreshAndLoadMore = false;
+                } else {
+                    canRefreshAndLoadMore = true;
+                }
+            } else {
+                canRefreshAndLoadMore = false;
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
         if (switchRoomListenerMap.containsKey(currentRoomId)) {
@@ -238,4 +264,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
     }
 
 
+    public void switchOtherRoom(String roomId) {
+        mViewPager.setCurrentItem(mRoomAdapter.getItemPosition(roomId), false);
+    }
 }

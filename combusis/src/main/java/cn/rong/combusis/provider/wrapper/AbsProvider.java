@@ -41,6 +41,10 @@ public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
         getAsynWithNeed(id, resultBack, true);
     }
 
+    public T getSync(String key) {
+        return lruCache.get(key);
+    }
+
     /**
      * @param id
      * @param resultBack
@@ -122,6 +126,10 @@ public abstract class AbsProvider<T extends Provide> implements IProvider<T> {
      * @param ts
      */
     protected void onUpdateComplete(List<T> ts) {
+    }
+
+    public boolean contains(String key) {
+        return lruCache.snapshot().containsKey(key);
     }
 
     @Override

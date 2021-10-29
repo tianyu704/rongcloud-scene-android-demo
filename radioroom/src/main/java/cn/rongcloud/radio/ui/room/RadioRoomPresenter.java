@@ -983,8 +983,8 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param message
      */
     public void jumpRoom(RCAllBroadcastMessage message) {
-        // 当前房间不跳转
-        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), mRoomId))
+        // 当前房间不跳转,房主不能跳转
+        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), mRoomId) || isSelf(mVoiceRoomBean.getUserId()))
             return;
         OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
             @Override
@@ -1029,10 +1029,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     private void jumpOtherRoom(int roomType, final String roomId) {
-        boolean isClose = TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId());
-        leaveRoom(false, isClose, () -> {
-            IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
-        });
+        if (VoiceRoomProvider.provider().contains(roomId)) {
+            mView.switchOtherRoom(roomId);
+        } else {
+            leaveRoom(false, false, () -> {
+                IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
+            });
+        }
     }
 
     interface CloseRoomCallback {

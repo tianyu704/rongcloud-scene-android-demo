@@ -68,4 +68,6 @@ public interface RadioRoomView extends IBaseView {
     void showRoomCloseDialog();
 
     void showFinishView();
+
+    void switchOtherRoom(String roomId);
 }

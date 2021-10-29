@@ -61,4 +61,8 @@ public class RoomVPAdapter extends FragmentStateAdapter {
         }
         return null;
     }
+
+    public int getItemPosition(String roomId) {
+        return mRoomList.indexOf(roomId);
+    }
 }
