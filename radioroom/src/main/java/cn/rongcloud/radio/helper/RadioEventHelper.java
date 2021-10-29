@@ -194,20 +194,6 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
     }
 
     @Override
-    public void onAudienceEnter(String s) {
-        for (RCRadioEventListener l : listeners) {
-            l.onAudienceEnter(s);
-        }
-    }
-
-    @Override
-    public void onAudienceLeave(String s) {
-        for (RCRadioEventListener l : listeners) {
-            l.onAudienceLeave(s);
-        }
-    }
-
-    @Override
     public void onRadioRoomKVUpdate(IRCRadioRoomEngine.UpdateKey updateKey, String s) {
         for (RCRadioEventListener l : listeners) {
             l.onRadioRoomKVUpdate(updateKey, s);
