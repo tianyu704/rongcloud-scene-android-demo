@@ -783,6 +783,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 leaveRoom(false, false);
                 mView.showToast("你已被踢出房间");
             }
+            refreshRoomMemberCount();
         } else if (content instanceof RCChatroomLike) {
             mView.showLikeAnimation();
             return;
