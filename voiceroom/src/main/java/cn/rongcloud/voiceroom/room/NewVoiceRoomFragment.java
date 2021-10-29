@@ -410,7 +410,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      * pk禁止操作提示
      */
     private boolean checkPKState() {
-        boolean isPK = StateUtil.isPking();
+        boolean isPK = StateUtil.isPking() && TextUtils.equals(AccountStore.INSTANCE.getUserId(), present.getCreateUserId());
         if (isPK) {
             KToast.show("当前PK中，无法进行该操作");
         }
@@ -888,6 +888,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomTitleBar.setOnlineNum(OnlineCount);
     }
 
+    @Override
+    public void switchOtherRoom(String roomId) {
+        ((AbsRoomActivity) requireActivity()).switchOtherRoom(roomId);
+    }
+
 
     @Override
     public void setVoiceName(String name) {
@@ -914,6 +919,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void clickBroadcast(RCAllBroadcastMessage message) {
+        mAllBroadcastView.showMessage(null);
         present.jumpRoom(message);
     }
 }

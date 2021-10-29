@@ -420,6 +420,11 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         rlRoomFinishedId.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public void switchOtherRoom(String roomId) {
+        ((AbsRoomActivity) requireActivity()).switchOtherRoom(roomId);
+    }
+
     /**
      * 点击右上角菜单按钮
      */
@@ -553,6 +558,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void clickBroadcast(RCAllBroadcastMessage message) {
+        mAllBroadcastView.showMessage(null);
         present.jumpRoom(message);
     }
 }

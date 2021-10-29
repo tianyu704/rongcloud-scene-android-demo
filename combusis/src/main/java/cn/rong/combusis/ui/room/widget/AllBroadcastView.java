@@ -61,7 +61,7 @@ public class AllBroadcastView extends AppCompatTextView {
         this.onClickBroadcast = onClickBroadcast;
     }
 
-    private void showMessage(RCAllBroadcastMessage message) {
+    public void showMessage(RCAllBroadcastMessage message) {
         if (message == null) {
             animation(false);
         } else {
