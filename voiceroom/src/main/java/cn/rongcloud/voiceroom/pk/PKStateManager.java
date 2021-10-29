@@ -24,6 +24,7 @@ import cn.rong.combusis.EventBus;
 import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.sdk.StateUtil;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
