@@ -16,15 +16,11 @@ import android.text.TextUtils;
 
 import androidx.fragment.app.Fragment;
 
-import com.rongcloud.common.dao.database.DatabaseManager;
-import com.rongcloud.common.dao.entities.CallRecordEntityKt;
-
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import cn.rong.combusis.DataShareManager;
 import io.rong.callkit.util.ActivityStartCheckUtils;
-import io.rong.callkit.util.UserInfoProvider;
 import io.rong.calllib.IRongReceivedCallListener;
 import io.rong.calllib.ReportUtil;
 import io.rong.calllib.RongCallClient;
@@ -58,7 +54,8 @@ public class RongCallModule implements IExtensionModule {
     private static boolean mViewLoaded = true;
     private Context mContext;
     private static RongCallMissedListener missedListener;
-    private static boolean ignoreIncomingCall;
+    // 替换成 AVManager-> ignoreIncomingCall
+//    private static boolean ignoreIncomingCall;
     private Application mApplication;
 
     public RongCallModule() {
@@ -157,30 +154,8 @@ public class RongCallModule implements IExtensionModule {
         missedListener = listener;
     }
 
-    /**
-     * 启动通话界面
-     *
-     * @param context                  上下文
-     * @param callSession              通话实体
-     * @param startForCheckPermissions android6.0需要实时获取应用权限。
-     *                                 当需要实时获取权限时，设置startForCheckPermissions为true， 其它情况下设置为false。
-     */
-    private void startVoIPActivity(
-            Context context, final RongCallSession callSession, boolean startForCheckPermissions) {
-        RLog.d(TAG, "startVoIPActivity.ignoreIncomingCall : " + ignoreIncomingCall + " , AndroidVersion :" + Build.VERSION.SDK_INT + " ,startForCheckPermissions : " + startForCheckPermissions);
-        if (ignoreIncomingCall) {
-            RongCallClient.getInstance().hangUpCall();
-            return;
-        }
-        ReportUtil.appStatus(ReportUtil.TAG.RECEIVE_CALL_LISTENER, callSession, "state|desc", "startVoIPActivity", Build.VERSION.SDK_INT);
-        // 在 Android 10 以上版本不再允许后台运行 Activity
-        if (Build.VERSION.SDK_INT < 29 || isAppOnForeground(context)) {
-            context.startActivity(createVoIPIntent(context, callSession, startForCheckPermissions));
-        }else {
-            // 调整都发生通知
-            onSendBroadcast(context, callSession, startForCheckPermissions);
-        }
-        mCallSession = null;
+    public static void ignoreIncomingCall(boolean ignore) {
+        DataShareManager.get().setIgnoreIncomingCall(ignore);
     }
 
     private void onSendBroadcast(Context context, RongCallSession callSession, boolean startForCheckPermissions) {
@@ -235,17 +210,6 @@ public class RongCallModule implements IExtensionModule {
             }
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setPackage(context.getPackageName());
-
-//            DatabaseManager.INSTANCE.insertCallRecord(callSession.getCallerUserId(),
-//                    null,
-//                    callSession.getSelfUserId(),
-//                    null,
-//                    new Date().getTime(),
-//                    0,
-//                    callSession.getMediaType().equals(RongCallCommon.CallMediaType.VIDEO) ? CallRecordEntityKt.VIDEO_SINGLE_CALL : CallRecordEntityKt.AUDIO_SINGLE_CALL,
-//                    CallRecordEntityKt.DIRECTION_CALLED);
-//
-//            UserInfoProvider.getInstance().getUserInfoByPhoneNumber(callSession.getCallerUserId()).subscribe();
         }
         return intent;
     }
@@ -302,12 +266,34 @@ public class RongCallModule implements IExtensionModule {
         return false;
     }
 
-    public static void ignoreIncomingCall(boolean ignore) {
-        ignoreIncomingCall = ignore;
+    public static boolean isIgnoreIncomingCall() {
+        return DataShareManager.get().isIgnoreIncomingCall();
     }
 
-    public static boolean isIgnoreIncomingCall() {
-        return ignoreIncomingCall;
+    /**
+     * 启动通话界面
+     *
+     * @param context                  上下文
+     * @param callSession              通话实体
+     * @param startForCheckPermissions android6.0需要实时获取应用权限。
+     *                                 当需要实时获取权限时，设置startForCheckPermissions为true， 其它情况下设置为false。
+     */
+    private void startVoIPActivity(
+            Context context, final RongCallSession callSession, boolean startForCheckPermissions) {
+        RLog.d(TAG, "startVoIPActivity.ignoreIncomingCall : " + DataShareManager.get().isIgnoreIncomingCall() + " , AndroidVersion :" + Build.VERSION.SDK_INT + " ,startForCheckPermissions : " + startForCheckPermissions);
+        if (DataShareManager.get().isIgnoreIncomingCall()) {
+            RongCallClient.getInstance().hangUpCall();
+            return;
+        }
+        ReportUtil.appStatus(ReportUtil.TAG.RECEIVE_CALL_LISTENER, callSession, "state|desc", "startVoIPActivity", Build.VERSION.SDK_INT);
+        // 在 Android 10 以上版本不再允许后台运行 Activity
+        if (Build.VERSION.SDK_INT < 29 || isAppOnForeground(context)) {
+            context.startActivity(createVoIPIntent(context, callSession, startForCheckPermissions));
+        } else {
+            // 调整都发生通知
+            onSendBroadcast(context, callSession, startForCheckPermissions);
+        }
+        mCallSession = null;
     }
 
     @Override

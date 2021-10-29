@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.rong.combusis.DataShareManager;
 import cn.rong.combusis.R;
 import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.provider.voiceroom.RoomType;
@@ -50,7 +51,16 @@ public abstract class AbsRoomActivity extends BaseActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        // 取消忽略av call
+        DataShareManager.get().setIgnoreIncomingCall(false);
+        super.onDestroy();
+    }
+
+    @Override
     public void init() {
+        // 忽略av call
+        DataShareManager.get().setIgnoreIncomingCall(true);
         initRoom();
         // 状态栏透明
         StatusBarUtil.setTranslucentStatus(this);
