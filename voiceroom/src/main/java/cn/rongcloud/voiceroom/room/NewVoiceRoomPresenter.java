@@ -252,6 +252,9 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
     private void joinRoom(String roomId, boolean isCreate) {
         initListener(roomId);
+        //重置底部状态
+        currentStatus = STATUS_NOT_ON_SEAT;
+        mView.changeStatus(currentStatus);
         if (isCreate) {
             RCVoiceRoomInfo rcVoiceRoomInfo = new RCVoiceRoomInfo();
             rcVoiceRoomInfo.setRoomName(mVoiceRoomBean.getRoomName());
