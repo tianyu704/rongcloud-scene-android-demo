@@ -114,12 +114,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 if (null != pkView) pkView.reset(isBroadcast);
                 if (isBroadcast) {
                     // 走到这里 说明主播是退出后 又进自己房间
-                    RCPKInfo rcpkInfo = new RCPKInfo();
-                    rcpkInfo.setInviterRoomId(pkInfos[0].getRoomId());//邀请人
-                    rcpkInfo.setInviterId(pkInfos[0].getUserId());
-                    rcpkInfo.setInviteeRoomId(pkInfos[1].getRoomId());//被邀请
-                    rcpkInfo.setInviteeId(pkInfos[1].getUserId());
-                    VoiceRoomApi.getApi().quickStartPk(rcpkInfo, new IResultBack<Boolean>() {
+                    VoiceRoomApi.getApi().resumePk(pkInfos[1].getRoomId(), pkInfos[1].getUserId(), new IResultBack<Boolean>() {
                         @Override
                         public void onResult(Boolean aBoolean) {
                             if (aBoolean) {

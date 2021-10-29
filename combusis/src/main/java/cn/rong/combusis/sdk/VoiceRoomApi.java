@@ -12,7 +12,6 @@ import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.model.PKResponse;
-import cn.rongcloud.voiceroom.model.RCPKInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 
 public class VoiceRoomApi implements Api {
@@ -397,8 +396,8 @@ public class VoiceRoomApi implements Api {
 
     }
 
-    public void quickStartPk(RCPKInfo rcpkInfo, IResultBack<Boolean> resultBack) {
-        RCVoiceRoomEngine.getInstance().quickStartPk(rcpkInfo, new RCVoiceRoomCallback() {
+    public void resumePk(String pkRoomId, String pkUserId, IResultBack<Boolean> resultBack) {
+        RCVoiceRoomEngine.getInstance().resumePk(pkRoomId, pkUserId, new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
                 if (null != resultBack) resultBack.onResult(true);
