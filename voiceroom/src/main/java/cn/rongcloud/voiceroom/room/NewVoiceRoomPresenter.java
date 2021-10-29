@@ -105,6 +105,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
@@ -354,7 +355,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      */
     @Override
     public boolean onReceived(Message message, int i) {
-        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())) {
+        if (mVoiceRoomBean != null && !TextUtils.isEmpty(mVoiceRoomBean.getRoomId())
+                &&message.getConversationType()== Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(mVoiceRoomBean.getRoomId(), message.getContent());
         }
         return true;
