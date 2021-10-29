@@ -104,13 +104,13 @@ public class VoiceRoomApi implements Api {
     @Override
     public void lockAll(boolean locked) {
         RCVoiceRoomEngine.getInstance().lockOtherSeats(locked, null);
-        KToast.show(locked ? "全麦锁定成功" : "全麦解锁成功");
+//        KToast.show(locked ? "全麦锁定成功" : "全麦解锁成功");
     }
 
     @Override
     public void muteAll(boolean mute) {
         RCVoiceRoomEngine.getInstance().muteOtherSeats(mute, null);
-        KToast.show(mute ? "全麦静音成功" : "全麦取消静音成功");
+//        KToast.show(mute ? "全麦静音成功" : "全麦取消静音成功");
     }
 
     /**
@@ -336,7 +336,7 @@ public class VoiceRoomApi implements Api {
 
     @Override
     public void responsePKInvitation(String inviterRoomId, String inviterUserId, PKResponse pkState, IResultBack<Boolean> resultBack) {
-        String action = (pkState == PKResponse.accept ? "同意" : pkState == PKResponse.reject ? "拒绝" : "忽略") + "PK邀请";
+//        String action = (pkState == PKResponse.accept ? "PK同意" : pkState == PKResponse.reject ? "拒绝" : "忽略") + "PK邀请";
         RCVoiceRoomEngine.getInstance().responsePKInvitation(
                 inviterRoomId,
                 inviterUserId,
@@ -344,7 +344,13 @@ public class VoiceRoomApi implements Api {
                 new RCVoiceRoomCallback() {
                     @Override
                     public void onSuccess() {
-                        KToast.show(action + "成功");
+                        if (PKResponse.accept == pkState) {
+                            KToast.show("同意邀请");
+                        } else if (PKResponse.reject == pkState) {
+                            KToast.show("拒绝邀请");
+                        } else {
+                            KToast.show("邀请被取消");
+                        }
                         if (null != resultBack) resultBack.onResult(true);
                         // 当前邀请人信息
                         IEventHelp.PKInviter pkInviter = EventHelper.helper().getPKInviter();
@@ -361,7 +367,7 @@ public class VoiceRoomApi implements Api {
 
                     @Override
                     public void onError(int i, String s) {
-                        KToast.show(action + "失败");
+                        KToast.show("响应PK邀请失败");
                         Logger.e(TAG, "responsePKInvitation#onError [" + i + "]:" + s);
                         if (null != resultBack) resultBack.onResult(false);
                     }
