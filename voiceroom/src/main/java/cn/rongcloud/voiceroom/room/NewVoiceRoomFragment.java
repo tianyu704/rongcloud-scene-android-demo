@@ -7,7 +7,6 @@ import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_WAIT_FOR_
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -50,6 +49,7 @@ import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.sdk.StateUtil;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
@@ -76,7 +76,6 @@ import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.pk.IPKState;
 import cn.rongcloud.voiceroom.pk.PKStateManager;
-import cn.rongcloud.voiceroom.pk.StateUtil;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
 import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
@@ -516,7 +515,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             mRoomSeatView.setRoomOwnerMute(false);
             mRoomSeatView.setGiftCount(0L);
         } else {
-            Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
+//            Log.e(TAG, "refreshRoomOwner: " + uiSeatModel.toString());
             UserProvider.provider().getAsyn(uiSeatModel.getUserId(), new IResultBack<UserInfo>() {
                 @Override
                 public void onResult(UserInfo userInfo) {

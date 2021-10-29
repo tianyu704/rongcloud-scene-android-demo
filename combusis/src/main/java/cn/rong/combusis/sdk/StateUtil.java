@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.pk;
+package cn.rong.combusis.sdk;
 
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;

@@ -24,6 +24,7 @@ import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.sdk.StateUtil;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
@@ -128,6 +129,10 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlInvitedSeat.setOnClickListener(v -> {
+            if (StateUtil.isPking()) {
+                EToast.showToast("当前PK中,无法进行该操作");
+                return;
+            }
             mOnMemberSettingClickListener.clickInviteSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
