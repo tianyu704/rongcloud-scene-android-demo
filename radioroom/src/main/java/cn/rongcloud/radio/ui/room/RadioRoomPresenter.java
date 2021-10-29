@@ -789,7 +789,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         }
 
         // 显示到弹幕列表
-        mView.addToMessageList(content, false);
+        if (RadioEventHelper.getInstance().isShowingMessage(message)) {
+            mView.addToMessageList(content, false);
+        }
     }
 
     @Override
@@ -801,10 +803,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onAudienceLeave(String s) {
         Logger.e("==============onAudienceLeave: " + s);
+        refreshRoomMemberCount();
         if (TextUtils.equals(s, getCreateUserId())) {
             mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
-        } else {
-            refreshRoomMemberCount();
         }
     }
 

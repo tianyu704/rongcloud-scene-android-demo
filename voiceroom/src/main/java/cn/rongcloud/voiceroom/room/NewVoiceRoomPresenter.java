@@ -1586,8 +1586,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     public void jumpRoom(RCAllBroadcastMessage message) {
         // 当前房间不跳转
         if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId())
-                ||newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId())!=null
-                ||TextUtils.equals(AccountStore.INSTANCE.getUserId(),mVoiceRoomBean.getCreateUserId()))
+                || newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId()) != null
+                || TextUtils.equals(AccountStore.INSTANCE.getUserId(), mVoiceRoomBean.getCreateUserId()))
             return;
         OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
             @Override

@@ -194,10 +194,10 @@ public class PKProcessbar extends ProgressBar {
         float progressPosX = (int) (mRealWidth * radio);//设置当前进度的宽度
         int mRealheigth = Math.max(mUnReachedProgressBarHeight, mReachedProgressBarHeight);
         // 控制progressPosX
-        if (progressPosX < mRealheigth * 1.5f) {
-            progressPosX = mRealheigth * 1.5f;
-        } else if (progressPosX > mRealWidth - mRealheigth * 1.5f) {
-            progressPosX = mRealWidth - mRealheigth * 1.5f;
+        if (progressPosX < mRealheigth * 2f) {
+            progressPosX = mRealheigth * 2f;
+        } else if (progressPosX > mRealWidth - mRealheigth * 2f) {
+            progressPosX = mRealWidth - mRealheigth * 2f;
         }
         // draw start circle
         float r = mRealheigth / 2.0f;
@@ -277,14 +277,14 @@ public class PKProcessbar extends ProgressBar {
         //draw left text
         String text = "我方 " + leftValue;//设置文本
         mPaint.setColor(mTextColor);
-        mPaint.setTextSize(sp2px(14));
+        mPaint.setTextSize(sp2px(11));
         float leftWidth = mPaint.measureText(text);//返回文本的宽度
         float textHeight = (mPaint.descent() + mPaint.ascent()) / 2;//设置文本的高度
-        canvas.drawText(text, mRealheigth / 3, mRealheigth / 2 - textHeight, mPaint);
+        canvas.drawText(text, mRealheigth / 5, mRealheigth / 2 - textHeight, mPaint);
         //draw right text
         text = "对方 " + leftValue;//设置文本
         float rightWidth = mPaint.measureText(text);//返回文本的宽度
-        canvas.drawText(text, mRealWidth - rightWidth - mRealheigth / 3, mRealheigth / 2 - textHeight, mPaint);
+        canvas.drawText(text, mRealWidth - rightWidth - mRealheigth / 5, mRealheigth / 2 - textHeight, mPaint);
         canvas.restore();
     }
 

@@ -83,5 +83,7 @@ public interface IPKState {
          * pk状态变化
          */
         void onPkState();
+
+        void onSendPKMessage(String content);
     }
 }
