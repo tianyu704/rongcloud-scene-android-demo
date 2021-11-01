@@ -25,6 +25,7 @@ import cn.rong.combusis.message.RCChatroomGift;
 import cn.rong.combusis.message.RCChatroomGiftAll;
 import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
@@ -38,6 +39,7 @@ import cn.rongcloud.radioroom.room.RCRadioEventListener;
 import io.rong.imkit.picture.tools.ToastUtils;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
+import io.rong.message.TextMessage;
 
 /**
  * @author gyn
@@ -187,7 +189,8 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         if (content instanceof RCChatroomBarrage || content instanceof RCChatroomEnter
                 || content instanceof RCChatroomKickOut || content instanceof RCChatroomGiftAll
                 || content instanceof RCChatroomGift || content instanceof RCChatroomAdmin
-                || content instanceof RCChatroomLocationMessage || content instanceof RCFollowMsg) {
+                || content instanceof RCChatroomLocationMessage || content instanceof RCFollowMsg
+                || content instanceof RCChatroomVoice || content instanceof TextMessage) {
             return true;
         }
         return false;
