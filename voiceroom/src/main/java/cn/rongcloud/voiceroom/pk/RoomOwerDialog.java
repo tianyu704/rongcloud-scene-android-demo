@@ -26,7 +26,9 @@ import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.R;
+import cn.rongcloud.voiceroom.pk.domain.PKResult;
 
 /**
  * pk在线房主弹框
@@ -60,15 +62,26 @@ public class RoomOwerDialog extends BottomDialog {
                 holder.rootView().setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        dismiss();
-                        VoiceRoomApi.getApi().sendPKInvitation(item.getRoomId(), item.getCreateUser().getUserId(),
-                                new IResultBack<Boolean>() {
-                                    @Override
-                                    public void onResult(Boolean aBoolean) {
-                                        KToast.show(aBoolean ? "已邀请PK,等的对方接受" : "PK邀请失败");
-                                        if (null != resultBack) resultBack.onResult(aBoolean);
-                                    }
-                                });
+                        String roomId = item.getRoomId();
+                        isInPk(roomId, new IResultBack<Boolean>() {
+                            @Override
+                            public void onResult(Boolean aBoolean) {
+                                if (!aBoolean) {// 没有正在pk
+                                    dismiss();
+                                    VoiceRoomApi.getApi().sendPKInvitation(item.getRoomId(), item.getCreateUser().getUserId(),
+                                            new IResultBack<Boolean>() {
+                                                @Override
+                                                public void onResult(Boolean aBoolean) {
+                                                    KToast.show(aBoolean ? "已邀请PK,等的对方接受" : "PK邀请失败");
+                                                    if (null != resultBack)
+                                                        resultBack.onResult(aBoolean);
+                                                }
+                                            });
+                                } else {
+                                    EToast.showToast("对方正在PK中");
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -76,6 +89,26 @@ public class RoomOwerDialog extends BottomDialog {
         adapter.setRefreshView(rcyOwner);
         rcyOwner.enableRefresh(false);
         rcyOwner.enableRefresh(false);
+    }
+
+    /**
+     * 判断是否正在pk
+     *
+     * @param roomId     房间id
+     * @param resultBack 回调
+     */
+    void isInPk(String roomId, IResultBack<Boolean> resultBack) {
+        PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
+            @Override
+            public void onResult(PKResult pkResult) {
+                if (null == pkResult || pkResult.getStatusMsg() == -1 || pkResult.getStatusMsg() == 2) {
+                    Logger.e(TAG, "init: Not In PK");
+                    resultBack.onResult(false);
+                } else {
+                    resultBack.onResult(true);
+                }
+            }
+        });
     }
 
     private void requestOwners() {
