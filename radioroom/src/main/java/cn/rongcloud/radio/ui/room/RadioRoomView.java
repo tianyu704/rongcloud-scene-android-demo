@@ -70,4 +70,6 @@ public interface RadioRoomView extends IBaseView {
     void showFinishView();
 
     void switchOtherRoom(String roomId);
+
+    void refreshMessageList();
 }

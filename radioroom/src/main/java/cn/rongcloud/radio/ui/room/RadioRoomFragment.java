@@ -425,6 +425,11 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         ((AbsRoomActivity) requireActivity()).switchOtherRoom(roomId);
     }
 
+    @Override
+    public void refreshMessageList() {
+        mRoomMessageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * 点击右上角菜单按钮
      */
