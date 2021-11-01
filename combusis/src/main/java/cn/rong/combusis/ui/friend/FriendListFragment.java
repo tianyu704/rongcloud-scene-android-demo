@@ -1,68 +1,116 @@
 package cn.rong.combusis.ui.friend;
 
 
+import android.view.View;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
-import com.basis.adapter.interfaces.IAdapte;
-import com.basis.adapter.recycle.RcyHolder;
+import androidx.annotation.NonNull;
+
 import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
-import com.basis.net.oklib.api.Method;
 import com.basis.net.oklib.wrapper.Wrapper;
-import com.basis.ui.ListFragment;
+import com.basis.ui.BaseFragment;
+import com.scwang.smart.refresh.layout.SmartRefreshLayout;
+import com.scwang.smart.refresh.layout.api.RefreshLayout;
+import com.scwang.smart.refresh.layout.listener.OnRefreshLoadMoreListener;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.ui.friend.model.Friend;
+import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 
-public class FriendListFragment extends ListFragment<Friend, Friend, RcyHolder> implements FriendAdapter.OnFollowClickListener {
+public class FriendListFragment extends BaseFragment implements FriendAdapter.OnFollowClickListener {
     private FriendAdapter mAdapter;
     private int mType = 2;// 1 我关注的 2 我的粉丝
     private SendPrivateMessageFragment sendPrivateMessageFragment;
+    private RecyclerViewAtVP2 mFriendRecyclerView;
+    private SmartRefreshLayout refreshLayout;
+    private TextView emptyView;
+    private int page = 1;
 
     public static FriendListFragment getInstance() {
         return new FriendListFragment();
     }
 
     @Override
-    public void initView() {
+    public void init() {
         RadioGroup radioGroup = getView().findViewById(R.id.rg_friend);
         radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_follower) {
                 mType = 2;
                 mAdapter.setType(mType);
-                loadData();
+                loadData(true);
             } else if (checkedId == R.id.rb_follow) {
                 mType = 1;
                 mAdapter.setType(mType);
-                loadData();
+                loadData(true);
             }
         });
+        mFriendRecyclerView = (RecyclerViewAtVP2) getView(R.id.rv_friend);
+        refreshLayout = (SmartRefreshLayout) getView(R.id.layout_refresh);
+        emptyView = (TextView) getView(R.id.tv_empty);
+        mAdapter = new FriendAdapter(getContext(), R.layout.item_friend);
+        mAdapter.setType(mType);
+        mAdapter.setOnFollowClickListener(this);
+        mFriendRecyclerView.setAdapter(mAdapter);
+
+        refreshLayout.setOnRefreshLoadMoreListener(new OnRefreshLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                loadData(false);
+            }
+
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                loadData(true);
+            }
+        });
+
         sendPrivateMessageFragment = new SendPrivateMessageFragment();
     }
 
-    private void loadData() {
+
+    private void loadData(boolean isRefresh) {
+        if (isRefresh) {
+            page = 1;
+        }
         Map<String, Object> params = new HashMap<>(8);
         params.put("type", mType);
-        request("Loading...", VRApi.FOLLOW_LIST, params, Method.get, true);
+        params.put("page", page);
+        params.put("size", 10);
+        OkApi.get(VRApi.FOLLOW_LIST, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                List<Friend> friends = result.getList("list", Friend.class);
+                if (friends != null && !friends.isEmpty()) {
+                    mAdapter.setData(friends, isRefresh);
+                    if (page == 1) {
+                        refreshLayout.finishRefresh();
+                    } else {
+                        refreshLayout.finishLoadMore();
+                    }
+                    emptyView.setVisibility(View.GONE);
+                    page++;
+                } else {
+                    refreshLayout.setNoMoreData(true);
+                    if (page == 1) {
+                        emptyView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
-    }
-
-    @Override
-    public IAdapte<Friend, RcyHolder> onSetAdapter() {
-        mAdapter = new FriendAdapter(getContext(), R.layout.item_friend);
-        mAdapter.setType(mType);
-        mAdapter.setOnFollowClickListener(this);
-        return mAdapter;
+        loadData(true);
     }
 
     @Override

@@ -33,7 +33,14 @@ abstract class BaseBottomSheetDialogFragment(@LayoutRes val layoutId: Int) :
     }
 
     fun show(manager: FragmentManager) {
-        super.show(manager, this.javaClass.name)
+        //如果座位正在使用中
+        try {
+            manager.beginTransaction().remove(this).commit();
+            super.show(manager, this.javaClass.name)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

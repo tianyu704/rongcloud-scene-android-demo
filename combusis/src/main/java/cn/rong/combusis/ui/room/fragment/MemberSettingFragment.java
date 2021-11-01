@@ -378,10 +378,13 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                             RCFollowMsg followMsg = new RCFollowMsg();
                             followMsg.setUser(AccountStore.INSTANCE.toUser());
                             followMsg.setTargetUser(member.toUser());
-                            mOnMemberSettingClickListener.clickFollow(followMsg);
+                            mOnMemberSettingClickListener.clickFollow(true, followMsg);
                         }
                     } else {
                         ToastUtils.s(getContext(), "取消关注成功");
+                        if (mOnMemberSettingClickListener != null) {
+                            mOnMemberSettingClickListener.clickFollow(false, null);
+                        }
                     }
                     member.setStatus(isFollow ? 1 : 0);
                     refreshFollow(isFollow);
@@ -467,6 +470,6 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
          *
          * @param followMsg
          */
-        void clickFollow(RCFollowMsg followMsg);
+        void clickFollow(boolean isFollow, RCFollowMsg followMsg);
     }
 }

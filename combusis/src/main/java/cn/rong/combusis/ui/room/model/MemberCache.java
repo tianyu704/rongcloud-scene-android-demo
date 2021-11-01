@@ -119,7 +119,7 @@ public class MemberCache {
     /**
      * 通过userId，拿到对应的成员
      */
-    public User getMember(String userId){
+    public User getMember(String userId) {
         List<User> members = getMembers();
         for (User member : members) {
             if (member.getUserId().equals(userId)) {
@@ -139,6 +139,22 @@ public class MemberCache {
         if (!list.contains(user)) {
             list.add(user);
             memberList.setValue(list);
+        }
+    }
+
+    public void addAdmin(String id) {
+        List<String> ids = getAdminList().getValue();
+        if (!ids.contains(id)) {
+            ids.add(id);
+            getAdminList().setValue(ids);
+        }
+    }
+
+    public void removeAdmin(String id) {
+        List<String> ids = getAdminList().getValue();
+        if (ids.contains(id)) {
+            ids.remove(id);
+            getAdminList().setValue(ids);
         }
     }
 

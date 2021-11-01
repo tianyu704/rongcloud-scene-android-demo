@@ -3,22 +3,26 @@ package cn.rong.combusis.ui.room;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.basis.adapter.recycle.RcyAdapter;
 import com.basis.adapter.recycle.RcyHolder;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
@@ -39,6 +43,7 @@ import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.widget.CenterAlignImageSpan;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
 
@@ -49,10 +54,12 @@ import io.rong.message.TextMessage;
 public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
     OnClickMessageUserListener mOnClickMessageUserListener;
     private String mRoomCreateId = "";
+    private int iconSize = 0;
 
     public RoomMessageAdapter(Context context, OnClickMessageUserListener onClickMessageUserListener) {
         this(context, R.layout.item_message_system, R.layout.item_message_normal, R.layout.item_message_voice);
         this.mOnClickMessageUserListener = onClickMessageUserListener;
+        iconSize = UiUtils.INSTANCE.dp2Px(context, 11);
     }
 
     public RoomMessageAdapter(Context context, int... itemLayoutId) {
@@ -76,7 +83,7 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
 
     @Override
     public void convert(RcyHolder holder, MessageContent messageContent, int position, int layoutId) {
-        if (messageContent instanceof RCChatroomLocationMessage ||messageContent instanceof TextMessage) {
+        if (messageContent instanceof RCChatroomLocationMessage || messageContent instanceof TextMessage) {
             setSystemMessage(holder, messageContent);
         } else if (messageContent instanceof RCChatroomVoice) {
             setVoiceMessage(holder, (RCChatroomVoice) messageContent);
@@ -92,9 +99,9 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
      * @param messageContent messageContent
      */
     private void setSystemMessage(RcyHolder holder, MessageContent messageContent) {
-        if (messageContent instanceof RCChatroomLocationMessage){
+        if (messageContent instanceof RCChatroomLocationMessage) {
             holder.setText(R.id.tv_message_system, ((RCChatroomLocationMessage) messageContent).getContent());
-        }else if (messageContent instanceof TextMessage){
+        } else if (messageContent instanceof TextMessage) {
             holder.setText(R.id.tv_message_system, ((TextMessage) messageContent).getContent());
         }
 
@@ -110,7 +117,6 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
         EmojiTextView messageTextView = holder.getView(R.id.tv_message_content);
         List<MsgInfo> list = new ArrayList<>(4);
         list.add(new MsgInfo(String.format("%s: ", message.getUserName()), message.getUserId(), true, 0, 0));
-        updateRole(message.getUserId(), messageTextView);
         messageTextView.setText(styleBuilder(list));
         messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
         holder.setText(R.id.tv_voice_duration, String.format("%s''", message.getDuration()));
@@ -167,11 +173,9 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
         if (message instanceof RCChatroomBarrage) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomBarrage) message).getUserName()), ((RCChatroomBarrage) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(((RCChatroomBarrage) message).getContent(), "", false, 0, 0));
-            updateRole(((RCChatroomBarrage) message).getUserId(), messageTextView);
         } else if (message instanceof RCChatroomEnter) {
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomEnter) message).getUserName()), ((RCChatroomEnter) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo("进来了", "", false, 0, 0));
-            updateRole(((RCChatroomEnter) message).getUserId(), messageTextView);
         } else if (message instanceof RCChatroomKickOut) {
             list.add(new MsgInfo(String.format("%s 被 ", ((RCChatroomKickOut) message).getTargetName()), "", false, 0, 0));
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomKickOut) message).getUserName()), ((RCChatroomKickOut) message).getUserId(), true, 0, 0));
@@ -179,14 +183,12 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
         } else if (message instanceof RCChatroomGiftAll) {
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGiftAll) message).getUserName()), ((RCChatroomGiftAll) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(String.format("全麦打赏 %s x%s", ((RCChatroomGiftAll) message).getGiftName(), ((RCChatroomGiftAll) message).getNumber()), "", false, 0, 0));
-            updateRole(((RCChatroomGiftAll) message).getUserId(), messageTextView);
             messageTextView.setBackgroundResource(R.drawable.bg_voice_room_gift_message_item);
         } else if (message instanceof RCChatroomGift) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomGift) message).getUserName()), ((RCChatroomGift) message).getUserId(), true, 0, 0));
             list.add(new MsgInfo(" 送给 ", "", false, 0, 0));
             list.add(new MsgInfo(String.format("%s ", ((RCChatroomGift) message).getTargetName()), ((RCChatroomGift) message).getTargetId(), true, 0, 0));
             list.add(new MsgInfo(String.format(" %s x%s", ((RCChatroomGift) message).getGiftName(), ((RCChatroomGift) message).getNumber()), "", false, 0, 0));
-            updateRole(((RCChatroomGift) message).getUserId(), messageTextView);
             messageTextView.setBackgroundResource(R.drawable.bg_voice_room_gift_message_item);
         } else if (message instanceof RCChatroomAdmin) {
             list.add(new MsgInfo(String.format("%s: ", ((RCChatroomAdmin) message).getUserName()), ((RCChatroomAdmin) message).getUserId(), true, 0, 0));
@@ -195,7 +197,6 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             } else {
                 list.add(new MsgInfo(" 被撤回管理员", "", false, 0, 0));
             }
-            updateRole(((RCChatroomAdmin) message).getUserId(), messageTextView);
         } else if (message instanceof RCChatroomSeats) {
             list.add(new MsgInfo(String.format("房间更换为 %s 座模式，请重新上麦", ((RCChatroomSeats) message).getCount()), "", false, 0, 0));
         } else if (message instanceof RCChatroomLocationMessage) {
@@ -206,30 +207,9 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
             list.add(new MsgInfo(TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId()) ? "你" : user.getUserName(), user.getUserId(), true, 0, 0));
             list.add(new MsgInfo(" 关注了 ", "", false, 0, 0));
             list.add(new MsgInfo(TextUtils.equals(targetUser.getUserId(), AccountStore.INSTANCE.getUserId()) ? "你" : targetUser.getUserName(), targetUser.getUserId(), true, 0, 0));
-            updateRole(user.getUserId(), messageTextView);
         }
         messageTextView.setText(styleBuilder(list));
         messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
-    }
-
-    private void updateRole(String userId, TextView view) {
-        if (TextUtils.equals(userId, mRoomCreateId)) {
-            view.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_creator,
-                    0,
-                    0,
-                    0
-            );
-            view.setCompoundDrawablePadding(2);
-        } else if (MemberCache.getInstance().isAdmin(userId)) {
-            view.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_is_admin,
-                    0,
-                    0,
-                    0
-            );
-            view.setCompoundDrawablePadding(2);
-        }
     }
 
     private SpannableStringBuilder styleBuilder(List<MsgInfo> infos) {
@@ -238,6 +218,27 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
         MsgInfo info;
         for (int i = 0; i < infos.size(); i++) {
             info = infos.get(i);
+            if (!TextUtils.isEmpty(info.getClickId())) {
+                if (TextUtils.equals(info.getClickId(), mRoomCreateId)) {
+                    SpannableString icon = new SpannableString(" ");
+                    Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_creator);
+                    drawable.setBounds(0, 0, iconSize, iconSize);
+                    icon.setSpan(new CenterAlignImageSpan(drawable), 0, icon.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    style.append(icon).append(" ");
+                    info.start = start;
+                    start += 2;
+                    info.end = start;
+                } else if (MemberCache.getInstance().isAdmin(info.getClickId())) {
+                    SpannableString icon = new SpannableString(" ");
+                    Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_is_admin);
+                    drawable.setBounds(0, 0, iconSize, iconSize);
+                    icon.setSpan(new CenterAlignImageSpan(drawable), 0, icon.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                    style.append(icon).append(" ");
+                    info.start = start;
+                    start += 2;
+                    info.end = start;
+                }
+            }
             info.start = start;
             start += info.getContent().length();
             info.end = start;

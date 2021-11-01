@@ -1,5 +1,6 @@
 package cn.rong.combusis.ui.room;
 
+import android.content.Intent;
 import android.graphics.Rect;
 import android.text.TextUtils;
 
@@ -26,6 +27,7 @@ import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
+import cn.rong.combusis.service.RTCNotificationService;
 import io.rong.imkit.utils.StatusBarUtil;
 
 
@@ -53,6 +55,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
     protected void onDestroy() {
         // 取消忽略av call
         DataShareManager.get().setIgnoreIncomingCall(false);
+        stopService(new Intent(this, RTCNotificationService.class));
         super.onDestroy();
     }
 
@@ -134,9 +137,21 @@ public abstract class AbsRoomActivity extends BaseActivity {
                 getLayout().setPadding(0, 0, 0, bottomMargin);
             }
         });
-
+        startService();
     }
 
+    private void startService() {
+        Intent intent = new Intent(this, RTCNotificationService.class);
+        switch (getRoomType()) {
+            case RADIO_ROOM:
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_RADIO_ROOM);
+                break;
+            case VOICE_ROOM:
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_VOICE_ROOM);
+                break;
+        }
+        this.startService(intent);
+    }
 
     protected void refresh() {
         VoiceRoomProvider.provider().loadPage(true, getRoomType(), voiceRoomBeans -> {

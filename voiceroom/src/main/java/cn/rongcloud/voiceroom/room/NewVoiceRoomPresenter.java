@@ -89,6 +89,7 @@ import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
+import cn.rongcloud.rtc.core.NetworkMonitorAutoDetect;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -103,6 +104,7 @@ import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
@@ -146,6 +148,8 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
     private List<Disposable> disposableList = new ArrayList<>();
     private NewEmptySeatFragment newEmptySeatFragment;
+    private NetworkMonitorAutoDetect networkMonitorAutoDetect;
+    private boolean isNetWorkConnect;
 
     public NewVoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -420,7 +424,43 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         setObSeatInfoChange();
         setObRoomInfoChange();
         setObShieldListener();
+        setNetWorkChangleListener();
+    }
 
+    /**
+     * 网络状态监听
+     */
+    private void setNetWorkChangleListener() {
+
+        networkMonitorAutoDetect = new NetworkMonitorAutoDetect(new NetworkMonitorAutoDetect.Observer() {
+            @Override
+            public void onConnectionTypeChanged(NetworkMonitorAutoDetect.ConnectionType newConnectionType) {
+                //连接网络类型发生了改变
+                Log.e(TAG, "onConnectionTypeChanged: ");
+            }
+
+            @Override
+            public void onNetworkConnect(NetworkMonitorAutoDetect.NetworkInformation networkInfo) {
+                //网络连接
+                if (isNetWorkConnect){
+                    //说明是断网重连状态
+                    Log.e(TAG, "onNetworkConnect: "+"断网重连成功");
+                    UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
+                    if (uiSeatModel!=null&&uiSeatModel.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
+                        //说明当前用户在本地的状态是在麦，与RTC那边做对比，如果远程显示不在麦位上了，那么本地需要重新上麦
+                        //如果远程显示也在麦位上，那么不需要做任何操作
+                    }
+                }
+                isNetWorkConnect=false;
+            }
+
+            @Override
+            public void onNetworkDisconnect(long networkHandle) {
+                //网络断开
+                isNetWorkConnect = true;
+                Log.e(TAG, "onNetworkDisconnect: " );
+            }
+        }, ((NewVoiceRoomFragment) mView).requireContext());
     }
 
     /**
@@ -629,7 +669,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             newEmptySeatFragment.show(((NewVoiceRoomFragment) mView).getChildFragmentManager());
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //如果座位正在使用中
-
         }
     }
 
@@ -1035,8 +1074,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param followMsg
      */
     @Override
-    public void clickFollow(RCFollowMsg followMsg) {
-        sendMessage(followMsg);
+    public void clickFollow(boolean isFollow, RCFollowMsg followMsg) {
+        if (isFollow) {
+            sendMessage(followMsg);
+        }
+        mView.setTitleFollow(isFollow);
     }
 
     /**
@@ -1218,6 +1260,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         }
         disposableList.clear();
         EventBus.get().off(UPDATE_SHIELD, null);
+
+        if (networkMonitorAutoDetect!=null){
+            networkMonitorAutoDetect.destroy();
+        }
     }
 
     /**

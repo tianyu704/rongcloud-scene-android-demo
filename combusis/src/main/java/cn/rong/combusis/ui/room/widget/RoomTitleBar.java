@@ -139,7 +139,7 @@ public class RoomTitleBar extends ConstraintLayout {
         });
     }
 
-    private void setFollow(boolean isFollow) {
+    public void setFollow(boolean isFollow) {
         mFollowTextView.setVisibility(VISIBLE);
         mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 6), 0);
         if (isFollow) {
@@ -169,10 +169,13 @@ public class RoomTitleBar extends ConstraintLayout {
                             RCFollowMsg followMsg = new RCFollowMsg();
                             followMsg.setUser(AccountStore.INSTANCE.toUser());
                             followMsg.setTargetUser(member.toUser());
-                            onFollowClickListener.clickFollow(followMsg);
+                            onFollowClickListener.clickFollow(true, followMsg);
                         }
                     } else {
                         ToastUtils.s(getContext(), "取消关注成功");
+                        if (onFollowClickListener != null) {
+                            onFollowClickListener.clickFollow(false, null);
+                        }
                     }
                     member.setStatus(isFollow ? 1 : 0);
                     setFollow(isFollow);
@@ -204,6 +207,6 @@ public class RoomTitleBar extends ConstraintLayout {
     }
 
     public interface OnFollowClickListener {
-        void clickFollow(RCFollowMsg followMsg);
+        void clickFollow(boolean isFollow, RCFollowMsg followMsg);
     }
 }

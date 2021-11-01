@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import com.basis.mvp.BasePresenter;
 import com.basis.net.oklib.OkApi;
@@ -246,6 +247,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         refreshRoomMemberCount();
         // 礼物数量
         getGiftCount();
+        // 管理员变化后刷新消息列表
+        MemberCache.getInstance().getAdminList().observe((LifecycleOwner) mView, new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
+                mView.refreshMessageList();
+            }
+        });
     }
 
     public String getRoomId() {
@@ -584,7 +592,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 Logger.e("==============leaveRoom onError");
                 mView.finish();
                 mView.dismissLoading();
-                mView.showToast(message);
             }
         });
     }
@@ -713,6 +720,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onResult(Wrapper result) {
                 if (result.ok()) {
+                    if (isAdmin) {
+                        MemberCache.getInstance().addAdmin(user.getUserId());
+                    } else {
+                        MemberCache.getInstance().removeAdmin(user.getUserId());
+                    }
                     RCChatroomAdmin admin = new RCChatroomAdmin();
                     admin.setAdmin(isAdmin);
                     admin.setUserId(user.getUserId());
@@ -746,8 +758,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     @Override
-    public void clickFollow(RCFollowMsg followMsg) {
-        sendMessage(followMsg);
+    public void clickFollow(boolean isFollow, RCFollowMsg followMsg) {
+        if (isFollow) {
+            sendMessage(followMsg);
+        }
+        mView.setTitleFollow(isFollow);
     }
 
     /**

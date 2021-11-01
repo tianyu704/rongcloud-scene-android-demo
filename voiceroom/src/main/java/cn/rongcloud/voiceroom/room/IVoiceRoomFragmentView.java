@@ -85,4 +85,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void setOnlineCount(int OnlineCount);
 
     void switchOtherRoom(String roomId);
+
+    void setTitleFollow(boolean isFollow);
 }

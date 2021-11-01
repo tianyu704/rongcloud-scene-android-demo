@@ -901,6 +901,11 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         ((AbsRoomActivity) requireActivity()).switchOtherRoom(roomId);
     }
 
+    @Override
+    public void setTitleFollow(boolean isFollow) {
+        mRoomTitleBar.setFollow(isFollow);
+    }
+
 
     @Override
     public void setVoiceName(String name) {

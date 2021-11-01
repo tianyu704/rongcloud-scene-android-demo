@@ -17,6 +17,7 @@ import androidx.core.view.isVisible
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog
 import cn.rong.combusis.common.ui.dialog.TipDialog
 import cn.rong.combusis.feedback.FeedbackHelper
+import cn.rong.combusis.service.RTCNotificationService
 import cn.rong.combusis.ui.room.widget.like.FavAnimation
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
@@ -236,7 +237,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         startService(
             Intent(
                 this,
-                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
+                RTCNotificationService::class.java
             )
         )
     }
@@ -527,7 +528,7 @@ class VoiceRoomActivity : BaseActivity(), IVoiceRoomView,
         stopService(
             Intent(
                 this,
-                cn.rongcloud.voiceroomdemo.mvp.activity.RTCNotificationService::class.java
+                RTCNotificationService::class.java
             )
         )
     }
