@@ -758,8 +758,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     @Override
-    public void clickFollow(RCFollowMsg followMsg) {
-        sendMessage(followMsg);
+    public void clickFollow(boolean isFollow, RCFollowMsg followMsg) {
+        if (isFollow) {
+            sendMessage(followMsg);
+        }
+        mView.setTitleFollow(isFollow);
     }
 
     /**

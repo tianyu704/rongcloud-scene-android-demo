@@ -430,6 +430,11 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         mRoomMessageAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void setTitleFollow(boolean isFollow) {
+        mRoomTitleBar.setFollow(isFollow);
+    }
+
     /**
      * 点击右上角菜单按钮
      */

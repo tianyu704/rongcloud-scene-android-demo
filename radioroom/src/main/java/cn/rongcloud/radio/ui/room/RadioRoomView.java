@@ -72,4 +72,6 @@ public interface RadioRoomView extends IBaseView {
     void switchOtherRoom(String roomId);
 
     void refreshMessageList();
+
+    void setTitleFollow(boolean isFollow);
 }

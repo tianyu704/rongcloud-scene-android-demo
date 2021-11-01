@@ -1074,8 +1074,11 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
      * @param followMsg
      */
     @Override
-    public void clickFollow(RCFollowMsg followMsg) {
-        sendMessage(followMsg);
+    public void clickFollow(boolean isFollow, RCFollowMsg followMsg) {
+        if (isFollow) {
+            sendMessage(followMsg);
+        }
+        mView.setTitleFollow(isFollow);
     }
 
     /**
