@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
+import com.kit.UIKit;
 import com.kit.utils.ImageLoader;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
@@ -163,7 +164,8 @@ public class PKView extends LinearLayout implements IPK {
 
     @Override
     public void reset(boolean broadcast) {
-
+        ivMute.setSelected(false);
+        UIKit.setVisiable(ivMute, broadcast);
     }
 
     @Override

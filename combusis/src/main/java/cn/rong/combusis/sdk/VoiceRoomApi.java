@@ -378,7 +378,7 @@ public class VoiceRoomApi implements Api {
     public void mutePKUser(boolean isMute, IResultBack<Boolean> resultBack) {
         RCVoiceRoomEngine.getInstance().mutePKUser(
                 isMute,
-                new DefaultRoomCallback("mutePKUser", "屏蔽PK对象音频", resultBack));
+                new DefaultRoomCallback("mutePKUser", isMute ? "屏蔽音频" : "取消屏蔽音频", resultBack));
     }
 
     @Override
