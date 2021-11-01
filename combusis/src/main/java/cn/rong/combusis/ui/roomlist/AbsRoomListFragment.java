@@ -1,16 +1,16 @@
 package cn.rong.combusis.ui.roomlist;
 
 
+import android.view.View;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
-import com.basis.adapter.interfaces.IAdapte;
-import com.basis.adapter.recycle.RcyHolder;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
-import com.basis.ui.ListFragment;
-import com.bcq.refresh.XRecyclerView;
+import com.basis.ui.BaseFragment;
+import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,6 +24,7 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.ui.OnItemClickRoomListListener;
+import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -32,12 +33,15 @@ import kotlin.jvm.functions.Function0;
  * @author gyn
  * @date 2021/9/15
  */
-public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, VoiceRoomBean, RcyHolder> implements OnItemClickRoomListListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
+public abstract class AbsRoomListFragment extends BaseFragment implements OnItemClickRoomListListener<VoiceRoomBean>, CreateRoomDialog.CreateRoomCallBack {
 
     private RoomListAdapter mAdapter;
-    private XRecyclerView mRoomList;
+    private RecyclerViewAtVP2 mRoomList;
     private CreateRoomDialog mCreateRoomDialog;
     private ConfirmDialog confirmDialog;
+    private SmartRefreshLayout refreshLayout;
+    private View emptyView;
+
     private ActivityResultLauncher mLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result != null && result.getData() != null && result.getData().getData() != null && mCreateRoomDialog != null) {
             mCreateRoomDialog.setCoverUri(result.getData().getData());
@@ -45,29 +49,31 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
     });
 
     @Override
-    public IAdapte onSetAdapter() {
+    public void init() {
+        mRoomList = (RecyclerViewAtVP2) getView(R.id.xrv_room);
+        refreshLayout = (SmartRefreshLayout) getView(R.id.layout_refresh);
+        emptyView = (View) getView(R.id.layout_empty);
+        getView(R.id.iv_create_room).setOnClickListener(v -> {
+            createRoom();
+        });
         mAdapter = new RoomListAdapter(getContext(), R.layout.item_room);
         mAdapter.setOnItemClickListener(this);
-        return mAdapter;
+        mRoomList.setAdapter(mAdapter);
+        refreshLayout.setOnRefreshListener(refreshLayout -> {
+            loadRoomList(true);
+        });
+        refreshLayout.setOnLoadMoreListener(refreshLayout -> {
+            loadRoomList(false);
+        });
+        emptyView.setOnClickListener(v -> {
+            loadRoomList(true);
+        });
+        checkUserRoom();
     }
 
     @Override
     public int setLayoutId() {
         return R.layout.fragment_room_list;
-    }
-
-    @Override
-    protected int onSetNoneLayoutId() {
-        return R.layout.layout_room_empty;
-    }
-
-    @Override
-    public void initView() {
-        mRoomList = (XRecyclerView) getView(R.id.xrv_room);
-        getView(R.id.iv_create_room).setOnClickListener(v -> {
-            createRoom();
-        });
-        checkUserRoom();
     }
 
 
@@ -80,12 +86,6 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
 
     public abstract RoomType getRoomType();
 
-    @Override
-    public void onCustomerRequestAgain(boolean refresh) {
-        super.onCustomerRequestAgain(refresh);
-        loadRoomList(refresh);
-    }
-
     /**
      * 请求房间列表数据
      *
@@ -93,19 +93,24 @@ public abstract class AbsRoomListFragment extends ListFragment<VoiceRoomBean, Vo
      */
     private void loadRoomList(boolean isRefresh) {
         if (isRefresh) {
-            mRoomList.setNoMore(false);
+            refreshLayout.resetNoMoreData();
         }
         VoiceRoomProvider.provider().loadPage(isRefresh, getRoomType(), voiceRoomBeans -> {
-            refresh(voiceRoomBeans, isRefresh);
+            mAdapter.setData(voiceRoomBeans, isRefresh);
+
             if (VoiceRoomProvider.provider().getPage() <= 2) {
-                mRoomList.refreshComplete();
+                refreshLayout.finishRefresh();
             } else {
-                mRoomList.loadComplete();
+                refreshLayout.finishLoadMore();
             }
 
             if (voiceRoomBeans != null && !voiceRoomBeans.isEmpty()) {
+                emptyView.setVisibility(View.GONE);
             } else {
-                mRoomList.setNoMore(true);
+                refreshLayout.setNoMoreData(true);
+                if (VoiceRoomProvider.provider().getPage() == 1) {
+                    emptyView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }

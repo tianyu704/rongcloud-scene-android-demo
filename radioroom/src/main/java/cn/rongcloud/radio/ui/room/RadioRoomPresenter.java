@@ -584,7 +584,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 Logger.e("==============leaveRoom onError");
                 mView.finish();
                 mView.dismissLoading();
-                mView.showToast(message);
             }
         });
     }
