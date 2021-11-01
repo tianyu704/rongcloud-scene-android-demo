@@ -52,26 +52,28 @@ public class RTCNotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.e(CHANNEL_ID, "onStartCommand" + intent);
-        String action = intent.getStringExtra(ACTION);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(action)
-                        .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                0);
-        Notification.Builder builder =
-                new Notification.Builder(this)
-                        .setSmallIcon(R.drawable.app_icon)
-                        .setContentTitle("语聊房")
-                        .setContentText("正在语聊中...")
-                        .setContentIntent(pendingIntent);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setCategory(Notification.CATEGORY_EVENT);
+        if (intent != null) {
+            String action = intent.getStringExtra(ACTION);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                    new Intent(action)
+                            .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+                    0);
+            Notification.Builder builder =
+                    new Notification.Builder(this)
+                            .setSmallIcon(R.drawable.app_icon)
+                            .setContentTitle("语聊房")
+                            .setContentText("正在语聊中...")
+                            .setContentIntent(pendingIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                builder.setCategory(Notification.CATEGORY_EVENT);
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setChannelId(CHANNEL_ID);
+            }
+            Notification notification = builder.build();
+            manager.notify(notifyId, notification);
+            startForeground(notifyId, notification);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder.setChannelId(CHANNEL_ID);
-        }
-        Notification notification = builder.build();
-        manager.notify(notifyId, notification);
-        startForeground(notifyId, notification);
         return super.onStartCommand(intent, flags, startId);
     }
 
