@@ -17,8 +17,8 @@ public class IntentWrap {
     public static final String KEY_IS_CREATE = "KEY_IS_CREATE";
     public static final String KEY_ROOM_POSITION = "KEY_ROOM_POSITION";
     // actions
-    private static final String ACTION_RADIO_ROOM = "cn.rongcloud.radio.ui.room.RadioRoomActivity";
-    private static final String ACTION_VOICE_ROOM = "cn.rongcloud.voiceroom.room.NewVoiceRoomActivity";
+    public static final String ACTION_RADIO_ROOM = "cn.rongcloud.radio.ui.room.RadioRoomActivity";
+    public static final String ACTION_VOICE_ROOM = "cn.rongcloud.voiceroom.room.NewVoiceRoomActivity";
 
     /**
      * 打开电台房间

@@ -2,7 +2,7 @@
  * Copyright © 2021 RongCloud. All rights reserved.
  */
 
-package cn.rongcloud.voiceroomdemo.mvp.activity;
+package cn.rong.combusis.service;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -15,7 +15,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
-import cn.rongcloud.voiceroomdemo.R;
+import cn.rong.combusis.R;
 
 
 /**
@@ -24,6 +24,7 @@ import cn.rongcloud.voiceroomdemo.R;
 public class RTCNotificationService extends Service {
 
     private static final String CHANNEL_ID = "RTCNotificationService";
+    public static final String ACTION = "ACTION";
     private final int notifyId = 20200202;
     private NotificationManager manager;
 
@@ -40,13 +41,25 @@ public class RTCNotificationService extends Service {
         super.onCreate();
         Log.e(CHANNEL_ID, "onCreate");
         init();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        Log.e(CHANNEL_ID, "onBind");
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.e(CHANNEL_ID, "onStartCommand" + intent);
+        String action = intent.getStringExtra(ACTION);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent("io.rong.intent.action.voice_room")
+                new Intent(action)
                         .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
                 0);
         Notification.Builder builder =
                 new Notification.Builder(this)
-                        .setSmallIcon(R.mipmap.app_icon)
+                        .setSmallIcon(R.drawable.app_icon)
                         .setContentTitle("语聊房")
                         .setContentText("正在语聊中...")
                         .setContentIntent(pendingIntent);
@@ -59,17 +72,6 @@ public class RTCNotificationService extends Service {
         Notification notification = builder.build();
         manager.notify(notifyId, notification);
         startForeground(notifyId, notification);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        Log.e(CHANNEL_ID, "onBind");
-        return null;
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
 

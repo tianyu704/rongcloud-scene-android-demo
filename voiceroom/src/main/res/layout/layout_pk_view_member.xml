@@ -10,7 +10,7 @@
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_gravity="center"
-        android:src="@drawable/default_portrait" />
+        android:src="@drawable/ic_pk_none" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_count"

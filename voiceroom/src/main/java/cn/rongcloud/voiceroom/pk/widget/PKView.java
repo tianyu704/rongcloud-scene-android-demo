@@ -2,7 +2,9 @@ package cn.rongcloud.voiceroom.pk.widget;
 
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -10,12 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.basis.adapter.recycle.RcyAdapter;
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
+import com.kit.UIKit;
 import com.kit.utils.ImageLoader;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
@@ -48,7 +50,7 @@ public class PKView extends LinearLayout implements IPK {
 
     private PKProcessbar pkProcessbar;
     private RecyclerView rvSender, rvReceiver;
-    private RcyAdapter lAdapter, rAdapter;
+    private PKAdapter lAdapter, rAdapter;
     private Timer timer;
     private TextView tvTime;
     private ImageView ivVs;
@@ -88,13 +90,13 @@ public class PKView extends LinearLayout implements IPK {
         rAdapter = new PKAdapter(context, true);
         rvSender.setAdapter(lAdapter);
         rvReceiver.setAdapter(rAdapter);
-        rvSender.setLayoutManager(new GridLayoutManager(context, 3, RecyclerView.HORIZONTAL, false) {
+        rvSender.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
             }
         });
-        rvReceiver.setLayoutManager(new GridLayoutManager(context, 3, RecyclerView.HORIZONTAL, true) {
+        rvReceiver.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, true) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
@@ -162,7 +164,8 @@ public class PKView extends LinearLayout implements IPK {
 
     @Override
     public void reset(boolean broadcast) {
-
+        ivMute.setSelected(false);
+        UIKit.setVisiable(ivMute, broadcast);
     }
 
     @Override
@@ -263,6 +266,7 @@ public class PKView extends LinearLayout implements IPK {
 
     public static class PKAdapter extends RcySAdapter<RankInfo, RcyHolder> {
         private boolean receiveFlag;
+        private final static int COUNT = 3;
 
         public PKAdapter(Context context, boolean receiveFlag) {
             super(context, R.layout.layout_pk_view_member);
@@ -270,10 +274,31 @@ public class PKView extends LinearLayout implements IPK {
         }
 
         @Override
+        public synchronized void setData(List<RankInfo> list, boolean refresh) {
+            int size = null == list ? 0 : list.size();
+            Log.e(TAG, "size = " + size);
+            if (size != COUNT) {
+                List<RankInfo> temps = new ArrayList();
+                for (int i = 0; i < COUNT; i++) {
+                    if (i < size) {
+                        temps.add(list.get(i));
+                    } else {
+                        temps.add(new RankInfo("", i + 1));
+                    }
+                }
+                super.setData(temps, refresh);
+            } else {
+                super.setData(list, refresh);
+            }
+        }
+
+        @Override
         public void convert(RcyHolder holder, RankInfo info, int position) {
             holder.setText(R.id.tv_count, info.rank + "");
             ImageView imageView = holder.getView(R.id.iv_gift);
-            ImageLoader.loadUrl(imageView, info.portrait, R.drawable.default_portrait, ImageLoader.Size.SZ_100);
+            if (!TextUtils.isEmpty(info.portrait)) {
+                ImageLoader.loadUrl(imageView, info.portrait, R.drawable.ic_pk_none, ImageLoader.Size.SZ_100);
+            }
             holder.setSelected(R.id.tv_count, receiveFlag);
         }
     }

@@ -87,6 +87,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSeatSizeFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
+import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.rtc.core.NetworkMonitorAutoDetect;
 import cn.rongcloud.voiceroom.R;
@@ -121,7 +122,7 @@ import kotlin.jvm.functions.Function2;
  */
 public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
         IRongCoreListener.OnReceiveMessageListener, IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
-        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, OnCloseMiniRoomListener {
+        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, OnCloseMiniRoomListener, RoomTitleBar.OnFollowClickListener {
 
     private String TAG = "NewVoiceRoomPresenter";
 

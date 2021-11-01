@@ -39,7 +39,6 @@ import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import io.rong.imkit.picture.tools.ToastUtils;
-import io.rong.imlib.MD5;
 
 /**
  * @author gyn
@@ -156,37 +155,42 @@ public class CreateRoomDialog extends BottomDialog {
                 }
                 mPassword = s;
                 mInputPasswordDialog.dismiss();
+                uploadThemePic(roomName);
                 return null;
             });
             mInputPasswordDialog.show();
         } else {
-            // 选择本地图片后，先上传本地图片
-            if (!TextUtils.isEmpty(mCoverUrl)) {
-                mLoading.show();
-                FileBody body = new FileBody("multipart/form-data", new File(mCoverUrl));
-                OkApi.file(VRApi.FILE_UPLOAD, "file", body, new WrapperCallBack() {
-                    @Override
-                    public void onResult(Wrapper result) {
-                        String url = result.getBody().getAsString();
-                        if (result.ok() && !TextUtils.isEmpty(url)) {
-                            createRoom(roomName, VRApi.FILE_PATH + url);
-                        } else {
-                            ToastUtils.s(mActivity, result.getMessage());
-                            mLoading.dismiss();
-                        }
-                    }
+            uploadThemePic(roomName);
+        }
+    }
 
-                    @Override
-                    public void onError(int code, String msg) {
-                        super.onError(code, msg);
-                        ToastUtils.s(mActivity, msg);
+    private void uploadThemePic(String roomName) {
+        // 选择本地图片后，先上传本地图片
+        if (!TextUtils.isEmpty(mCoverUrl)) {
+            mLoading.show();
+            FileBody body = new FileBody("multipart/form-data", new File(mCoverUrl));
+            OkApi.file(VRApi.FILE_UPLOAD, "file", body, new WrapperCallBack() {
+                @Override
+                public void onResult(Wrapper result) {
+                    String url = result.getBody().getAsString();
+                    if (result.ok() && !TextUtils.isEmpty(url)) {
+                        createRoom(roomName, VRApi.FILE_PATH + url);
+                    } else {
+                        ToastUtils.s(mActivity, result.getMessage());
                         mLoading.dismiss();
                     }
-                });
-            } else {
-                mLoading.show();
-                createRoom(roomName, "");
-            }
+                }
+
+                @Override
+                public void onError(int code, String msg) {
+                    super.onError(code, msg);
+                    ToastUtils.s(mActivity, msg);
+                    mLoading.dismiss();
+                }
+            });
+        } else {
+            mLoading.show();
+            createRoom(roomName, "");
         }
     }
 
