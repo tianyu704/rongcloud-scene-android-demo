@@ -1,6 +1,7 @@
 package cn.rong.combusis.ui.room.widget;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +12,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.jakewharton.rxbinding4.view.RxView;
+import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.UiUtils;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.manager.AllBroadcastManager;
+import cn.rong.combusis.message.RCFollowMsg;
+import cn.rong.combusis.ui.room.model.Member;
 import io.reactivex.rxjava3.core.Observable;
-import kotlin.Unit;
+import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
  * @author gyn
@@ -32,6 +43,9 @@ public class RoomTitleBar extends ConstraintLayout {
     private TextView mDelayTextView;
     private ImageButton mMenuButton;
     private ConstraintLayout mLeftView;
+    private TextView mFollowTextView;
+    private Member member;
+    private OnFollowClickListener onFollowClickListener;
 
     public RoomTitleBar(@NonNull Context context) {
         this(context, null);
@@ -50,6 +64,10 @@ public class RoomTitleBar extends ConstraintLayout {
         mOnlineTextView = mRootView.findViewById(R.id.tv_room_online);
         mDelayTextView = mRootView.findViewById(R.id.tv_room_delay);
         mMenuButton = mRootView.findViewById(R.id.btn_menu);
+        mFollowTextView = mRootView.findViewById(R.id.tv_follow);
+        mFollowTextView.setOnClickListener(v -> {
+            follow();
+        });
     }
 
     public Observable setOnMemberClickListener() {
@@ -60,9 +78,11 @@ public class RoomTitleBar extends ConstraintLayout {
         return RxView.clicks(mMenuButton).throttleFirst(1, TimeUnit.SECONDS);
     }
 
-    public void setData(String name, int id) {
+    public void setData(String name, int id, String roomUserId, OnFollowClickListener onFollowClickListener) {
+        this.onFollowClickListener = onFollowClickListener;
         setRoomName(name);
         setRoomId(id);
+        getFollowStatus(roomUserId);
     }
 
     public void setRoomId(int id) {
@@ -99,9 +119,91 @@ public class RoomTitleBar extends ConstraintLayout {
         }
     }
 
+    private void getFollowStatus(String roomUserId) {
+        if (TextUtils.equals(roomUserId, AccountStore.INSTANCE.getUserId())) {
+            mFollowTextView.setVisibility(GONE);
+            mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 20), 0);
+            return;
+        }
+        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{roomUserId}).build(), new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    List<Member> members = result.getList(Member.class);
+                    if (members != null && members.size() > 0) {
+                        member = members.get(0);
+                        setFollow(member.isFollow());
+                    }
+                }
+            }
+        });
+    }
+
+    private void setFollow(boolean isFollow) {
+        mFollowTextView.setVisibility(VISIBLE);
+        mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 6), 0);
+        if (isFollow) {
+            mFollowTextView.setText("已关注");
+            mFollowTextView.setBackgroundResource(R.drawable.btn_titlebar_followed);
+        } else {
+            mFollowTextView.setText("关注");
+            mFollowTextView.setBackgroundResource(R.drawable.bg_voice_room_send_button);
+        }
+    }
+
+    /**
+     * 关注
+     */
+    private void follow() {
+        if (member == null) {
+            return;
+        }
+        boolean isFollow = !this.member.isFollow();
+        OkApi.get(VRApi.followUrl(member.getUserId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    if (isFollow) {
+                        ToastUtils.s(getContext(), "关注成功");
+                        if (onFollowClickListener != null) {
+                            RCFollowMsg followMsg = new RCFollowMsg();
+                            followMsg.setUser(AccountStore.INSTANCE.toUser());
+                            followMsg.setTargetUser(member.toUser());
+                            onFollowClickListener.clickFollow(followMsg);
+                        }
+                    } else {
+                        ToastUtils.s(getContext(), "取消关注成功");
+                    }
+                    member.setStatus(isFollow ? 1 : 0);
+                    setFollow(isFollow);
+                } else {
+                    if (isFollow) {
+                        ToastUtils.s(getContext(), "关注失败");
+                    } else {
+                        ToastUtils.s(getContext(), "取消关注失败");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                if (isFollow) {
+                    ToastUtils.s(getContext(), "关注失败");
+                } else {
+                    ToastUtils.s(getContext(), "取消关注失败");
+                }
+            }
+        });
+    }
+
+
     @Override
     protected void onDetachedFromWindow() {
         AllBroadcastManager.getInstance().removeListener();
         super.onDetachedFromWindow();
+    }
+
+    public interface OnFollowClickListener {
+        void clickFollow(RCFollowMsg followMsg);
     }
 }

@@ -59,6 +59,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
+import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radio.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
@@ -79,7 +80,8 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements RadioRoomListener,
         RadioRoomMemberSettingClickListener, OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
-        BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, CreatorSettingFragment.OnCreatorSettingClickListener {
+        BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener,
+        CreatorSettingFragment.OnCreatorSettingClickListener, RoomTitleBar.OnFollowClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
     private RoomOwnerType mRoomOwnerType;
