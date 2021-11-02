@@ -241,8 +241,11 @@ public class PKView extends LinearLayout implements IPK {
     public void setGiftSenderRank(List<String> lefts, List<String> rights) {
         int ls = null != lefts ? lefts.size() : 0;
         List<RankInfo> llis = new ArrayList<>();
-        for (int i = ls - 1; i > -1; i--) {
-            llis.add(new RankInfo(lefts.get(i), ls - i));
+//        for (int i = ls - 1; i > -1; i--) {
+//            llis.add(new RankInfo(lefts.get(i), ls - i));
+//        }
+        for (int i = 0; i < ls; i++) {
+            llis.add(new RankInfo(lefts.get(i), i + 1));
         }
         int rs = null != rights ? rights.size() : 0;
         List<RankInfo> rlis = new ArrayList<>();
@@ -298,6 +301,8 @@ public class PKView extends LinearLayout implements IPK {
             ImageView imageView = holder.getView(R.id.iv_gift);
             if (!TextUtils.isEmpty(info.portrait)) {
                 ImageLoader.loadUrl(imageView, info.portrait, R.drawable.ic_pk_none, ImageLoader.Size.SZ_100);
+            } else {
+                imageView.setImageResource(R.drawable.ic_pk_none);
             }
             holder.setSelected(R.id.tv_count, receiveFlag);
         }
