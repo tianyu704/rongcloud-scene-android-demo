@@ -46,6 +46,7 @@ public class RoomTitleBar extends ConstraintLayout {
     private TextView mFollowTextView;
     private Member member;
     private OnFollowClickListener onFollowClickListener;
+    private boolean isShowFollow = false;
 
     public RoomTitleBar(@NonNull Context context) {
         this(context, null);
@@ -121,10 +122,11 @@ public class RoomTitleBar extends ConstraintLayout {
 
     private void getFollowStatus(String roomUserId) {
         if (TextUtils.equals(roomUserId, AccountStore.INSTANCE.getUserId())) {
-            mFollowTextView.setVisibility(GONE);
-            mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 20), 0);
+            isShowFollow = false;
+            setFollow(false);
             return;
         }
+        isShowFollow = true;
         OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{roomUserId}).build(), new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
@@ -140,14 +142,19 @@ public class RoomTitleBar extends ConstraintLayout {
     }
 
     public void setFollow(boolean isFollow) {
-        mFollowTextView.setVisibility(VISIBLE);
-        mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 6), 0);
-        if (isFollow) {
-            mFollowTextView.setText("已关注");
-            mFollowTextView.setBackgroundResource(R.drawable.btn_titlebar_followed);
+        if (isShowFollow) {
+            mFollowTextView.setVisibility(VISIBLE);
+            mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 6), 0);
+            if (isFollow) {
+                mFollowTextView.setText("已关注");
+                mFollowTextView.setBackgroundResource(R.drawable.btn_titlebar_followed);
+            } else {
+                mFollowTextView.setText("关注");
+                mFollowTextView.setBackgroundResource(R.drawable.bg_voice_room_send_button);
+            }
         } else {
-            mFollowTextView.setText("关注");
-            mFollowTextView.setBackgroundResource(R.drawable.bg_voice_room_send_button);
+            mFollowTextView.setVisibility(GONE);
+            mLeftView.setPadding(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding), 0, UiUtils.INSTANCE.dp2Px(getContext(), 20), 0);
         }
     }
 
