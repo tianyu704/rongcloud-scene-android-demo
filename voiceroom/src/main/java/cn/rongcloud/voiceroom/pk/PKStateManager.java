@@ -111,7 +111,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 String currentId = AccountStore.INSTANCE.getUserId();
                 //当前房间主播 可能pk主播退出进入pk方的房间会引起问题
                 boolean isBroadcast = TextUtils.equals(currentId, pkInfos[0].getUserId());
-                if (null != pkView) pkView.reset(isBroadcast);
+                Logger.e(TAG, "isBroadcast = " + isBroadcast);
                 if (isBroadcast) {
                     VoiceRoomApi.getApi().muteAll(true);
                     // 走到这里 说明主播是退出后 又进自己房间
@@ -381,7 +381,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             @Override
             public void onResult(PKResult pkResult) {
                 if (null == pkView) return;
-                pkView.reset(true);
+                pkView.reset(isPKer());
                 PKInfo[] pkInfos = refreshPKInfo(pkResult);
                 if (null != pkInfos && isPKer()) {
                     sendPKStartMessage(pkInfos[1].getUserId());
