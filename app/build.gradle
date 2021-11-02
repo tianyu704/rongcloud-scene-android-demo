@@ -92,6 +92,7 @@ android {
             buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
 //            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://10.40.0.97:8081/\"")
+            buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
         }
         releaseEnvironment {
             dimension 'environment'
@@ -100,6 +101,7 @@ android {
             buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
 //            buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://120.92.102.127:8081/\"")
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://10.120.6.162:8081/\"")
+            buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
         }
     }
 }
