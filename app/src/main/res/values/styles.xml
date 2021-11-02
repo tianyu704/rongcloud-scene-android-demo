@@ -3,11 +3,4 @@
   -->
 
 <resources>
-    <!--控制popupwindows进出动画-->
-    <style name="popup_window_anim_style">
-    <item name="android:windowEnterAnimation">@anim/pop_enter_anim</item>
-    <!-- 指定显示的动画xml -->
-    <item name="android:windowExitAnimation">@anim/pop_exit_anim</item>
-    <!-- 指定消失的动画xml -->
-</style>
 </resources>

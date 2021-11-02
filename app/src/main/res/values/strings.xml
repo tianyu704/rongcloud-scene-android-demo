@@ -14,10 +14,6 @@
     <string name="save">保存</string>
     <string name="username_can_not_be_empty">用户名不能为空</string>
 
-    <string name="please_input_complete_password">请输入完整的密码</string>
-    <string name="password_error">密码错误</string>
-
-
     <string name="voice_room">语聊房</string>
     <string name="voice_room_des">超大聊天室，支持麦位、麦序 \n管理，涵盖 KTV 等多种玩法</string>
     <string name="video_call">视频通话</string>
@@ -26,15 +22,5 @@
     <string name="voice_call_des">拥有智能降噪的无差别电话体验</string>
     <string name="radio_room">语音电台</string>
     <string name="radio_room_des">听众端采用CDN链路 支持人数无上限</string>
-    <string name="send">送给</string>
-    <string name="select_all">全选</string>
-    <string name="send_t">赠送</string>
 
-    <string name="chatfooter_cancel_rcd">手指上划，取消发送</string>
-    <string name="chatfooter_cancel_rcd_release">松开手指，取消发送</string>
-    <string name="chatfooter_too_short">录音时间太短</string>
-    <string name="chatfooter_too_long">说话时间太长</string>
-    <string name="rcd_long_perss_spenk">长按请说话</string>
-    <string name="media_ejected">储存卡已拔出，语音功能将暂时不可用</string>
-    <string name="media_no_memory">储存卡存储空间不足</string>
 </resources>

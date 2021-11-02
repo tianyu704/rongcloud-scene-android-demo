@@ -51,15 +51,4 @@
         <item name="editTextStyle">@style/LoginEditTextStyle</item>
     </style>
 
-    <style name="Theme.VoiceRoomActivityTheme" parent="Theme.AppTheme.LauncherActivity">
-        <item name="android:windowTranslucentStatus">true</item>
-    </style>
-
-    <style name="Theme.ScrolVRoomThem" parent="Theme.AppTheme.NoAction">
-        <!--        <item name="android:windowTranslucentNavigation">true</item>-->
-        <!--        <item name="android:windowTranslucentStatus">false</item>-->
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:statusBarColor">#6478E3</item>
-    </style>
 </resources>

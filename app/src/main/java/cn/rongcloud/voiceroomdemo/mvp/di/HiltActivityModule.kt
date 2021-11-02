@@ -4,14 +4,9 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.di
 
-import android.app.Activity
-import android.util.Log
-import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
-import javax.inject.Named
 
 /**
  * @author gusd
