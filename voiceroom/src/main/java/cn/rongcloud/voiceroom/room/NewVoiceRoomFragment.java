@@ -34,7 +34,6 @@ import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.intent.IntentWrap;
@@ -121,7 +120,6 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private BackgroundSettingFragment mBackgroundSettingFragment;
     private GiftFragment mGiftFragment;
     private MusicDialog mMusicDialog;
-    private ConfirmDialog confirmDialog;
     private String mRoomId;
     private boolean isCreate;
 

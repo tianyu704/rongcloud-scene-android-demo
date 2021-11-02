@@ -405,13 +405,15 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void showRoomCloseDialog() {
-        new TipDialog(
+       TipDialog closeRoomDialog= new TipDialog(
                 requireContext(),
                 "当前直播已结束",
                 "确定", "", () -> {
             present.leaveRoom(false, false);
             return null;
-        }).show();
+        });
+        closeRoomDialog.setCancelable(false);
+        closeRoomDialog.show();
     }
 
     @Override

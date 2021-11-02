@@ -792,6 +792,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                                 return null;
                             }
                         });
+                        confirmDialog.setCancelable(false);
                         confirmDialog.show();
                         break;
                     case EVENT_BACKGROUND_CHANGE:
