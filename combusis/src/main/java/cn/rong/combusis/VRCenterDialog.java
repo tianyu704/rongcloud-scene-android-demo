@@ -19,6 +19,8 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.kit.UIKit;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -90,6 +92,14 @@ public class VRCenterDialog extends Dialog {
     }
 
     public void replaceContent(String title, String cancel, View.OnClickListener cancelClick, String confirm, View.OnClickListener confirmClick, View view) {
+        replaceContent(title, -1, cancel, -1, cancelClick, confirm, -1, confirmClick, view);
+    }
+
+
+    public void replaceContent(String title, int titleColor, String cancel, int cancelColor, View.OnClickListener cancelClick, String confirm, int confirmColor, View.OnClickListener confirmClick, View view) {
+        if (titleColor > -1) this.title.setTextColor(UIKit.getResources().getColor(titleColor));
+        if (cancelColor > -1) this.cancel.setTextColor(UIKit.getResources().getColor(titleColor));
+        if (confirmColor > -1) this.confirm.setTextColor(UIKit.getResources().getColor(titleColor));
         this.title.setText(title);
         int btnCount = 0;
         divider.setVisibility(View.GONE);

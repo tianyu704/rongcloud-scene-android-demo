@@ -131,14 +131,14 @@ public class FeedbackHelper implements IFeedback {
                 }
             });
         }
-        VRCenterDialog.replaceContent("请留下您的使用感受吧",
-                "稍后再说", new View.OnClickListener() {
+        VRCenterDialog.replaceContent("请留下您的使用感受吧", R.color.basis_color_primary,
+                "稍后再说", R.color.basis_color_secondary, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         dismissDialog();
                         clearStatistics();
                     }
-                }, "", null, initScoreView());
+                }, "", -1, null, initScoreView());
         VRCenterDialog.show();
     }
 
@@ -232,14 +232,15 @@ public class FeedbackHelper implements IFeedback {
     private void shwoDownDialog() {
         if (null == VRCenterDialog) return;
         VRCenterDialog.replaceContent("请问哪个方面需要改进呢？",
-                "提交反馈", new View.OnClickListener() {
+                R.color.basis_color_primary,
+                "提交反馈", R.color.basis_color_secondary, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (null != selectedDowns && !selectedDowns.isEmpty()) {
                             sendReport();
                         }
                     }
-                }, "我再想想", new View.OnClickListener() {
+                }, "我再想想", R.color.basis_color_secondary, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         dismissDialog();
@@ -288,12 +289,13 @@ public class FeedbackHelper implements IFeedback {
     private void showLastPromotion() {
         if (null == VRCenterDialog) return;
         VRCenterDialog.replaceContent("融云最近活动，了解一下？",
-                "我想了解", new View.OnClickListener() {
+                R.color.basis_color_primary,
+                "我想了解", R.color.basis_color_secondary, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         jumpPromotionPage();
                     }
-                }, "我再想想", new View.OnClickListener() {
+                }, "我再想想", R.color.basis_color_primary, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         dismissDialog();
