@@ -7,7 +7,6 @@ import com.basis.net.oklib.net.Page;
 import com.basis.net.oklib.wrapper.OkHelper;
 import com.basis.net.oklib.wrapper.interfaces.IHeader;
 import com.rongcloud.common.utils.AccountStore;
-import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +42,6 @@ public class ComApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initBasis();
-        CrashReport.initCrashReport(this);
     }
 
     private void initBasis() {

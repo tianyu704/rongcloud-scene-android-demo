@@ -152,3 +152,7 @@
 #-keep class com.** {*;}
 #modle
 -keep class cn.rongcloud.voiceroomdemo.net.api.bean.** {*;}
+# bugly start
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}
+# bugly end
