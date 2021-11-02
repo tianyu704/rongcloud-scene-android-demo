@@ -443,6 +443,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 //网络连接
                 if (isNetWorkConnect){
                     //说明是断网重连状态
+                    isNetWorkConnect=false;
                     Log.e(TAG, "onNetworkConnect: "+"断网重连成功");
                     UiSeatModel uiSeatModel = newVoiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
                     if (uiSeatModel!=null&&uiSeatModel.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
@@ -450,7 +451,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         //如果远程显示也在麦位上，那么不需要做任何操作
                     }
                 }
-                isNetWorkConnect=false;
             }
 
             @Override
