@@ -3,6 +3,7 @@ package cn.rong.combusis.sdk.event;
 import android.text.TextUtils;
 
 import com.basis.UIStack;
+import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
@@ -43,7 +44,7 @@ public class EventHelper extends AbsPKHelper {
     }
 
     public void regeister(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
-        init(roomId,rcVoiceRoomEventListener);
+        init(roomId, rcVoiceRoomEventListener);
     }
 
     @Override
@@ -67,7 +68,6 @@ public class EventHelper extends AbsPKHelper {
      * 根据用户id获取麦位信息
      *
      * @param userId
-     *
      * @return 麦位信息
      */
     public RCVoiceSeatInfo getSeatInfo(String userId) {
@@ -85,7 +85,6 @@ public class EventHelper extends AbsPKHelper {
 
     /**
      * @param index 索引
-     *
      * @return 麦位信息
      */
     public RCVoiceSeatInfo getSeatInfo(int index) {
@@ -209,18 +208,22 @@ public class EventHelper extends AbsPKHelper {
             @Override
             public void onResult(UserInfo userInfo) {
                 Logger.e(TAG, "onShowTipDialog: " + GsonUtil.obj2Json(userInfo));
-                String message = "";
                 if (null != userInfo) {
-                    if (TipType.InvitedSeat == type) {
-                        message = userInfo.getName() + "邀请您上麦，是否同意？";
-                        EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
-                    } else if (TipType.RequestSeat == type) {
-                        message = userInfo.getName() + "申请上麦，是否同意？";
-                        EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
-                    } else {
-                        EventDialogHelper.helper().showPKDialog(UIStack.getInstance().getTopActivity(), type.getValue(), roomId, userInfo, resultBack);
-                    }
-
+                    UIKit.runOnUiTherad(new Runnable() {// fix：子线程弹不出弹框
+                        @Override
+                        public void run() {
+                            String message = "";
+                            if (TipType.InvitedSeat == type) {
+                                message = userInfo.getName() + "邀请您上麦，是否同意？";
+                                EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
+                            } else if (TipType.RequestSeat == type) {
+                                message = userInfo.getName() + "申请上麦，是否同意？";
+                                EventDialogHelper.helper().showTipDialog(UIStack.getInstance().getTopActivity(), type.getValue(), message, resultBack);
+                            } else {
+                                EventDialogHelper.helper().showPKDialog(UIStack.getInstance().getTopActivity(), type.getValue(), roomId, userInfo, resultBack);
+                            }
+                        }
+                    });
                 } else {
                     if (null != resultBack) resultBack.onResult(false);
                 }
