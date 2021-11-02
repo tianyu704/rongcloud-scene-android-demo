@@ -431,7 +431,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
 
     @Override
     public void onChatRoomKVUpdate(String roomId, final Map<String, String> chatRoomKvMap) {
-        VMLog.d(TAG, "onChatRoomKVUpdate1111111 : " + "roomId = " + roomId + " size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
+        VMLog.d(TAG, "onChatRoomKVUpdate : " + "roomId = " + roomId + " size = " + chatRoomKvMap.size() + " chatRoomKvMap = " + JsonUtils.toJson(chatRoomKvMap));
         if (null == chatRoomKvMap || chatRoomKvMap.isEmpty()) {
             VMLog.d(TAG, "onChatRoomKVUpdate: KV is Empty");
             return;
