@@ -712,9 +712,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
      */
     @Override
     public void clickSettings() {
-        if (!checkPKState()) {
-            present.showSettingDialog();
-        }
+        present.showSettingDialog();
     }
 
     /**
