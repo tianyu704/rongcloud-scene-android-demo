@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.basis.UIStack;
 import com.basis.widget.ActionWrapBar;
+import com.basis.widget.WXDialog;
 import com.basis.widget.interfaces.IWrapBar;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
+import com.kit.utils.NetUtil;
 
 /**
  * @author: BaiCQ
@@ -87,6 +89,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IBasis {
 
     @Override
     public void onNetChange() {
+        if (!NetUtil.isNetworkAvailable()) {
+            WXDialog.showDefaultDialog(activity, "网络异常进行检查", null);
+        }
     }
 
     @Override
