@@ -4,19 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.di
 
-import android.app.Activity
 import androidx.fragment.app.Fragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.present.SendPresentFragment
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.emptyseatsetting.IEmptySeatView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.membersetting.IMemberSettingView
-import cn.rongcloud.voiceroomdemo.mvp.fragment.voiceroom.selfsetting.ISelfSettingView
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomModel
-import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
-import cn.rongcloud.voiceroom.ui.uimodel.UiMemberModel
-import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel
-import cn.rongcloud.voiceroom2.VoiceRoomFragment
-import cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity
-import cn.rongcloud.voiceroomdemo.mvp.model.VoiceRoomListModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,52 +19,15 @@ import javax.inject.Named
 @InstallIn(FragmentComponent::class)
 class HiltFragmentModule {
 
-    @Named("EmptySeatSetting")
-    @Provides
-    fun provideEmptySeatSettingBean(view: IEmptySeatView): UiSeatModel {
-        return view.getEmptyUiSeatModel()!!
-    }
-
-    @Named("SelfSeatSetting")
-    @Provides
-    fun provideSelfSeatSettingBean(view: ISelfSettingView): UiSeatModel {
-        return view.getUiSeatModel()!!
-    }
-    //这里出现了闪退异常
-    @Provides
-    fun provideRoomInfoBean(roomModel: VoiceRoomModel): VoiceRoomBean {
-        return roomModel?.currentUIRoomInfo?.roomBean!!
-    }
-
-    @Provides
-    fun provideMemberModel(view: IMemberSettingView): UiMemberModel {
-        return view.getMemberInfo()!!
-    }
-
-    @Provides
-    @Named("selectedIds")
-    fun provideSelectedIds(activity: Activity, fragment: Fragment): List<String> {
-        if (fragment is SendPresentFragment) {
-            fragment.getSelectedIds()
-        }
-        return emptyList()
-    }
-
     @Named("isCreate")
     @Provides
     fun provideVoiceRoomIsCreate(fragment: Fragment): Boolean {
-        if (fragment is VoiceRoomFragment) {
-            return fragment.isCreate
-        }
         return false
     }
 
     @Named("roomId")
     @Provides
     fun provideVoiceRoomId(fragment: Fragment): String {
-        if (fragment is VoiceRoomFragment) {
-            return fragment.roomId
-        }
         return ""
     }
 }

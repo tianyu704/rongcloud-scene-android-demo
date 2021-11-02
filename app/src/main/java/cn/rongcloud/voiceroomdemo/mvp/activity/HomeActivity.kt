@@ -38,7 +38,6 @@ import io.rong.imlib.model.Conversation
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.layout_action_right_button_message.view.*
 import kotlinx.android.synthetic.main.layout_portrait.*
-import kotlinx.android.synthetic.main.layout_present_member_item.view.*
 import javax.inject.Inject
 
 private const val CODE_SETTING_REQUEST = 10000

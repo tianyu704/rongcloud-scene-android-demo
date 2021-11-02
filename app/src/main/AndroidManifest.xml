@@ -34,32 +34,8 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppTheme">
-        <activity
-            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomActivity"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.VoiceRoomActivityTheme"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="io.rong.intent.action.voice_room" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
 
-        <activity
-            android:name="cn.rongcloud.voiceroom2.ScorlVoiceRoomActivity"
-            android:launchMode="singleInstance"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.ScrolVRoomThem">
-            <intent-filter>
-                <action android:name="io.rong.intent.action.voice_room" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="cn.rongcloud.voiceroomdemo.mvp.activity.VoiceRoomListActivity"
-            android:screenOrientation="portrait" />
-        <activity
+    <activity
             android:name="cn.rongcloud.voiceroomdemo.mvp.activity.SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@style/BasisTheme" />
@@ -90,10 +66,6 @@
             android:name="cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.LoginStyle" />
-
-        <activity
-            android:name=".mvp.activity.VoiceRoomListActivity2"
-            android:screenOrientation="portrait" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
