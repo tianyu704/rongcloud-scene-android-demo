@@ -104,7 +104,6 @@ import cn.rongcloud.voiceroom.ui.uimodel.UiRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
@@ -234,7 +233,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
         RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
             @Override
             public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
+                Logger.d("==============leaveRoom onSuccess");
                 newVoiceRoomModel.changeUserRoom("");
                 if (isExit) {
                     UIKit.postDelayed(new Runnable() {
@@ -271,7 +270,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             RCVoiceRoomEngine.getInstance().createAndJoinRoom(roomId, rcVoiceRoomInfo, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    Logger.e("==============createAndJoinRoom onSuccess");
+                    Logger.d("==============createAndJoinRoom onSuccess");
                     newVoiceRoomModel.changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
@@ -287,7 +286,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             RCVoiceRoomEngine.getInstance().joinRoom(roomId, new RCVoiceRoomCallback() {
                 @Override
                 public void onSuccess() {
-                    Logger.e("==============joinRoom onSuccess");
+                    Logger.d("==============joinRoom onSuccess");
                     newVoiceRoomModel.changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
@@ -315,7 +314,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
             RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
             tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
             mView.showMessage(tips, false);
-            Logger.e("=================发送了默认消息");
+            Logger.d("=================发送了默认消息");
             // 广播消息
             RCChatroomEnter enter = new RCChatroomEnter();
             enter.setUserId(AccountStore.INSTANCE.getUserId());
@@ -1145,7 +1144,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
 
             @Override
             public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
+                Logger.d("==============leaveRoom onSuccess");
                 newVoiceRoomModel.changeUserRoom("");
                 mView.dismissLoading();
                 mView.finish();

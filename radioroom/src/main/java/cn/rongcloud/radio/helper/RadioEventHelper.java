@@ -163,7 +163,9 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
 
             @Override
             public void onError(Message message, int code, String reason) {
-                ToastUtils.s(UIKit.getContext(), "发送失败");
+                if (messageContent instanceof RCChatroomBarrage || messageContent instanceof RCChatroomVoice) {
+                    ToastUtils.s(UIKit.getContext(), "发送失败");
+                }
                 Logger.e("=============" + code + ":" + reason);
             }
         });

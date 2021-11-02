@@ -164,7 +164,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param voiceRoomBean
      */
     private void initRoomData(VoiceRoomBean voiceRoomBean) {
-        Logger.e("================jjjjjjjjjjjjjjjj" + voiceRoomBean);
+        Logger.d("================jjjjjjjjjjjjjjjj" + voiceRoomBean);
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
 
@@ -175,7 +175,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             // 之前不在房间，加入房间
             if (!isInRoom) {
                 switchRoom();
-                Logger.e("=================== leave room and join room");
+                Logger.d("=================== leave room and join room");
             } else {
                 addListener();
                 // 从最小化回来后刷新状态
