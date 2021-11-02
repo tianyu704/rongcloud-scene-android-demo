@@ -368,19 +368,22 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * 刷新房间人数
      */
     public void refreshRoomMemberCount() {
-        RongIMClient.getInstance()
-                .getChatRoomInfo(mRoomId, 0, ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC, new RongIMClient.ResultCallback<ChatRoomInfo>() {
-                    @Override
-                    public void onSuccess(ChatRoomInfo chatRoomInfo) {
-                        if (chatRoomInfo != null) {
-                            mView.setOnlineCount(chatRoomInfo.getTotalMemberCount());
+        // 由于退出房间前先发离开的消息，但还没离开成功，这时候立即获取人数是错误的，因此延时获取一下人数
+        UIKit.postDelayed(() -> {
+            RongIMClient.getInstance()
+                    .getChatRoomInfo(mRoomId, 0, ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC, new RongIMClient.ResultCallback<ChatRoomInfo>() {
+                        @Override
+                        public void onSuccess(ChatRoomInfo chatRoomInfo) {
+                            if (chatRoomInfo != null) {
+                                mView.setOnlineCount(chatRoomInfo.getTotalMemberCount());
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onError(RongIMClient.ErrorCode errorCode) {
-                    }
-                });
+                        @Override
+                        public void onError(RongIMClient.ErrorCode errorCode) {
+                        }
+                    });
+        }, 500);
     }
 
     /**

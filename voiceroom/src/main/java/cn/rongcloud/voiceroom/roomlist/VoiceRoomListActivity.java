@@ -25,8 +25,7 @@ public class VoiceRoomListActivity extends AbsSwitchActivity {
     }
     @Override
     protected void onStart() {
-        IFloatWindow iFloatWindow = FloatWindow.get(MiniRoomManager.TAG);
-        if (UIStack.getInstance().isTaskTop(this)||iFloatWindow!=null) {
+        if (UIStack.getInstance().isTaskTop(this)||MiniRoomManager.getInstance().isShowing()) {
             //当前用户是否在顶部，如果在不做任何操作
             //如果不在顶部，但是当前是顶部窗口是最小化的，那么也不做判断
         }else {

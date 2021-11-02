@@ -1123,6 +1123,10 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                 //同意
                 newVoiceRoomModel.enterSeatIfAvailable();
                 confirmDialog.dismiss();
+                if (currentStatus==STATUS_WAIT_FOR_SEAT) {
+                    //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
+                    newVoiceRoomModel.cancelRequestSeat(null);
+                }
                 return null;
             }
         }
