@@ -176,7 +176,20 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
             return;
         }
         VMLog.d(TAG, "leaveRoom#roomId:" + mRadioRoom.getRoomId());
-        leaveSeat(null);
+        leaveSeat(new RCRadioRoomCallback() {
+            @Override
+            public void onSuccess() {
+                quitChatRoom(callback);
+            }
+
+            @Override
+            public void onError(int code, String message) {
+                quitChatRoom(callback);
+            }
+        });
+    }
+
+    private void quitChatRoom(RCRadioRoomCallback callback) {
         //离开聊天室 无论成功与否 都执行leaveRTCRoom
         RongChatRoomClient.getInstance().quitChatRoom(mRadioRoom.getRoomId(), new IRongCoreCallback.OperationCallback() {
             @Override
