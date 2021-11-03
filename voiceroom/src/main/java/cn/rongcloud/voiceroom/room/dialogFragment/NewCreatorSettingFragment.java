@@ -6,7 +6,6 @@ import android.view.View;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.Guideline;
 
-
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.music.MusicManager;
@@ -106,14 +105,7 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
 
     private void showMusicPauseTip() {
         confirmDialog = new ConfirmDialog(requireContext(), "播放音乐中下麦会导致音乐中断，是否确定下麦?",
-                true, "确定", "取消", new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                //取消
-                confirmDialog.dismiss();
-                return null;
-            }
-        }, new Function0<Unit>() {
+                true, "确定", "取消", null, new Function0<Unit>() {
             @Override
             public Unit invoke() {
                 //确定

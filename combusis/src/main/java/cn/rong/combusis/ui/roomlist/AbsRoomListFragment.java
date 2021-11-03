@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 
 import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.ui.BaseFragment;
@@ -117,7 +118,6 @@ public abstract class AbsRoomListFragment extends BaseFragment implements OnItem
 
     @Override
     public void onCreateSuccess(VoiceRoomBean voiceRoomBean) {
-        mCreateRoomDialog.dismiss();
         mAdapter.getData().add(0, voiceRoomBean);
         mAdapter.notifyItemInserted(0);
         clickItem(voiceRoomBean, 0, true, Arrays.asList(voiceRoomBean));
@@ -125,7 +125,6 @@ public abstract class AbsRoomListFragment extends BaseFragment implements OnItem
 
     @Override
     public void onCreateExist(VoiceRoomBean voiceRoomBean) {
-        mCreateRoomDialog.dismiss();
         new ConfirmDialog(requireContext(), getString(R.string.text_you_have_created_room), true, "确定", "取消", () -> null, () -> {
             jumpRoom(voiceRoomBean);
             return null;
@@ -133,8 +132,26 @@ public abstract class AbsRoomListFragment extends BaseFragment implements OnItem
     }
 
     private void createRoom() {
-        mCreateRoomDialog = new CreateRoomDialog(requireActivity(), mLauncher, getRoomType(), this);
-        mCreateRoomDialog.show();
+        showLoading("");
+        // 创建之前检查是否已有创建的房间
+        OkApi.put(VRApi.ROOM_CREATE_CHECK, null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                dismissLoading();
+                if (result.ok()) {
+                    mCreateRoomDialog = new CreateRoomDialog(requireActivity(), mLauncher, getRoomType(), AbsRoomListFragment.this);
+                    mCreateRoomDialog.show();
+                } else if (result.getCode() == 30016) {
+                    VoiceRoomBean voiceRoomBean = result.get(VoiceRoomBean.class);
+                    if (voiceRoomBean != null) {
+                        onCreateExist(voiceRoomBean);
+                    } else {
+                        mCreateRoomDialog = new CreateRoomDialog(requireActivity(), mLauncher, getRoomType(), AbsRoomListFragment.this);
+                        mCreateRoomDialog.show();
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -158,7 +175,7 @@ public abstract class AbsRoomListFragment extends BaseFragment implements OnItem
                                 "确定", "取消", new Function0<Unit>() {
                             @Override
                             public Unit invoke() {
-                                confirmDialog.dismiss();
+                                changeUserRoom();
                                 return null;
                             }
                         }, new Function0<Unit>() {
@@ -188,5 +205,17 @@ public abstract class AbsRoomListFragment extends BaseFragment implements OnItem
     public void onDestroy() {
         super.onDestroy();
         VoiceRoomProvider.provider().clear();
+    }
+
+    //更改所属房间
+    private void changeUserRoom() {
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", "")
+                .build();
+        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+            }
+        });
     }
 }

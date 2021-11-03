@@ -10,7 +10,6 @@ import com.rongcloud.common.utils.AccountStore;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -24,8 +23,6 @@ import io.rong.imkit.picture.tools.ToastUtils;
  * @date 2021/9/14
  */
 public class VoiceRoomListFragment extends AbsRoomListFragment {
-
-    private ConfirmDialog confirmDialog;
 
     public static Fragment getInstance() {
         return new VoiceRoomListFragment();
