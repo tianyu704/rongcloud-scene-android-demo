@@ -90,13 +90,13 @@ public class PKView extends LinearLayout implements IPK {
         rAdapter = new PKAdapter(context, true);
         rvSender.setAdapter(lAdapter);
         rvReceiver.setAdapter(rAdapter);
-        rvSender.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
+        rvSender.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, true) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
             }
         });
-        rvReceiver.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, true) {
+        rvReceiver.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
@@ -210,7 +210,8 @@ public class PKView extends LinearLayout implements IPK {
             timer = null;
         }
         // 开启 惩罚记时  移除开启阶段的180s的差值
-        timer = new Timer(tvTime, timeDiff - MAX * 1000, listener);
+        // 已调整 惩罚时间未起点
+        timer = new Timer(tvTime, timeDiff, listener);
         timer.start();
         refreshPkResult();
     }
@@ -241,9 +242,6 @@ public class PKView extends LinearLayout implements IPK {
     public void setGiftSenderRank(List<String> lefts, List<String> rights) {
         int ls = null != lefts ? lefts.size() : 0;
         List<RankInfo> llis = new ArrayList<>();
-//        for (int i = ls - 1; i > -1; i--) {
-//            llis.add(new RankInfo(lefts.get(i), ls - i));
-//        }
         for (int i = 0; i < ls; i++) {
             llis.add(new RankInfo(lefts.get(i), i + 1));
         }
