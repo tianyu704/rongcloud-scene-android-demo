@@ -115,7 +115,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
     public void addRadioEventListener(RadioRoomListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
-            Logger.e("==============addRadioEventListener:messages-" + messages.size() + " listener size:" + listeners.size());
+            Logger.d("==============addRadioEventListener:messages-" + messages.size() + " listener size:" + listeners.size());
             if (!messages.isEmpty()) {
                 listener.onLoadMessageHistory(messages);
             }
@@ -129,7 +129,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
     @Override
     public void removeRadioEventListener(RadioRoomListener listener) {
         listeners.remove(listener);
-        Logger.e("==============RadioEventHelper:removeRadioEventListener");
+        Logger.d("==============RadioEventHelper:removeRadioEventListener");
     }
 
     @Override
@@ -158,7 +158,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
             @Override
             public void onSuccess(Message message) {
                 onMessageReceived(message);
-                Logger.e("=============sendChatRoomMessage:success");
+                Logger.d("=============sendChatRoomMessage:success");
             }
 
             @Override
@@ -173,7 +173,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
 
     @Override
     public void onMessageReceived(Message message) {
-        Logger.e("========================" + message.getContent() + JsonUtils.toJson(message.getContent()));
+        Logger.d("========================" + message.getContent() + JsonUtils.toJson(message.getContent()));
         if (message.getContent() instanceof RCAllBroadcastMessage) {
             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) message.getContent());
             return;

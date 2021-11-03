@@ -183,7 +183,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 refreshSeatView();
                 refreshRoomData();
                 mView.dismissLoading();
-                Logger.e("=================== refresh room");
+                Logger.d("=================== refresh room");
             }
         }
     }
@@ -219,7 +219,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RCRadioRoomEngine.getInstance().joinRoom(roomInfo, new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
-                Logger.e("==============joinRoom onSuccess");
+                Logger.d("==============joinRoom onSuccess");
                 changeUserRoom(mRoomId);
                 // 房主上麦
                 if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
@@ -294,7 +294,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onSuccess() {
                 RadioEventHelper.getInstance().setInSeat(true);
-                Logger.e("==============enterSeat onSuccess");
+                Logger.d("==============enterSeat onSuccess");
                 mView.setSeatState(RoomSeatView.SeatState.NORMAL);
                 RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "0", null);
                 RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SILENT, "0", null);
@@ -351,7 +351,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             public void onResult(Wrapper result) {
                 if (result.ok()) {
                     Map<String, String> map = result.getMap();
-                    Logger.e("================" + map.toString());
                     try {
                         Long giftCount = Long.valueOf(map.get(getCreateUserId()));
                         if (giftCount != null) {
@@ -561,7 +560,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param isSwitchLeave 是否是上下滑动切换导致的离开房间，切换时有离开操作，所以不用再离开
      */
     public void leaveRoom(boolean isSwitchLeave, boolean isClose, CloseRoomCallback closeRoomCallback) {
-        Logger.e("==============leaveRoom isSwitchLeave:" + isSwitchLeave + " isClose:" + isClose);
+        Logger.d("==============leaveRoom isSwitchLeave:" + isSwitchLeave + " isClose:" + isClose);
         if (isClose) {
             sendMessage(new RCRRCloseMessage());
         }
@@ -578,7 +577,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onSuccess() {
                 changeUserRoom("");
-                Logger.e("==============leaveRoom onSuccess");
+                Logger.d("==============leaveRoom onSuccess");
                 if (isClose) {
                     deleteRoom(closeRoomCallback);
                 } else {
@@ -788,7 +787,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onMessageReceived(Message message) {
         MessageContent content = message.getContent();
-        Logger.e("==============onMessageReceived: " + content.getClass() + JsonUtils.toJson(content));
+        Logger.d("==============onMessageReceived: " + content.getClass() + JsonUtils.toJson(content));
 
         if (content instanceof RCChatroomGift || content instanceof RCChatroomGiftAll) {
             // 刷新礼物数
@@ -831,7 +830,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
     @Override
     public void onRadioRoomKVUpdate(IRCRadioRoomEngine.UpdateKey updateKey, String s) {
-        Logger.e("===============" + updateKey.getValue() + "=====" + s);
+        Logger.d("===============" + updateKey.getValue() + "=====" + s);
         switch (updateKey) {
             case RC_ROOM_NAME:
                 mView.setRadioName(s);
@@ -959,7 +958,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void onDestroy() {
         RadioEventHelper.getInstance().removeRadioEventListener(this);
-        Logger.e("====================" + "radio room destroy, remove listener" + mView);
+        Logger.d("====================" + "radio room destroy, remove listener" + mView);
         super.onDestroy();
     }
 

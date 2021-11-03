@@ -68,7 +68,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
 
             @Override
             public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
+                Logger.d("==============leaveRoom onSuccess");
             }
 
             @Override

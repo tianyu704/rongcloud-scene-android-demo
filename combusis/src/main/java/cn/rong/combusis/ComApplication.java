@@ -6,6 +6,7 @@ import com.basis.BasisHelper;
 import com.basis.net.oklib.net.Page;
 import com.basis.net.oklib.wrapper.OkHelper;
 import com.basis.net.oklib.wrapper.interfaces.IHeader;
+import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 
 import java.util.HashMap;
@@ -34,6 +35,7 @@ import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.message.RCRRCloseMessage;
 import cn.rongcloud.messager.RCMessager;
+import cn.rongcloud.voiceroom.utils.VMLog;
 import okhttp3.Headers;
 
 public class ComApplication extends Application {
@@ -106,6 +108,8 @@ public class ComApplication extends Application {
                 RCRRCloseMessage.class,
                 RCChatSeatRemove.class
         );
+        Logger.setDebug(BuildConfig.DEBUG);
+        VMLog.setDebug(BuildConfig.DEBUG);
     }
 }
 
