@@ -23,7 +23,8 @@ class UserInfoDialog(
     context: Context,
     private val logoutBlock: (() -> Unit)? = null,
     private val saveBlock: ((userName: String, portrait: Uri?) -> Unit)? = null,
-    private val showPictureSelectBlock: (() -> Unit)? = null
+    private val showPictureSelectBlock: (() -> Unit)? = null,
+    private val unregisterBlock: (() -> Unit)? = null
 ) : BaseDialog(
     context, R.layout.layout_user_info_popup_window,
     false
@@ -59,7 +60,10 @@ class UserInfoDialog(
         tv_logout.setOnClickListener {
             logoutBlock?.invoke()
         }
-
+        tv_unregister.setOnClickListener {
+            dismiss()
+            unregisterBlock?.invoke()
+        }
     }
 
     fun setUserPortrait(picturePath: Uri) {
