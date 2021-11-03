@@ -1308,7 +1308,7 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
     public void clickItem(MutableLiveData<IFun.BaseFun> item, int position) {
         IFun.BaseFun fun = item.getValue();
         if (fun instanceof RoomNoticeFun) {
-            mView.showNoticeDialog();
+            mView.showNoticeDialog(true);
         } else if (fun instanceof RoomLockFun) {
             if (fun.getStatus() == 1) {
                 setRoomPassword(false, "", item);

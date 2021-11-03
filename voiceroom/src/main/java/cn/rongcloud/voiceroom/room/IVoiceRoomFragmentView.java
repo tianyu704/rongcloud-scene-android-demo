@@ -66,7 +66,7 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void showSelectBackgroundDialog(String url);
 
-    void showNoticeDialog();
+    void showNoticeDialog(boolean isEdit);
 
     void setRoomBackground(String url);
 

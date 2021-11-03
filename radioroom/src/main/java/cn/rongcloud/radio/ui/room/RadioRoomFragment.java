@@ -343,6 +343,10 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
                 false,
                 () -> null,
                 s -> {
+                    if (TextUtils.isEmpty(s)) {
+                        showToast("房间名称不能为空");
+                        return null;
+                    }
                     present.setRoomName(s);
                     mEditDialog.dismiss();
                     return null;
