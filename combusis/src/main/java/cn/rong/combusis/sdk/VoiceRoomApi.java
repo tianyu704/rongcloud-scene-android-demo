@@ -347,7 +347,7 @@ public class VoiceRoomApi implements Api {
                         if (PKResponse.accept == pkState) {
                             KToast.show("同意邀请");
                         } else if (PKResponse.reject == pkState) {
-                            KToast.show("已拒绝pk邀请");
+                            KToast.show("已拒绝PK邀请");
                         } else {
                             KToast.show("邀请被取消");
                         }

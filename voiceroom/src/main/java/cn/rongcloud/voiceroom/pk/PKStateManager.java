@@ -357,9 +357,9 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         } else if (EventBus.TAG.PK_RESPONSE.equals(tag) && args[0] instanceof PKResponse) {
             PKResponse pkState = (PKResponse) args[0];
             if (pkState == PKResponse.reject) {
-                KToast.show("您的PK邀请被拒绝");
+                KToast.show("对方拒绝了PK邀请");
             } else if (pkState == PKResponse.ignore) {
-                KToast.show("对方无响应，发起PK 失败");
+                KToast.show("对方无回应，PK发起失败");
             }
         } else if (EventBus.TAG.PK_GIFT.equals(tag)) {
             Logger.e(TAG, "礼物消息");

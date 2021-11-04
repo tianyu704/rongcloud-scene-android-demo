@@ -565,7 +565,6 @@ public class NewVoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView>
                         } else if (aClass.equals(RCChatroomSeats.class)) {
                             refreshRoomMember();
                         }
-                        Log.e("TAG", "accept: " + messageContent);
                     }
                 }));
     }
