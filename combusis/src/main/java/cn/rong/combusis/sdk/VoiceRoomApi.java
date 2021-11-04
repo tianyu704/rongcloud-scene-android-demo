@@ -128,7 +128,7 @@ public class VoiceRoomApi implements Api {
                 locked,
                 new DefaultRoomCallback(
                         "muteSeat",
-                        action,
+                        "",
                         resultBack));
     }
 

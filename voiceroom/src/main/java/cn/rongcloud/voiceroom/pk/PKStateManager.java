@@ -27,10 +27,12 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.sdk.StateUtil;
 import cn.rong.combusis.sdk.VoiceRoomApi;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKInfo;
 import cn.rongcloud.voiceroom.pk.domain.PKResult;
 import cn.rongcloud.voiceroom.pk.widget.IPK;
@@ -386,8 +388,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 if (null != pkInfos && isPKer()) {
                     sendPKStartMessage(pkInfos[1].getUserId());
                 }
-                if (isPKer()) {//静麦所有
-                    VoiceRoomApi.getApi().muteAll(true);
+                if (isPKer()) {//锁麦所有 ->
+                    lockAllAndKitout();
                 }
                 long timeDiff = null == pkResult ? -1 : pkResult.getTimeDiff();
                 pkView.pkStart(timeDiff, new IPK.OnTimerEndListener() {
@@ -398,6 +400,16 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 });
             }
         });
+    }
+
+    void lockAllAndKitout() {
+        RCVoiceRoomInfo roomInfo = EventHelper.helper().getRoomInfo();
+        if (null != roomInfo) {
+            int seatCount = roomInfo.getSeatCount();
+            for (int i = 1; i < seatCount; i++) {
+                VoiceRoomApi.getApi().lockSeat(i, true, null);
+            }
+        }
     }
 
     /**
@@ -434,8 +446,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         if (null != stateListener && isPKer()) {
             stateListener.onSendPKMessage("本轮PK结束");
         }
-        if (isPKer()) {//取消静麦
-            VoiceRoomApi.getApi().muteAll(false);
+        if (isPKer()) {//取消锁麦
+            VoiceRoomApi.getApi().lockAll(false);
         }
         if (isInviter()) {
             //约定邀请者 quitpk
@@ -456,7 +468,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             @Override
             public void onResult(UserInfo userInfo) {
                 String pkInfo = null != userInfo ? userInfo.getName() : pkId;
-                if (null != stateListener) stateListener.onSendPKMessage("与" + pkInfo + "的PK即将开始");
+                if (null != stateListener)
+                    stateListener.onSendPKMessage("与" + pkInfo + "的PK即将开始,PK过程中，麦上观众将被抱下麦");
             }
         });
     }
