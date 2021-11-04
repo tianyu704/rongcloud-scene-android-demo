@@ -58,7 +58,7 @@ public class RoomNoticeDialog extends Dialog {
         }
         if (isEdit) {
             mTitleView.setText("修改房间公告");
-            mNoticeView.setFocusable(true);
+            mNoticeView.setFocusableInTouchMode(true);
             mNoticeView.setCursorVisible(true);
             mNoticeView.requestFocus();
             if (!TextUtils.isEmpty(notice)) {
@@ -77,7 +77,7 @@ public class RoomNoticeDialog extends Dialog {
             mCancelView.setOnClickListener(v -> dismiss());
         } else {
             mTitleView.setText("房间公告");
-            mNoticeView.setFocusable(false);
+            mNoticeView.setFocusableInTouchMode(false);
             mNoticeView.setCursorVisible(false);
             mCancelView.setVisibility(View.GONE);
             mConfirmView.setVisibility(View.GONE);
