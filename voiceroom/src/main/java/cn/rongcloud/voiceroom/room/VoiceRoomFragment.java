@@ -245,7 +245,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
 
         // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
-        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity)-UiUtils.INSTANCE.getNavigationBarHeight(activity);
         getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             Rect rect = new Rect();
             getLayout().getWindowVisibleDisplayFrame(rect);
