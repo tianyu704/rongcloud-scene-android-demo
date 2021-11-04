@@ -112,6 +112,8 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     private OnBottomOptionClickListener mOnBottomOptionClickListener;
     private AudioRecordManager audioRecordManager;
 
+    private long showSoftKeyboardTime = 0L;
+
     public RoomBottomView(@NonNull Context context) {
         this(context, null);
     }
@@ -151,8 +153,23 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         mInputView.setOnFocusChangeListener(new OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
+                Logger.e("=================== " + hasFocus + " " + System.currentTimeMillis());
+                if (mInputBar.getVisibility() != VISIBLE) {
+                    return;
+                }
                 if (hasFocus) {
+                    showSoftKeyboardTime = System.currentTimeMillis();
                     SoftKeyboardUtils.showSoftKeyboard(mInputView);
+                    Logger.e("=================== 111");
+                } else {
+                    // 解决魅蓝Note5,获取焦点后系统立马又自动取消焦点，导致键盘不能弹出
+                    // 这里看获取焦点又取消焦点的间隔小于500ms就再打开键盘
+                    long diff = System.currentTimeMillis() - showSoftKeyboardTime;
+                    if (diff < 500) {
+                        showSoftKeyboardTime = 0;
+                        SoftKeyboardUtils.showSoftKeyboard(mInputView);
+                        Logger.e("=================== 222");
+                    }
                 }
             }
         });
@@ -176,6 +193,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
             mInputBar.setVisibility(VISIBLE);
             mInputView.requestFocus();
         });
+
         // 点击emoji
         mEmojiView.setOnClickListener(v -> {
             mEmojiPopup.toggle();
@@ -262,9 +280,9 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
      */
     public void hideSoftKeyboardAndInput() {
         if (mInputBar.getVisibility() == VISIBLE) {
+            mInputBar.setVisibility(View.GONE);
             mInputView.clearFocus();
             SoftKeyboardUtils.hideSoftKeyboard(mInputView);
-            mInputBar.setVisibility(View.GONE);
         }
     }
 

@@ -29,6 +29,7 @@ import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
 import cn.rongcloud.radioroom.utils.JsonUtils;
 import cn.rongcloud.radioroom.utils.VMLog;
+import cn.rongcloud.rtc.api.RCRTCAudioRouteManager;
 import cn.rongcloud.rtc.api.RCRTCConfig;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.api.RCRTCRemoteUser;
@@ -368,6 +369,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
             public void onSuccess() {
                 release();
                 RCRTCEngine.getInstance().unInit();
+                RCRTCAudioRouteManager.getInstance().unInit();
                 onSuccessWithCheck(callback);
             }
 
@@ -422,6 +424,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         }
         RCRTCConfig config = builder.build();
         RCRTCEngine.getInstance().init(RCMessager.getInstance().getApplication(), config);
+        RCRTCAudioRouteManager.getInstance().init(RCMessager.getInstance().getApplication());
     }
 
     @Override
