@@ -376,6 +376,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     @Override
     public void joinRoom() {
         present.init(mRoomId, isCreate);
+        mAllBroadcastView.setBroadcastListener();
     }
 
     private void initPk() {

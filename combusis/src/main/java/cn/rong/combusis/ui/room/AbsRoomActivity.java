@@ -1,7 +1,6 @@
 package cn.rong.combusis.ui.room;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -11,7 +10,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
-import com.rongcloud.common.utils.UiUtils;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;
@@ -40,7 +38,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
     private ViewPager2 mViewPager;
     private RoomVPAdapter mRoomAdapter;
     private int mCurrentPosition;
-    private int bottomMargin = 0;
     private HashMap<String, SwitchRoomListener> switchRoomListenerMap = new HashMap<>();
     private String currentRoomId;
     private SmartRefreshLayout refreshLayout;
@@ -121,22 +118,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
         mCurrentPosition = getCurrentItem();
         mViewPager.setCurrentItem(mCurrentPosition, false);
 
-        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
-        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
-        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            Rect rect = new Rect();
-            getLayout().getWindowVisibleDisplayFrame(rect);
-            int height = screenHeight - rect.bottom;
-            if (bottomMargin != height) {
-                // 假定高度超过屏幕的1/4代表键盘弹出了
-                if (height > screenHeight / 4) {
-                    bottomMargin = height;
-                } else {
-                    bottomMargin = 0;
-                }
-                getLayout().setPadding(0, 0, 0, bottomMargin);
-            }
-        });
         startService();
     }
 
