@@ -1,7 +1,5 @@
 package cn.rong.combusis.sdk.event.wrapper;
 
-import android.content.Context;
-
 import com.kit.wapper.IResultBack;
 
 import java.util.List;
@@ -9,6 +7,7 @@ import java.util.List;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
+import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.model.MessageContent;
 
@@ -27,6 +26,13 @@ public interface IEventHelp {
      * @param roomId 房间id
      */
     void regeister(String roomId);
+
+    /**
+     * 获取room info
+     *
+     * @return room info
+     */
+    RCVoiceRoomInfo getRoomInfo();
 
     /**
      * 根据用户id获取麦位信息
@@ -57,14 +63,17 @@ public interface IEventHelp {
      * 取消外部监听
      */
     void removeRCVoiceRoomEventListener();
+
     /**
      * 保存当前请求上麦的状态
      */
     void setCurrentStatus(int status);
+
     /**
      * 获取当前状态
      */
     int getCurrentStatus();
+
     /**
      * 添加网络延迟监听
      *

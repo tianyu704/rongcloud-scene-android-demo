@@ -29,7 +29,6 @@ import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.sdk.Api;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
@@ -90,6 +89,10 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             rcVoiceRoomEventListener.onRoomKVReady();
         }
         Log.d(TAG, "onRoomKVReady");
+    }
+
+    public RCVoiceRoomInfo getRoomInfo() {
+        return roomInfo;
     }
 
     /**
