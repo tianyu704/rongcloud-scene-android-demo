@@ -28,6 +28,7 @@ import cn.rong.combusis.common.utils.UIKit;
 import cn.rong.combusis.music.IMusic;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.music.domain.MusicBean;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
 
 public class FragmentMusicAdd extends BaseFragment {
     private final static int MUSIC_PICK_REQUEST_CODE = 10000;
@@ -109,7 +110,7 @@ public class FragmentMusicAdd extends BaseFragment {
                 MusicManager.get().addMusicByUri(uri, new LoadTag(getActivity(), "上传中..."), new IResultBack<Boolean>() {
                     @Override
                     public void onResult(Boolean aBoolean) {
-                        KToast.show(aBoolean ? "音乐添加成功" : "音乐添加失败");
+                        if (aBoolean) EToast.showToast("音乐添加成功");
                     }
                 });
             }
