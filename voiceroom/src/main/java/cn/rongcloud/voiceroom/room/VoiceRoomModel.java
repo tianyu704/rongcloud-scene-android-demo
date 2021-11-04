@@ -322,7 +322,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
             UiSeatModel uiSeatModel = uiSeatModels.get(i);
             uiSeatModel.setSpeaking(b);
         }
-        MiniRoomManager.getInstance().onSpeak(b);
     }
 
     /**
