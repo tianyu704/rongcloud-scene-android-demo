@@ -155,10 +155,13 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     public void onPKInvitationCanceled(String roomId, String userId) {
         Logger.e(TAG, "onPKInvitationCanceled");
         EventDialogHelper.helper().dismissDialog();
+        if (null != pkInviter) {
+            // 调用忽略是 邀请双方都会执行这个回调，但是主动调用忽略 会将pkInviter释放，可以判断
+            EToast.showToast("邀请已被取消");
+        }
         // 释放邀请者信息
         pkInviter = null;
         current = Type.PK_NONE;
-        EToast.showToast("邀请已被取消");
         dispatchPKState(null);
     }
 
