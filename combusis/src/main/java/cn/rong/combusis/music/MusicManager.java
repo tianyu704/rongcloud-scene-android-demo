@@ -247,8 +247,9 @@ public class MusicManager implements IMusic {
      */
     @Override
     public void switchMusicPlayState(MusicBean music) {
-        Logger.e(TAG, "playOrPauseMusic");
-        if (!TextUtils.isEmpty(currentPlayMusicUrl) && currentPlayMusicUrl.equals(music.getUrl())) {
+        if (!TextUtils.isEmpty(currentPlayMusicUrl) && currentPlayMusicUrl.equals(music.getUrl())
+                && (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED ||
+                currentMusicState == RCRTCAudioMixer.MixingState.PLAY)) {
             if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
                 RCRTCAudioMixer.getInstance().resume();
                 music.setPlaying(true);
@@ -265,6 +266,7 @@ public class MusicManager implements IMusic {
                 }
             });
         } else {
+            Logger.e(TAG, "switchMusicPlayState 2");
             // 暂停旧的
             if (!TextUtils.isEmpty(currentPlayMusicUrl)) {
                 stopPlayMusic();
