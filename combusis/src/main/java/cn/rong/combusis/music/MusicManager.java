@@ -247,8 +247,9 @@ public class MusicManager implements IMusic {
      */
     @Override
     public void switchMusicPlayState(MusicBean music) {
-        Logger.e(TAG, "playOrPauseMusic");
-        if (!TextUtils.isEmpty(currentPlayMusicUrl) && currentPlayMusicUrl.equals(music.getUrl())) {
+        if (!TextUtils.isEmpty(currentPlayMusicUrl) && currentPlayMusicUrl.equals(music.getUrl())
+                && (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED ||
+                currentMusicState == RCRTCAudioMixer.MixingState.PLAY)) {
             if (currentMusicState == RCRTCAudioMixer.MixingState.PAUSED) {
                 RCRTCAudioMixer.getInstance().resume();
                 music.setPlaying(true);
@@ -265,6 +266,7 @@ public class MusicManager implements IMusic {
                 }
             });
         } else {
+            Logger.e(TAG, "switchMusicPlayState 2");
             // 暂停旧的
             if (!TextUtils.isEmpty(currentPlayMusicUrl)) {
                 stopPlayMusic();
@@ -374,7 +376,7 @@ public class MusicManager implements IMusic {
         String realPath = RealPathFromUriUtils.getRealPathFromUri(UIKit.getContext(), uri);
         Logger.e(TAG, "addMusicByUri: realPath = " + realPath);
         if (TextUtils.isEmpty(realPath)) {
-            Logger.e(TAG, "文件选择异常");
+            KToast.show("文件选择异常");
             if (null != resultBack) resultBack.onResult(false);
             return;
         }
@@ -385,7 +387,7 @@ public class MusicManager implements IMusic {
                 && !realPath.endsWith("ogg")
                 && !realPath.endsWith("amr")
         ) {
-            Logger.e(TAG, "仅支持 MP3、AAC、M4A、WAV、OGG、AMR 格式文件");
+            KToast.show("仅支持 MP3、AAC、M4A、WAV、OGG、AMR 格式文件");
             if (null != resultBack) resultBack.onResult(false);
             return;
         }
@@ -395,7 +397,7 @@ public class MusicManager implements IMusic {
             public void onResult(String url) {
                 if (null != loadTag) loadTag.dismiss();
                 if (TextUtils.isEmpty(url)) {
-                    Logger.e(TAG, "文件上传失败");
+                    KToast.show("文件上传失败");
                     if (null != resultBack) resultBack.onResult(false);
                     return;
                 }
