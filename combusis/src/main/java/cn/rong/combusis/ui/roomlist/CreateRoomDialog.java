@@ -215,8 +215,10 @@ public class CreateRoomDialog extends BottomDialog {
                 if (mCreateRoomCallBack != null) {
                     VoiceRoomBean voiceRoomBean = result.get(VoiceRoomBean.class);
                     if (result.ok() && voiceRoomBean != null) {
+                        dismiss();
                         mCreateRoomCallBack.onCreateSuccess(voiceRoomBean);
                     } else if (30016 == result.getCode() && voiceRoomBean != null) {
+                        dismiss();
                         mCreateRoomCallBack.onCreateExist(voiceRoomBean);
                     } else {
                         ToastUtils.s(mActivity, result.getMessage());

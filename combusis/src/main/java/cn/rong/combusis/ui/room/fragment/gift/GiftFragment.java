@@ -133,8 +133,8 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
         mMemberAdapter = new RcySAdapter<Member, RcyHolder>(getContext(), R.layout.item_gift_member) {
             @Override
             public void convert(RcyHolder holder, Member member, int position) {
-                ImageView imageView=holder.getView(R.id.iv_member_head);
-                ImageLoaderUtil.INSTANCE.loadImage(context,imageView , member.getPortraitUrl(),R.drawable.default_portrait);
+                ImageView imageView = holder.getView(R.id.iv_member_head);
+                ImageLoaderUtil.INSTANCE.loadImage(context, imageView, member.getPortraitUrl(), R.drawable.default_portrait);
                 String name = "观众";
                 if (TextUtils.equals(mVoiceRoomBean.getCreateUserId(), member.getUserId())) {
                     name = "房主";
@@ -249,7 +249,14 @@ public class GiftFragment extends BaseBottomSheetDialogFragment {
         successMembers.clear();
         for (String userId : mSelectUserIds) {
             sendGift(userId);
-            sendGiftBroadcast(userId, isAll);
+            if (!isAll) {
+                // 非全选每人发一条
+                sendGiftBroadcast(userId, false);
+            }
+        }
+        if (isAll) {
+            // 全选只发一条全麦打赏的广播
+            sendGiftBroadcast("", true);
         }
         boolean finalIsAll = isAll;
         new Thread(() -> {

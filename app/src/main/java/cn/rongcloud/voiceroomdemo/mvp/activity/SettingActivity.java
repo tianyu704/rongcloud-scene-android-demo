@@ -26,6 +26,7 @@ import cn.rongcloud.annotation.HiltBinding;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView;
 import cn.rongcloud.voiceroomdemo.mvp.presenter.SettingPresenter;
+import cn.rongcloud.voiceroomdemo.ui.dialog.UnregisterDialog;
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog;
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb;
 import cn.rongcloud.voiceroomdemo.webview.BaseActionBarActivity;
@@ -38,6 +39,7 @@ import kotlin.jvm.functions.Function0;
 public class SettingActivity extends BaseActionBarActivity implements View.OnClickListener, ISettingView {
     private UserInfoDialog dialog;
     private boolean needModefy = false;
+    private UnregisterDialog unregisterDialog;
 
     public static void startActivity(Activity activity, int code) {
         if (code > 0) {
@@ -141,10 +143,12 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
         dialog = new UserInfoDialog(this, new Function0() {
             @Override
             public Object invoke() {
+                dialog.dismiss();
                 presenter.logout();
                 return null;
             }
         }, (userName, uri) -> {
+            dialog.dismiss();
             presenter.modifyUserInfo(userName, uri);
             return null;
         }, () -> {
@@ -153,10 +157,20 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, 10000);
             return null;
+        }, () -> {
+            showUnregisterDialog();
+            return null;
         });
         dialog.show();
     }
 
+    public void showUnregisterDialog() {
+        unregisterDialog = new UnregisterDialog(this, v -> {
+            unregisterDialog.dismiss();
+            presenter.unregister();
+        });
+        unregisterDialog.show();
+    }
 
     @Override
     public void modifyInfoSuccess() {

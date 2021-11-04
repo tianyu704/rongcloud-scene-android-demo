@@ -177,4 +177,14 @@ public class VRApi {
      * 发送全服广播的礼物
      */
     public static final String GIFT_BROADCAST = HOST + "mic/room/message/broadcast";
+
+    /**
+     * 检查是否创建了房间
+     */
+    public static final String ROOM_CREATE_CHECK = HOST + "mic/room/create/check";
+
+    /**
+     * 注册或者注销，注销不传任何参数
+     */
+    public static final String RESIGN = HOST + "user/resign";
 }

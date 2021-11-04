@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
-import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.ui.room.model.Member;
 import io.reactivex.rxjava3.core.Observable;
@@ -204,13 +203,6 @@ public class RoomTitleBar extends ConstraintLayout {
                 }
             }
         });
-    }
-
-
-    @Override
-    protected void onDetachedFromWindow() {
-        AllBroadcastManager.getInstance().removeListener();
-        super.onDetachedFromWindow();
     }
 
     public interface OnFollowClickListener {

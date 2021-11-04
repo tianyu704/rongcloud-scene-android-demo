@@ -158,6 +158,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
         // 释放邀请者信息
         pkInviter = null;
         current = Type.PK_NONE;
+        EToast.showToast("邀请已被取消");
         dispatchPKState(null);
     }
 

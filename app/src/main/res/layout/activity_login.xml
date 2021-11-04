@@ -98,12 +98,9 @@
 
         <ImageView
             android:id="@+id/iv_checked"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/shape_checkbox_outter"
-            android:padding="2.5dp"
-            android:src="@drawable/shape_checkbox_inner" />
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:background="@drawable/shape_checkbox_inner" />
 
         <TextView
             android:id="@+id/bottom_info"

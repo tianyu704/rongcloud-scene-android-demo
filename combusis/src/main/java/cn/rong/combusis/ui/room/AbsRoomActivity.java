@@ -1,7 +1,6 @@
 package cn.rong.combusis.ui.room;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -11,7 +10,6 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.basis.ui.BaseActivity;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
-import com.rongcloud.common.utils.UiUtils;
 import com.scwang.smart.refresh.layout.SmartRefreshLayout;
 import com.scwang.smart.refresh.layout.api.RefreshLayout;
 import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener;

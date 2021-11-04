@@ -26,6 +26,7 @@ class ConfirmDialog(
     BaseDialog(context, R.layout.layout_confirm_dialog, false) {
     override fun initListener() {
         btn_cancel.setOnClickListener {
+            cancelBlock?.invoke()
             dismiss()
             cancelBlock?.let { it1 -> it1() }
         }

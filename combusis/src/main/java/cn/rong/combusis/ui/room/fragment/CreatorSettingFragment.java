@@ -67,14 +67,7 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment {
 
     private void showMusicPauseTip() {
         confirmDialog = new ConfirmDialog(requireContext(), "播放音乐中下麦会导致音乐中断，是否确定下麦?",
-                true, "确定", "取消", new Function0<Unit>() {
-            @Override
-            public Unit invoke() {
-                //取消
-                confirmDialog.dismiss();
-                return null;
-            }
-        }, new Function0<Unit>() {
+                true, "确定", "取消", null, new Function0<Unit>() {
             @Override
             public Unit invoke() {
                 //确定

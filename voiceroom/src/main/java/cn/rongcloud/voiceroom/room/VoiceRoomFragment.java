@@ -206,7 +206,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
         mNoticeView = getView(R.id.tv_notice);
         mNoticeView.setOnClickListener(v -> {
-            showNoticeDialog();
+            showNoticeDialog(false);
         });
         // 背景
         mBackgroundImageView = getView(R.id.iv_background);
@@ -265,15 +265,11 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
     /**
      * 显示公告弹窗
+     *
+     * @param isEdit
      */
     @Override
-    public void showNoticeDialog() {
-        boolean isEdit = false;
-        if (present.getRoomOwnerType() == RoomOwnerType.VOICE_OWNER) {
-            isEdit = true;
-        } else {
-            isEdit = false;
-        }
+    public void showNoticeDialog(boolean isEdit) {
         mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
             public void saveNotice(String notice) {
@@ -406,6 +402,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
     @Override
     public void joinRoom() {
         present.init(mRoomId, isCreate);
+        mAllBroadcastView.setBroadcastListener();
     }
 
     private void initPk() {
@@ -753,9 +750,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      */
     @Override
     public void clickSettings() {
-        if (!checkPKState()) {
-            present.showSettingDialog();
-        }
+        present.showSettingDialog();
     }
 
     /**
@@ -857,6 +852,10 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
                 false,
                 () -> null,
                 newName -> {
+                    if (TextUtils.isEmpty(newName)) {
+                        showToast("房间名称不能为空");
+                        return null;
+                    }
                     present.setRoomName(newName);
                     mEditDialog.dismiss();
                     return null;

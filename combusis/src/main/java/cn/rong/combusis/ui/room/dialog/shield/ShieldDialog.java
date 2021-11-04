@@ -85,7 +85,7 @@ public class ShieldDialog extends BottomDialog {
         if (shields.contains(Shield.buildDefault())) {
             tagSize = count - 1;
         }
-        String text = titlePre + (tagSize > 0 ? "(" + tagSize + "/" + max_tag + ")" : "");
+        String text = titlePre + " (" + tagSize + "/" + max_tag + ")";
         title.setText(text);
         for (int i = 0; i < count; i++) {
             final View tagView;
