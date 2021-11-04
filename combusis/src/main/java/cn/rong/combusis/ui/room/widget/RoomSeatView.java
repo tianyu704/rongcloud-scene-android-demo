@@ -37,7 +37,7 @@ public class RoomSeatView extends ConstraintLayout {
     private ConstraintLayout mClViewerPause;
     private String roomOwnerName;
     private String roomOwnerPortrait;
-    private SeatState seatState;
+    private SeatState seatState =SeatState.NORMAL;
 
     public RoomSeatView(@NonNull Context context) {
         this(context, null);
