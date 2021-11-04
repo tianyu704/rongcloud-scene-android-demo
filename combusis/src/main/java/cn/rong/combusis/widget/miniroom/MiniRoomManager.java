@@ -94,11 +94,7 @@ public class MiniRoomManager implements OnMiniRoomListener {
         miniWindows.setOnClickListener(v -> {
             close();
             try {
-                if (intent.getFlags()== Intent.FLAG_ACTIVITY_NEW_TASK) {
-                    context.getApplicationContext().startActivity(intent);
-                }else {
-                    context.startActivity(intent);
-                }
+                context.startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
             }

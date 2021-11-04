@@ -249,6 +249,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onSpeakingStateChanged(index, speaking);
         }
+        if (MiniRoomManager.getInstance().isShowing()){
+            MiniRoomManager.getInstance().onSpeak(speaking);
+        }
 //        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (null != statusListeners) {
             for (StatusListener l : statusListeners) {
