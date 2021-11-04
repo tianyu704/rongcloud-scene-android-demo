@@ -96,7 +96,6 @@ public class RCChatroomPK extends MessageContent {
 
     public byte[] encode() {
         String json = GsonUtil.obj2Json(this);
-//        Logger.e(TAG, "encode:" + json);
         return json.getBytes(StandardCharsets.UTF_8);
     }
 

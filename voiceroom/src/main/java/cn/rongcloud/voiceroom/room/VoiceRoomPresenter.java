@@ -568,7 +568,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                         }else if (aClass.equals(RCChatroomLocationMessage.class)) {
                             EventHelper.helper().addMessage(messageContent);
                         }
-                        Log.e("TAG", "accept: " + messageContent);
                     }
                 }));
     }

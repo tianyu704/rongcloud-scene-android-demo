@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -90,13 +89,13 @@ public class PKView extends LinearLayout implements IPK {
         rAdapter = new PKAdapter(context, true);
         rvSender.setAdapter(lAdapter);
         rvReceiver.setAdapter(rAdapter);
-        rvSender.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, true) {
+        rvSender.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
             }
         });
-        rvReceiver.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, false) {
+        rvReceiver.setLayoutManager(new LinearLayoutManager(context, RecyclerView.HORIZONTAL, true) {
             @Override
             public boolean canScrollHorizontally() {
                 return false;
@@ -277,9 +276,9 @@ public class PKView extends LinearLayout implements IPK {
         @Override
         public synchronized void setData(List<RankInfo> list, boolean refresh) {
             int size = null == list ? 0 : list.size();
-            Log.e(TAG, "size = " + size);
+            // 保证集合数量
+            List<RankInfo> temps = new ArrayList();
             if (size != COUNT) {
-                List<RankInfo> temps = new ArrayList();
                 for (int i = 0; i < COUNT; i++) {
                     if (i < size) {
                         temps.add(list.get(i));
@@ -287,10 +286,15 @@ public class PKView extends LinearLayout implements IPK {
                         temps.add(new RankInfo("", i + 1));
                     }
                 }
-                super.setData(temps, refresh);
             } else {
-                super.setData(list, refresh);
+                temps.addAll(list);
             }
+            // 翻转集合
+            List<RankInfo> datas = new ArrayList();
+            for (int i = COUNT - 1; i > -1; i--) {
+                datas.add(temps.get(i));
+            }
+            super.setData(datas, refresh);
         }
 
         @Override
