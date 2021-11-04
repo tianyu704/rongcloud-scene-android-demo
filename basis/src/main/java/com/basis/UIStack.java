@@ -91,7 +91,7 @@ public class UIStack {
         for (int i = len - 1; i >= 0; i--) {
             IBasis base = ibasiss.get(i);
             if (base instanceof Activity) {
-                return (BaseActivity) base;
+                return (Activity) base;
             }
         }
         return null;

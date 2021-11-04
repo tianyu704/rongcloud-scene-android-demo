@@ -1,5 +1,7 @@
 package cn.rong.combusis.sdk.event.wrapper;
 
+import android.content.Context;
+
 import com.kit.wapper.IResultBack;
 
 import java.util.List;
@@ -8,6 +10,7 @@ import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import io.rong.imlib.model.MessageContent;
 
 public interface IEventHelp {
 
@@ -23,7 +26,7 @@ public interface IEventHelp {
      *
      * @param roomId 房间id
      */
-    void regeister(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener);
+    void regeister(String roomId);
 
     /**
      * 根据用户id获取麦位信息
@@ -45,6 +48,23 @@ public interface IEventHelp {
      */
     void addRoomListener(RoomListener listener);
 
+    /**
+     * 注册房间外部回调监听
+     */
+    void setRCVoiceRoomEventListener(RCVoiceRoomEventListener rcVoiceRoomEventListener);
+
+    /**
+     * 取消外部监听
+     */
+    void removeRCVoiceRoomEventListener();
+    /**
+     * 保存当前请求上麦的状态
+     */
+    void setCurrentStatus(int status);
+    /**
+     * 获取当前状态
+     */
+    int getCurrentStatus();
     /**
      * 添加网络延迟监听
      *
@@ -89,6 +109,36 @@ public interface IEventHelp {
      * @return pk状态
      */
     Type getPKState();
+
+    /**
+     * 获取当前房间ID
+     */
+    String getRoomId();
+
+    /**
+     * 房间公屏消息
+     */
+    void addMessage(MessageContent message);
+
+    /**
+     * 获取房间公屏消息
+     */
+    List<MessageContent> getMessageList();
+
+    /**
+     * 获取麦位信息
+     */
+    List<RCVoiceSeatInfo> getRCVoiceSeatInfoList();
+
+    /**
+     * 设置是否静音
+     */
+    void setMuteAllRemoteStreams(boolean isMute);
+
+    /**
+     * 是否静音
+     */
+    boolean getMuteAllRemoteStreams();
 
     /**
      * 获取可用麦位索引

@@ -16,7 +16,7 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomActivity;
+import cn.rongcloud.voiceroom.room.VoiceRoomActivity;
 import io.rong.imkit.picture.tools.ToastUtils;
 
 /**
@@ -39,7 +39,7 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
             if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
                 ArrayList list = new ArrayList();
                 list.add(item.getRoomId());
-                NewVoiceRoomActivity.startActivity(getActivity(), list, 0, isCreate);
+                VoiceRoomActivity.startActivity(getActivity(), list, 0, isCreate);
             } else if (item.isPrivate()) {
                 inputPasswordDialog = new InputPasswordDialog(requireContext(), false, () -> null, s -> {
                     if (TextUtils.isEmpty(s)) {
@@ -53,7 +53,7 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
                         inputPasswordDialog.dismiss();
                         ArrayList list = new ArrayList();
                         list.add(item.getRoomId());
-                        NewVoiceRoomActivity.startActivity(getActivity(), list, 0, false);
+                        VoiceRoomActivity.startActivity(getActivity(), list, 0, false);
                     } else {
                         showToast("密码错误");
                     }
@@ -70,7 +70,7 @@ public class VoiceRoomListFragment extends AbsRoomListFragment {
                 }
                 int p = list.indexOf(item.getRoomId());
                 if (p < 0) p = 0;
-                NewVoiceRoomActivity.startActivity(getActivity(), list, p, false);
+                VoiceRoomActivity.startActivity(getActivity(), list, p, false);
             }
         });
     }

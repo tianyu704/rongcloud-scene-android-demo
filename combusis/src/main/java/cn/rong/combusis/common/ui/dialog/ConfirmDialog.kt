@@ -27,6 +27,7 @@ class ConfirmDialog(
     override fun initListener() {
         btn_cancel.setOnClickListener {
             dismiss()
+            cancelBlock?.let { it1 -> it1() }
         }
         btn_confirm.setOnClickListener {
             if (needDismiss) {

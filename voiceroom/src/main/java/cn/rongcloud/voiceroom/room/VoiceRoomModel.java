@@ -67,6 +67,7 @@ import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
 import io.rong.imlib.IRongCoreEnum;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -75,7 +76,7 @@ import kotlin.jvm.functions.Function2;
 /**
  * 语聊房的逻辑处理
  */
-public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implements RCVoiceRoomEventListener {
+public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCVoiceRoomEventListener {
 
     private String TAG = "NewVoiceRoomModel";
     //线程调度器
@@ -196,7 +197,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     }
 
 
-    public NewVoiceRoomModel(NewVoiceRoomPresenter present, Lifecycle lifecycle) {
+    public VoiceRoomModel(VoiceRoomPresenter present, Lifecycle lifecycle) {
         super(present, lifecycle);
     }
 
@@ -234,6 +235,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
             seatListChangeSubject.onNext(uiSeatModels);
         }
     }
+
 
     /**
      * 用户加入麦位
@@ -323,9 +325,15 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
         MiniRoomManager.getInstance().onSpeak(b);
     }
 
+    /**
+     * 消息接收
+     * @param message 收到的消息
+     */
     @Override
     public void onMessageReceived(Message message) {
-
+        if (!TextUtils.isEmpty(present.getRoomId())&& message.getConversationType() == Conversation.ConversationType.CHATROOM) {
+            RCChatRoomMessageManager.INSTANCE.onReceiveMessage(present.getRoomId(), message.getContent());
+        }
     }
 
     @Override
@@ -343,7 +351,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     @Override
     public void onPickSeatReceivedFrom(String userId) {
 
-        if (userId.equals(currentUIRoomInfo.getRoomBean().getCreateUser().getUserId())) {
+        if (userId.equals(present.getCreateUserId())) {
             //当前是房主邀请的
             present.showPickReceivedDialog(true, userId);
         } else {
@@ -478,6 +486,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
      */
     @Override
     public void onNetworkStatus(int i) {
+        if (present!=null)
         present.onNetworkStatus(i);
     }
 
@@ -766,7 +775,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
                         kickOut.setUserName(AccountStore.INSTANCE.getUserName());
                         kickOut.setTargetId(user.getUserId());
                         kickOut.setTargetName(user.getUserName());
-                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(currentUIRoomInfo.getRoomBean().getRoomId(),
+                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(present.getRoomId(),
                                 kickOut,
                                 true,
                                 new Function1<Integer, Unit>() {
@@ -983,7 +992,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
     /**
      * 拒绝邀请
      */
-    public void refuseInvite(String userId) {
+    public void refuseInvite() {
         RCVoiceRoomEngine.getInstance()
                 .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId(), null);
     }
@@ -1018,7 +1027,7 @@ public class NewVoiceRoomModel extends BaseModel<NewVoiceRoomPresenter> implemen
                 if (isMute) {//关闭耳返
                     RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(false);
                 } else {//根据缓存状态恢复耳返
-                    boolean enable = SharedPreferUtil.getBoolean("key_earMonitoring_" + present.getmVoiceRoomBean().getRoomId());
+                    boolean enable = SharedPreferUtil.getBoolean("key_earMonitoring_" + present.getRoomId());
                     RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(enable);
                 }
             }

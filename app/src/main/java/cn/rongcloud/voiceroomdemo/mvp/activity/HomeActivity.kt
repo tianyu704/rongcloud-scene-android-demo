@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.mvp.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,6 +24,8 @@ import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
+import com.basis.UIStack
+import com.basis.ui.IBasis
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.loadPortrait
 import com.rongcloud.common.extension.showToast
@@ -46,7 +49,7 @@ private const val TAG = "HomeActivity"
 
 @HiltBinding(value = IHomeView::class)
 @AndroidEntryPoint
-class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMessageObserver {
+class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMessageObserver,IBasis {
 
     companion object {
         fun startActivity(context: Context) {
@@ -64,6 +67,11 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     lateinit var presenter: HomePresenter
 
     private var userInfoDialog: UserInfoDialog? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        UIStack.getInstance().add(this)
+        super.onCreate(savedInstanceState)
+    }
 
 
     override fun getContentView(): Int = R.layout.activity_home
@@ -175,6 +183,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
                 it.dismiss()
             }
         }
+        UIStack.getInstance().remove(this)
         UnReadMessageManager.getInstance().removeObserver(this)
     }
 
@@ -223,5 +232,18 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
 
     override fun onCountChanged(p0: Int) {
         findViewById<View>(R.id.tv_seat_order_operation_number)?.isVisible = p0 > 0
+    }
+
+    override fun setLayoutId(): Int {
+        return 0;
+    }
+
+    override fun init() {
+    }
+
+    override fun onRefresh(obj: Any?) {
+    }
+
+    override fun onNetChange() {
     }
 }

@@ -32,7 +32,7 @@ import io.rong.imlib.model.UserInfo;
 /**
  * 语聊房麦位适配器
  */
-public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomSeatsAdapter.SeatItemViewHolder> {
+public class VoiceRoomSeatsAdapter extends RecyclerView.Adapter<VoiceRoomSeatsAdapter.SeatItemViewHolder> {
 
     private OnClickVoiceRoomSeatsListener onClickVoiceRoomSeatsListener;
     private Context context;
@@ -40,7 +40,7 @@ public class NewVoiceRoomSeatsAdapter extends RecyclerView.Adapter<NewVoiceRoomS
     //数据源
     private ArrayList<UiSeatModel> seatData = new ArrayList<>();
 
-    public NewVoiceRoomSeatsAdapter(Context context, OnClickVoiceRoomSeatsListener onClickVoiceRoomSeatsListener) {
+    public VoiceRoomSeatsAdapter(Context context, OnClickVoiceRoomSeatsListener onClickVoiceRoomSeatsListener) {
         this.onClickVoiceRoomSeatsListener = onClickVoiceRoomSeatsListener;
         this.context = context;
     }

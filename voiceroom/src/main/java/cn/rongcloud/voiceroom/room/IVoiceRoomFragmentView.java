@@ -54,6 +54,8 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void showMessage(MessageContent messageContent, boolean isRefresh);
 
+    void showMessageList(List<MessageContent> messageContentList, boolean isRefresh);
+
     void showSettingDialog(List<MutableLiveData<IFun.BaseFun>> funList);
 
     void showSetPasswordDialog(MutableLiveData<IFun.BaseFun> item);

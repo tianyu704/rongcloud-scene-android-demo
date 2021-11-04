@@ -5,6 +5,7 @@
 package cn.rongcloud.voiceroom.model
 
 import android.app.Activity
+import androidx.core.content.ContentProviderCompat.requireContext
 import cn.rong.combusis.message.*
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider
@@ -56,7 +57,9 @@ class VRoomWrapper(activity: Activity?, val roomId: String) : RoomListener,
         VoiceRoomProvider.provider().observeSingle(roomId) { roomBean ->
             netRoomInfo = roomBean
         }
-        EventHelper.helper().regeister(roomId,null)
+        EventHelper.helper().regeister(
+            roomId
+        )
         EventHelper.helper().addRoomListener(this)
         EventHelper.helper().addStatusListener(this)
     }

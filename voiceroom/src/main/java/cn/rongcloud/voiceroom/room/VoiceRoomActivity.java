@@ -19,7 +19,7 @@ import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
  * @author 李浩  语聊房重构
  * @date 2021/9/24
  */
-public class NewVoiceRoomActivity extends AbsRoomActivity {
+public class VoiceRoomActivity extends AbsRoomActivity {
     private boolean isCreate;
 
     public static void startActivity(Activity activity, ArrayList<String> roomIds, int position, boolean isCreate) {
@@ -44,7 +44,7 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
 
     @Override
     public Fragment getFragment(String roomId) {
-        return NewVoiceRoomFragment.getInstance(roomId, isCreate);
+        return VoiceRoomFragment.getInstance(roomId, isCreate);
     }
 
     @Override
@@ -64,18 +64,18 @@ public class NewVoiceRoomActivity extends AbsRoomActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
-
-            @Override
-            public void onSuccess() {
-                Logger.e("==============leaveRoom onSuccess");
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============leaveRoom onError");
-            }
-        });
+//        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
+//
+//            @Override
+//            public void onSuccess() {
+//                Logger.e("==============leaveRoom onSuccess");
+//            }
+//
+//            @Override
+//            public void onError(int code, String message) {
+//                Logger.e("==============leaveRoom onError");
+//            }
+//        });
     }
 
 
