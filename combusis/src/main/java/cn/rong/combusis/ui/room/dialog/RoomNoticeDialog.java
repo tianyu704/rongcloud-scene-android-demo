@@ -25,7 +25,6 @@ import cn.rong.combusis.R;
  */
 public class RoomNoticeDialog extends Dialog {
     private View contentView;
-    private boolean isEdit = false;
     private EditText mNoticeView;
     private TextView mTitleView;
     private Button mCancelView;

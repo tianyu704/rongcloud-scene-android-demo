@@ -6,9 +6,11 @@ import android.graphics.Point;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -152,6 +154,22 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 if (hasFocus) {
                     SoftKeyboardUtils.showSoftKeyboard(mInputView);
                 }
+            }
+        });
+        mInputView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    //发送消息
+                    Editable msg = mInputView.getText();
+                    if (TextUtils.isEmpty(msg) || TextUtils.isEmpty(msg.toString().trim())) {
+                        EToast.showToast("消息不能为空");
+                        return false;
+                    }
+                    mOnBottomOptionClickListener.clickSendMessage(msg.toString().trim());
+                    return true;
+                }
+                return false;
             }
         });
         mSendMessageView.setOnClickListener(v -> {
