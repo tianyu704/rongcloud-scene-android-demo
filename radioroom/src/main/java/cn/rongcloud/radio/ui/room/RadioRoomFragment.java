@@ -1,6 +1,7 @@
 package cn.rongcloud.radio.ui.room;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -98,6 +99,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
+    private int bottomMargin = 0;
 
     private String mRoomId;
 
@@ -155,6 +157,23 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         mMessageView.setAdapter(mRoomMessageAdapter);
 
         mCoverView = getView(R.id.view_cover);
+
+        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
+        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect rect = new Rect();
+            getLayout().getWindowVisibleDisplayFrame(rect);
+            int height = screenHeight - rect.bottom;
+            if (bottomMargin != height) {
+                // 假定高度超过屏幕的1/4代表键盘弹出了
+                if (height > screenHeight / 4) {
+                    bottomMargin = height;
+                } else {
+                    bottomMargin = 0;
+                }
+                mRoomBottomView.setPadding(0, 0, 0, bottomMargin);
+            }
+        });
     }
 
     @Override
@@ -199,6 +218,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     @Override
     public void joinRoom() {
         present.init(mRoomId);
+        mAllBroadcastView.setBroadcastListener();
     }
 
     /**
@@ -409,11 +429,11 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
 
     @Override
     public void showRoomCloseDialog() {
-       TipDialog closeRoomDialog= new TipDialog(
+        TipDialog closeRoomDialog = new TipDialog(
                 requireContext(),
                 "当前直播已结束",
                 "确定", "", () -> {
-            present.leaveRoom(false, false);
+            present.leaveRoom();
             return null;
         });
         closeRoomDialog.setCancelable(false);
@@ -465,14 +485,14 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
             @Override
             public void clickLeaveRoom() {
                 // 观众离开房间
-                present.leaveRoom(false, false);
+                present.leaveRoom();
             }
 
             @Override
             public void clickCloseRoom() {
                 new ConfirmDialog(requireContext(), "确定结束本次直播吗？", true, "确定", "取消", () -> null, () -> {
                     // 房主关闭房间
-                    present.leaveRoom(false, true);
+                    present.closeRoom();
                     return null;
                 }).show();
             }
@@ -493,7 +513,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         super.destroyRoom();
         clVoiceRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
-        present.leaveRoom(true, false);
+        present.switchRoom();
     }
 
     @Override
@@ -568,7 +588,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     public void onClick(View v) {
         if (v.getId() == R.id.btn_go_back_list) {
             //直接退出当前房间
-            present.leaveRoom(false, false);
+            present.leaveRoom();
         }
     }
 

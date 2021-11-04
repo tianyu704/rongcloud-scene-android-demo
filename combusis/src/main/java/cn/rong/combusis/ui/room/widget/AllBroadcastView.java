@@ -26,7 +26,7 @@ import cn.rong.combusis.message.RCAllBroadcastMessage;
  * @author gyn
  * @date 2021/10/19
  */
-public class AllBroadcastView extends AppCompatTextView {
+public class AllBroadcastView extends AppCompatTextView implements AllBroadcastManager.OnObtainMessage {
 
     private OnClickBroadcast onClickBroadcast;
 
@@ -52,9 +52,11 @@ public class AllBroadcastView extends AppCompatTextView {
         int left = getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding);
         int top = getResources().getDimensionPixelOffset(R.dimen.dimen_5dp);
         setPadding(left, top, left, top);
-        AllBroadcastManager.getInstance().setListener(message -> {
-            showMessage(message);
-        });
+        setBroadcastListener();
+    }
+
+    public void setBroadcastListener() {
+        AllBroadcastManager.getInstance().setListener(this);
     }
 
     public void setOnClickBroadcast(OnClickBroadcast onClickBroadcast) {
@@ -161,8 +163,13 @@ public class AllBroadcastView extends AppCompatTextView {
 
     @Override
     protected void onDetachedFromWindow() {
-        AllBroadcastManager.getInstance().removeListener();
+        AllBroadcastManager.getInstance().removeListener(this);
         super.onDetachedFromWindow();
+    }
+
+    @Override
+    public void onMessage(RCAllBroadcastMessage message) {
+        showMessage(message);
     }
 
     public interface OnClickBroadcast {

@@ -88,8 +88,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     private RoomOwnerType mRoomOwnerType;
     // 是否已经在房间
     private boolean isInRoom = false;
-    // 是否发送了默认消息
-    private boolean isSendDefaultMessage = false;
 
     public RadioRoomPresenter(RadioRoomView mView, LifecycleOwner lifecycleOwner) {
         super(mView, lifecycleOwner.getLifecycle());
@@ -135,18 +133,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                     if (result.getCode() == 30001) {
                         //房间不存在了
                         mView.showFinishView();
-                        removeListener();
-                        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-                                changeUserRoom("");
-                            }
-
-                            @Override
-                            public void onError(int code, String message) {
-
-                            }
-                        });
+                        RadioEventHelper.getInstance().leaveRoom(null);
                     }
                 }
             }
@@ -174,7 +161,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
             // 之前不在房间，加入房间
             if (!isInRoom) {
-                switchRoom();
+                leaveAndJoinRoom();
                 Logger.d("=================== leave room and join room");
             } else {
                 addListener();
@@ -193,7 +180,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         RadioEventHelper.getInstance().addRadioEventListener(this);
     }
 
-    private void switchRoom() {
+    private void leaveAndJoinRoom() {
         RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
             @Override
             public void onSuccess() {
@@ -430,18 +417,10 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             enter.setUserId(AccountStore.INSTANCE.getUserId());
             enter.setUserName(AccountStore.INSTANCE.getUserName());
             sendMessage(enter);
-            isSendDefaultMessage = true;
+            RadioEventHelper.getInstance().setSendDefaultMessage(true);
         }
     }
 
-    /**
-     * 发送公告更新的
-     */
-    private void sendNoticeModifyMessage() {
-        RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-        tips.setContent("房间公告已更新！");
-        mView.addToMessageList(tips, false);
-    }
 
     /**
      * 发送文字消息
@@ -550,78 +529,26 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         });
     }
 
-    public void leaveRoom(boolean isSwitchLeave, boolean isClose) {
-        leaveRoom(isSwitchLeave, isClose, null);
+    public void switchRoom() {
+        RadioEventHelper.getInstance().switchRoom();
     }
 
-    /**
-     * 调用离开房间
-     *
-     * @param isSwitchLeave 是否是上下滑动切换导致的离开房间，切换时有离开操作，所以不用再离开
-     */
-    public void leaveRoom(boolean isSwitchLeave, boolean isClose, CloseRoomCallback closeRoomCallback) {
-        Logger.d("==============leaveRoom isSwitchLeave:" + isSwitchLeave + " isClose:" + isClose);
-        if (isClose) {
-            sendMessage(new RCRRCloseMessage());
-        }
-        RCChatroomLeave leave = new RCChatroomLeave();
-        leave.setUserId(AccountStore.INSTANCE.getUserId());
-        leave.setUserName(AccountStore.INSTANCE.getUserName());
-        sendMessage(leave);
-        removeListener();
-        if (isSwitchLeave) {
-            return;
-        }
-        mView.showLoading(isClose ? "正在关闭房间" : "正在离开房间");
-        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
+    public void leaveRoom() {
+        mView.showLoading("");
+        RadioEventHelper.getInstance().leaveRoom(new RadioEventHelper.LeaveRoomCallback() {
             @Override
-            public void onSuccess() {
-                changeUserRoom("");
-                Logger.d("==============leaveRoom onSuccess");
-                if (isClose) {
-                    deleteRoom(closeRoomCallback);
-                } else {
-                    if (closeRoomCallback != null) {
-                        closeRoomCallback.onSuccess();
-                    }
-                    mView.dismissLoading();
-                    mView.finish();
-                }
-            }
-
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============leaveRoom onError");
-                mView.finish();
+            public void leaveFinish() {
                 mView.dismissLoading();
+                mView.finish();
             }
         });
     }
 
-    private void removeListener() {
-        MusicManager.get().stopPlayMusic();
-        RadioEventHelper.getInstance().unRegister();
-    }
-
-    /**
-     * 房主关闭房间
-     */
-    private void deleteRoom(CloseRoomCallback closeRoomCallback) {
-        mView.showLoading("正在关闭房间");
-        // 房主关闭房间，调用删除房间接口
-        OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+    public void closeRoom() {
+        mView.showLoading("");
+        RadioEventHelper.getInstance().closeRoom(mRoomId, new RadioEventHelper.CloseRoomCallback() {
             @Override
-            public void onResult(Wrapper result) {
-                if (closeRoomCallback != null) {
-                    closeRoomCallback.onSuccess();
-                }
-                mView.dismissLoading();
-                mView.finish();
-            }
-
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
+            public void onSuccess() {
                 mView.dismissLoading();
                 mView.finish();
             }
@@ -799,10 +726,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             // 如果踢出的是自己，就离开房间
             String targetId = ((RCChatroomKickOut) content).getTargetId();
             if (TextUtils.equals(targetId, AccountStore.INSTANCE.getUserId())) {
-                leaveRoom(false, false);
+                leaveRoom();
                 mView.showToast("你已被踢出房间");
+            } else {
+                refreshRoomMemberCount();
             }
-            refreshRoomMemberCount();
         } else if (content instanceof RCChatroomLike) {
             mView.showLikeAnimation();
             return;
@@ -835,28 +763,20 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             case RC_ROOM_NAME:
                 mView.setRadioName(s);
                 break;
-            case RC_NOTICE:
-                if (isSendDefaultMessage) {
-                    sendNoticeModifyMessage();
-                }
-                break;
             case RC_SPEAKING:
                 boolean isSpeaking = TextUtils.equals(s, "1");
                 mView.setSpeaking(isSpeaking);
                 break;
             case RC_SUSPEND:
-                RadioEventHelper.getInstance().setSuspend(TextUtils.equals(s, "1"));
                 refreshSeatView();
                 break;
             case RC_BGNAME:
                 mView.setRoomBackground(s);
                 break;
             case RC_SEATING:
-                RadioEventHelper.getInstance().setInSeat(TextUtils.equals(s, "1"));
                 refreshSeatView();
                 break;
             case RC_SILENT:
-                RadioEventHelper.getInstance().setMute(TextUtils.equals(s, "1"));
                 refreshMute();
                 break;
         }
@@ -1052,8 +972,14 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         if (VoiceRoomProvider.provider().contains(roomId)) {
             mView.switchOtherRoom(roomId);
         } else {
-            leaveRoom(false, false, () -> {
-                IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
+            mView.showLoading("");
+            RadioEventHelper.getInstance().leaveRoom(new RadioEventHelper.LeaveRoomCallback() {
+                @Override
+                public void leaveFinish() {
+                    mView.dismissLoading();
+                    mView.finish();
+                    IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
+                }
             });
         }
     }

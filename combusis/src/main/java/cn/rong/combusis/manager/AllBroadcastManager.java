@@ -54,8 +54,10 @@ public class AllBroadcastManager {
         }, delay);
     }
 
-    public void removeListener() {
-        this.onObtainMessage = null;
+    public void removeListener(OnObtainMessage onObtainMessage) {
+        if (onObtainMessage == this.onObtainMessage) {
+            this.onObtainMessage = null;
+        }
     }
 
     public interface OnObtainMessage {
