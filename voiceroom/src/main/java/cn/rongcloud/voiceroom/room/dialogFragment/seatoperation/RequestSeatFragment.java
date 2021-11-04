@@ -19,7 +19,7 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 import io.reactivex.rxjava3.functions.Consumer;
 
 /**
@@ -30,11 +30,11 @@ public class RequestSeatFragment extends BaseFragment {
 
     private RecyclerView rvList;
     private MyAdapter myAdapter;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
 
-    public RequestSeatFragment(NewVoiceRoomModel newVoiceRoomModel) {
+    public RequestSeatFragment(VoiceRoomModel voiceRoomModel) {
         super(R.layout.layout_list);
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
     }
 
     @Override
@@ -43,10 +43,10 @@ public class RequestSeatFragment extends BaseFragment {
         rvList.setLayoutManager(new LinearLayoutManager(getContext()));
         myAdapter = new MyAdapter();
         rvList.setAdapter(myAdapter);
-        refreshData(newVoiceRoomModel.getRequestSeats());
+        refreshData(voiceRoomModel.getRequestSeats());
 
         //监听一下变化方便及时去更新Ui
-        newVoiceRoomModel.obRequestSeatListChange()
+        voiceRoomModel.obRequestSeatListChange()
                 .subscribe(new Consumer<List<User>>() {
                     @Override
                     public void accept(List<User> users) throws Throwable {
@@ -114,7 +114,7 @@ public class RequestSeatFragment extends BaseFragment {
      */
     private void acceptRequest(String userId) {
         //判断麦位是否已经满了，这里需要交给界面去处理，因为麦位信息是时时刻刻在变化的
-        newVoiceRoomModel.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
+        voiceRoomModel.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 if (result){

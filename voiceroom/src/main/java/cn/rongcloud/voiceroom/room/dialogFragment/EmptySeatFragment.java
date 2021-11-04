@@ -14,14 +14,14 @@ import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * 房主点击空座位的时候弹窗的fragment
  */
-public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
+public class EmptySeatFragment extends BaseBottomSheetDialogFragment {
 
 
     private Guideline glBg;
@@ -40,16 +40,16 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
 
     private UiSeatModel uiSeatModel;
     private String roomId;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
 
-    public NewEmptySeatFragment() {
+    public EmptySeatFragment() {
         super(R.layout.fragment_new_empty_seat_setting);
     }
 
-    public void setData(String roomId, UiSeatModel uiSeatModel,NewVoiceRoomModel newVoiceRoomModel) {
+    public void setData(String roomId, UiSeatModel uiSeatModel, VoiceRoomModel voiceRoomModel) {
         this.uiSeatModel=uiSeatModel;
         this.roomId=roomId;
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
             @Override
             public void onClick(View v) {
                 //显示邀请的fragment
-                newVoiceRoomModel.present.showSeatOperationViewPagerFragment(1);
+                voiceRoomModel.present.showSeatOperationViewPagerFragment(1);
                 dismiss();
             }
         });
@@ -102,7 +102,7 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
      * 禁麦或者开麦ß
      */
     private void muteOrUnMuteSeat() {
-        newVoiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), new ClickCallback<Boolean>() {
+        voiceRoomModel.clickMuteSeat(uiSeatModel.getIndex(), !uiSeatModel.isMute(), new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 if (result){
@@ -116,7 +116,7 @@ public class NewEmptySeatFragment extends BaseBottomSheetDialogFragment {
 
     //座位的关闭和打开
     private void closeOrOpenSeat() {
-        newVoiceRoomModel.clickCloseSeatByIndex(uiSeatModel.getIndex(),
+        voiceRoomModel.clickCloseSeatByIndex(uiSeatModel.getIndex(),
                 uiSeatModel.getSeatStatus() != RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking,
                 new ClickCallback<Boolean>() {
                     @Override

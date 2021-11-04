@@ -25,8 +25,8 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
     protected Type current = Type.PK_NONE;
 
     @Override
-    protected void init(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
-        super.init(roomId, rcVoiceRoomEventListener);
+    protected void init(String roomId) {
+        super.init(roomId);
         current = Type.PK_NONE;
         //由于手动调quitPK 不会回调onPkFinish，因此需要在调用api成功后修改current状态
         EventBus.get().on(EventBus.TAG.PK_INVITE_QUIT, new EventBus.EventCallback() {

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 
 /**
  * 麦位操作的fragment
@@ -24,12 +24,12 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
 
     private TabLayout tlTitle;
     private ViewPager2 vpPage;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
     private int index;
 
-    public SeatOperationViewPagerFragment(NewVoiceRoomModel newVoiceRoomModel, int index) {
+    public SeatOperationViewPagerFragment(VoiceRoomModel voiceRoomModel, int index) {
         super(R.layout.fragment_new_viewpage_list);
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
         this.index=index;
     }
 
@@ -39,8 +39,8 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         vpPage = (ViewPager2) getView().findViewById(R.id.vp_page);
 
         ArrayList<BaseFragment> fragments = new ArrayList<>();
-        fragments.add(new RequestSeatFragment(newVoiceRoomModel));
-        fragments.add(new InviteSeatFragment(newVoiceRoomModel));
+        fragments.add(new RequestSeatFragment(voiceRoomModel));
+        fragments.add(new InviteSeatFragment(voiceRoomModel));
 
         vpPage.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         FragmentStateAdapter fragmentStateAdapter = new FragmentStateAdapter(getChildFragmentManager(), getLifecycle()) {

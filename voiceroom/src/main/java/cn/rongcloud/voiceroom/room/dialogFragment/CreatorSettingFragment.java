@@ -11,7 +11,7 @@ import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -23,7 +23,7 @@ import kotlin.jvm.functions.Function0;
 /**
  * 房主点击自己的头像弹窗
  */
-public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
+public class CreatorSettingFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
 
     private Guideline glBg;
@@ -32,12 +32,12 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
     private AppCompatTextView btnOutOfSeat;
     private AppCompatTextView btnMuteSelf;
     private ConfirmDialog confirmDialog;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
     private UiSeatModel uiSeatModel;
 
-    public NewCreatorSettingFragment(NewVoiceRoomModel newVoiceRoomModel, UiSeatModel uiSeatModel) {
+    public CreatorSettingFragment(VoiceRoomModel voiceRoomModel, UiSeatModel uiSeatModel) {
         super(R.layout.fragmeng_new_creator_setting);
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
         this.uiSeatModel=uiSeatModel;
     }
 
@@ -62,14 +62,14 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
     public void onClick(View v) {
         if (v.getId() == R.id.btn_out_of_seat) {//是否下麦围观
             //判断是否在播放音乐
-            if (newVoiceRoomModel.isPlayingMusic()) {
+            if (voiceRoomModel.isPlayingMusic()) {
                 showMusicPauseTip();
             }else {
                 leaveSeat();
             }
         } else if (v.getId() == R.id.btn_mute_self) {
             //操作关闭还是打开麦克风
-            newVoiceRoomModel.creatorMuteSelf()
+            voiceRoomModel.creatorMuteSelf()
                     .subscribe(new Action() {
                         @Override
                         public void run() throws Throwable {
@@ -88,7 +88,7 @@ public class NewCreatorSettingFragment extends BaseBottomSheetDialogFragment imp
      * 离开麦位
      */
     private void leaveSeat() {
-        newVoiceRoomModel.leaveSeat()
+        voiceRoomModel.leaveSeat()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action() {
                     @Override

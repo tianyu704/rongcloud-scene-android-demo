@@ -5,14 +5,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.rongcloud.voiceroom">
 
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
     <application>
         <activity android:name=".pk.TestPkActivity"
             android:theme="@style/BasisTheme"/>
         <activity android:name=".roomlist.VoiceRoomListActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".room.NewVoiceRoomActivity"
-            android:launchMode="singleInstance"
+            android:name=".room.VoiceRoomActivity"
+            android:launchMode="standard"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="cn.rongcloud.voiceroom.room.NewVoiceRoomActivity" />

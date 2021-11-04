@@ -117,7 +117,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
         mRoomAdapter.setData(roomIds);
         mCurrentPosition = getCurrentItem();
         mViewPager.setCurrentItem(mCurrentPosition, false);
-
         startService();
     }
 

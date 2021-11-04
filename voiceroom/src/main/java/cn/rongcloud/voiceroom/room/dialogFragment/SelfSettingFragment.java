@@ -15,7 +15,7 @@ import com.rongcloud.common.utils.AccountStore;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -30,7 +30,7 @@ import io.rong.imkit.picture.tools.ToastUtils;
 /**
  * 麦位上点击自己的头像 弹窗
  */
-public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
+public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
 
 
     private Guideline glBg;
@@ -40,13 +40,13 @@ public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
     private AppCompatTextView btnOutOfSeat;
     private UiSeatModel seatInfo;
     private String roomId;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
     private boolean isLeaveSeating = false;//是否正在断开连接中
-    public NewSelfSettingFragment(UiSeatModel seatInfo, String roomId, NewVoiceRoomModel newVoiceRoomModel) {
+    public SelfSettingFragment(UiSeatModel seatInfo, String roomId, VoiceRoomModel voiceRoomModel) {
         super(R.layout.fragment_new_self_setting);
         this.seatInfo = seatInfo;
         this.roomId = roomId;
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
     }
 
     @Override
@@ -71,10 +71,10 @@ public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
                 leaveSeat();
             }
         });
-        onRecordStatusChange(newVoiceRoomModel.isRecordingStatus());
+        onRecordStatusChange(voiceRoomModel.isRecordingStatus());
 
         //监听一下状态
-        newVoiceRoomModel.addSubscription(newVoiceRoomModel.obSeatInfoByIndex(seatInfo.getIndex())
+        voiceRoomModel.addSubscription(voiceRoomModel.obSeatInfoByIndex(seatInfo.getIndex())
                     .subscribe(new Consumer<UiSeatModel>() {
                         @Override
                         public void accept(UiSeatModel uiSeatModel) throws Throwable {
@@ -96,7 +96,7 @@ public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
      */
     private void leaveSeat() {
         isLeaveSeating=true;
-        newVoiceRoomModel.leaveSeat()
+        voiceRoomModel.leaveSeat()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(new Action() {
                     @Override
@@ -132,8 +132,8 @@ public class NewSelfSettingFragment extends BaseBottomSheetDialogFragment {
                 @Override
                 public void subscribe(@NonNull CompletableEmitter emitter) throws Throwable {
                     //如果麦克风打开的，那么关闭方法调用
-                    RCVoiceRoomEngine.getInstance().disableAudioRecording(newVoiceRoomModel.isRecordingStatus());
-                    newVoiceRoomModel.setRecordingStatus(!newVoiceRoomModel.isRecordingStatus());
+                    RCVoiceRoomEngine.getInstance().disableAudioRecording(voiceRoomModel.isRecordingStatus());
+                    voiceRoomModel.setRecordingStatus(!voiceRoomModel.isRecordingStatus());
                     emitter.onComplete();
                 }
             }).doOnComplete(new Action() {

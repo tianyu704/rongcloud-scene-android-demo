@@ -1,10 +1,11 @@
 package cn.rongcloud.voiceroom.room;
 
-import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_NOT_ON_SEAT;
-import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_ON_SEAT;
-import static cn.rongcloud.voiceroom.room.NewVoiceRoomPresenter.STATUS_WAIT_FOR_SEAT;
+import static cn.rongcloud.voiceroom.room.VoiceRoomPresenter.STATUS_NOT_ON_SEAT;
+import static cn.rongcloud.voiceroom.room.VoiceRoomPresenter.STATUS_ON_SEAT;
+import static cn.rongcloud.voiceroom.room.VoiceRoomPresenter.STATUS_WAIT_FOR_SEAT;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -76,7 +77,7 @@ import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.pk.IPKState;
 import cn.rongcloud.voiceroom.pk.PKStateManager;
 import cn.rongcloud.voiceroom.pk.widget.PKView;
-import cn.rongcloud.voiceroom.room.adapter.NewVoiceRoomSeatsAdapter;
+import cn.rongcloud.voiceroom.room.adapter.VoiceRoomSeatsAdapter;
 import cn.rongcloud.voiceroom.ui.uimodel.UiSeatModel;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.RouteUtils;
@@ -94,7 +95,7 @@ import kotlin.jvm.functions.Function2;
  * @author 李浩
  * @date 2021/9/24
  */
-public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
+public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         implements IVoiceRoomFragmentView, RoomMessageAdapter.OnClickMessageUserListener,
         RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
         , View.OnClickListener, AllBroadcastView.OnClickBroadcast {
@@ -108,7 +109,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     private RoomMessageAdapter mRoomMessageAdapter;
     private AllBroadcastView mAllBroadcastView;
     private RecyclerView rv_seat_list;
-    private NewVoiceRoomSeatsAdapter voiceRoomSeatsAdapter;
+    private VoiceRoomSeatsAdapter voiceRoomSeatsAdapter;
     private MemberSettingFragment mMemberSettingFragment;
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private RoomNoticeDialog mNoticeDialog;
@@ -136,7 +137,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         Bundle bundle = new Bundle();
         bundle.putString(ROOM_ID, roomId);
         bundle.putBoolean(IntentWrap.KEY_IS_CREATE, isCreate);
-        Fragment fragment = new NewVoiceRoomFragment();
+        Fragment fragment = new VoiceRoomFragment();
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -180,7 +181,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
             @Override
             public void accept(Unit unit) throws Throwable {
                 //添加防抖动
-                mMemberListFragment = new MemberListFragment(present.getRoomId(), NewVoiceRoomFragment.this);
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), VoiceRoomFragment.this);
                 mMemberListFragment.show(getChildFragmentManager());
             }
         });
@@ -188,7 +189,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         rv_seat_list = getView(R.id.rv_seat_list);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 4);
         rv_seat_list.setLayoutManager(gridLayoutManager);
-        voiceRoomSeatsAdapter = new NewVoiceRoomSeatsAdapter(getActivity(), new NewVoiceRoomSeatsAdapter.OnClickVoiceRoomSeatsListener() {
+        voiceRoomSeatsAdapter = new VoiceRoomSeatsAdapter(getActivity(), new VoiceRoomSeatsAdapter.OnClickVoiceRoomSeatsListener() {
             @Override
             public void clickVoiceRoomSeats(UiSeatModel uiSeatModel, int position) {
                 onClickVoiceRoomSeats(uiSeatModel, position);
@@ -229,7 +230,8 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         mRoomBottomView = getView(R.id.room_bottom_view);
         // 弹幕消息列表
         mMessageView = getView(R.id.rv_message);
-        mMessageView.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        mMessageView.setLayoutManager(linearLayoutManager);
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
         mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
         mMessageView.setAdapter(mRoomMessageAdapter);
@@ -240,7 +242,26 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         if (null == mNoticeDialog) {
             mNoticeDialog = new RoomNoticeDialog(activity);
         }
+
+
+        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
+        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            Rect rect = new Rect();
+            getLayout().getWindowVisibleDisplayFrame(rect);
+            int height = screenHeight - rect.bottom;
+            if (bottomMargin != height) {
+                // 假定高度超过屏幕的1/4代表键盘弹出了
+                if (height > screenHeight / 4) {
+                    bottomMargin = height;
+                } else {
+                    bottomMargin = 0;
+                }
+                mRoomBottomView.setPadding(0, 0, 0, bottomMargin);
+            }
+        });
     }
+    private int bottomMargin = 0;
 
     /**
      * 显示公告弹窗
@@ -277,7 +298,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
                 if (checkDrawOverlaysPermission(false)) {
 
                     //先做悬浮窗
-                    requireActivity().moveTaskToBack(true);
+//                    requireActivity().moveTaskToBack(true);
+
+                    requireActivity().finish();
+
+                    EventHelper.helper().removeRCVoiceRoomEventListener();
+
                     //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                     requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
@@ -436,12 +462,12 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
 
     @Override
-    public NewVoiceRoomPresenter createPresent() {
-        return new NewVoiceRoomPresenter(this, getLifecycle());
+    public VoiceRoomPresenter createPresent() {
+        return new VoiceRoomPresenter(this, getLifecycle());
     }
 
     /**
-     * 显示消息
+     * 显示单条消息
      *
      * @param messageContent
      * @param isRefresh
@@ -456,6 +482,20 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
         int count = mRoomMessageAdapter.getItemCount();
         if (count > 0) {
             mMessageView.smoothScrollToPosition(count - 1);
+        }
+    }
+
+    /**
+     * 显示消息集合
+     * @param messageContentList
+     * @param isRefresh
+     */
+    @Override
+    public void showMessageList(List<MessageContent> messageContentList, boolean isRefresh) {
+        mRoomMessageAdapter.setData(messageContentList, isRefresh);
+        int count = mRoomMessageAdapter.getItemCount();
+        if (count > 0) {
+            mMessageView.smoothScrollToPosition(count-1);
         }
     }
 
@@ -593,6 +633,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
 
     @Override
     public void changeStatus(int status) {
+        EventHelper.helper().setCurrentStatus(status);
         //修改底部的状态
         switch (status) {
             case STATUS_NOT_ON_SEAT:
@@ -654,7 +695,7 @@ public class NewVoiceRoomFragment extends AbsRoomFragment<NewVoiceRoomPresenter>
     public void finish() {
         //在销毁之前提前出栈顶
         try {
-            UIStack.getInstance().remove(((NewVoiceRoomActivity) requireActivity()));
+            UIStack.getInstance().remove(((VoiceRoomActivity) requireActivity()));
             requireActivity().finish();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,5 +1,7 @@
 package cn.rong.combusis.sdk.event;
 
+import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
 
 import com.basis.UIStack;
@@ -22,9 +24,11 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.ChatRoomInfo;
 import io.rong.imlib.model.ChatRoomMemberInfo;
+import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 
 public class EventHelper extends AbsPKHelper {
@@ -43,9 +47,44 @@ public class EventHelper extends AbsPKHelper {
         return !TextUtils.isEmpty(roomId);
     }
 
-    public void regeister(String roomId, RCVoiceRoomEventListener rcVoiceRoomEventListener) {
-        init(roomId, rcVoiceRoomEventListener);
+
+    public void regeister(String roomId) {
+        init(roomId);
     }
+
+    @Override
+    public String getRoomId(){
+        if (TextUtils.isEmpty(roomId)){
+            return "";
+        }
+        return roomId;
+    }
+
+    @Override
+    public void addMessage(MessageContent message) {
+        messageList.add(message);
+    }
+
+    @Override
+    public List<MessageContent> getMessageList() {
+        return messageList;
+    }
+
+    @Override
+    public List<RCVoiceSeatInfo> getRCVoiceSeatInfoList() {
+        return mSeatInfos;
+    }
+
+    @Override
+    public void setMuteAllRemoteStreams(boolean isMute) {
+        this.isMute=isMute;
+    }
+
+    @Override
+    public boolean getMuteAllRemoteStreams() {
+        return isMute;
+    }
+
 
     @Override
     public void unregeister() {
@@ -56,6 +95,26 @@ public class EventHelper extends AbsPKHelper {
     public void addRoomListener(RoomListener listener) {
         if (null == listeners) listeners = new ArrayList<>();
         listeners.add(listener);
+    }
+
+    @Override
+    public void setRCVoiceRoomEventListener(RCVoiceRoomEventListener rcVoiceRoomEventListener) {
+        this.rcVoiceRoomEventListener = rcVoiceRoomEventListener;
+    }
+
+    @Override
+    public void removeRCVoiceRoomEventListener() {
+        this.rcVoiceRoomEventListener = null;
+    }
+
+    @Override
+    public void setCurrentStatus(int status) {
+        currentStatus=status;
+    }
+
+    @Override
+    public int getCurrentStatus() {
+        return currentStatus;
     }
 
     @Override

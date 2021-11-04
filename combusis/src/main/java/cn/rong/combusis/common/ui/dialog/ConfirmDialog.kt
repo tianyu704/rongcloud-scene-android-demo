@@ -28,6 +28,7 @@ class ConfirmDialog(
         btn_cancel.setOnClickListener {
             cancelBlock?.invoke()
             dismiss()
+            cancelBlock?.let { it1 -> it1() }
         }
         btn_confirm.setOnClickListener {
             if (needDismiss) {

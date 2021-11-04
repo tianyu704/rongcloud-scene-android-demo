@@ -19,7 +19,7 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.R;
-import cn.rongcloud.voiceroom.room.NewVoiceRoomModel;
+import cn.rongcloud.voiceroom.room.VoiceRoomModel;
 import io.reactivex.rxjava3.functions.Consumer;
 
 /**
@@ -29,11 +29,11 @@ public class InviteSeatFragment extends BaseFragment {
 
     private RecyclerView rvList;
     private MyAdapter myAdapter;
-    private NewVoiceRoomModel newVoiceRoomModel;
+    private VoiceRoomModel voiceRoomModel;
 
-    public InviteSeatFragment(NewVoiceRoomModel newVoiceRoomModel) {
+    public InviteSeatFragment(VoiceRoomModel voiceRoomModel) {
         super(R.layout.layout_list);
-        this.newVoiceRoomModel=newVoiceRoomModel;
+        this.voiceRoomModel = voiceRoomModel;
     }
 
     @Override
@@ -42,9 +42,9 @@ public class InviteSeatFragment extends BaseFragment {
         rvList.setLayoutManager(new LinearLayoutManager(getContext()));
         myAdapter = new MyAdapter();
         rvList.setAdapter(myAdapter);
-        refreshData(newVoiceRoomModel.getInviteSeats());
+        refreshData(voiceRoomModel.getInviteSeats());
         //监听，房间人员离开，被踢出，上麦，下麦都操作都要时时刻刻影响可邀请的列表
-        newVoiceRoomModel.obInviteSeatListChange().subscribe(new Consumer<List<User>>() {
+        voiceRoomModel.obInviteSeatListChange().subscribe(new Consumer<List<User>>() {
             @Override
             public void accept(List<User> users) throws Throwable {
                 refreshData(users);
@@ -99,7 +99,7 @@ public class InviteSeatFragment extends BaseFragment {
                     @Override
                     public void onClick(View v) {
                         //开始执行邀请逻辑
-                        newVoiceRoomModel.clickInviteSeat(uiMemberModel.getUserId(), new ClickCallback<Boolean>() {
+                        voiceRoomModel.clickInviteSeat(uiMemberModel.getUserId(), new ClickCallback<Boolean>() {
                             @Override
                             public void onResult(Boolean result, String msg) {
                                 if (result) {
