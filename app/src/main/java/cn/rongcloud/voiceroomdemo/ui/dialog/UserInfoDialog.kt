@@ -7,6 +7,7 @@ package cn.rongcloud.voiceroomdemo.ui.dialog
 import android.content.Context
 import android.net.Uri
 import cn.rong.combusis.common.ui.dialog.BaseDialog
+import cn.rong.combusis.common.utils.ChineseLengthFilter
 import cn.rongcloud.voiceroomdemo.R
 import com.rongcloud.common.extension.getString
 import com.rongcloud.common.extension.loadLocalPortrait
@@ -38,6 +39,7 @@ class UserInfoDialog(
 
     override fun initView() {
         iv_portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
+        et_user_name.filters = arrayOf(ChineseLengthFilter(20))
         AccountStore.getUserName()?.let {
             et_user_name.setText(it)
         }

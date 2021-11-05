@@ -23,7 +23,6 @@ import com.basis.widget.BottomDialog;
 import com.kit.utils.ImageLoader;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.LocalDataStore;
-import com.rongcloud.common.utils.MaxLengthWithEmojiFilter;
 import com.rongcloud.common.utils.UiUtils;
 
 import java.io.File;
@@ -35,6 +34,7 @@ import java.util.Map;
 import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.common.utils.ChineseLengthFilter;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -129,7 +129,7 @@ public class CreateRoomDialog extends BottomDialog {
 
         mRoomNameEditText = getContentView().findViewById(R.id.et_room_name);
         mPrivateButton = getContentView().findViewById(R.id.rb_private);
-        mRoomNameEditText.setFilters(new InputFilter[]{new MaxLengthWithEmojiFilter(10)});
+        mRoomNameEditText.setFilters(new InputFilter[]{new ChineseLengthFilter(20)});
         mLoading = new LoadTag(mActivity, mActivity.getString(R.string.text_creating_room));
     }
 

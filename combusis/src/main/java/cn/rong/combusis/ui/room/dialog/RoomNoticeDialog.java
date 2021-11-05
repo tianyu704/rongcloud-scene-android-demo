@@ -15,9 +15,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.kit.utils.ScreenUtil;
-import com.rongcloud.common.utils.MaxLengthWithEmojiFilter;
 
 import cn.rong.combusis.R;
+import cn.rong.combusis.common.utils.ChineseLengthFilter;
 
 /**
  * @author gyn
@@ -63,7 +63,7 @@ public class RoomNoticeDialog extends Dialog {
             if (!TextUtils.isEmpty(notice)) {
                 mNoticeView.setSelection(notice.length());
             }
-            mNoticeView.setFilters(new InputFilter[]{new MaxLengthWithEmojiFilter(100)});
+            mNoticeView.setFilters(new InputFilter[]{new ChineseLengthFilter(200)});
             mCancelView.setVisibility(View.VISIBLE);
             mConfirmView.setVisibility(View.VISIBLE);
             mConfirmView.setOnClickListener(v -> {

@@ -8,7 +8,7 @@ import android.content.Context
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import cn.rong.combusis.R
-import com.rongcloud.common.utils.MaxLengthWithEmojiFilter
+import cn.rong.combusis.common.utils.ChineseLengthFilter
 import kotlinx.android.synthetic.main.layout_edit_dialog.*
 
 /**
@@ -41,7 +41,7 @@ class EditDialog(
         et_content.hint = hint
         et_content.setText(text)
         et_content.setSelection(text.length)
-        et_content.filters = arrayOf(MaxLengthWithEmojiFilter(maxLength))
+        et_content.filters = arrayOf(ChineseLengthFilter(maxLength * 2))
         if (isNumber) {
             et_content.inputType = EditorInfo.TYPE_CLASS_NUMBER
         }
