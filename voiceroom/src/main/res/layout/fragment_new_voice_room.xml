@@ -107,7 +107,7 @@
             <cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2
                 android:id="@+id/rv_message"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"

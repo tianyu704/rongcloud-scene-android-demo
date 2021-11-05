@@ -247,10 +247,13 @@ public abstract class AbsRoomActivity extends BaseActivity {
 
     // 控制是否可以上下滑动，不能上下滑动也不能刷新和加载
     public void setCanSwitch(boolean canSwitch) {
+        Logger.e("=================cccccccccccc");
         mViewPager.setUserInputEnabled(canSwitch);
         if (canSwitch) {
-            refreshLayout.setEnableRefresh(canRefreshAndLoadMore);
-            refreshLayout.setEnableLoadMore(canRefreshAndLoadMore);
+            if (canRefreshAndLoadMore) {
+                refreshLayout.setEnableLoadMore(mCurrentPosition == mRoomAdapter.getItemCount() - 1);
+                refreshLayout.setEnableRefresh(mCurrentPosition == 0);
+            }
         } else {
             refreshLayout.setEnableRefresh(false);
             refreshLayout.setEnableLoadMore(false);
