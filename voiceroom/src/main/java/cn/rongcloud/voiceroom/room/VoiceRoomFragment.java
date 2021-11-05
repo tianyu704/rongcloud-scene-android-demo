@@ -272,10 +272,11 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             finish();
             return;
         }
-        if (checkPKState() && TextUtils.equals(AccountStore.INSTANCE.getUserId(), present.getCreateUserId())) {
+        // pk中房主才提示
+        if (StateUtil.isPking() && TextUtils.equals(AccountStore.INSTANCE.getUserId(), present.getCreateUserId())) {
+            KToast.show("当前PK中，无法进行该操作");
             return;
         }
-
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
