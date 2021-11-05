@@ -473,7 +473,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
             public void onResult(UserInfo userInfo) {
                 String pkInfo = null != userInfo ? userInfo.getName() : pkId;
                 if (null != stateListener)
-                    stateListener.onSendPKMessage("与" + pkInfo + "的PK即将开始,PK过程中，麦上观众将被抱下麦");
+                    stateListener.onSendPKMessage("与" + pkInfo + "的PK即将开始，PK过程中，麦上观众将被抱下麦");
             }
         });
     }
