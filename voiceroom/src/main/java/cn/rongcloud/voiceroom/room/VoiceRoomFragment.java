@@ -5,7 +5,6 @@ import static cn.rongcloud.voiceroom.room.VoiceRoomPresenter.STATUS_ON_SEAT;
 import static cn.rongcloud.voiceroom.room.VoiceRoomPresenter.STATUS_WAIT_FOR_SEAT;
 
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -242,27 +241,12 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         if (null == mNoticeDialog) {
             mNoticeDialog = new RoomNoticeDialog(activity);
         }
-
-
-        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
-        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity) - UiUtils.INSTANCE.getNavigationBarHeight(activity);
-        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            Rect rect = new Rect();
-            getLayout().getWindowVisibleDisplayFrame(rect);
-            int height = screenHeight - rect.bottom;
-            if (bottomMargin != height) {
-                // 假定高度超过屏幕的1/4代表键盘弹出了
-                if (height > screenHeight / 4) {
-                    bottomMargin = height;
-                } else {
-                    bottomMargin = 0;
-                }
-                mRoomBottomView.setPadding(0, 0, 0, bottomMargin);
-            }
-        });
     }
 
-    private int bottomMargin = 0;
+    @Override
+    public void onSoftKeyboardChange(int height) {
+        mRoomBottomView.setPadding(0, 0, 0, height);
+    }
 
     /**
      * 显示公告弹窗

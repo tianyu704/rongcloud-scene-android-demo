@@ -1,19 +1,23 @@
 package cn.rong.combusis.ui.room;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ViewTreeObserver;
 
 import androidx.annotation.Nullable;
 
 import com.basis.mvp.BasePresenter;
 import com.basis.ui.BaseFragment;
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.UiUtils;
 
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
+import io.rong.imkit.utils.StatusBarUtil;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
 
@@ -34,10 +38,7 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
         Logger.d("==================================onCreate:" + getTag());
     }
 
-    @Override
-    public void initListener() {
-        addSwitchRoomListener();
-    }
+    private int bottomMargin = 0;
 
     @Override
     public void preJoinRoom() {
@@ -80,11 +81,7 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
         Logger.d("==================================onStop:" + getTag());
     }
 
-    @Override
-    public void onDestroyView() {
-        removeSwitchRoomListener();
-        super.onDestroyView();
-    }
+    private int screenHeight = 0;
 
 
     // 是否是请求开启悬浮窗权限的过程中
@@ -118,5 +115,40 @@ public abstract class AbsRoomFragment<P extends BasePresenter> extends BaseFragm
             }
         }).show();
     }
+
+    private ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = () -> {
+        Rect rect = new Rect();
+        getLayout().getWindowVisibleDisplayFrame(rect);
+        int height = screenHeight - rect.bottom;
+        // 假定高度超过屏幕的1/4代表键盘弹出了
+        if (height < screenHeight / 4) {
+            height = 0;
+        }
+        if (bottomMargin != height) {
+            bottomMargin = height;
+            onSoftKeyboardChange(bottomMargin);
+        }
+    };
+
+    @Override
+    public void initListener() {
+        addSwitchRoomListener();
+        initSoftKeyboardListener();
+    }
+
+    @Override
+    public void onDestroyView() {
+        removeSwitchRoomListener();
+        getLayout().getViewTreeObserver().removeOnGlobalLayoutListener(globalLayoutListener);
+        super.onDestroyView();
+    }
+
+    private void initSoftKeyboardListener() {
+        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
+        screenHeight = UiUtils.INSTANCE.getScreenHeight(requireContext()) + StatusBarUtil.getStatusBarHeight(requireContext());
+        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
+    }
+
+    public abstract void onSoftKeyboardChange(int height);
 }
 

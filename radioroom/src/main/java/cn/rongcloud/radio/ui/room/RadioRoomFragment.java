@@ -1,7 +1,6 @@
 package cn.rongcloud.radio.ui.room;
 
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -99,7 +98,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     private GiftFragment mGiftFragment;
     private CreatorSettingFragment mCreatorSettingFragment;
     private MusicDialog mMusicDialog;
-    private int bottomMargin = 0;
 
     private String mRoomId;
 
@@ -157,23 +155,11 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         mMessageView.setAdapter(mRoomMessageAdapter);
 
         mCoverView = getView(R.id.view_cover);
+    }
 
-        // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
-        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity);
-        getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            Rect rect = new Rect();
-            getLayout().getWindowVisibleDisplayFrame(rect);
-            int height = screenHeight - rect.bottom;
-            if (bottomMargin != height) {
-                // 假定高度超过屏幕的1/4代表键盘弹出了
-                if (height > screenHeight / 4) {
-                    bottomMargin = height;
-                } else {
-                    bottomMargin = 0;
-                }
-                mRoomBottomView.setPadding(0, 0, 0, bottomMargin);
-            }
-        });
+    @Override
+    public void onSoftKeyboardChange(int height) {
+        mRoomBottomView.setPadding(0, 0, 0, height);
     }
 
     @Override

@@ -13,21 +13,12 @@ import android.view.View
 import android.view.WindowManager
 
 
-import android.view.KeyEvent
-
-import android.view.KeyCharacterMap
-
-import android.view.ViewConfiguration
-
-import android.app.Activity
-import android.graphics.Point
-
-
 /**
  * @author gusd
  * @Date 2021/06/09
  */
 object UiUtils {
+
     fun dp2Px(context: Context, dp: Float): Int {
         val scale = context.resources.displayMetrics.density //当前屏幕密度因子
         return (dp * scale + 0.5f).toInt()
@@ -52,36 +43,6 @@ object UiUtils {
             display.getMetrics(dm)
         }
         return dm.heightPixels
-    }
-    /**
-     * 获取虚拟导航栏的高度
-     */
-    fun getNavigationBarHeight(activity: Activity): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            val display = activity.windowManager.defaultDisplay
-            val size = Point()
-            val realSize = Point()
-            display.getSize(size)
-            display.getRealSize(realSize)
-            val resources = activity.resources
-            val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-            val height = resources.getDimensionPixelSize(resourceId)
-            //超出系统默认的导航栏高度以上，则认为存在虚拟导航
-            if (realSize.y - size.y > height - 10) {
-                height
-            } else 0
-        } else {
-            val menu = ViewConfiguration.get(activity).hasPermanentMenuKey()
-            val back = KeyCharacterMap.deviceHasKey(KeyEvent.KEYCODE_BACK)
-            if (menu || back) {
-                0
-            } else {
-                val resources = activity.resources
-                val resourceId =
-                    resources.getIdentifier("navigation_bar_height", "dimen", "android")
-                resources.getDimensionPixelSize(resourceId)
-            }
-        }
     }
 
     /**

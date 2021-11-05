@@ -68,7 +68,7 @@
             android:layout_marginStart="10dp"
             android:drawableStart="@drawable/ic_room_delay_1"
             android:drawablePadding="3dp"
-            android:text="30"
+            android:text="0"
             android:textColor="@color/white"
             android:textSize="9sp"
             app:layout_constraintStart_toEndOf="@id/tv_room_online"

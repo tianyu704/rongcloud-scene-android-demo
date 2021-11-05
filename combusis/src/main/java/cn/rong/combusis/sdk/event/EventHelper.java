@@ -1,7 +1,5 @@
 package cn.rong.combusis.sdk.event;
 
-import android.app.Application;
-import android.content.Context;
 import android.text.TextUtils;
 
 import com.basis.UIStack;
@@ -24,7 +22,6 @@ import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
-import dagger.hilt.android.qualifiers.ApplicationContext;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.model.ChatRoomInfo;
 import io.rong.imlib.model.ChatRoomMemberInfo;
@@ -165,7 +162,7 @@ public class EventHelper extends AbsPKHelper {
                         new RongIMClient.ResultCallback<ChatRoomInfo>() {
                             @Override
                             public void onSuccess(ChatRoomInfo chatRoomInfo) {
-                                Logger.e("=======" + chatRoomInfo.getTotalMemberCount());
+                                Logger.d("=======" + chatRoomInfo.getTotalMemberCount());
                                 if (null != resultBack && null != chatRoomInfo) {
                                     List<ChatRoomMemberInfo> cs = chatRoomInfo.getMemberInfo();
                                     int count = null == cs ? 0 : cs.size();

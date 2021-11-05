@@ -247,7 +247,6 @@ public abstract class AbsRoomActivity extends BaseActivity {
 
     // 控制是否可以上下滑动，不能上下滑动也不能刷新和加载
     public void setCanSwitch(boolean canSwitch) {
-        Logger.e("=================cccccccccccc");
         mViewPager.setUserInputEnabled(canSwitch);
         if (canSwitch) {
             if (canRefreshAndLoadMore) {

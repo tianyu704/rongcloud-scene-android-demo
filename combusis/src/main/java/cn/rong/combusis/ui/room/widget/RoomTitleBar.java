@@ -46,6 +46,7 @@ public class RoomTitleBar extends ConstraintLayout {
     private Member member;
     private OnFollowClickListener onFollowClickListener;
     private boolean isShowFollow = false;
+    private int mDelay = 0;
 
     public RoomTitleBar(@NonNull Context context) {
         this(context, null);
@@ -103,8 +104,12 @@ public class RoomTitleBar extends ConstraintLayout {
 
     public void setDelay(int delay, boolean isShow) {
         if (isShow) {
+            if (mDelay == delay) {
+                return;
+            }
+            mDelay = delay;
             mDelayTextView.setVisibility(View.VISIBLE);
-            mDelayTextView.setText(String.valueOf(delay) + "ms");
+            mDelayTextView.setText(delay + "ms");
             int leftPicId;
             if (delay < 100) {
                 leftPicId = R.drawable.ic_room_delay_1;
