@@ -14,6 +14,7 @@ import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -285,11 +286,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                 mView.setSeatState(RoomSeatView.SeatState.NORMAL);
                 RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "0", null);
                 RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SILENT, "0", null);
+                AudioManagerUtil.INSTANCE.choiceAudioModel();
             }
 
             @Override
             public void onError(int code, String message) {
                 Logger.e("==============enterSeat onError, code:" + code + ",message:" + message);
+                AudioManagerUtil.INSTANCE.choiceAudioModel();
             }
         });
     }
@@ -303,11 +306,12 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             @Override
             public void onSuccess() {
                 mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
+                AudioManagerUtil.INSTANCE.choiceAudioModel();
             }
 
             @Override
             public void onError(int i, String s) {
-
+                AudioManagerUtil.INSTANCE.choiceAudioModel();
             }
         });
     }
