@@ -245,7 +245,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
 
         // 由于状态栏透明和键盘有冲突，所以监听键盘弹出时顶起布局
-        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity)-UiUtils.INSTANCE.getNavigationBarHeight(activity);
+        int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(activity) - UiUtils.INSTANCE.getNavigationBarHeight(activity);
         getLayout().getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             Rect rect = new Rect();
             getLayout().getWindowVisibleDisplayFrame(rect);
@@ -261,6 +261,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             }
         });
     }
+
     private int bottomMargin = 0;
 
     /**
@@ -487,6 +488,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
     /**
      * 显示消息集合
+     *
      * @param messageContentList
      * @param isRefresh
      */
@@ -495,7 +497,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         mRoomMessageAdapter.setData(messageContentList, isRefresh);
         int count = mRoomMessageAdapter.getItemCount();
         if (count > 0) {
-            mMessageView.smoothScrollToPosition(count-1);
+            mMessageView.smoothScrollToPosition(count - 1);
         }
     }
 
@@ -728,13 +730,11 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      */
     @Override
     public void clickPrivateMessage() {
-        if (!checkPKState()) {
-            RouteUtils.routeToSubConversationListActivity(
-                    requireActivity(),
-                    Conversation.ConversationType.PRIVATE,
-                    "消息"
-            );
-        }
+        RouteUtils.routeToSubConversationListActivity(
+                requireActivity(),
+                Conversation.ConversationType.PRIVATE,
+                "消息"
+        );
     }
 
     @Override
