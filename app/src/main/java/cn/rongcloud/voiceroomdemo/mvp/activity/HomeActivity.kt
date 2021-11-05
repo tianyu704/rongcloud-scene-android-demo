@@ -172,7 +172,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     }
 
     fun logout() {
-        RCVoiceRoomEngine.getInstance().disconnect()
+        RCVoiceRoomEngine.getInstance().disconnect(false)
         super.onLogout()
     }
 

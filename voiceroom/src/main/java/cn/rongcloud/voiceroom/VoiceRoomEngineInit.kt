@@ -35,7 +35,7 @@ class VoiceRoomEngineInit @Inject constructor() : ModuleInit {
     override fun onInit(application: Application) {
         Log.d(TAG, "onInit: ")
         try {
-            RCVoiceRoomEngine.getInstance().initWithAppKey(application, AppConfig.APP_KEY)
+            RCVoiceRoomEngine.getInstance().initWithAppKey(application, AppConfig.APP_KEY, null)
         } catch (e: Exception) {
             Log.e(TAG, "onInit: e = " + e)
         }
