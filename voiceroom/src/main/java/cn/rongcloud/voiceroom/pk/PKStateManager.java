@@ -115,7 +115,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 boolean isBroadcast = TextUtils.equals(currentId, pkInfos[0].getUserId());
                 Logger.e(TAG, "isBroadcast = " + isBroadcast);
                 if (isBroadcast) {
-                    VoiceRoomApi.getApi().muteAll(true);
+                    lockAllAndKitout();
                     // 走到这里 说明主播是退出后 又进自己房间
                     VoiceRoomApi.getApi().resumePk(pkInfos[1].getRoomId(), pkInfos[1].getUserId(), new IResultBack<Boolean>() {
                         @Override
@@ -131,6 +131,10 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 } else {
                     pkView.reset(false);
                     handleAudienceJoinPk(pkResult);
+                    // 观众根据状态修改pk状态
+                    EventBus.get().emit(EventBus.TAG.PK_AUTO_MODIFY,
+                            pkResult.getStatusMsg() == 0 ? IEventHelp.Type.PK_START :
+                                    IEventHelp.Type.PK_PUNISH);
                 }
             }
         });

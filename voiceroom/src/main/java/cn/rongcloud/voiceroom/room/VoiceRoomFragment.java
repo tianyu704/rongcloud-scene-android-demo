@@ -288,7 +288,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             finish();
             return;
         }
-        if (checkPKState()) {
+        if (checkPKState() && TextUtils.equals(AccountStore.INSTANCE.getUserId(), present.getCreateUserId())) {
             return;
         }
 
@@ -438,7 +438,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      * pk禁止操作提示
      */
     private boolean checkPKState() {
-        boolean isPK = StateUtil.isPking() && TextUtils.equals(AccountStore.INSTANCE.getUserId(), present.getCreateUserId());
+        boolean isPK = StateUtil.isPking();
         if (isPK) {
             KToast.show("当前PK中，无法进行该操作");
         }
