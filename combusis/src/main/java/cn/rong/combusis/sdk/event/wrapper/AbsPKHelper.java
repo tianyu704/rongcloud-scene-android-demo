@@ -10,7 +10,6 @@ import cn.rong.combusis.EventBus;
 import cn.rong.combusis.message.RCChatroomPK;
 import cn.rong.combusis.message.RCChatroomPKGift;
 import cn.rong.combusis.sdk.VoiceRoomApi;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.PKResponse;
 import cn.rongcloud.voiceroom.model.RCPKInfo;
 import io.rong.imlib.model.Message;
@@ -101,8 +100,8 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
      * @param rcpkInfo
      */
     @Override
-    public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
-        Logger.e(TAG, "onPKgoing");
+    public void onPKConnect(@NonNull RCPKInfo rcpkInfo) {
+        Logger.e(TAG, "onPKConnect");
         //邀请同意 开始PK 释放被邀请信息
         VoiceRoomApi.getApi().releasePKInvitee();
         // 开启pk 统一有服务端分发消息

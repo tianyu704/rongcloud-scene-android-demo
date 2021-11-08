@@ -39,7 +39,6 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
-import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
@@ -490,7 +489,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     }
 
     @Override
-    public void onPKgoing(@NonNull RCPKInfo rcpkInfo) {
+    public void onPKConnect(@NonNull RCPKInfo rcpkInfo) {
 
     }
 

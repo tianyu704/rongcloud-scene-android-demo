@@ -453,18 +453,18 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         if (isPKer()) {//取消锁麦
             VoiceRoomApi.getApi().lockAll(false);
         }
-//        if (isInviter()) {
-        //约定邀请者 quitpk
-        VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
-            @Override
-            public void onResult(Boolean aBoolean) {
-                // 兼容ios 调整两端都结束 避免一端异常
+        if (isInviter()) {
+            //约定邀请者 quitpk
+            VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
+                @Override
+                public void onResult(Boolean aBoolean) {
+                    // 兼容ios 调整两端都结束 避免一端异常
 //                    if (!aBoolean) KToast.show("PK结束失败");
-            }
-        });
-//        } else {
-//            // 受邀者 修改惩罚结束标识 等待pkFinish回调
-//        }
+                }
+            });
+        } else {
+            // 受邀者 修改惩罚结束标识 等待pkFinish回调
+        }
     }
 
     private void sendPKStartMessage(String pkId) {
