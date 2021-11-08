@@ -283,9 +283,6 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
 
-                    //先做悬浮窗
-//                    requireActivity().moveTaskToBack(true);
-
                     requireActivity().finish();
 
                     EventHelper.helper().removeRCVoiceRoomEventListener();
