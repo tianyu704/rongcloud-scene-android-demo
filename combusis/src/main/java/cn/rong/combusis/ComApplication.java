@@ -75,6 +75,7 @@ public class ComApplication extends Application {
             public Map<String, String> onAddHeader() {
                 Map map = new HashMap<String, String>();
                 map.put("Authorization", AccountStore.INSTANCE.getAuthorization());
+                map.put("BusinessToken", "vStHYPdrQoImm-7Ur0ks1g");
                 return map;
             }
 

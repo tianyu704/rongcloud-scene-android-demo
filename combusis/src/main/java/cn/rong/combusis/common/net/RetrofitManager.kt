@@ -65,6 +65,7 @@ object RetrofitManager {
             if (!authorization.isNullOrBlank()) {
                 requestBuilder.addHeader("Authorization", authorization)
             }
+            requestBuilder.addHeader("BusinessToken", "vStHYPdrQoImm-7Ur0ks1g")
             val request = requestBuilder.build()
             chain.proceed(request)
         }
