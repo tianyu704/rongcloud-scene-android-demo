@@ -95,7 +95,6 @@ import cn.rongcloud.rtc.core.NetworkMonitorAutoDetect;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import cn.rongcloud.voiceroom.room.dialogFragment.CreatorSettingFragment;
@@ -120,7 +119,7 @@ import kotlin.jvm.functions.Function2;
  * 语聊房present
  */
 public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
-         IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
+        IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
         , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, OnCloseMiniRoomListener, RoomTitleBar.OnFollowClickListener {
 
     private String TAG = "NewVoiceRoomPresenter";
@@ -177,7 +176,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     }
 
 
-
     public void addDisposable(Disposable disposable) {
         disposableList.add(disposable);
     }
@@ -206,16 +204,16 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                     VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                     if (roomBean != null) {
                         mVoiceRoomBean = roomBean;
-                        if (isInRoom){
+                        if (isInRoom) {
                             //如果已经在房间里面了,那么需要重新设置监听
                             initListener(roomId);
-                            currentStatus=EventHelper.helper().getCurrentStatus();
+                            currentStatus = EventHelper.helper().getCurrentStatus();
                             mView.changeStatus(currentStatus);
                             voiceRoomModel.currentUIRoomInfo.setMute(EventHelper.helper().getMuteAllRemoteStreams());
                             voiceRoomModel.onSeatInfoUpdate(EventHelper.helper().getRCVoiceSeatInfoList());
                             setCurrentRoom(mVoiceRoomBean);
                             mView.dismissLoading();
-                        }else {
+                        } else {
                             leaveRoom(roomId, isCreate, true);
                         }
 
@@ -322,11 +320,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             // 默认消息
             RCChatroomLocationMessage welcome = new RCChatroomLocationMessage();
             welcome.setContent(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()));
-            RCChatRoomMessageManager.INSTANCE.sendLocationMessage(mVoiceRoomBean.getRoomId(),welcome);
+            RCChatRoomMessageManager.INSTANCE.sendLocationMessage(mVoiceRoomBean.getRoomId(), welcome);
 
             RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
             tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
-            RCChatRoomMessageManager.INSTANCE.sendLocationMessage(mVoiceRoomBean.getRoomId(),tips);
+            RCChatRoomMessageManager.INSTANCE.sendLocationMessage(mVoiceRoomBean.getRoomId(), tips);
             Logger.d("=================发送了默认消息");
             // 广播消息
             RCChatroomEnter enter = new RCChatroomEnter();
@@ -371,14 +369,14 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     public void setCurrentRoom(VoiceRoomBean mVoiceRoomBean) {
         roomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(mVoiceRoomBean);
         // 房主进入房间，如果不在麦位上那么自动上麦
-        if (roomOwnerType == RoomOwnerType.VOICE_OWNER && !voiceRoomModel.userInSeat()&&!isInRoom) {
+        if (roomOwnerType == RoomOwnerType.VOICE_OWNER && !voiceRoomModel.userInSeat() && !isInRoom) {
             roomOwnerEnterSeat();
         }
-        if (isInRoom){
+        if (isInRoom) {
             //恢复一下当前信息就可以了
             List<MessageContent> messageList = EventHelper.helper().getMessageList();
-            mView.showMessageList(messageList,true);
-        }else {
+            mView.showMessageList(messageList, true);
+        } else {
             // 发送默认消息
             sendSystemMessage();
         }
@@ -442,12 +440,12 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             @Override
             public void onNetworkConnect(NetworkMonitorAutoDetect.NetworkInformation networkInfo) {
                 //网络连接
-                if (isNetWorkConnect){
+                if (isNetWorkConnect) {
                     //说明是断网重连状态
-                    isNetWorkConnect=false;
-                    Log.e(TAG, "onNetworkConnect: "+"断网重连成功");
+                    isNetWorkConnect = false;
+                    Log.e(TAG, "onNetworkConnect: " + "断网重连成功");
                     UiSeatModel uiSeatModel = voiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
-                    if (uiSeatModel!=null&&uiSeatModel.getSeatStatus()== RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
+                    if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
                         //说明当前用户在本地的状态是在麦，与RTC那边做对比，如果远程显示不在麦位上了，那么本地需要重新上麦
                         //如果远程显示也在麦位上，那么不需要做任何操作
                     }
@@ -458,7 +456,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             public void onNetworkDisconnect(long networkHandle) {
                 //网络断开
                 isNetWorkConnect = true;
-                Log.e(TAG, "onNetworkDisconnect: " );
+                Log.e(TAG, "onNetworkDisconnect: ");
             }
         }, ((VoiceRoomFragment) mView).requireContext());
     }
@@ -554,18 +552,19 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
                                 || RCFollowMsg.class.equals(aClass) || TextMessage.class.equals(aClass)) {
-                            mView.showMessage(messageContent, false);
+                            // fix：悬浮框 接收pk邀请
+                            if (null != mView) mView.showMessage(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
                             getGiftCount();
                         } else if (aClass.equals(RCChatroomLike.class)) {
-                            mView.showLikeAnimation();
+                            if (null != mView) mView.showLikeAnimation();
                             return;
                         } else if (aClass.equals(RCAllBroadcastMessage.class)) {
                             AllBroadcastManager.getInstance().addMessage((RCAllBroadcastMessage) messageContent);
                         } else if (aClass.equals(RCChatroomSeats.class)) {
                             refreshRoomMember();
-                        }else if (aClass.equals(RCChatroomLocationMessage.class)) {
+                        } else if (aClass.equals(RCChatroomLocationMessage.class)) {
                             EventHelper.helper().addMessage(messageContent);
                         }
                     }
@@ -713,7 +712,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 //当前用户已经在麦位上
                 currentStatus = STATUS_ON_SEAT;
                 mView.changeStatus(currentStatus);
-            }else {
+            } else {
                 //当前用户不在麦位上
                 if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                     //说明已经申请了上麦,那么等着对方给判断就好，不用做特定的操作
@@ -883,8 +882,10 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 , new Function1<Integer, Unit>() {
                     @Override
                     public Unit invoke(Integer integer) {
-                        mView.clearInput();
-                        mView.hideSoftKeyboardAndIntput();
+                        if (null != mView) {// fix：悬浮框 同意pk崩溃
+                            mView.clearInput();
+                            mView.hideSoftKeyboardAndIntput();
+                        }
                         EventHelper.helper().addMessage(messageContent);
                         if (messageContent instanceof RCChatroomAdmin) {
                             //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
@@ -1132,7 +1133,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 //同意
                 voiceRoomModel.enterSeatIfAvailable();
                 confirmDialog.dismiss();
-                if (currentStatus==STATUS_WAIT_FOR_SEAT) {
+                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                     //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
                     voiceRoomModel.cancelRequestSeat(null);
                 }
@@ -1280,7 +1281,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
 
         EventBus.get().off(UPDATE_SHIELD, null);
 
-        if (networkMonitorAutoDetect!=null){
+        if (networkMonitorAutoDetect != null) {
             networkMonitorAutoDetect.destroy();
         }
     }
