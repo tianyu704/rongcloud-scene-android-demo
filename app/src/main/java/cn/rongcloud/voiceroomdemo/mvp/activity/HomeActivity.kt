@@ -71,6 +71,11 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     override fun onCreate(savedInstanceState: Bundle?) {
         UIStack.getInstance().add(this)
         super.onCreate(savedInstanceState)
+        if (!isTaskRoot()) {
+            //判断当前启动的activity在任务栈中存在
+            //若当前启动的activity是首页则关闭，即代表是点击了home键重新启动了activity
+            finish();
+        }
     }
 
 
