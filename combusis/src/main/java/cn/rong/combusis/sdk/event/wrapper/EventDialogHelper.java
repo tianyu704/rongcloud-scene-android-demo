@@ -86,7 +86,7 @@ public class EventDialogHelper {
         }
         TextView textView = new TextView(dialog.getContext());
         textView.setTextSize(14);
-        textView.setTextColor(Color.parseColor("#ffffff"));
+        textView.setTextColor(Color.parseColor("#343434"));
         if (null != pkTimer) {
             pkTimer.cancel();
         }
