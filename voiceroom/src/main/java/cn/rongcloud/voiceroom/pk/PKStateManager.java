@@ -248,7 +248,13 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                         PKApi.reportPKEnd(roomId, pkRoomId, new IResultBack<Boolean>() {
                             @Override
                             public void onResult(Boolean s) {
-                                // 等待服务端分发pk结束消息
+                                // 主动结束，须调用quitPk
+                                VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
+                                    @Override
+                                    public void onResult(Boolean aBoolean) {
+                                        if (!aBoolean) KToast.show("PK结束失败");
+                                    }
+                                });
                             }
                         });
                     }
@@ -343,7 +349,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                 } else if (IEventHelp.Type.PK_PUNISH == pkState) {// pk 惩罚
                     handlePkPunish();
                 } else if (IEventHelp.Type.PK_STOP == pkState) {// pk 结束
-                    handlePKStop();
+                    handlePKStop(chatroomPK);
                     if (null != chatroomPK) {
                         // pk结束者房间id
                         String stopId = chatroomPK.getStopPkRoomId();
@@ -443,7 +449,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
      * 1、邀请者调用SDK quitPk 结束pk
      * 2、被邀请者 暂不处理
      */
-    void handlePKStop() {
+    void handlePKStop(RCChatroomPK chatroomPK) {
         Logger.e(TAG, "PK Stop");
         if (null != stateListener) stateListener.onPkStop();
         if (null != pkView) pkView.pkStop();
@@ -453,17 +459,22 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         if (isPKer()) {//取消锁麦
             VoiceRoomApi.getApi().lockAll(false);
         }
-        if (isInviter()) {
-            //约定邀请者 quitpk
-            VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
-                @Override
-                public void onResult(Boolean aBoolean) {
-                    // 兼容ios 调整两端都结束 避免一端异常
-//                    if (!aBoolean) KToast.show("PK结束失败");
-                }
-            });
+        if (null != chatroomPK && TextUtils.isEmpty(chatroomPK.getStopPkRoomId())) {
+            //倒计时 自动挂断
+            if (isInviter()) {
+                //约定邀请者 quitpk
+                VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
+                    @Override
+                    public void onResult(Boolean aBoolean) {
+                        // 兼容ios 调整两端都结束 避免一端异常
+                        if (!aBoolean) KToast.show("PK结束失败");
+                    }
+                });
+            } else {
+                // 受邀者 修改惩罚结束标识 等待pkFinish回调
+            }
         } else {
-            // 受邀者 修改惩罚结束标识 等待pkFinish回调
+            //主动挂断 不需要处理
         }
     }
 
