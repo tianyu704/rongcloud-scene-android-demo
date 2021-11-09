@@ -44,6 +44,12 @@ android {
         multiDexEnabled true
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
     signingConfigs {
         debug {
             keyAlias "debugkey"

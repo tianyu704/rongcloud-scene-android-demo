@@ -9,13 +9,13 @@ buildscript {
     ext.kotlin_version = "1.4.0"
     ext.hilt_version = '2.35'
     repositories {
+        maven { url "http://maven.rongcloud.cn/repository/maven-releases/" }
         google()
         mavenCentral()
         maven { url "https://oss.jfrog.org/libs-snapshot" }
         maven { url 'http://developer.huawei.com/repo/' }
         maven { url 'https://jitpack.io' }
         maven { url 'https://repo1.maven.org/maven2/' }
-        maven { url "http://maven.rongcloud.cn/repository/maven-releases/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:3.5.0"
@@ -29,6 +29,7 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "http://maven.rongcloud.cn/repository/maven-releases/" }
         google()
         mavenCentral()
         jcenter() // Warning: this repository is going to shut down soon
@@ -36,7 +37,7 @@ allprojects {
         maven { url 'http://developer.huawei.com/repo/' }
         maven { url 'https://jitpack.io' }
         maven { url 'https://repo1.maven.org/maven2/' }
-        maven { url "http://maven.rongcloud.cn/repository/maven-releases/" }
+
     }
 }
 
