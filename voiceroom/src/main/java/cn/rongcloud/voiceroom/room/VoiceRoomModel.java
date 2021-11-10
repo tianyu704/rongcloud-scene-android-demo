@@ -18,18 +18,12 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import com.basis.mvp.BaseModel;
-import com.basis.net.oklib.OkApi;
-import com.basis.net.oklib.OkParams;
-import com.basis.net.oklib.WrapperCallBack;
-import com.basis.net.oklib.wrapper.Wrapper;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.utils.SharedPreferUtil;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomKickOut;
@@ -218,7 +212,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        Log.e(TAG, "onSeatInfoUpdate: "+list.get(1));
         synchronized (this){
             uiSeatModels.clear();
             for (int i = 0; i < list.size(); i++) {
