@@ -285,8 +285,6 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
 
                     requireActivity().finish();
 
-                    EventHelper.helper().removeRCVoiceRoomEventListener();
-
                     //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                     requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 

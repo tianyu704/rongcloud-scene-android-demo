@@ -27,7 +27,6 @@ import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.sdk.event.wrapper.TipType;
-import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -131,6 +130,7 @@ public class EventHelper extends AbsPKHelper{
             @Override
             public void onSuccess() {
                 MusicManager.get().stopPlayMusic();
+                unregeister();
                 changeUserRoom("");
                 if (callback != null)
                     callback.onSuccess();

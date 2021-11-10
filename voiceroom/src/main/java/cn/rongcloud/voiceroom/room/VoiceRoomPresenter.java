@@ -62,7 +62,6 @@ import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
-import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -91,7 +90,6 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
-import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.rtc.core.NetworkMonitorAutoDetect;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
@@ -1263,14 +1261,24 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * 切换房间的时候，对之前房间的操作
      */
     public void leaveCurrentRoom() {
+        //取消对当前房间的监听
+        EventHelper.helper().unregeister();
+        //取消当前对于各种消息的回调监听
+        unInitListener();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unInitListener();
+    }
+
+    public void unInitListener() {
         for (Disposable disposable : disposableList) {
             disposable.dispose();
         }
         disposableList.clear();
-
-        EventHelper.helper().unregeister();
         EventHelper.helper().removeRCVoiceRoomEventListener();
-
         EventBus.get().off(UPDATE_SHIELD, null);
 
         if (networkMonitorAutoDetect != null) {
