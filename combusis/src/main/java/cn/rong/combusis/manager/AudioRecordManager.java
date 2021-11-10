@@ -333,7 +333,7 @@ public class AudioRecordManager implements Handler.Callback {
                 }
             }
             File savePath = SavePathUtils.getSavePath(mContext.getCacheDir());
-            mAudioPath = Uri.fromFile(new File(savePath, System.currentTimeMillis() + "temp.mp3"));
+            mAudioPath = Uri.fromFile(new File(savePath, System.currentTimeMillis() + "temp.voice"));
             mMediaRecorder.setOutputFile(mAudioPath.getPath());
             mMediaRecorder.prepare();
             mMediaRecorder.start();

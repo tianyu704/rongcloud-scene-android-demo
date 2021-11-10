@@ -290,7 +290,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
                     //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                     requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
 
-                    MiniRoomManager.getInstance().show(requireContext(), present.getRoomId(), present.getThemePictureUrl(), requireActivity().getIntent(), present);
+                    MiniRoomManager.getInstance().show(requireContext(), present.getRoomId(), present.getThemePictureUrl(), requireActivity().getIntent(), EventHelper.helper());
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }
@@ -305,7 +305,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             @Override
             public void clickCloseRoom() {
                 // 房主关闭房间
-                present.closeRoom(null);
+                present.closeRoom();
             }
         });
         mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);

@@ -1,24 +1,35 @@
 package cn.rong.combusis.sdk.event;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.basis.UIStack;
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.UserProvider;
+import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
 import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.sdk.event.wrapper.TipType;
+import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
+import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomResultCallback;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
@@ -28,7 +39,7 @@ import io.rong.imlib.model.ChatRoomMemberInfo;
 import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 
-public class EventHelper extends AbsPKHelper {
+public class EventHelper extends AbsPKHelper{
 
     private final static IEventHelp _helper = new EventHelper();
 
@@ -50,8 +61,8 @@ public class EventHelper extends AbsPKHelper {
     }
 
     @Override
-    public String getRoomId(){
-        if (TextUtils.isEmpty(roomId)){
+    public String getRoomId() {
+        if (TextUtils.isEmpty(roomId)) {
             return "";
         }
         return roomId;
@@ -74,7 +85,7 @@ public class EventHelper extends AbsPKHelper {
 
     @Override
     public void setMuteAllRemoteStreams(boolean isMute) {
-        this.isMute=isMute;
+        this.isMute = isMute;
     }
 
     @Override
@@ -106,7 +117,47 @@ public class EventHelper extends AbsPKHelper {
 
     @Override
     public void setCurrentStatus(int status) {
-        currentStatus=status;
+        currentStatus = status;
+    }
+
+    /**
+     * 离开当前房间
+     *
+     * @param callback
+     */
+    @Override
+    public void leaveRoom(LeaveRoomCallBack callback) {
+        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                MusicManager.get().stopPlayMusic();
+                changeUserRoom("");
+                if (callback != null)
+                    callback.onSuccess();
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                if (callback != null)
+                    callback.onError(i, s);
+            }
+        });
+    }
+
+    //更改所属房间
+    @Override
+    public void changeUserRoom(String roomId){
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", roomId)
+                .build();
+        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()){
+                    Log.e(TAG, "onResult: "+result.getMessage() );
+                }
+            }
+        });
     }
 
     @Override
@@ -286,5 +337,22 @@ public class EventHelper extends AbsPKHelper {
             }
         });
 
+    }
+
+    @Override
+    public void onCloseMiniRoom(CloseResult closeResult) {
+        leaveRoom(new LeaveRoomCallBack() {
+            @Override
+            public void onSuccess() {
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
+            }
+
+            @Override
+            public void onError(int code, String message) {
+
+            }
+        });
     }
 }

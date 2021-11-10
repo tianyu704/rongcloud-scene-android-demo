@@ -4,14 +4,16 @@ import com.kit.wapper.IResultBack;
 
 import java.util.List;
 
+import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
+import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
 import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imlib.model.MessageContent;
 
-public interface IEventHelp {
+public interface IEventHelp extends OnCloseMiniRoomListener {
 
     /**
      * 是否初始化
@@ -68,6 +70,17 @@ public interface IEventHelp {
      * 保存当前请求上麦的状态
      */
     void setCurrentStatus(int status);
+
+    /**
+     * 离开房间
+     */
+    void  leaveRoom(LeaveRoomCallBack callback);
+
+    /**
+     * 更改所属于房间
+     * @param roomId
+     */
+    void changeUserRoom(String roomId);
 
     /**
      * 获取当前状态

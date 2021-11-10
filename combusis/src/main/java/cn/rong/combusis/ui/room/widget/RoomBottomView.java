@@ -23,6 +23,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentActivity;
 
 import com.kit.utils.Logger;
+import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.UiUtils;
 import com.vanniktech.emoji.EmojiPopup;
 
@@ -35,6 +36,7 @@ import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
+import cn.rongcloud.voiceroom.model.RCVoiceSeatInfo;
 import io.rong.imkit.manager.UnReadMessageManager;
 import io.rong.imkit.utils.PermissionCheckUtil;
 import io.rong.imkit.utils.RongUtils;
@@ -236,12 +238,18 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                     AudioPlayManager.getInstance().stopPlay();
                 }
                 //判断正在视频通话和语音通话中不能进行语音消息发送
-                if (RongUtils.phoneIsInUse(v.getContext()) || IMLibExtensionModuleManager.getInstance()
+                RCVoiceSeatInfo seatInfo = EventHelper.helper().getSeatInfo(AccountStore.INSTANCE.getUserId());
+                boolean isMic=RongUtils.phoneIsInUse(v.getContext()) || IMLibExtensionModuleManager.getInstance()
                         .onRequestHardwareResource(HardwareResource.ResourceType.VIDEO)
                         || IMLibExtensionModuleManager.getInstance()
-                        .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO)
-                ) {
-                    return true;
+                        .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO);
+                //如果麦克风被占用
+                if (isMic){
+                    //不在麦位上，或者在麦位上但是没有被禁麦,
+                    if (seatInfo==null||(seatInfo!=null&&!seatInfo.isMute())){
+                        EToast.showToast("麦克风被占用，不可发送语音");
+                        return true;
+                    }
                 }
                 audioRecordManager.startRecord(v.getRootView(), Conversation.ConversationType.PRIVATE, roomId);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {

@@ -68,6 +68,7 @@ import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.event.EventHelper;
+import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
@@ -120,7 +121,7 @@ import kotlin.jvm.functions.Function2;
  */
 public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> implements OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
         IVoiceRoomPresent, MemberSettingFragment.OnMemberSettingClickListener
-        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, OnCloseMiniRoomListener, RoomTitleBar.OnFollowClickListener {
+        , BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener, RoomTitleBar.OnFollowClickListener {
 
     private String TAG = "NewVoiceRoomPresenter";
 
@@ -241,7 +242,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             @Override
             public void onSuccess() {
                 Logger.d("==============leaveRoom onSuccess");
-                voiceRoomModel.changeUserRoom("");
+                EventHelper.helper().changeUserRoom("");
                 if (isExit) {
                     UIKit.postDelayed(new Runnable() {
                         @Override
@@ -281,7 +282,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 @Override
                 public void onSuccess() {
                     Logger.d("==============createAndJoinRoom onSuccess");
-                    voiceRoomModel.changeUserRoom(roomId);
+                    EventHelper.helper().changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -297,7 +298,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 @Override
                 public void onSuccess() {
                     Logger.d("==============joinRoom onSuccess");
-                    voiceRoomModel.changeUserRoom(roomId);
+                    EventHelper.helper().changeUserRoom(roomId);
                     setCurrentRoom(mVoiceRoomBean);
                     mView.dismissLoading();
                 }
@@ -1151,15 +1152,12 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     /**
      * 调用离开房间
      */
-    public void leaveRoom(CloseRoomCallback callback) {
+    public void leaveRoom(LeaveRoomCallBack callback) {
         mView.showLoading("");
-        MusicManager.get().stopPlayMusic();
-        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
-
+        EventHelper.helper().leaveRoom(new LeaveRoomCallBack() {
             @Override
             public void onSuccess() {
                 Logger.d("==============leaveRoom onSuccess");
-                voiceRoomModel.changeUserRoom("");
                 leaveCurrentRoom();
                 mView.dismissLoading();
                 mView.finish();
@@ -1180,16 +1178,13 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     /**
      * 房主关闭房间
      */
-    public void closeRoom(CloseRoomCallback callback) {
+    public void closeRoom() {
         mView.showLoading("正在关闭房间");
         RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null);
-        //先离开房间,离开以后，去删除房间
-        RCVoiceRoomEngine.getInstance().leaveRoom(new RCVoiceRoomCallback() {
+        EventHelper.helper().leaveRoom(new LeaveRoomCallBack() {
             @Override
             public void onSuccess() {
-                // 房主关闭房间，调用删除房间接口
-                MusicManager.get().stopPlayMusic();
-                voiceRoomModel.changeUserRoom("");
+                //房主关闭房间，调用删除房间接口
                 leaveCurrentRoom();
                 OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
                     @Override
@@ -1197,9 +1192,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                         if (result.ok()) {
                             mView.finish();
                             mView.dismissLoading();
-                            if (callback != null) {
-                                callback.onSuccess();
-                            }
                         } else {
                             mView.dismissLoading();
                         }
@@ -1710,22 +1702,19 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         if (VoiceRoomProvider.provider().contains(roomId)) {
             mView.switchOtherRoom(roomId);
         } else {
-            leaveRoom(() -> {
-                IntentWrap.launchRoom(((VoiceRoomFragment) mView).requireContext(), roomType, roomId);
+            leaveRoom(new LeaveRoomCallBack() {
+                @Override
+                public void onSuccess() {
+                    IntentWrap.launchRoom(((VoiceRoomFragment) mView).requireContext(), roomType, roomId);
+                }
+
+                @Override
+                public void onError(int code, String message) {
+
+                }
             });
         }
     }
 
-    @Override
-    public void onCloseMiniRoom(CloseResult closeResult) {
-        leaveRoom(() -> {
-            if (closeResult != null) {
-                closeResult.onClose();
-            }
-        });
-    }
 
-    interface CloseRoomCallback {
-        void onSuccess();
-    }
 }

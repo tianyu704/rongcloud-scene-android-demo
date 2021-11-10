@@ -1033,18 +1033,4 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    //更改所属房间
-    public void changeUserRoom(String roomId){
-        HashMap<String, Object> params = new OkParams()
-                .add("roomId", roomId)
-                .build();
-        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()){
-                    Log.e(TAG, "onResult: "+result.getMessage() );
-                }
-            }
-        });
-    }
 }
