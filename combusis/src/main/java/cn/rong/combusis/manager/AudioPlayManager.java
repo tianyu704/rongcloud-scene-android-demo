@@ -326,7 +326,7 @@ public class AudioPlayManager implements SensorEventListener {
                 });
 //                fis = new FileInputStream(audioUri.getPath());
 //                mMediaPlayer.setDataSource(fis.getFD());
-                mMediaPlayer.setDataSource(audioUri.toString());
+                mMediaPlayer.setDataSource(context, Uri.parse(audioUri.toString()));
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     AudioAttributes attributes = new AudioAttributes.Builder()
                             .setUsage(AudioAttributes.USAGE_MEDIA)
