@@ -81,11 +81,11 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
     }
 
     private void onErrorWithCheck(final RCRadioRoomBaseCallback callback, final int code, final String message) {
+        VMLog.d(TAG, "onErrorWithCheck:[" + code + "],[" + message + "] callback:" + callback);
         if (null != callback) main.post(new Runnable() {
             @Override
             public void run() {
                 callback.onError(code, message);
-                VMLog.d(TAG, "onErrorWithCheck:[" + code + "],[" + message + "]");
             }
         });
     }
@@ -342,6 +342,7 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements VRKVStat
         mRcrtcRoom.getLocalUser().subscribeStreams(Arrays.asList(stream), new IRCRTCResultCallback() {
             @Override
             public void onSuccess() {
+                VMLog.d(TAG, "onPublishCDNStream:listenRadio:subscribeStreams:onSuccess");
                 onSuccessWithCheck(callback);
             }
 
