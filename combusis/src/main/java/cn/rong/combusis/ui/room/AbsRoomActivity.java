@@ -211,13 +211,24 @@ public abstract class AbsRoomActivity extends BaseActivity {
     protected abstract void initRoom();
 
     // 当前页的位置
-    protected abstract int getCurrentItem();
+    protected int getCurrentItem() {
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_POSITION)) {
+            return getIntent().getIntExtra(IntentWrap.KEY_ROOM_POSITION, 0);
+        }
+        return 0;
+    }
 
     // 返回要初始化的Fragment
     protected abstract Fragment getFragment(String roomId);
 
     // 加载数据
-    protected abstract List<String> loadData();
+    public List<String> loadData() {
+        if (getIntent().hasExtra(IntentWrap.KEY_ROOM_IDS)) {
+            ArrayList<String> ids = getIntent().getStringArrayListExtra(IntentWrap.KEY_ROOM_IDS);
+            return ids;
+        }
+        return null;
+    }
 
     protected abstract RoomType getRoomType();
 
