@@ -80,10 +80,14 @@ import io.rong.imlib.model.MessageContent;
  * @author gyn
  * @date 2021/9/24
  */
-public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements RadioRoomListener,
-        RadioRoomMemberSettingClickListener, OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
-        BackgroundSettingFragment.OnSelectBackgroundListener, GiftFragment.OnSendGiftListener,
-        CreatorSettingFragment.OnCreatorSettingClickListener, RoomTitleBar.OnFollowClickListener {
+public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
+        implements RadioRoomListener,
+                RadioRoomMemberSettingClickListener,
+                OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
+                BackgroundSettingFragment.OnSelectBackgroundListener,
+                GiftFragment.OnSendGiftListener,
+                CreatorSettingFragment.OnCreatorSettingClickListener,
+                RoomTitleBar.OnFollowClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
     private RoomOwnerType mRoomOwnerType;
@@ -104,46 +108,49 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         isInRoom = TextUtils.equals(RadioEventHelper.getInstance().getRoomId(), roomId);
         Logger.d("==================================inRoom:" + isInRoom);
         mView.showLoading("");
-        UIKit.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getRoomInfo();
-            }
-        }, 500);
+        UIKit.postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        getRoomInfo();
+                    }
+                },
+                500);
     }
 
-    /**
-     * 获取房间信息
-     */
+    /** 获取房间信息 */
     public void getRoomInfo() {
-        OkApi.get(VRApi.getRoomInfo(mRoomId), null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
-                    if (roomBean != null) {
-                        mVoiceRoomBean = roomBean;
-                        if (mVoiceRoomBean.isStop()) {
-                            mView.dismissLoading();
+        OkApi.get(
+                VRApi.getRoomInfo(mRoomId),
+                null,
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                            if (roomBean != null) {
+                                mVoiceRoomBean = roomBean;
+                                if (mVoiceRoomBean.isStop()) {
+                                    mView.dismissLoading();
+                                } else {
+                                    initRoomData(roomBean);
+                                }
+                            }
                         } else {
-                            initRoomData(roomBean);
+                            mView.dismissLoading();
+                            if (result.getCode() == 30001) {
+                                // 房间不存在了
+                                mView.showFinishView();
+                                RadioEventHelper.getInstance().leaveRoom(null);
+                            }
                         }
                     }
-                } else {
-                    mView.dismissLoading();
-                    if (result.getCode() == 30001) {
-                        //房间不存在了
-                        mView.showFinishView();
-                        RadioEventHelper.getInstance().leaveRoom(null);
-                    }
-                }
-            }
 
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
-            }
-        });
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                    }
+                });
     }
 
     /**
@@ -155,7 +162,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         Logger.d("================jjjjjjjjjjjjjjjj" + voiceRoomBean);
         if (voiceRoomBean != null) {
             this.mVoiceRoomBean = voiceRoomBean;
-
 
             mRoomOwnerType = VoiceRoomProvider.provider().getRoomOwnerType(voiceRoomBean);
             mView.setRoomData(voiceRoomBean, mRoomOwnerType);
@@ -182,49 +188,62 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     }
 
     private void leaveAndJoinRoom() {
-        RCRadioRoomEngine.getInstance().leaveRoom(new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                Logger.d("==============leave room success");
-                changeUserRoom("");
-                joinRoom();
-            }
+        RCRadioRoomEngine.getInstance()
+                .leaveRoom(
+                        new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Logger.d("==============leave room success");
+                                changeUserRoom("");
+                                joinRoom();
+                            }
 
-            @Override
-            public void onError(int i, String s) {
-                Logger.d("==============leave room error " + i + "-" + s);
-                joinRoom();
-            }
-        });
+                            @Override
+                            public void onError(int i, String s) {
+                                Logger.d("==============leave room error " + i + "-" + s);
+                                joinRoom();
+                            }
+                        });
     }
 
     private void joinRoom() {
         addListener();
 
-        RCRadioRoomInfo roomInfo = new RCRadioRoomInfo(TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId()) ? RCRTCLiveRole.BROADCASTER : RCRTCLiveRole.AUDIENCE);
+        RCRadioRoomInfo roomInfo =
+                new RCRadioRoomInfo(
+                        TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())
+                                ? RCRTCLiveRole.BROADCASTER
+                                : RCRTCLiveRole.AUDIENCE);
         roomInfo.setRoomId(mRoomId);
         roomInfo.setRoomName(mVoiceRoomBean.getRoomName());
-        RCRadioRoomEngine.getInstance().joinRoom(roomInfo, new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                Logger.d("==============joinRoom onSuccess");
-                changeUserRoom(mRoomId);
-                // 房主上麦
-                if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
-                    enterSeat();
-                }
-                // 发送默认消息
-                sendDefaultMessage();
-                refreshRoomData();
-                mView.dismissLoading();
-            }
+        RCRadioRoomEngine.getInstance()
+                .joinRoom(
+                        roomInfo,
+                        new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                Logger.d("==============joinRoom onSuccess");
+                                changeUserRoom(mRoomId);
+                                // 房主上麦
+                                if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
+                                    enterSeat();
+                                }
+                                // 发送默认消息
+                                sendDefaultMessage();
+                                refreshRoomData();
+                                mView.dismissLoading();
+                            }
 
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============joinRoom onError,code:" + code + ",message:" + message);
-                mView.dismissLoading();
-            }
-        });
+                            @Override
+                            public void onError(int code, String message) {
+                                Logger.e(
+                                        "==============joinRoom onError,code:"
+                                                + code
+                                                + ",message:"
+                                                + message);
+                                mView.dismissLoading();
+                            }
+                        });
     }
 
     // 刷新房间内其他信息
@@ -236,12 +255,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         // 礼物数量
         getGiftCount();
         // 管理员变化后刷新消息列表
-        MemberCache.getInstance().getAdminList().observe((LifecycleOwner) mView, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> strings) {
-                mView.refreshMessageList();
-            }
-        });
+        MemberCache.getInstance()
+                .getAdminList()
+                .observe(
+                        (LifecycleOwner) mView,
+                        new Observer<List<String>>() {
+                            @Override
+                            public void onChanged(List<String> strings) {
+                                mView.refreshMessageList();
+                            }
+                        });
     }
 
     public String getRoomId() {
@@ -273,56 +296,62 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         return mRoomOwnerType;
     }
 
-
-    /**
-     * 房主上麦
-     */
+    /** 房主上麦 */
     public void enterSeat() {
-        RCRadioRoomEngine.getInstance().enterSeat(new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                RadioEventHelper.getInstance().setInSeat(true);
-                Logger.d("==============enterSeat onSuccess");
-                mView.setSeatState(RoomSeatView.SeatState.NORMAL);
-                RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "0", null);
-                RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SILENT, "0", null);
-                AudioManagerUtil.INSTANCE.choiceAudioModel();
-            }
+        RCRadioRoomEngine.getInstance()
+                .enterSeat(
+                        new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                RadioEventHelper.getInstance().setInSeat(true);
+                                Logger.d("==============enterSeat onSuccess");
+                                mView.setSeatState(RoomSeatView.SeatState.NORMAL);
+                                RCRadioRoomEngine.getInstance()
+                                        .updateRadioRoomKV(
+                                                IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "0", null);
+                                RCRadioRoomEngine.getInstance()
+                                        .updateRadioRoomKV(
+                                                IRCRadioRoomEngine.UpdateKey.RC_SILENT, "0", null);
+                                AudioManagerUtil.INSTANCE.choiceAudioModel();
+                            }
 
-            @Override
-            public void onError(int code, String message) {
-                Logger.e("==============enterSeat onError, code:" + code + ",message:" + message);
-                AudioManagerUtil.INSTANCE.choiceAudioModel();
-            }
-        });
+                            @Override
+                            public void onError(int code, String message) {
+                                Logger.e(
+                                        "==============enterSeat onError, code:"
+                                                + code
+                                                + ",message:"
+                                                + message);
+                                AudioManagerUtil.INSTANCE.choiceAudioModel();
+                            }
+                        });
     }
 
-    /**
-     * 房主下麦
-     */
+    /** 房主下麦 */
     public void leaveSeat() {
         MusicManager.get().stopPlayMusic();
-        RCRadioRoomEngine.getInstance().leaveSeat(new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
-                AudioManagerUtil.INSTANCE.choiceAudioModel();
-            }
+        RCRadioRoomEngine.getInstance()
+                .leaveSeat(
+                        new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                mView.setSeatState(RoomSeatView.SeatState.LEAVE_SEAT);
+                                AudioManagerUtil.INSTANCE.choiceAudioModel();
+                            }
 
-            @Override
-            public void onError(int i, String s) {
-                AudioManagerUtil.INSTANCE.choiceAudioModel();
-            }
-        });
+                            @Override
+                            public void onError(int i, String s) {
+                                AudioManagerUtil.INSTANCE.choiceAudioModel();
+                            }
+                        });
     }
 
-    /**
-     * 点击麦位头像
-     */
+    /** 点击麦位头像 */
     public void clickRoomSeat() {
         if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
             if (RadioEventHelper.getInstance().isInSeat()) {
-                mView.showCreatorSetting(RadioEventHelper.getInstance().isMute(), MusicManager.get().isPlaying());
+                mView.showCreatorSetting(
+                        RadioEventHelper.getInstance().isMute(), MusicManager.get().isPlaying());
             } else {
                 enterSeat();
             }
@@ -333,64 +362,72 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         }
     }
 
-    /**
-     * 获取房间内礼物列表
-     */
+    /** 获取房间内礼物列表 */
     private void getGiftCount() {
-        OkApi.get(VRApi.getGiftList(mRoomId), null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    Map<String, String> map = result.getMap();
-                    try {
-                        Long giftCount = Long.valueOf(map.get(getCreateUserId()));
-                        if (giftCount != null) {
-                            mView.setGiftCount(giftCount);
-                        }
-                    } catch (NumberFormatException e) {
-                    }
-                }
-            }
-        });
-    }
-
-    /**
-     * 刷新房间人数
-     */
-    public void refreshRoomMemberCount() {
-        // 由于退出房间前先发离开的消息，但还没离开成功，这时候立即获取人数是错误的，因此延时获取一下人数
-        UIKit.postDelayed(() -> {
-            RongIMClient.getInstance()
-                    .getChatRoomInfo(mRoomId, 0, ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC, new RongIMClient.ResultCallback<ChatRoomInfo>() {
-                        @Override
-                        public void onSuccess(ChatRoomInfo chatRoomInfo) {
-                            if (chatRoomInfo != null) {
-                                mView.setOnlineCount(chatRoomInfo.getTotalMemberCount());
+        OkApi.get(
+                VRApi.getGiftList(mRoomId),
+                null,
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            Map<String, String> map = result.getMap();
+                            try {
+                                Long giftCount = Long.valueOf(map.get(getCreateUserId()));
+                                if (giftCount != null) {
+                                    mView.setGiftCount(giftCount);
+                                }
+                            } catch (NumberFormatException e) {
                             }
                         }
-
-                        @Override
-                        public void onError(RongIMClient.ErrorCode errorCode) {
-                        }
-                    });
-        }, 500);
+                    }
+                });
     }
 
-    /**
-     * 获取房间公告
-     */
-    public void getNotice(boolean isModify) {
-        RCRadioRoomEngine.getInstance().getRadioRoomValue(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, new RCRadioRoomResultCallback<String>() {
-            @Override
-            public void onSuccess(String s) {
-                mView.showNotice(s, isModify);
-            }
+    /** 刷新房间人数 */
+    public void refreshRoomMemberCount() {
+        // 由于退出房间前先发离开的消息，但还没离开成功，这时候立即获取人数是错误的，因此延时获取一下人数
+        UIKit.postDelayed(
+                () -> {
+                    RongIMClient.getInstance()
+                            .getChatRoomInfo(
+                                    mRoomId,
+                                    0,
+                                    ChatRoomInfo.ChatRoomMemberOrder.RC_CHAT_ROOM_MEMBER_ASC,
+                                    new RongIMClient.ResultCallback<ChatRoomInfo>() {
+                                        @Override
+                                        public void onSuccess(ChatRoomInfo chatRoomInfo) {
+                                            if (chatRoomInfo != null) {
+                                                mView.setOnlineCount(
+                                                        chatRoomInfo.getTotalMemberCount());
+                                            }
+                                        }
 
-            @Override
-            public void onError(int i, String s) {
-                mView.showNotice(String.format("欢迎来到%s。", mVoiceRoomBean.getRoomName()), isModify);
-            }
-        });
+                                        @Override
+                                        public void onError(RongIMClient.ErrorCode errorCode) {}
+                                    });
+                },
+                500);
+    }
+
+    /** 获取房间公告 */
+    public void getNotice(boolean isModify) {
+        RCRadioRoomEngine.getInstance()
+                .getRadioRoomValue(
+                        IRCRadioRoomEngine.UpdateKey.RC_NOTICE,
+                        new RCRadioRoomResultCallback<String>() {
+                            @Override
+                            public void onSuccess(String s) {
+                                mView.showNotice(s, isModify);
+                            }
+
+                            @Override
+                            public void onError(int i, String s) {
+                                mView.showNotice(
+                                        String.format("欢迎来到%s。", mVoiceRoomBean.getRoomName()),
+                                        isModify);
+                            }
+                        });
     }
 
     /**
@@ -399,12 +436,11 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param notice
      */
     public void modifyNotice(String notice) {
-        RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, notice, null);
+        RCRadioRoomEngine.getInstance()
+                .updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, notice, null);
     }
 
-    /**
-     * 发送默认消息
-     */
+    /** 发送默认消息 */
     private void sendDefaultMessage() {
         if (mVoiceRoomBean != null) {
             // 清空所有消息
@@ -425,7 +461,6 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         }
     }
 
-
     /**
      * 发送文字消息
      *
@@ -436,52 +471,51 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         barrage.setContent(msg);
         barrage.setUserId(AccountStore.INSTANCE.getUserId());
         barrage.setUserName(AccountStore.INSTANCE.getUserName());
-        getShield(new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    List<Shield> shields = result.getList(Shield.class);
-                    boolean isContains = false;
-                    if (shields != null) {
-                        for (Shield shield : shields) {
-                            if (msg.contains(shield.getName())) {
-                                isContains = true;
-                                break;
+        getShield(
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            List<Shield> shields = result.getList(Shield.class);
+                            boolean isContains = false;
+                            if (shields != null) {
+                                for (Shield shield : shields) {
+                                    if (msg.contains(shield.getName())) {
+                                        isContains = true;
+                                        break;
+                                    }
+                                }
                             }
+                            if (isContains) {
+                                mView.addToMessageList(barrage, false);
+                                mView.clearInput();
+                            } else {
+                                sendMessage(barrage);
+                            }
+                        } else {
+                            sendMessage(barrage);
                         }
                     }
-                    if (isContains) {
-                        mView.addToMessageList(barrage, false);
-                        mView.clearInput();
-                    } else {
+
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
                         sendMessage(barrage);
                     }
-                } else {
-                    sendMessage(barrage);
-                }
-            }
-
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
-                sendMessage(barrage);
-            }
-        });
+                });
     }
 
-    /**
-     * 设置弹框数据
-     */
+    /** 设置弹框数据 */
     public void showSettingDialog() {
-        List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
-                new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
-                new MutableLiveData<>(new RoomNameFun(0)),
-                new MutableLiveData<>(new RoomNoticeFun(0)),
-                new MutableLiveData<>(new RoomBackgroundFun(0)),
-                new MutableLiveData<>(new RoomShieldFun(0)),
-                new MutableLiveData<>(new RoomMusicFun(0)),
-                new MutableLiveData<>(new RoomPauseFun(0))
-        );
+        List<MutableLiveData<IFun.BaseFun>> funList =
+                Arrays.asList(
+                        new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
+                        new MutableLiveData<>(new RoomNameFun(0)),
+                        new MutableLiveData<>(new RoomNoticeFun(0)),
+                        new MutableLiveData<>(new RoomBackgroundFun(0)),
+                        new MutableLiveData<>(new RoomShieldFun(0)),
+                        new MutableLiveData<>(new RoomMusicFun(0)),
+                        new MutableLiveData<>(new RoomPauseFun(0)));
         mView.showSettingDialog(funList);
     }
 
@@ -507,30 +541,28 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         Logger.e(shields.toString());
     }
 
-    /**
-     * 获取屏蔽词
-     */
+    /** 获取屏蔽词 */
     private void getShield(WrapperCallBack wrapperCallBack) {
         OkApi.get(VRApi.getShield(mRoomId), null, wrapperCallBack);
     }
 
-    /**
-     * 暂停直播
-     */
+    /** 暂停直播 */
     public void pauseRadioLive() {
-        RCRadioRoomEngine.getInstance().leaveSeat(new RCRadioRoomCallback() {
-            @Override
-            public void onSuccess() {
-                mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
-                // 发暂停通知
-                RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "1", null);
-            }
+        RCRadioRoomEngine.getInstance()
+                .leaveSeat(
+                        new RCRadioRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                mView.setSeatState(RoomSeatView.SeatState.OWNER_PAUSE);
+                                // 发暂停通知
+                                RCRadioRoomEngine.getInstance()
+                                        .updateRadioRoomKV(
+                                                IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "1", null);
+                            }
 
-            @Override
-            public void onError(int i, String s) {
-
-            }
-        });
+                            @Override
+                            public void onError(int i, String s) {}
+                        });
     }
 
     public void switchRoom() {
@@ -539,24 +571,29 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
     public void leaveRoom() {
         mView.showLoading("");
-        RadioEventHelper.getInstance().leaveRoom(new RadioEventHelper.LeaveRoomCallback() {
-            @Override
-            public void leaveFinish() {
-                mView.dismissLoading();
-                mView.finish();
-            }
-        });
+        RadioEventHelper.getInstance()
+                .leaveRoom(
+                        new RadioEventHelper.LeaveRoomCallback() {
+                            @Override
+                            public void leaveFinish() {
+                                mView.dismissLoading();
+                                mView.finish();
+                            }
+                        });
     }
 
     public void closeRoom() {
         mView.showLoading("");
-        RadioEventHelper.getInstance().closeRoom(mRoomId, new RadioEventHelper.CloseRoomCallback() {
-            @Override
-            public void onSuccess() {
-                mView.dismissLoading();
-                mView.finish();
-            }
-        });
+        RadioEventHelper.getInstance()
+                .closeRoom(
+                        mRoomId,
+                        new RadioEventHelper.CloseRoomCallback() {
+                            @Override
+                            public void onSuccess() {
+                                mView.dismissLoading();
+                                mView.finish();
+                            }
+                        });
     }
 
     /**
@@ -566,13 +603,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param password
      * @param item
      */
-    public void setRoomPassword(boolean isPrivate, String password, MutableLiveData<IFun.BaseFun> item) {
+    public void setRoomPassword(
+            boolean isPrivate, String password, MutableLiveData<IFun.BaseFun> item) {
         int p = isPrivate ? 1 : 0;
-        OkApi.put(VRApi.ROOM_PASSWORD,
+        OkApi.put(
+                VRApi.ROOM_PASSWORD,
                 new OkParams()
                         .add("roomId", mRoomId)
                         .add("isPrivate", p)
-                        .add("password", password).build(),
+                        .add("password", password)
+                        .build(),
                 new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
@@ -596,11 +636,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      * @param name
      */
     public void setRoomName(String name) {
-        OkApi.put(VRApi.ROOM_NAME,
-                new OkParams()
-                        .add("roomId", mRoomId)
-                        .add("name", name)
-                        .build(),
+        OkApi.put(
+                VRApi.ROOM_NAME,
+                new OkParams().add("roomId", mRoomId).add("name", name).build(),
                 new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
@@ -608,7 +646,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
                             mView.showToast("修改成功");
                             mView.setRadioName(name);
                             mVoiceRoomBean.setRoomName(name);
-                            RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_ROOM_NAME, name, null);
+                            RCRadioRoomEngine.getInstance()
+                                    .updateRadioRoomKV(
+                                            IRCRadioRoomEngine.UpdateKey.RC_ROOM_NAME, name, null);
                         } else {
                             mView.showToast("修改失败");
                         }
@@ -643,41 +683,46 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             return;
         }
         boolean isAdmin = !MemberCache.getInstance().isAdmin(user.getUserId());
-        HashMap<String, Object> params = new OkParams()
-                .add("roomId", mRoomId)
-                .add("userId", user.getUserId())
-                .add("isManage", isAdmin)
-                .build();
+        HashMap<String, Object> params =
+                new OkParams()
+                        .add("roomId", mRoomId)
+                        .add("userId", user.getUserId())
+                        .add("isManage", isAdmin)
+                        .build();
         // 先请求 设置/取消 管理员
-        OkApi.put(VRApi.ADMIN_MANAGE, params, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    if (isAdmin) {
-                        MemberCache.getInstance().addAdmin(user.getUserId());
-                    } else {
-                        MemberCache.getInstance().removeAdmin(user.getUserId());
+        OkApi.put(
+                VRApi.ADMIN_MANAGE,
+                params,
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            if (isAdmin) {
+                                MemberCache.getInstance().addAdmin(user.getUserId());
+                            } else {
+                                MemberCache.getInstance().removeAdmin(user.getUserId());
+                            }
+                            RCChatroomAdmin admin = new RCChatroomAdmin();
+                            admin.setAdmin(isAdmin);
+                            admin.setUserId(user.getUserId());
+                            admin.setUserName(user.getUserName());
+                            // 成功后发送管理变更的消息
+                            sendMessage(admin);
+                            callback.onResult(true, "");
+                        } else {
+                            mView.showToast(result.getMessage());
+                            callback.onResult(true, result.getMessage());
+                        }
                     }
-                    RCChatroomAdmin admin = new RCChatroomAdmin();
-                    admin.setAdmin(isAdmin);
-                    admin.setUserId(user.getUserId());
-                    admin.setUserName(user.getUserName());
-                    // 成功后发送管理变更的消息
-                    sendMessage(admin);
-                    callback.onResult(true, "");
-                } else {
-                    mView.showToast(result.getMessage());
-                    callback.onResult(true, result.getMessage());
-                }
-            }
-        });
+                });
     }
 
-    /**
-     * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
-     */
+    /** 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号 */
     public void sendGift() {
-        mView.showSendGiftDialog(mVoiceRoomBean, getCreateUserId(), Arrays.asList(new Member().toMember(getCreateRoomUser())));
+        mView.showSendGiftDialog(
+                mVoiceRoomBean,
+                getCreateUserId(),
+                Arrays.asList(new Member().toMember(getCreateRoomUser())));
     }
 
     /**
@@ -687,7 +732,8 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      */
     @Override
     public void clickSendGift(User user) {
-        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
+        mView.showSendGiftDialog(
+                mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
     }
 
     @Override
@@ -698,27 +744,31 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         mView.setTitleFollow(isFollow);
     }
 
-    /**
-     * 根据id获取用户信息
-     */
+    /** 根据id获取用户信息 */
     public void getUserInfo(String userId) {
-        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{userId}).build(), new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    List<Member> members = result.getList(Member.class);
-                    if (members != null && members.size() > 0) {
-                        mView.showUserSetting(members.get(0));
+        OkApi.post(
+                VRApi.GET_USER,
+                new OkParams().add("userIds", new String[] {userId}).build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            List<Member> members = result.getList(Member.class);
+                            if (members != null && members.size() > 0) {
+                                mView.showUserSetting(members.get(0));
+                            }
+                        }
                     }
-                }
-            }
-        });
+                });
     }
 
     @Override
     public void onMessageReceived(Message message) {
         MessageContent content = message.getContent();
-        Logger.d("==============onMessageReceived: " + content.getClass() + JsonUtils.toJson(content));
+        Logger.d(
+                "==============onMessageReceived: "
+                        + content.getClass()
+                        + JsonUtils.toJson(content));
 
         if (content instanceof RCChatroomGift || content instanceof RCChatroomGiftAll) {
             // 刷新礼物数
@@ -738,7 +788,8 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         } else if (content instanceof RCChatroomLike) {
             mView.showLikeAnimation();
             return;
-        } else if (content instanceof RCChatroomBarrage && isSelf(((RCChatroomBarrage) content).getUserId())) {
+        } else if (content instanceof RCChatroomBarrage
+                && isSelf(((RCChatroomBarrage) content).getUserId())) {
             // 自己发消息成功后清除输入框内容
             mView.clearInput();
         } else if (content instanceof RCRRCloseMessage) {
@@ -786,9 +837,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         }
     }
 
-    /**
-     * 刷新座位状态
-     */
+    /** 刷新座位状态 */
     private void refreshSeatView() {
         if (RadioEventHelper.getInstance().isSuspend()) {
             if (isSelf(getCreateUserId())) {
@@ -845,28 +894,30 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
 
     @Override
     public void selectBackground(String url) {
-        OkApi.put(VRApi.ROOM_BACKGROUND, new OkParams()
-                .add("roomId", mRoomId)
-                .add("backgroundUrl", url)
-                .build(), new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    mVoiceRoomBean.setBackgroundUrl(url);
-                    mView.setRoomBackground(url);
-                    RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_BGNAME, url, null);
-                    mView.showToast("设置成功");
-                } else {
-                    mView.showToast("设置失败");
-                }
-            }
+        OkApi.put(
+                VRApi.ROOM_BACKGROUND,
+                new OkParams().add("roomId", mRoomId).add("backgroundUrl", url).build(),
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            mVoiceRoomBean.setBackgroundUrl(url);
+                            mView.setRoomBackground(url);
+                            RCRadioRoomEngine.getInstance()
+                                    .updateRadioRoomKV(
+                                            IRCRadioRoomEngine.UpdateKey.RC_BGNAME, url, null);
+                            mView.showToast("设置成功");
+                        } else {
+                            mView.showToast("设置失败");
+                        }
+                    }
 
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
-                mView.showToast("设置失败");
-            }
-        });
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                        mView.showToast("设置失败");
+                    }
+                });
     }
 
     @Override
@@ -894,7 +945,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
     @Override
     public void clickMuteSelf(boolean isMute) {
         RCRadioRoomEngine.getInstance().muteSelf(isMute);
-        RCRadioRoomEngine.getInstance().updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_SILENT, isMute ? "1" : "0", null);
+        RCRadioRoomEngine.getInstance()
+                .updateRadioRoomKV(
+                        IRCRadioRoomEngine.UpdateKey.RC_SILENT, isMute ? "1" : "0", null);
     }
 
     @Override
@@ -906,19 +959,20 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
         mView.addAllToMessageList(contents, true);
     }
 
-    //更改所属房间
+    // 更改所属房间
     public void changeUserRoom(String roomId) {
-        HashMap<String, Object> params = new OkParams()
-                .add("roomId", roomId)
-                .build();
-        OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    Log.e("TAG", "changeUserRoom: " + result.getBody());
-                }
-            }
-        });
+        HashMap<String, Object> params = new OkParams().add("roomId", roomId).build();
+        OkApi.get(
+                VRApi.USER_ROOM_CHANGE,
+                params,
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            Log.e("TAG", "changeUserRoom: " + result.getBody());
+                        }
+                    }
+                });
     }
 
     /**
@@ -928,48 +982,65 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
      */
     public void jumpRoom(RCAllBroadcastMessage message) {
         // 当前房间不跳转,房主不能跳转
-        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), mRoomId) || isSelf(mVoiceRoomBean.getUserId()))
-            return;
-        OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
-            @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
-                    if (roomBean != null) {
-                        // 房间有密码需要弹框验证密码
-                        if (roomBean.isPrivate()) {
-                            new InputPasswordDialog(((RadioRoomFragment) mView).requireContext(), false, () -> null, s -> {
-                                if (TextUtils.isEmpty(s)) {
-                                    return null;
-                                }
-                                if (s.length() < 4) {
-                                    mView.showToast(UIKit.getResources().getString(R.string.text_please_input_four_number));
-                                    return null;
-                                }
-                                if (TextUtils.equals(s, roomBean.getPassword())) {
-                                    jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());
+        if (message == null
+                || TextUtils.isEmpty(message.getRoomId())
+                || TextUtils.equals(message.getRoomId(), mRoomId)
+                || isSelf(mVoiceRoomBean.getUserId())) return;
+        OkApi.get(
+                VRApi.getRoomInfo(message.getRoomId()),
+                null,
+                new WrapperCallBack() {
+                    @Override
+                    public void onResult(Wrapper result) {
+                        if (result.ok()) {
+                            VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                            if (roomBean != null) {
+                                // 房间有密码需要弹框验证密码
+                                if (roomBean.isPrivate()) {
+                                    new InputPasswordDialog(
+                                                    ((RadioRoomFragment) mView).requireContext(),
+                                                    false,
+                                                    () -> null,
+                                                    s -> {
+                                                        if (TextUtils.isEmpty(s)) {
+                                                            return null;
+                                                        }
+                                                        if (s.length() < 4) {
+                                                            mView.showToast(
+                                                                    UIKit.getResources()
+                                                                            .getString(
+                                                                                    R.string
+                                                                                            .text_please_input_four_number));
+                                                            return null;
+                                                        }
+                                                        if (TextUtils.equals(
+                                                                s, roomBean.getPassword())) {
+                                                            jumpOtherRoom(
+                                                                    roomBean.getRoomType(),
+                                                                    roomBean.getRoomId());
+                                                        } else {
+                                                            mView.showToast("密码错误");
+                                                        }
+                                                        return null;
+                                                    })
+                                            .show();
                                 } else {
-                                    mView.showToast("密码错误");
+                                    jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());
                                 }
-                                return null;
-                            }).show();
+                            }
                         } else {
-                            jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                            mView.dismissLoading();
+                            if (result.getCode() == 30001) {
+                                mView.showToast("房间不存在了");
+                            }
                         }
                     }
-                } else {
-                    mView.dismissLoading();
-                    if (result.getCode() == 30001) {
-                        mView.showToast("房间不存在了");
-                    }
-                }
-            }
 
-            @Override
-            public void onError(int code, String msg) {
-                super.onError(code, msg);
-            }
-        });
+                    @Override
+                    public void onError(int code, String msg) {
+                        super.onError(code, msg);
+                    }
+                });
     }
 
     private void jumpOtherRoom(int roomType, final String roomId) {
@@ -977,18 +1048,19 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView> implements 
             mView.switchOtherRoom(roomId);
         } else {
             mView.showLoading("");
-            RadioEventHelper.getInstance().leaveRoom(new RadioEventHelper.LeaveRoomCallback() {
-                @Override
-                public void leaveFinish() {
-                    mView.dismissLoading();
-                    mView.finish();
-                    IntentWrap.launchRoom(((RadioRoomFragment) mView).requireContext(), roomType, roomId);
-                }
-            });
+            RadioEventHelper.getInstance()
+                    .leaveRoom(
+                            new RadioEventHelper.LeaveRoomCallback() {
+                                @Override
+                                public void leaveFinish() {
+                                    mView.dismissLoading();
+                                    mView.finish();
+                                    IntentWrap.launchRoom(
+                                            ((RadioRoomFragment) mView).requireContext(),
+                                            roomType,
+                                            roomId);
+                                }
+                            });
         }
-    }
-
-    interface CloseRoomCallback {
-        void onSuccess();
     }
 }
