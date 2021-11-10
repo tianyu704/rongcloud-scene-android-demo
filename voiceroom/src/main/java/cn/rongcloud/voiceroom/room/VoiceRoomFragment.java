@@ -515,9 +515,12 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         //离开房间的时候
         clVoiceRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
-        present.leaveCurrentRoom();
         // uninit pk
         unInitPk();
+        //取消对当前房间的监听
+        EventHelper.helper().unregeister();
+        //取消当前对于各种消息的回调监听
+        present.unInitListener();
     }
 
     @Override

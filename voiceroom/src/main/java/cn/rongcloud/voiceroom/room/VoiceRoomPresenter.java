@@ -1156,7 +1156,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             @Override
             public void onSuccess() {
                 Logger.d("==============leaveRoom onSuccess");
-                leaveCurrentRoom();
                 mView.dismissLoading();
                 mView.finish();
                 if (callback != null) {
@@ -1183,7 +1182,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             @Override
             public void onSuccess() {
                 //房主关闭房间，调用删除房间接口
-                leaveCurrentRoom();
                 OkApi.get(VRApi.deleteRoom(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
@@ -1257,22 +1255,17 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         });
     }
 
-    /**
-     * 切换房间的时候，对之前房间的操作
-     */
-    public void leaveCurrentRoom() {
-        //取消对当前房间的监听
-        EventHelper.helper().unregeister();
-        //取消当前对于各种消息的回调监听
-        unInitListener();
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //界面销毁，回收监听
         unInitListener();
     }
 
+    /**
+     * 回收掉对房间的各种监听
+     */
     public void unInitListener() {
         for (Disposable disposable : disposableList) {
             disposable.dispose();
