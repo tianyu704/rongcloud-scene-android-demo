@@ -38,7 +38,7 @@ import io.rong.imlib.model.ChatRoomMemberInfo;
 import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.UserInfo;
 
-public class EventHelper extends AbsPKHelper{
+public class EventHelper extends AbsPKHelper {
 
     private final static IEventHelp _helper = new EventHelper();
 
@@ -146,15 +146,15 @@ public class EventHelper extends AbsPKHelper{
 
     //更改所属房间
     @Override
-    public void changeUserRoom(String roomId){
+    public void changeUserRoom(String roomId) {
         HashMap<String, Object> params = new OkParams()
                 .add("roomId", roomId)
                 .build();
         OkApi.get(VRApi.USER_ROOM_CHANGE, params, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
-                if (result.ok()){
-                    Log.e(TAG, "onResult: "+result.getMessage() );
+                if (result.ok()) {
+                    Log.e(TAG, "onResult: " + result.getMessage());
                 }
             }
         });
@@ -179,6 +179,7 @@ public class EventHelper extends AbsPKHelper{
      */
     public RCVoiceSeatInfo getSeatInfo(String userId) {
         synchronized (obj) {
+            if (mSeatInfos == null) return null;
             int count = mSeatInfos.size();
             for (int i = 0; i < count; i++) {
                 RCVoiceSeatInfo s = mSeatInfos.get(i);

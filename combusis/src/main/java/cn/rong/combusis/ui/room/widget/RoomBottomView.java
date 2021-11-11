@@ -239,14 +239,14 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 }
                 //判断正在视频通话和语音通话中不能进行语音消息发送
                 RCVoiceSeatInfo seatInfo = EventHelper.helper().getSeatInfo(AccountStore.INSTANCE.getUserId());
-                boolean isMic=RongUtils.phoneIsInUse(v.getContext()) || IMLibExtensionModuleManager.getInstance()
+                boolean isMic = RongUtils.phoneIsInUse(v.getContext()) || IMLibExtensionModuleManager.getInstance()
                         .onRequestHardwareResource(HardwareResource.ResourceType.VIDEO)
                         || IMLibExtensionModuleManager.getInstance()
                         .onRequestHardwareResource(HardwareResource.ResourceType.AUDIO);
                 //如果麦克风被占用
-                if (isMic){
+                if (isMic) {
                     //不在麦位上，或者在麦位上但是没有被禁麦,
-                    if (seatInfo==null||(seatInfo!=null&&!seatInfo.isMute())){
+                    if (seatInfo == null || (seatInfo != null && !seatInfo.isMute())) {
                         EToast.showToast("麦克风被占用，不可发送语音");
                         return true;
                     }
