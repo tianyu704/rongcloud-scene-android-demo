@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -18,6 +17,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.basis.R;
 import com.basis.ui.BaseActivity;
 import com.basis.widget.interfaces.IWrapBar;
+import com.kit.UIKit;
 import com.kit.utils.Logger;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ import java.util.List;
 
 public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
     private ActionBar actionBar;
-    private int title;
+    private String title;
     private boolean backHide = false;//back 是否隐藏
     private boolean noneBar = false;//action bar 是否隐藏
     private List<OpMenu> options;
@@ -53,7 +53,7 @@ public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
             toolbar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (null != activity)activity.onBackCode();
+                    if (null != activity) activity.onBackCode();
                 }
             });
             result = activity.getSupportActionBar();
@@ -73,8 +73,15 @@ public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
         return this;
     }
 
+    @SuppressLint("ResourceType")
     @Override
-    public ActionWrapBar setTitle(@StringRes int title) {
+    public ActionWrapBar setTitle(int titleId) {
+        this.title = titleId > 0 ? UIKit.getResources().getString(titleId) : "";
+        return this;
+    }
+
+    @Override
+    public ActionWrapBar setTitle(String title) {
         this.title = title;
         return this;
     }
@@ -105,7 +112,7 @@ public class ActionWrapBar implements IWrapBar<ActionWrapBar> {
     @Override
     public ActionWrapBar work() {
         if (null != actionBar) {
-            if (title > 0) actionBar.setTitle(title);
+            if (null != title) actionBar.setTitle(title);
             actionBar.setDisplayHomeAsUpEnabled(!backHide);
             if (noneBar) {
                 actionBar.hide();

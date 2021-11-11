@@ -13,26 +13,22 @@ import cn.rongcloud.voiceroom.model.FileModel
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView
 import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
+import com.basis.net.LoadTag
 import com.basis.net.oklib.OkApi
 import com.basis.net.oklib.WrapperCallBack
 import com.basis.net.oklib.wrapper.Wrapper
+import com.kit.utils.KToast
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.utils.AccountStore
-import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.scopes.ActivityScoped
-import javax.inject.Inject
 
 /**
  * @author gusd
  * @Date 2021/06/04
  */
-private const val TAG = "HomePresenter"
-
-@ActivityScoped
-class SettingPresenter @Inject constructor(
+class SettingPresenter constructor(
     val view: ISettingView,
-    @ActivityContext val context: Context,
-    activity: AppCompatActivity
+    val context: Context,
+    val activity: AppCompatActivity
 ) :
     BaseLifeCyclePresenter(activity) {
 
@@ -40,7 +36,8 @@ class SettingPresenter @Inject constructor(
     }
 
     fun modifyUserInfo(userName: String, selectedPicPath: Uri?) {
-        view.showWaitingDialog()
+        var tag = LoadTag(activity, "")
+        tag.show()
         if (selectedPicPath != null) {
             addDisposable(
                 FileModel.imageUpload(
@@ -62,9 +59,9 @@ class SettingPresenter @Inject constructor(
                         .copy(userName = respond.data?.name, portrait = respond.data?.portrait)
                     AccountStore.saveAccountInfo(accountInfo)
                     view.modifyInfoSuccess()
-                    view.hideWaitingDialog()
+                    tag.dismiss()
                 }, { t ->
-                    view.showError(-1, t.message)
+                    KToast.show(t.message)
                 })
             )
         } else {
@@ -81,9 +78,9 @@ class SettingPresenter @Inject constructor(
                             .copy(userName = r.data?.name)
                         AccountStore.saveAccountInfo(accountInfo)
                         view.modifyInfoSuccess()
-                        view.hideWaitingDialog()
+                        tag.dismiss()
                     }, { t ->
-                        view.showError(-1, t.message)
+                        KToast.show(t.message)
                     })
             )
         }
@@ -93,7 +90,7 @@ class SettingPresenter @Inject constructor(
         OkApi.post(VRApi.RESIGN, null, object : WrapperCallBack() {
             override fun onResult(result: Wrapper?) {
                 if (result?.ok() == true) {
-                    view.showMessage("注销成功")
+                    KToast.show("注销成功")
                     logout()
                 }
             }

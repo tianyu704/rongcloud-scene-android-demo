@@ -15,31 +15,27 @@ import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 
+import com.basis.ui.BaseActivity;
+import com.basis.widget.interfaces.IWrapBar;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
-import javax.inject.Inject;
-
 import cn.rong.combusis.umeng.RcUmEvent;
 import cn.rong.combusis.umeng.UmengHelper;
-import cn.rongcloud.annotation.HiltBinding;
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ISettingView;
 import cn.rongcloud.voiceroomdemo.mvp.presenter.SettingPresenter;
 import cn.rongcloud.voiceroomdemo.ui.dialog.UnregisterDialog;
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog;
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb;
-import cn.rongcloud.voiceroomdemo.webview.BaseActionBarActivity;
-import dagger.hilt.android.AndroidEntryPoint;
 import kotlin.jvm.functions.Function0;
 
 
-@HiltBinding(value = ISettingView.class)
-@AndroidEntryPoint
-public class SettingActivity extends BaseActionBarActivity implements View.OnClickListener, ISettingView {
+public class SettingActivity extends BaseActivity implements View.OnClickListener, ISettingView {
     private UserInfoDialog dialog;
     private boolean needModefy = false;
     private UnregisterDialog unregisterDialog;
+    private SettingPresenter presenter;
 
     public static void startActivity(Activity activity, int code) {
         if (code > 0) {
@@ -57,7 +53,7 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
     }
 
     @Override
-    public int getContentView() {
+    public int setLayoutId() {
         return R.layout.activity_setting;
     }
 
@@ -65,7 +61,17 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
     private TextView tv_name;
 
     @Override
-    public void initView() {
+    public void init() {
+        getWrapBar()
+                .addOptionMenu("", R.drawable.ic_setting)
+                .setOnMenuSelectedListener(new IWrapBar.OnMenuSelectedListener() {
+                    @Override
+                    public void onItemSelected(int position) {
+                        if (0 == position) {
+                            ProfileActivity.startActivity(activity, -1);
+                        }
+                    }
+                }).work();
         iv_portrait = findViewById(R.id.iv_portrait);
         tv_name = findViewById(R.id.tv_name);
         iv_portrait.setOnClickListener(this);
@@ -75,14 +81,11 @@ public class SettingActivity extends BaseActionBarActivity implements View.OnCli
         findViewById(R.id.ad_fourth).setOnClickListener(this);
         findViewById(R.id.ad_fivth).setOnClickListener(this);
         findViewById(R.id.customer_dial).setOnClickListener(this);
-        initDefalutActionBar("");
+        initData();
     }
 
-    @Inject
-    SettingPresenter presenter;
-
-    @Override
     public void initData() {
+        presenter = new SettingPresenter(this, this, this);
         tv_name.setText(AccountStore.INSTANCE.getUserName());
         String url = AccountStore.INSTANCE.getUserPortrait();
         if (TextUtils.isEmpty(url)) {

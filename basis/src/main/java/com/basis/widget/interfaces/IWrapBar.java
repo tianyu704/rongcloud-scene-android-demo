@@ -18,6 +18,8 @@ public interface IWrapBar<T extends IWrapBar> {
 
     T setTitle(@StringRes int title);
 
+    T setTitle(String title);
+
     T setOnMenuSelectedListener(OnMenuSelectedListener listener);
 
     T addOptionMenu(String title);

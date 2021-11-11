@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.basis.ui.BaseActivity;
+
 import cn.rongcloud.voiceroomdemo.R;
 
 
@@ -26,7 +28,7 @@ import cn.rongcloud.voiceroomdemo.R;
  * @ClassName: ActCommentWeb
  * @Description: 只加载https
  */
-public class ActCommentWeb extends BaseActionBarActivity {
+public class ActCommentWeb extends BaseActivity {
     public final static String tag = "ActCommentWeb";
     public final static String _https = "https";
     public final static String KEY_BASIC = "key_basic";
@@ -55,21 +57,18 @@ public class ActCommentWeb extends BaseActionBarActivity {
     }
 
     @Override
-    public int getContentView() {
+    public int setLayoutId() {
         return R.layout.act_commment_web;
     }
 
-    @Override
-    public void initData() {
-
-    }
 
     private TextView tvTitle;
     private Button btnRefresh, btnBack;
 
-    public void initView() {
+    public void init() {
         currnetUrl = getIntent().getStringExtra(KEY_URL);
         curretnTitle = getIntent().getStringExtra(KEY_BASIC);
+        getWrapBar().setTitle(curretnTitle).work();
         tvTitle = findViewById(R.id.title);
         btnRefresh = findViewById(R.id.title_refresh);
         btnBack = findViewById(R.id.title_back);
@@ -77,7 +76,6 @@ public class ActCommentWeb extends BaseActionBarActivity {
         Log.e(tag, "currnetUrl = " + currnetUrl);
         isHttps = currnetUrl.contains(_https);
         tvTitle.setText(curretnTitle);
-        initDefalutActionBar(curretnTitle);
         CommonUtil.openWebViewCache(this, webview, isHttps);
         //添加js
         webview.setWebViewClient(new MyWebViewClient());
@@ -106,7 +104,6 @@ public class ActCommentWeb extends BaseActionBarActivity {
             }
         });
     }
-
 
     class MyWebViewClient extends WebViewClient {
         @Override

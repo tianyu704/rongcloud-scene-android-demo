@@ -2,7 +2,7 @@
   ~ Copyright © 2021 RongCloud. All rights reserved.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">融云 RTC</string>
     <string name="please_input_phone_number">请输入手机号</string>
     <string name="please_input_verification_code">请输入验证码</string>
@@ -22,5 +22,9 @@
     <string name="voice_call_des">拥有智能降噪的无差别电话体验</string>
     <string name="radio_room">语音电台</string>
     <string name="radio_room_des">听众端采用CDN链路 支持人数无上限</string>
+    <string name="str_rejster_coms" tools:ignore="ExtraTranslation">注册条款</string>
+    <string name="str_privite_coms" tools:ignore="ExtraTranslation">隐身政策</string>
+    <string name="str_uninit_coms" tools:ignore="ExtraTranslation">账号注销</string>
+    <string name="str_logout" tools:ignore="ExtraTranslation">退出登录</string>
 
 </resources>
