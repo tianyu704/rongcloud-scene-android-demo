@@ -5,7 +5,6 @@ import android.content.Intent;
 
 import androidx.fragment.app.Fragment;
 
-
 import cn.rong.combusis.ui.friend.FriendListFragment;
 import cn.rong.combusis.ui.roomlist.AbsSwitchActivity;
 

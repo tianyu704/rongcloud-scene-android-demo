@@ -124,10 +124,10 @@ public abstract class AbsRoomActivity extends BaseActivity {
         Intent intent = new Intent(this, RTCNotificationService.class);
         switch (getRoomType()) {
             case RADIO_ROOM:
-                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_RADIO_ROOM);
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.getRadioRoomAction(activity));
                 break;
             case VOICE_ROOM:
-                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_VOICE_ROOM);
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.getVoiceRoomAction(activity));
                 break;
         }
         this.startService(intent);
@@ -192,6 +192,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
                 }
                 currentRoomId = roomId;
                 mRoomAdapter.setData(ids);
+                getIntent().putExtra(IntentWrap.KEY_ROOM_IDS, mRoomAdapter.getData());
             }
         }
         refreshLayout.finishRefresh();
@@ -205,6 +206,7 @@ public abstract class AbsRoomActivity extends BaseActivity {
             return;
         }
         mRoomAdapter.addData(ids);
+        getIntent().putExtra(IntentWrap.KEY_ROOM_IDS, mRoomAdapter.getData());
         refreshLayout.finishLoadMore();
     }
 

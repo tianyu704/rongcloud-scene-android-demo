@@ -199,7 +199,7 @@ public abstract class AbsRoomListFragment extends BaseFragment
         if (TextUtils.equals(item.getUserId(), AccountStore.INSTANCE.getUserId())) {
             ArrayList list = new ArrayList();
             list.add(item.getRoomId());
-            preLaunchRoomActivity(item.getRoomId(), list, 0, isCreate);
+            launchRoomActivity(item.getRoomId(), list, 0, isCreate);
         } else if (item.isPrivate()) {
             inputPasswordDialog =
                     new InputPasswordDialog(requireContext(), false, () -> null,
@@ -215,7 +215,7 @@ public abstract class AbsRoomListFragment extends BaseFragment
                                     inputPasswordDialog.dismiss();
                                     ArrayList list = new ArrayList();
                                     list.add(item.getRoomId());
-                                    preLaunchRoomActivity(item.getRoomId(), list, 0, false);
+                                    launchRoomActivity(item.getRoomId(), list, 0, false);
                                 } else {
                                     showToast("密码错误");
                                 }
@@ -233,20 +233,17 @@ public abstract class AbsRoomListFragment extends BaseFragment
             }
             int p = list.indexOf(item.getRoomId());
             if (p < 0) p = 0;
-            preLaunchRoomActivity(item.getRoomId(), list, p, false);
+            launchRoomActivity(item.getRoomId(), list, p, false);
         }
     }
 
-    private void preLaunchRoomActivity(
+    private void launchRoomActivity(
             String roomId, ArrayList<String> roomIds, int position, boolean isCreate) {
         // 如果在其他房间有悬浮窗，先关闭再跳转
         MiniRoomManager.getInstance().finish(roomId, () -> {
-            launchRoomActivity(roomIds, position, isCreate);
+            IntentWrap.launchRoom(requireContext(), getRoomType(), roomIds, position, isCreate);
         });
     }
-
-    public abstract void launchRoomActivity(
-            ArrayList<String> roomIds, int position, boolean isCreate);
 
     /**
      * 检查用户之前是否在某个房间内

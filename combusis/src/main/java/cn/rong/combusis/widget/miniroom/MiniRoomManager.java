@@ -115,20 +115,20 @@ public class MiniRoomManager implements OnMiniRoomListener {
     /**
      * 是否和悬浮窗房间是同一房间
      *
-     * @param roomId
+     * @param targetRoomId
      * @return
      */
-    public boolean isSameRoom(String roomId) {
-        if (TextUtils.isEmpty(roomId)) {
+    public boolean isSameRoom(String targetRoomId) {
+        if (TextUtils.isEmpty(targetRoomId)) {
             return false;
         } else {
-            return TextUtils.equals(roomId, this.roomId);
+            return TextUtils.equals(targetRoomId, this.roomId);
         }
     }
 
-    public void finish(String roomId, OnCloseMiniRoomListener.CloseResult closeResult) {
+    public void finish(String targetRoomId, OnCloseMiniRoomListener.CloseResult closeResult) {
         FloatWindow.destroy(TAG);
-        if (!isSameRoom(roomId) && onCloseMiniRoomListener != null) {
+        if (!isSameRoom(targetRoomId) && onCloseMiniRoomListener != null) {
             onCloseMiniRoomListener.onCloseMiniRoom(closeResult);
         } else if (closeResult != null) {
             closeResult.onClose();

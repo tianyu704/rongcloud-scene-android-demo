@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class RoomVPAdapter extends FragmentStateAdapter {
 
-    private List<String> mRoomList = new ArrayList<>();
+    private ArrayList<String> mRoomList = new ArrayList<>();
     private AbsRoomActivity mFragmentActivity;
 
     public RoomVPAdapter(@NonNull AbsRoomActivity fragmentActivity) {
@@ -24,11 +24,8 @@ public class RoomVPAdapter extends FragmentStateAdapter {
         mFragmentActivity = fragmentActivity;
     }
 
-    public void setData(List<String> roomList) {
-        if (roomList != null) {
-            this.mRoomList = roomList;
-            notifyDataSetChanged();
-        }
+    public ArrayList<String> getData() {
+        return mRoomList;
     }
 
     public void addData(List<String> roomList) {
@@ -64,5 +61,13 @@ public class RoomVPAdapter extends FragmentStateAdapter {
 
     public int getItemPosition(String roomId) {
         return mRoomList.indexOf(roomId);
+    }
+
+    public void setData(List<String> roomList) {
+        if (roomList != null) {
+            this.mRoomList.clear();
+            this.mRoomList.addAll(roomList);
+            notifyDataSetChanged();
+        }
     }
 }
