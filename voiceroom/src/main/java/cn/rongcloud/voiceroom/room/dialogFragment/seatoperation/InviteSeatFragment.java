@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kit.utils.ImageLoader;
 import com.rongcloud.common.base.BaseFragment;
-import com.rongcloud.common.extension.ExtensKt;
 
 import java.util.List;
 
@@ -91,7 +91,8 @@ public class InviteSeatFragment extends BaseFragment {
                 ImageView iv_user_portrait = itemView.findViewById(R.id.iv_user_portrait);
                 TextView tv_member_name = itemView.findViewById(R.id.tv_member_name);
                 TextView tv_operation = itemView.findViewById(R.id.tv_operation);
-                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortraitUrl());
+//                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortraitUrl());
+                ImageLoader.loadUrl(iv_user_portrait, uiMemberModel.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);
                 tv_member_name.setText(uiMemberModel.getUserName());
                 tv_operation.setText("邀请");
 //                tv_operation.setSelected(uiMemberModel.isInvitedInfoSeat());

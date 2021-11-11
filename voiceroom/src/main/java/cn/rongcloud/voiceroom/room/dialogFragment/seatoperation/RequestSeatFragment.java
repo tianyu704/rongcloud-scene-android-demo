@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kit.utils.ImageLoader;
 import com.rongcloud.common.base.BaseFragment;
-import com.rongcloud.common.extension.ExtensKt;
 
 import java.util.List;
 
@@ -71,9 +71,28 @@ public class RequestSeatFragment extends BaseFragment {
     }
 
     /**
+     * 同意麦位申请
+     *
+     * @param userId
+     */
+    private void acceptRequest(String userId) {
+        //判断麦位是否已经满了，这里需要交给界面去处理，因为麦位信息是时时刻刻在变化的
+        voiceRoomModel.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    ((SeatOperationViewPagerFragment) getParentFragment()).dismiss();
+                } else {
+                    EToast.showToast(msg);
+                }
+            }
+        });
+    }
+
+    /**
      * 创建适配器
      */
-    class MyAdapter extends BaseListAdapter<MyAdapter.MyViewHolder>{
+    class MyAdapter extends BaseListAdapter<MyAdapter.MyViewHolder> {
 
         @NonNull
         @Override
@@ -82,7 +101,7 @@ public class RequestSeatFragment extends BaseFragment {
         }
 
 
-        class MyViewHolder extends BaseViewHolder{
+        class MyViewHolder extends BaseViewHolder {
 
             public MyViewHolder(@NonNull ViewGroup parent) {
                 super(parent);
@@ -90,11 +109,10 @@ public class RequestSeatFragment extends BaseFragment {
 
             @Override
             public void bindView(@NonNull User uiMemberModel, @NonNull View itemView) {
-
                 ImageView iv_user_portrait = itemView.findViewById(R.id.iv_user_portrait);
                 TextView tv_member_name = itemView.findViewById(R.id.tv_member_name);
                 TextView tv_operation = itemView.findViewById(R.id.tv_operation);
-                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortraitUrl());
+                ImageLoader.loadUrl(iv_user_portrait, uiMemberModel.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);
                 tv_member_name.setText(uiMemberModel.getUserName());
                 tv_operation.setText("接受");
                 tv_operation.setOnClickListener(new View.OnClickListener() {
@@ -106,24 +124,6 @@ public class RequestSeatFragment extends BaseFragment {
                 });
             }
         }
-    }
-
-    /**
-     * 同意麦位申请
-     * @param userId
-     */
-    private void acceptRequest(String userId) {
-        //判断麦位是否已经满了，这里需要交给界面去处理，因为麦位信息是时时刻刻在变化的
-        voiceRoomModel.acceptRequestSeat(userId, new ClickCallback<Boolean>() {
-            @Override
-            public void onResult(Boolean result, String msg) {
-                if (result){
-                    ((SeatOperationViewPagerFragment) getParentFragment()).dismiss();
-                }else {
-                    EToast.showToast(msg);
-                }
-            }
-        });
     }
 
 }
