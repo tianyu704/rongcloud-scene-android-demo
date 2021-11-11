@@ -187,4 +187,14 @@ public class VRApi {
      * 注册或者注销，注销不传任何参数
      */
     public static final String RESIGN = HOST + "user/resign";
+
+    /**
+     * 暂停房间
+     *
+     * @param roomId
+     * @return
+     */
+    public static String stopRoom(String roomId) {
+        return HOST + "mic/room/" + roomId + "/stop";
+    }
 }

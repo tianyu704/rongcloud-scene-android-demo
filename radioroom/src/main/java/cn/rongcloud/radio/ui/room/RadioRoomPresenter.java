@@ -132,11 +132,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                             VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
                             if (roomBean != null) {
                                 mVoiceRoomBean = roomBean;
-                                if (mVoiceRoomBean.isStop()) {
-                                    mView.dismissLoading();
-                                } else {
-                                    initRoomData(roomBean);
-                                }
+                                initRoomData(roomBean);
                             }
                         } else {
                             mView.dismissLoading();
@@ -581,6 +577,12 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                                 RCRadioRoomEngine.getInstance()
                                         .updateRadioRoomKV(
                                                 IRCRadioRoomEngine.UpdateKey.RC_SUSPEND, "1", null);
+                                OkApi.get(VRApi.stopRoom(mRoomId), null, new WrapperCallBack() {
+                                    @Override
+                                    public void onResult(Wrapper result) {
+
+                                    }
+                                });
                             }
 
                             @Override
