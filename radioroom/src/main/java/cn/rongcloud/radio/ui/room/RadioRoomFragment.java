@@ -402,8 +402,8 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     }
 
     @Override
-    public void showCreatorSetting(boolean isMute, boolean isPlayingMusic) {
-        mCreatorSettingFragment = new CreatorSettingFragment(isMute, isPlayingMusic, present);
+    public void showCreatorSetting(boolean isMute, boolean isPlayingMusic, User user) {
+        mCreatorSettingFragment = new CreatorSettingFragment(isMute, isPlayingMusic, user, present);
         mCreatorSettingFragment.show(getChildFragmentManager());
     }
 
