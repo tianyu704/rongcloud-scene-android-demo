@@ -847,7 +847,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             if (uiSeatModel != null) {
                 if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                     //如果在麦位上
-                    CreatorSettingFragment creatorSettingFragment = new CreatorSettingFragment(voiceRoomModel, uiSeatModel);
+                    CreatorSettingFragment creatorSettingFragment = new CreatorSettingFragment(voiceRoomModel, uiSeatModel, mVoiceRoomBean.getCreateUser());
                     creatorSettingFragment.show(fragmentManager);
                 } else {
                     //如果不在麦位上，直接上麦

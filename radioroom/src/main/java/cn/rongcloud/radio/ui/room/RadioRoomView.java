@@ -6,6 +6,7 @@ import com.basis.mvp.IBaseView;
 
 import java.util.List;
 
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
@@ -61,7 +62,7 @@ public interface RadioRoomView extends IBaseView {
 
     void showLikeAnimation();
 
-    void showCreatorSetting(boolean isMute, boolean isPlayingMusic);
+    void showCreatorSetting(boolean isMute, boolean isPlayingMusic, User user);
 
     void showMusicDialog();
 

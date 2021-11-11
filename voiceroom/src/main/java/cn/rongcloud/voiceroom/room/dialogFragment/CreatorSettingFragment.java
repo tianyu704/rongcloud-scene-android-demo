@@ -6,9 +6,12 @@ import android.view.View;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.Guideline;
 
+import com.rongcloud.common.utils.ImageLoaderUtil;
+
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.music.MusicManager;
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.room.VoiceRoomModel;
@@ -34,11 +37,13 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment implem
     private ConfirmDialog confirmDialog;
     private VoiceRoomModel voiceRoomModel;
     private UiSeatModel uiSeatModel;
+    private User user;
 
-    public CreatorSettingFragment(VoiceRoomModel voiceRoomModel, UiSeatModel uiSeatModel) {
+    public CreatorSettingFragment(VoiceRoomModel voiceRoomModel, UiSeatModel uiSeatModel, User user) {
         super(R.layout.fragmeng_new_creator_setting);
         this.voiceRoomModel = voiceRoomModel;
-        this.uiSeatModel=uiSeatModel;
+        this.uiSeatModel = uiSeatModel;
+        this.user = user;
     }
 
     @Override
@@ -48,7 +53,9 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment implem
         tvMemberName = (AppCompatTextView) getView().findViewById(R.id.tv_member_name);
         btnOutOfSeat = (AppCompatTextView) getView().findViewById(R.id.btn_out_of_seat);
         btnMuteSelf = (AppCompatTextView) getView().findViewById(R.id.btn_mute_self);
-        btnMuteSelf.setText(uiSeatModel.isMute()?"打开麦克风":"关闭麦克风");
+        btnMuteSelf.setText(uiSeatModel.isMute() ? "打开麦克风" : "关闭麦克风");
+        tvMemberName.setText(user.getUserName());
+        ImageLoaderUtil.INSTANCE.loadImage(getContext(), ivMemberPortrait, user.getPortraitUrl(), R.drawable.default_portrait);
     }
 
     @Override
@@ -64,7 +71,7 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment implem
             //判断是否在播放音乐
             if (voiceRoomModel.isPlayingMusic()) {
                 showMusicPauseTip();
-            }else {
+            } else {
                 leaveSeat();
             }
         } else if (v.getId() == R.id.btn_mute_self) {
@@ -78,7 +85,7 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment implem
                     }, new Consumer<Throwable>() {
                         @Override
                         public void accept(Throwable throwable) throws Throwable {
-                           EToast.showToast(throwable.getMessage());
+                            EToast.showToast(throwable.getMessage());
                         }
                     });
         }

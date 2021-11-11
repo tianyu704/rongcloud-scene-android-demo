@@ -355,7 +355,7 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
             if (RadioEventHelper.getInstance().isInSeat()) {
                 mView.showCreatorSetting(
-                        RadioEventHelper.getInstance().isMute(), MusicManager.get().isPlaying());
+                        RadioEventHelper.getInstance().isMute(), MusicManager.get().isPlaying(), getCreateRoomUser());
             } else {
                 enterSeat();
             }
