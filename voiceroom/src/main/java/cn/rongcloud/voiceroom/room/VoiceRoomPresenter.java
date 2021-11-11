@@ -148,6 +148,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     private NetworkMonitorAutoDetect networkMonitorAutoDetect;
     private boolean isNetWorkConnect;
     private boolean isInRoom;
+    private String notice;
 
     public VoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -177,6 +178,10 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
 
     public void addDisposable(Disposable disposable) {
         disposableList.add(disposable);
+    }
+
+    public String getNotice() {
+        return notice;
     }
 
     /**
@@ -488,8 +493,8 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                             mView.setVoiceName(uiRoomModel.getRcRoomInfo().getRoomName());
                         }
                         if (mVoiceRoomBean != null) {
-                            String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
-                            mView.showNotice(notice, false);
+                            notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
+                            mView.setNotice(notice);
                         }
                     }
                 }, new Consumer<Throwable>() {

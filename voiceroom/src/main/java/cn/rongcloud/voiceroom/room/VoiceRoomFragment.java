@@ -255,7 +255,8 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      */
     @Override
     public void showNoticeDialog(boolean isEdit) {
-        mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+
+        mNoticeDialog.show(present.getNotice(), isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
             public void saveNotice(String notice) {
                 //修改公告信息
@@ -566,10 +567,9 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      * 设置公告的内容
      *
      * @param notice
-     * @param isModify
      */
     @Override
-    public void showNotice(String notice, boolean isModify) {
+    public void setNotice(String notice) {
         if (null != mNoticeDialog) {
             mNoticeDialog.setNotice(notice);
         }
