@@ -124,10 +124,10 @@ public abstract class AbsRoomActivity extends BaseActivity {
         Intent intent = new Intent(this, RTCNotificationService.class);
         switch (getRoomType()) {
             case RADIO_ROOM:
-                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_RADIO_ROOM);
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.getRadioRoomAction(activity));
                 break;
             case VOICE_ROOM:
-                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.ACTION_VOICE_ROOM);
+                intent.putExtra(RTCNotificationService.ACTION, IntentWrap.getVoiceRoomAction(activity));
                 break;
         }
         this.startService(intent);

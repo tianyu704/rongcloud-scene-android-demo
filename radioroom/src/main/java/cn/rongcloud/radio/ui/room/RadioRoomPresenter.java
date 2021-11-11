@@ -62,10 +62,10 @@ import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomSeatView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
+import cn.rongcloud.radio.R;
 import cn.rongcloud.radio.helper.RadioEventHelper;
 import cn.rongcloud.radio.helper.RadioRoomListener;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
-import cn.rongcloud.radioroom.R;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.callback.RCRadioRoomResultCallback;
@@ -82,12 +82,12 @@ import io.rong.imlib.model.MessageContent;
  */
 public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         implements RadioRoomListener,
-                RadioRoomMemberSettingClickListener,
-                OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
-                BackgroundSettingFragment.OnSelectBackgroundListener,
-                GiftFragment.OnSendGiftListener,
-                CreatorSettingFragment.OnCreatorSettingClickListener,
-                RoomTitleBar.OnFollowClickListener {
+        RadioRoomMemberSettingClickListener,
+        OnItemClickListener<MutableLiveData<IFun.BaseFun>>,
+        BackgroundSettingFragment.OnSelectBackgroundListener,
+        GiftFragment.OnSendGiftListener,
+        CreatorSettingFragment.OnCreatorSettingClickListener,
+        RoomTitleBar.OnFollowClickListener {
     private VoiceRoomBean mVoiceRoomBean;
     private String mRoomId = "";
     private RoomOwnerType mRoomOwnerType;
@@ -118,7 +118,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                 500);
     }
 
-    /** 获取房间信息 */
+    /**
+     * 获取房间信息
+     */
     public void getRoomInfo() {
         OkApi.get(
                 VRApi.getRoomInfo(mRoomId),
@@ -296,7 +298,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         return mRoomOwnerType;
     }
 
-    /** 房主上麦 */
+    /**
+     * 房主上麦
+     */
     public void enterSeat() {
         RCRadioRoomEngine.getInstance()
                 .enterSeat(
@@ -327,7 +331,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                         });
     }
 
-    /** 房主下麦 */
+    /**
+     * 房主下麦
+     */
     public void leaveSeat() {
         MusicManager.get().stopPlayMusic();
         RCRadioRoomEngine.getInstance()
@@ -346,7 +352,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                         });
     }
 
-    /** 点击麦位头像 */
+    /**
+     * 点击麦位头像
+     */
     public void clickRoomSeat() {
         if (mRoomOwnerType == RoomOwnerType.RADIO_OWNER) {
             if (RadioEventHelper.getInstance().isInSeat()) {
@@ -362,7 +370,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         }
     }
 
-    /** 获取房间内礼物列表 */
+    /**
+     * 获取房间内礼物列表
+     */
     private void getGiftCount() {
         OkApi.get(
                 VRApi.getGiftList(mRoomId),
@@ -384,7 +394,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                 });
     }
 
-    /** 刷新房间人数 */
+    /**
+     * 刷新房间人数
+     */
     public void refreshRoomMemberCount() {
         // 由于退出房间前先发离开的消息，但还没离开成功，这时候立即获取人数是错误的，因此延时获取一下人数
         UIKit.postDelayed(
@@ -404,13 +416,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                                         }
 
                                         @Override
-                                        public void onError(RongIMClient.ErrorCode errorCode) {}
+                                        public void onError(RongIMClient.ErrorCode errorCode) {
+                                        }
                                     });
                 },
                 500);
     }
 
-    /** 获取房间公告 */
+    /**
+     * 获取房间公告
+     */
     public void getNotice(boolean isModify) {
         RCRadioRoomEngine.getInstance()
                 .getRadioRoomValue(
@@ -440,7 +455,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                 .updateRadioRoomKV(IRCRadioRoomEngine.UpdateKey.RC_NOTICE, notice, null);
     }
 
-    /** 发送默认消息 */
+    /**
+     * 发送默认消息
+     */
     private void sendDefaultMessage() {
         if (mVoiceRoomBean != null) {
             // 清空所有消息
@@ -505,7 +522,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                 });
     }
 
-    /** 设置弹框数据 */
+    /**
+     * 设置弹框数据
+     */
     public void showSettingDialog() {
         List<MutableLiveData<IFun.BaseFun>> funList =
                 Arrays.asList(
@@ -541,12 +560,16 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         Logger.e(shields.toString());
     }
 
-    /** 获取屏蔽词 */
+    /**
+     * 获取屏蔽词
+     */
     private void getShield(WrapperCallBack wrapperCallBack) {
         OkApi.get(VRApi.getShield(mRoomId), null, wrapperCallBack);
     }
 
-    /** 暂停直播 */
+    /**
+     * 暂停直播
+     */
     public void pauseRadioLive() {
         RCRadioRoomEngine.getInstance()
                 .leaveSeat(
@@ -561,7 +584,8 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                             }
 
                             @Override
-                            public void onError(int i, String s) {}
+                            public void onError(int i, String s) {
+                            }
                         });
     }
 
@@ -717,7 +741,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                 });
     }
 
-    /** 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号 */
+    /**
+     * 点击底部送礼物，电台房只能给房主送，语聊房要把麦位上所有用户都返回，并且赋值麦位号
+     */
     public void sendGift() {
         mView.showSendGiftDialog(
                 mVoiceRoomBean,
@@ -744,11 +770,13 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         mView.setTitleFollow(isFollow);
     }
 
-    /** 根据id获取用户信息 */
+    /**
+     * 根据id获取用户信息
+     */
     public void getUserInfo(String userId) {
         OkApi.post(
                 VRApi.GET_USER,
-                new OkParams().add("userIds", new String[] {userId}).build(),
+                new OkParams().add("userIds", new String[]{userId}).build(),
                 new WrapperCallBack() {
                     @Override
                     public void onResult(Wrapper result) {
@@ -837,7 +865,9 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
         }
     }
 
-    /** 刷新座位状态 */
+    /**
+     * 刷新座位状态
+     */
     private void refreshSeatView() {
         if (RadioEventHelper.getInstance().isSuspend()) {
             if (isSelf(getCreateUserId())) {
@@ -998,31 +1028,31 @@ public class RadioRoomPresenter extends BasePresenter<RadioRoomView>
                                 // 房间有密码需要弹框验证密码
                                 if (roomBean.isPrivate()) {
                                     new InputPasswordDialog(
-                                                    ((RadioRoomFragment) mView).requireContext(),
-                                                    false,
-                                                    () -> null,
-                                                    s -> {
-                                                        if (TextUtils.isEmpty(s)) {
-                                                            return null;
-                                                        }
-                                                        if (s.length() < 4) {
-                                                            mView.showToast(
-                                                                    UIKit.getResources()
-                                                                            .getString(
-                                                                                    R.string
-                                                                                            .text_please_input_four_number));
-                                                            return null;
-                                                        }
-                                                        if (TextUtils.equals(
-                                                                s, roomBean.getPassword())) {
-                                                            jumpOtherRoom(
-                                                                    roomBean.getRoomType(),
-                                                                    roomBean.getRoomId());
-                                                        } else {
-                                                            mView.showToast("密码错误");
-                                                        }
-                                                        return null;
-                                                    })
+                                            ((RadioRoomFragment) mView).requireContext(),
+                                            false,
+                                            () -> null,
+                                            s -> {
+                                                if (TextUtils.isEmpty(s)) {
+                                                    return null;
+                                                }
+                                                if (s.length() < 4) {
+                                                    mView.showToast(
+                                                            UIKit.getResources()
+                                                                    .getString(
+                                                                            R.string
+                                                                                    .text_please_input_four_number));
+                                                    return null;
+                                                }
+                                                if (TextUtils.equals(
+                                                        s, roomBean.getPassword())) {
+                                                    jumpOtherRoom(
+                                                            roomBean.getRoomType(),
+                                                            roomBean.getRoomId());
+                                                } else {
+                                                    mView.showToast("密码错误");
+                                                }
+                                                return null;
+                                            })
                                             .show();
                                 } else {
                                     jumpOtherRoom(roomBean.getRoomType(), roomBean.getRoomId());

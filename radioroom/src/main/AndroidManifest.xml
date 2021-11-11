@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.rongcloud.radioroom">
+    package="cn.rongcloud.radio">
 
     <application>
         <activity
@@ -12,7 +12,7 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="cn.rongcloud.radio.ui.room.RadioRoomActivity" />
+                <action android:name="${applicationId}.RadioRoomActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>

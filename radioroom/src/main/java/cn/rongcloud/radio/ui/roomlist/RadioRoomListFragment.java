@@ -4,11 +4,8 @@ import androidx.fragment.app.Fragment;
 
 import com.basis.mvp.BasePresenter;
 
-import java.util.ArrayList;
-
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.ui.roomlist.AbsRoomListFragment;
-import cn.rongcloud.radio.ui.room.RadioRoomActivity;
 
 /**
  * @author gyn
@@ -18,11 +15,6 @@ public class RadioRoomListFragment extends AbsRoomListFragment {
 
     public static Fragment getInstance() {
         return new RadioRoomListFragment();
-    }
-
-    @Override
-    public void launchRoomActivity(ArrayList<String> roomIds, int position, boolean isCreate) {
-        RadioRoomActivity.startActivity(getActivity(), roomIds, position);
     }
 
     @Override
