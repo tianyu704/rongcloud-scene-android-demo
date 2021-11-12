@@ -17,9 +17,11 @@ import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
 import cn.rong.combusis.widget.miniroom.MiniRoomManager
 import cn.rongcloud.annotation.HiltBinding
+import cn.rongcloud.liveroom.roomlist.LiveRoomListActivity
 import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
+import cn.rongcloud.voiceroom.roomlist.VoiceRoomListActivity
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
@@ -83,22 +85,21 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
 
     override fun initView() {
         StatusBarUtil.setStatusBarFontIconDark(this, StatusBarUtil.TYPE_M, true)
-//        iv_voice_room.setOnClickListener {
-//            checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
-//                if (accept) {
-//                    UmengHelper.get().event(RcUmEvent.VoiceRoom)
-//                    VoiceRoomListActivity.startActivity(this)
-//                } else {
-//                    showToast("请赋予必要权限！")
-//                }
-//            }
-//        }
-        tv_new_roomList.visibility = View.GONE;
+        iv_video_live.setOnClickListener {
+            checkAndRequestPermissions(VOICE_PERMISSIONS) {
+                if (it) {
+                    UmengHelper.get().event(RcUmEvent.LiveRoom)
+                    LiveRoomListActivity.startActivity(this)
+                } else {
+                    showToast("请赋予必要权限！")
+                }
+            }
+        }
         iv_voice_room.setOnClickListener {
             checkAndRequestPermissions(VOICE_PERMISSIONS) { accept ->
                 if (accept) {
                     UmengHelper.get().event(RcUmEvent.VoiceRoom)
-                    cn.rongcloud.voiceroom.roomlist.VoiceRoomListActivity.startActivity(this)
+                    VoiceRoomListActivity.startActivity(this)
                 } else {
                     showToast("请赋予必要权限！")
                 }

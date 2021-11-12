@@ -182,17 +182,18 @@
                 android:textColor="@color/white"
                 android:textSize="18sp" />
         </FrameLayout>
-        <TextView
-            android:id="@+id/tv_new_roomList"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="新版本语聊房入口"
-            android:padding="20dp"
-            android:textColor="@color/black"
-            android:background="@color/rc_blue"
-            tools:ignore="MissingConstraints"
+
+        <FrameLayout
+            android:id="@+id/iv_video_live"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/ic_video_live"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_video_call"
+            app:layout_constraintDimensionRatio="w,225:160"
             app:layout_constraintTop_toBottomOf="@+id/iv_audio_call"
-            app:layout_constraintLeft_toRightOf="@+id/iv_video_call"/>
+            app:layout_constraintLeft_toLeftOf="@+id/iv_audio_call"
+            app:layout_constraintWidth_percent="0.475" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

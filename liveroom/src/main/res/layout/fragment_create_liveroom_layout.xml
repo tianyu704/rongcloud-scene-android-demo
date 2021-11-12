@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <cn.rongcloud.rtc.api.stream.RCRTCVideoView
+        android:id="@+id/rtc_preview_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_create_liveroom_header">
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/svg_back" />
+
+        <com.rongcloud.common.ui.widget.RadiusImageView
+            android:id="@+id/select_cover_view"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_below="@id/iv_back"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/icon_select_backgroup" />
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/et_room_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignTop="@+id/select_cover_view"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_toRightOf="@id/select_cover_view"
+            android:background="@drawable/bg_create_live_room_name"
+            android:gravity="center|left"
+            android:hint="设置房间标题"
+            android:paddingStart="15dp"
+            android:textSize="14sp" />
+
+        <RadioGroup
+            android:id="@+id/rg_is_public"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_alignLeft="@+id/et_room_name"
+            android:layout_alignBottom="@+id/select_cover_view"
+            android:layout_marginStart="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rb_private"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@drawable/btn_create_room_is_public"
+                android:checked="true"
+                android:paddingStart="5dp"
+                android:text="@string/private_voice_room"
+                android:textColor="@color/whiteTextColor"
+                android:textSize="14sp" />
+
+            <androidx.appcompat.widget.AppCompatRadioButton
+                android:id="@+id/rb_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="50dp"
+                android:button="@drawable/btn_create_room_is_public"
+                android:paddingStart="5dp"
+                android:text="@string/public_voice_room"
+                android:textColor="@color/whiteTextColor"
+                android:textSize="14sp" />
+        </RadioGroup>
+    </RelativeLayout>
+
+</RelativeLayout>

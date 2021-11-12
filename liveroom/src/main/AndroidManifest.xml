@@ -9,10 +9,15 @@
     <application>
         <activity
             android:name=".roomlist.LiveRoomListActivity"
-            android:launchMode="standard"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
+
+        <activity
+            android:name=".room.LiveRoomActivity"
+            android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="${applicationId}.VoiceRoomActivity" />
+                <action android:name="${applicationId}.RadioRoomActivity" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
