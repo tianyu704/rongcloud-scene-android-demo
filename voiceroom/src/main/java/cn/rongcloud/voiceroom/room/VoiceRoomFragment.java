@@ -467,6 +467,11 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         }
     }
 
+    @Override
+    public void refreshMessageList() {
+        mRoomMessageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * 显示消息集合
      *

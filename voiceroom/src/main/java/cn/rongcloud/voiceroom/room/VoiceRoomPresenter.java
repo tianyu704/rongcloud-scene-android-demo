@@ -400,6 +400,12 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         MemberCache.getInstance().getAdminList().observe(((VoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
             @Override
             public void onChanged(List<String> strings) {
+                mView.refreshMessageList();
+            }
+        });
+        MemberCache.getInstance().getAdminList().observe(((VoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
                 mView.refreshSeat();
             }
         });
