@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -74,7 +75,7 @@ public class ActCommentWeb extends BaseActivity {
         btnBack = findViewById(R.id.title_back);
         webview = findViewById(R.id.webview);
         Log.e(tag, "currnetUrl = " + currnetUrl);
-        isHttps = currnetUrl.contains(_https);
+        isHttps = TextUtils.isEmpty(currnetUrl) ? false : currnetUrl.contains(_https);
         tvTitle.setText(curretnTitle);
         CommonUtil.openWebViewCache(this, webview, isHttps);
         //添加js

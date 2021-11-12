@@ -208,20 +208,22 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     /**
      * 麦位信息发生了变化
      * 这里用同步锁，避免多线程操作的时候，影响麦位的显示
+     *
      * @param list
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        synchronized (this){
+        synchronized (this) {
+            int size = null == list ? 0 : list.size();
             uiSeatModels.clear();
-            for (int i = 0; i < list.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 //构建一个集合返回去
                 RCVoiceSeatInfo rcVoiceSeatInfo = list.get(i);
                 if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())
-                        &&rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
+                        && rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
                     rcVoiceSeatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
                 }
-                UiSeatModel uiSeatModel = new UiSeatModel(i,rcVoiceSeatInfo , seatInfoChangeSubject);
+                UiSeatModel uiSeatModel = new UiSeatModel(i, rcVoiceSeatInfo, seatInfoChangeSubject);
                 uiSeatModels.add(uiSeatModel);
             }
             seatListChangeSubject.onNext(uiSeatModels);
@@ -318,11 +320,12 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
 
     /**
      * 消息接收
+     *
      * @param message 收到的消息
      */
     @Override
     public void onMessageReceived(Message message) {
-        if (!TextUtils.isEmpty(present.getRoomId())&& message.getConversationType() == Conversation.ConversationType.CHATROOM) {
+        if (!TextUtils.isEmpty(present.getRoomId()) && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(present.getRoomId(), message.getContent());
         }
     }
@@ -331,7 +334,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     public void onRoomNotificationReceived(String name, String content) {
         ArrayList<String> contents = new ArrayList<>();
         contents.add(content);
-        roomEventSubject.onNext(new Pair<>(name,contents));
+        roomEventSubject.onNext(new Pair<>(name, contents));
     }
 
     /**
@@ -398,7 +401,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
                     for (User user : users) {
-                        if (user.getUserId().equals(requestUserId)&&getSeatInfoByUserId(user.getUserId())==null) {
+                        if (user.getUserId().equals(requestUserId) && getSeatInfoByUserId(user.getUserId()) == null) {
                             requestSeats.add(user);
                             break;
                         }
@@ -460,7 +463,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * 用户收到被踢出房间 然后弹窗告知，然后退出房间等操作
      *
      * @param targetId 被踢用户的标识
-     * @param userId 发起踢人用户的标识
+     * @param userId   发起踢人用户的标识
      */
     @Override
     public void onUserReceiveKickOutRoom(String targetId, String userId) {
@@ -478,8 +481,8 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onNetworkStatus(int i) {
-        if (present!=null)
-        present.onNetworkStatus(i);
+        if (present != null)
+            present.onNetworkStatus(i);
     }
 
     @Override
@@ -566,7 +569,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     public boolean isPlayingMusic() {
         return MusicManager.get().isPlaying();
     }
-
 
 
     /**
@@ -850,7 +852,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * 座位禁麦，根据点击的位置来禁止
      */
     public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
-        Log.e(TAG, "clickMuteSeat: "+isMute );
+        Log.e(TAG, "clickMuteSeat: " + isMute);
         present.addDisposable(Completable.create(new CompletableOnSubscribe() {
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {

@@ -22,6 +22,7 @@ public abstract class WrapperCallBack extends OCallBack<Wrapper> {//IOCallBack
 
     @Override
     public void onBefore(Request.Builder builder) {
+        if (null == builder) return;
         if (null != OkHelper.get().getHeadCacher()) { //添加header
             Map<String, String> hs = OkHelper.get().getHeadCacher().onAddHeader();
             if (null == hs || hs.isEmpty()) return;
