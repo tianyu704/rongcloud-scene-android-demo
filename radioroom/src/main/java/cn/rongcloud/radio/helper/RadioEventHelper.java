@@ -204,6 +204,7 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
         // 本地消息不发送出去
         if (messageContent instanceof RCChatroomLocationMessage) {
             Message message = new Message();
+            message.setConversationType(Conversation.ConversationType.CHATROOM);
             message.setContent(messageContent);
             onMessageReceived(message);
             return;
