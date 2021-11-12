@@ -23,6 +23,12 @@ include ':annotation'
 //电台模块
 include ':radioroom'
 
+//美颜模块
+include ':mhui'
+
+//直播房模块
+include ':liveroom'
+
 if (!(USE_AAR).toBoolean()) {
     println("------------------>>>>load local sdk module")
     include ':RCVoiceRoom'
@@ -31,3 +37,4 @@ if (!(USE_AAR).toBoolean()) {
     properties.load(propertyFile.newDataInputStream())
     project(':RCVoiceRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/voiceroom")
 }
+include ':liveroom'

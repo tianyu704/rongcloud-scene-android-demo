@@ -12,6 +12,8 @@ import cn.rongcloud.voiceroomdemo.mvp.activity.LauncherActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.LoginActivity
 import com.basis.BasisHelper
 import com.basis.net.oklib.net.Page
+import com.meihu.beauty.utils.MhDataManager
+import com.meihu.beautylibrary.MHSDK
 import com.rongcloud.common.ActivityManager
 import com.rongcloud.common.AppConfig
 import com.rongcloud.common.ModuleManager
@@ -62,6 +64,18 @@ class MyApp : ComApplication() {
         })
         //初始化 bugly
         CrashReport.initCrashReport(this, BuildConfig.BUGLY_ID, BuildConfig.DEBUG)
+
+        //初始化美狐
+//        cn.rongcloud.voiceroomdemo.dev
+//        授权码：
+//        cbb3a9f01d9fa52c0367ef8703f64327
+//
+//        cn.rongcloud.voiceroomdemo
+//        授权码：
+//        46a8c05ea8fedb279d53d9bd238637fe
+        MHSDK.init(this, "cbb3a9f01d9fa52c0367ef8703f64327")
+        //初始化
+        MhDataManager.getInstance().create(applicationContext);
         // 退出或者账号被挤下线的流程
         AccountStore.obLogoutSubject().subscribe {
             try {

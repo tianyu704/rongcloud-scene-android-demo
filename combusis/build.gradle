@@ -87,7 +87,7 @@ dependencies {
     implementation "androidx.room:room-rxjava3:$room_version"
 
     kapt "org.xerial:sqlite-jdbc:3.34.0"
-
+    api project(':mhui')
     api project(path: ':basis')
     if (USE_AAR.toBoolean()) {
         println("------------------------>>>>use aar")

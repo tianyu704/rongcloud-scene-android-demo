@@ -12,7 +12,11 @@ public enum RoomType {
     /**
      * 电台房
      */
-    RADIO_ROOM(2);
+    RADIO_ROOM(2),
+    /**
+     * 直播房
+     */
+    LIVE_ROOM(3);
 
     int type;
 
