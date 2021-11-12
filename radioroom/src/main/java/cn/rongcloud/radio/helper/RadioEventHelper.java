@@ -42,6 +42,7 @@ import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomCallback;
 import cn.rongcloud.radioroom.room.RCRadioEventListener;
 import io.rong.imkit.picture.tools.ToastUtils;
+import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
@@ -126,6 +127,9 @@ public class RadioEventHelper implements IRadioEventHelper, RCRadioEventListener
 
     @Override
     public void onMessageReceived(Message message) {
+        if (message.getConversationType() != Conversation.ConversationType.CHATROOM) {
+            return;
+        }
         MessageContent content = message.getContent();
         Logger.d("==============onMessageReceived: " + content.getClass() + JsonUtils.toJson(content));
         // 全局广播的消息
