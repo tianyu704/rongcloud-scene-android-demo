@@ -8,11 +8,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.Guideline;
 
-
-import com.rongcloud.common.extension.ExtensKt;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.ImageLoaderUtil;
 
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
+import cn.rong.combusis.provider.user.User;
 import cn.rongcloud.voiceroom.R;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.room.VoiceRoomModel;
@@ -42,11 +42,14 @@ public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
     private String roomId;
     private VoiceRoomModel voiceRoomModel;
     private boolean isLeaveSeating = false;//是否正在断开连接中
-    public SelfSettingFragment(UiSeatModel seatInfo, String roomId, VoiceRoomModel voiceRoomModel) {
+    private User user;
+
+    public SelfSettingFragment(UiSeatModel seatInfo, String roomId, VoiceRoomModel voiceRoomModel, User user) {
         super(R.layout.fragment_new_self_setting);
         this.seatInfo = seatInfo;
         this.roomId = roomId;
         this.voiceRoomModel = voiceRoomModel;
+        this.user = user;
     }
 
     @Override
@@ -57,8 +60,8 @@ public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
         btnMuteSelf = (AppCompatTextView) getView().findViewById(R.id.btn_mute_self);
         btnOutOfSeat = (AppCompatTextView) getView().findViewById(R.id.btn_out_of_seat);
 
-        ExtensKt.loadPortrait(ivMemberPortrait, seatInfo.getPortrait());
-        tvMemberName.setText(seatInfo.getUserName());
+        ImageLoaderUtil.INSTANCE.loadImage(requireContext(), ivMemberPortrait, user.getPortraitUrl(), R.drawable.default_portrait);
+        tvMemberName.setText(user.getUserName());
         btnMuteSelf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,19 +78,19 @@ public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
 
         //监听一下状态
         voiceRoomModel.addSubscription(voiceRoomModel.obSeatInfoByIndex(seatInfo.getIndex())
-                    .subscribe(new Consumer<UiSeatModel>() {
-                        @Override
-                        public void accept(UiSeatModel uiSeatModel) throws Throwable {
-                            if (!seatInfo.getUserId() .equals(AccountStore.INSTANCE.getUserId())) {
-                                if (isLeaveSeating) {
-                                    ToastUtils.s(getContext(),"正在断开链接中");
-                                }
-                                fragmentDismiss();
-                            } else {
-                                seatInfo = uiSeatModel;
+                .subscribe(new Consumer<UiSeatModel>() {
+                    @Override
+                    public void accept(UiSeatModel uiSeatModel) throws Throwable {
+                        if (!seatInfo.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+                            if (isLeaveSeating) {
+                                ToastUtils.s(getContext(), "正在断开链接中");
                             }
+                            fragmentDismiss();
+                        } else {
+                            seatInfo = uiSeatModel;
                         }
-                    }));
+                    }
+                }));
     }
 
 
@@ -95,24 +98,24 @@ public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
      * 断开链接
      */
     private void leaveSeat() {
-        isLeaveSeating=true;
+        isLeaveSeating = true;
         voiceRoomModel.leaveSeat()
                 .observeOn(AndroidSchedulers.mainThread())
                 .doFinally(new Action() {
                     @Override
                     public void run() throws Throwable {
-                        isLeaveSeating=false;
+                        isLeaveSeating = false;
                     }
                 }).doOnComplete(new Action() {
             @Override
             public void run() throws Throwable {
-                ToastUtils.s(getContext(),"您已断开连接");
+                ToastUtils.s(getContext(), "您已断开连接");
                 dismiss();
             }
         }).doOnError(new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Throwable {
-                ToastUtils.s(getContext(),throwable.getMessage());
+                ToastUtils.s(getContext(), throwable.getMessage());
             }
         }).subscribe();
     }
@@ -139,13 +142,13 @@ public class SelfSettingFragment extends BaseBottomSheetDialogFragment {
             }).doOnComplete(new Action() {
                 @Override
                 public void run() throws Throwable {
-                    ToastUtils.s(getContext(),"修改成功");
+                    ToastUtils.s(getContext(), "修改成功");
                     dismiss();
                 }
             }).doOnError(new Consumer<Throwable>() {
                 @Override
                 public void accept(Throwable throwable) throws Throwable {
-                    ToastUtils.s(getContext(),throwable.toString());
+                    ToastUtils.s(getContext(), throwable.toString());
                 }
             }).subscribe();
 

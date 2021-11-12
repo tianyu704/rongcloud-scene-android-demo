@@ -345,7 +345,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             if (!TextUtils.isEmpty(seatModel.getUserId()) && seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                 // 点击自己头像
-                present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
+                present.showNewSelfSettingFragment(seatModel).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
                 present.getUserInfo(seatModel.getUserId());

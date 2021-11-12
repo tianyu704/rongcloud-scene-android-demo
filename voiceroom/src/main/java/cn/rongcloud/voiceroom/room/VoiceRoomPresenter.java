@@ -837,12 +837,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * 麦位上点击自己的头像
      *
      * @param seatModel
-     * @param roomId
      * @return
      */
-    public SelfSettingFragment showNewSelfSettingFragment(UiSeatModel seatModel, String roomId) {
+    public SelfSettingFragment showNewSelfSettingFragment(UiSeatModel seatModel) {
         SelfSettingFragment selfSettingFragment = new SelfSettingFragment(seatModel, mVoiceRoomBean.getRoomId()
-                , voiceRoomModel);
+                , voiceRoomModel, AccountStore.INSTANCE.toUser());
         return selfSettingFragment;
     }
 

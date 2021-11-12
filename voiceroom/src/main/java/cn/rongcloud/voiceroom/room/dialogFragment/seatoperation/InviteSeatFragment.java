@@ -70,7 +70,7 @@ public class InviteSeatFragment extends BaseFragment {
     /**
      * 创建适配器
      */
-    class MyAdapter extends BaseListAdapter<MyAdapter.MyViewHolder>{
+    class MyAdapter extends BaseListAdapter<MyAdapter.MyViewHolder> {
 
         @NonNull
         @Override
@@ -79,7 +79,7 @@ public class InviteSeatFragment extends BaseFragment {
         }
 
 
-        class MyViewHolder extends BaseViewHolder{
+        class MyViewHolder extends BaseViewHolder {
 
             public MyViewHolder(@NonNull ViewGroup parent) {
                 super(parent);
@@ -91,7 +91,6 @@ public class InviteSeatFragment extends BaseFragment {
                 ImageView iv_user_portrait = itemView.findViewById(R.id.iv_user_portrait);
                 TextView tv_member_name = itemView.findViewById(R.id.tv_member_name);
                 TextView tv_operation = itemView.findViewById(R.id.tv_operation);
-//                ExtensKt.loadPortrait(iv_user_portrait,uiMemberModel.getPortraitUrl());
                 ImageLoader.loadUrl(iv_user_portrait, uiMemberModel.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);
                 tv_member_name.setText(uiMemberModel.getUserName());
                 tv_operation.setText("邀请");
