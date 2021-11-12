@@ -325,7 +325,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                     EToast.showToast("用户连线成功");
                     break;
                 case EVENT_REJECT_MANAGE_PICK:
-                    EToast.showToast("用户拒绝邀请");
+                    if (TextUtils.equals(content, AccountStore.INSTANCE.getUserId()))
+                        EToast.showToast("用户拒绝邀请");
                     break;
             }
         }
@@ -368,7 +369,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
             public Unit invoke() {
                 //拒绝
                 inviteDialog.dismiss();
-                VoiceRoomApi.getApi().notifyRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId());
+                VoiceRoomApi.getApi().notifyRoom(EVENT_REJECT_MANAGE_PICK, userId);
                 return null;
             }
         }, new Function0<Unit>() {

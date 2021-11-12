@@ -806,7 +806,9 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                         EToast.showToast("用户连线成功");
                         break;
                     case EVENT_REJECT_MANAGE_PICK:
-                        EToast.showToast("用户拒绝邀请");
+                        if (stringArrayListPair.second.get(0).equals(AccountStore.INSTANCE.getUserId())) {
+                            EToast.showToast("用户拒绝邀请");
+                        }
                         break;
                 }
             }
@@ -1128,7 +1130,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             public Unit invoke() {
                 //拒绝
                 confirmDialog.dismiss();
-                voiceRoomModel.refuseInvite();
+                voiceRoomModel.refuseInvite(userId);
                 return null;
             }
         }, new Function0<Unit>() {

@@ -985,10 +985,12 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
 
     /**
      * 拒绝邀请
+     *
+     * @param userId 邀请人ID
      */
-    public void refuseInvite() {
+    public void refuseInvite(String userId) {
         RCVoiceRoomEngine.getInstance()
-                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId(), null);
+                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, userId, null);
     }
 
     /**
