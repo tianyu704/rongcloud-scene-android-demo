@@ -347,6 +347,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
             present.showPickReceivedDialog(true, userId);
         } else {
             //管理员邀请
+            present.showPickReceivedDialog(false, userId);
         }
     }
 
