@@ -160,6 +160,10 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         voiceRoomModel = new VoiceRoomModel(this, lifecycle);
     }
 
+    public String getNotice() {
+        return notice;
+    }
+
     /**
      * 初始化
      *
