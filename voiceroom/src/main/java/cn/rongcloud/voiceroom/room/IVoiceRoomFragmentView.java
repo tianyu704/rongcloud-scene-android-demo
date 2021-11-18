@@ -46,7 +46,7 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void refreshRoomOwner(UiSeatModel uiSeatModel);
 
 
-    void showNotice(String notice, boolean isModify);
+    void setNotice(String notice);
 
     void clearInput();
 
@@ -89,4 +89,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
     void switchOtherRoom(String roomId);
 
     void setTitleFollow(boolean isFollow);
+
+    void refreshMessageList();
 }

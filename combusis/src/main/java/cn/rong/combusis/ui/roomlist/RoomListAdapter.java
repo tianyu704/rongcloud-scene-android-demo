@@ -5,15 +5,12 @@ import android.content.Context;
 import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
 import com.jakewharton.rxbinding4.view.RxView;
-import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
 
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
-import cn.rong.combusis.ui.OnItemClickListener;
 import cn.rong.combusis.ui.OnItemClickRoomListListener;
 import io.reactivex.rxjava3.functions.Consumer;
 import kotlin.Unit;
@@ -42,12 +39,12 @@ public class RoomListAdapter extends RcySAdapter<VoiceRoomBean, RcyHolder> {
         holder.setText(R.id.tv_room_creator_name, voiceRoomBean.getCreateUserName());
         holder.setText(R.id.tv_room_people_number, String.valueOf(voiceRoomBean.getUserTotal()));
         holder.setVisible(R.id.iv_room_locked, voiceRoomBean.isPrivate());
-        RxView.clicks(holder.itemView).throttleFirst(1000, TimeUnit.SECONDS)
+        RxView.clicks(holder.itemView).throttleFirst(1000, TimeUnit.MILLISECONDS)
                 .subscribe(new Consumer<Unit>() {
                     @Override
                     public void accept(Unit unit) throws Throwable {
                         if (mOnItemClickListener != null) {
-                            mOnItemClickListener.clickItem(voiceRoomBean, position,false,getData());
+                            mOnItemClickListener.clickItem(voiceRoomBean, position, false, getData());
                         }
                     }
                 });

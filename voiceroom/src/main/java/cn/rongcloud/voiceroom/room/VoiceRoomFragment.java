@@ -255,7 +255,8 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      */
     @Override
     public void showNoticeDialog(boolean isEdit) {
-        mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+
+        mNoticeDialog.show(present.getNotice(), isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
             @Override
             public void saveNotice(String notice) {
                 //修改公告信息
@@ -344,7 +345,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             if (!TextUtils.isEmpty(seatModel.getUserId()) && seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                 // 点击自己头像
-                present.showNewSelfSettingFragment(seatModel, present.getRoomId()).show(getChildFragmentManager());
+                present.showNewSelfSettingFragment(seatModel).show(getChildFragmentManager());
             } else {
                 // 点击别人头像
                 present.getUserInfo(seatModel.getUserId());
@@ -466,6 +467,11 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         }
     }
 
+    @Override
+    public void refreshMessageList() {
+        mRoomMessageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * 显示消息集合
      *
@@ -566,10 +572,9 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
      * 设置公告的内容
      *
      * @param notice
-     * @param isModify
      */
     @Override
-    public void showNotice(String notice, boolean isModify) {
+    public void setNotice(String notice) {
         if (null != mNoticeDialog) {
             mNoticeDialog.setNotice(notice);
         }

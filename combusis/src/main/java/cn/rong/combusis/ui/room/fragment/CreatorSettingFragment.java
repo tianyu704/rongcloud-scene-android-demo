@@ -2,9 +2,12 @@ package cn.rong.combusis.ui.room.fragment;
 
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.rongcloud.common.utils.ImageLoaderUtil;
+
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
+import cn.rong.combusis.provider.user.User;
 import de.hdodenhof.circleimageview.CircleImageView;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -18,17 +21,19 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment {
     OnCreatorSettingClickListener onCreatorSettingClickListener;
     private boolean isMute;
     private boolean isPlayMusic;
+    private User user;
     private CircleImageView mIvMemberPortrait;
     private AppCompatTextView mTvMemberName;
     private AppCompatTextView mBtnOutOfSeat;
     private AppCompatTextView mBtnMuteSelf;
     private ConfirmDialog confirmDialog;
 
-    public CreatorSettingFragment(boolean isMute, boolean isPlayMusic, OnCreatorSettingClickListener onCreatorSettingClickListener) {
+    public CreatorSettingFragment(boolean isMute, boolean isPlayMusic, User user, OnCreatorSettingClickListener onCreatorSettingClickListener) {
         super(R.layout.fragment_creator_setting);
         this.isMute = isMute;
         this.onCreatorSettingClickListener = onCreatorSettingClickListener;
         this.isPlayMusic = isPlayMusic;
+        this.user = user;
     }
 
     @Override
@@ -38,6 +43,10 @@ public class CreatorSettingFragment extends BaseBottomSheetDialogFragment {
         mBtnOutOfSeat = (AppCompatTextView) getView().findViewById(R.id.btn_out_of_seat);
         mBtnMuteSelf = (AppCompatTextView) getView().findViewById(R.id.btn_mute_self);
         refreshMuteBtn();
+        if (user != null) {
+            mTvMemberName.setText(user.getUserName());
+            ImageLoaderUtil.INSTANCE.loadImage(getContext(), mIvMemberPortrait, user.getPortraitUrl(), R.drawable.default_portrait);
+        }
     }
 
     @Override

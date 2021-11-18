@@ -153,6 +153,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     private NetworkMonitorAutoDetect networkMonitorAutoDetect;
     private boolean isNetWorkConnect;
     private boolean isInRoom;
+    private String notice;
 
     public VoiceRoomPresenter(IVoiceRoomFragmentView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -375,6 +376,12 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         MemberCache.getInstance().getAdminList().observe(((VoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
             @Override
             public void onChanged(List<String> strings) {
+                mView.refreshMessageList();
+            }
+        });
+        MemberCache.getInstance().getAdminList().observe(((VoiceRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
+            @Override
+            public void onChanged(List<String> strings) {
                 mView.refreshSeat();
             }
         });
@@ -468,8 +475,8 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                             mView.setVoiceName(uiRoomModel.getRcRoomInfo().getRoomName());
                         }
                         if (mVoiceRoomBean != null) {
-                            String notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
-                            mView.showNotice(notice, false);
+                            notice = TextUtils.isEmpty(extra) ? String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()) : extra;
+                            mView.setNotice(notice);
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -781,7 +788,9 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                         EToast.showToast("用户连线成功");
                         break;
                     case EVENT_REJECT_MANAGE_PICK:
-                        EToast.showToast("用户拒绝邀请");
+                        if (stringArrayListPair.second.get(0).equals(AccountStore.INSTANCE.getUserId())) {
+                            EToast.showToast("用户拒绝邀请");
+                        }
                         break;
                 }
             }
@@ -804,12 +813,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * 麦位上点击自己的头像
      *
      * @param seatModel
-     * @param roomId
      * @return
      */
-    public SelfSettingFragment showNewSelfSettingFragment(UiSeatModel seatModel, String roomId) {
+    public SelfSettingFragment showNewSelfSettingFragment(UiSeatModel seatModel) {
         SelfSettingFragment selfSettingFragment = new SelfSettingFragment(seatModel, mVoiceRoomBean.getRoomId()
-                , voiceRoomModel);
+                , voiceRoomModel, AccountStore.INSTANCE.toUser());
         return selfSettingFragment;
     }
 
@@ -822,7 +830,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             if (uiSeatModel != null) {
                 if (!TextUtils.isEmpty(uiSeatModel.getUserId()) && uiSeatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
                     //如果在麦位上
-                    CreatorSettingFragment creatorSettingFragment = new CreatorSettingFragment(voiceRoomModel, uiSeatModel);
+                    CreatorSettingFragment creatorSettingFragment = new CreatorSettingFragment(voiceRoomModel, uiSeatModel, mVoiceRoomBean.getCreateUser());
                     creatorSettingFragment.show(fragmentManager);
                 } else {
                     //如果不在麦位上，直接上麦
@@ -1103,7 +1111,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             public Unit invoke() {
                 //拒绝
                 confirmDialog.dismiss();
-                voiceRoomModel.refuseInvite();
+                voiceRoomModel.refuseInvite(userId);
                 return null;
             }
         }, new Function0<Unit>() {

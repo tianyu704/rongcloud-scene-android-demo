@@ -19,6 +19,10 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.view.WindowManager;
 
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.api.callback.FileIOCallBack;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -244,6 +248,30 @@ public class AudioPlayManager implements SensorEventListener {
         }
     }
 
+    public void loadAudio(String audioPath, DownloadCallback callback) {
+        int start = audioPath.lastIndexOf("/");
+        int end = audioPath.lastIndexOf(".");
+        String cacheName = audioPath.substring(start, end) + ".voice";
+        String dir = mContext.getCacheDir().getAbsolutePath();
+        File file = new File(dir, cacheName);
+        if (null != file && file.exists()) {
+            if (null != callback) callback.onResult(file.getAbsolutePath());
+            return;
+        }
+        OkApi.download(audioPath, null, new FileIOCallBack(dir, cacheName) {
+            @Override
+            public void onResult(File file) {
+                if (null != callback) callback.onResult(file.getAbsolutePath());
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+                if (null != callback) callback.onResult(null);
+            }
+        });
+    }
+
     public void startPlay(final Context context, Uri audioUri, IAudioPlayListener playListener) {
         synchronized (mLock) {
             if (context == null || audioUri == null) {
@@ -252,116 +280,126 @@ public class AudioPlayManager implements SensorEventListener {
             }
             mContext = context;
 
-            if (_playListener != null && mUriPlaying != null) {
-                _playListener.onStop(mUriPlaying);
-            }
-            resetMediaPlayer();
+            loadAudio(audioUri.toString(), new DownloadCallback() {
+                @Override
+                public void onResult(String path) {
 
-            this.afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
-                public void onAudioFocusChange(int focusChange) {
-                    synchronized (mLock) {
-                        RLog.d(TAG, "OnAudioFocusChangeListener " + focusChange);
-                        if (mAudioManager != null && focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                            mAudioManager.abandonAudioFocus(afChangeListener);
-                            afChangeListener = null;
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    synchronized (mLock) {
-                                        if (_playListener != null) {
-                                            _playListener.onComplete(mUriPlaying);
-                                            _playListener = null;
+                    if (_playListener != null && mUriPlaying != null) {
+                        _playListener.onStop(mUriPlaying);
+                    }
+                    resetMediaPlayer();
+
+                    afChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+                        public void onAudioFocusChange(int focusChange) {
+                            synchronized (mLock) {
+                                RLog.d(TAG, "OnAudioFocusChangeListener " + focusChange);
+                                if (mAudioManager != null && focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                                    mAudioManager.abandonAudioFocus(afChangeListener);
+                                    afChangeListener = null;
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            synchronized (mLock) {
+                                                if (_playListener != null) {
+                                                    _playListener.onComplete(mUriPlaying);
+                                                    _playListener = null;
+                                                }
+                                            }
                                         }
+                                    });
+                                    reset();
+                                }
+                            }
+                        }
+                    };
+
+                    FileInputStream fis = null;
+                    if (context instanceof Activity) {
+                        ((Activity) context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                    }
+                    try {
+                        _powerManager = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
+                        mAudioManager = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+                        if (!isHeadphonesPlugged(mAudioManager)) {
+                            _sensorManager = (SensorManager) context.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+                            if (_sensorManager != null) {
+                                _sensor = _sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+                                _sensorManager.registerListener(AudioPlayManager.this, _sensor, SensorManager.SENSOR_DELAY_NORMAL);
+                            }
+                        }
+                        muteAudioFocus(mAudioManager, true);
+
+                        _playListener = playListener;
+                        mUriPlaying = audioUri;
+                        mMediaPlayer = new MediaPlayer();
+                        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                synchronized (mLock) {
+                                    if (_playListener != null) {
+                                        _playListener.onComplete(mUriPlaying);
+                                        _playListener = null;
+                                    }
+                                    reset();
+                                    if (context instanceof Activity) {
+                                        ((Activity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                                     }
                                 }
-                            });
-                            reset();
-                        }
-                    }
-                }
-            };
-
-            FileInputStream fis = null;
-            if (context instanceof Activity) {
-                ((Activity) context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            }
-            try {
-                _powerManager = (PowerManager) context.getApplicationContext().getSystemService(Context.POWER_SERVICE);
-                mAudioManager = (AudioManager) context.getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-                if (!isHeadphonesPlugged(mAudioManager)) {
-                    _sensorManager = (SensorManager) context.getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
-                    if (_sensorManager != null) {
-                        _sensor = _sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-                        _sensorManager.registerListener(this, _sensor, SensorManager.SENSOR_DELAY_NORMAL);
-                    }
-                }
-                muteAudioFocus(mAudioManager, true);
-
-                _playListener = playListener;
-                mUriPlaying = audioUri;
-                mMediaPlayer = new MediaPlayer();
-                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        synchronized (mLock) {
-                            if (_playListener != null) {
-                                _playListener.onComplete(mUriPlaying);
-                                _playListener = null;
                             }
-                            reset();
-                            if (context instanceof Activity) {
-                                ((Activity) context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        });
+                        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                            @Override
+                            public boolean onError(MediaPlayer mp, int what, int extra) {
+                                synchronized (mLock) {
+                                    reset();
+                                    return true;
+                                }
                             }
+                        });
+                        fis = new FileInputStream(path);
+                        mMediaPlayer.setDataSource(fis.getFD());
+//                mMediaPlayer.setDataSource(context, Uri.parse(audioUri.toString()));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            AudioAttributes attributes = new AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                                    .build();
+                            mMediaPlayer.setAudioAttributes(attributes);
+                        } else {
+                            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                         }
-                    }
-                });
-                mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-                    @Override
-                    public boolean onError(MediaPlayer mp, int what, int extra) {
-                        synchronized (mLock) {
-                            reset();
-                            return true;
-                        }
-                    }
-                });
-//                fis = new FileInputStream(audioUri.getPath());
-//                mMediaPlayer.setDataSource(fis.getFD());
-                mMediaPlayer.setDataSource(context, Uri.parse(audioUri.toString()));
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    AudioAttributes attributes = new AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_MEDIA)
-                            .build();
-                    mMediaPlayer.setAudioAttributes(attributes);
-                } else {
-                    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                }
-                //mMediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
-                mMediaPlayer.prepareAsync();
-                mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mp) {
-                        mMediaPlayer.start();
-                    }
-                });
-                if (_playListener != null)
-                    _playListener.onStart(mUriPlaying);
-            } catch (Exception e) {
-                RLog.e(TAG, "startPlay", e);
-                if (_playListener != null) {
-                    _playListener.onStop(audioUri);
-                    _playListener = null;
-                }
-                reset();
-            } finally {
-                if (fis != null) {
-                    try {
-                        fis.close();
-                    } catch (IOException e) {
+                        //mMediaPlayer.setAudioStreamType(AudioManager.STREAM_VOICE_CALL);
+                        mMediaPlayer.prepareAsync();
+                        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mp) {
+                                mMediaPlayer.start();
+                            }
+                        });
+                        if (_playListener != null)
+                            _playListener.onStart(mUriPlaying);
+                    } catch (Exception e) {
                         RLog.e(TAG, "startPlay", e);
+                        if (_playListener != null) {
+                            _playListener.onStop(audioUri);
+                            _playListener = null;
+                        }
+                        reset();
+                    } finally {
+                        if (fis != null) {
+                            try {
+                                fis.close();
+                            } catch (IOException e) {
+                                RLog.e(TAG, "startPlay", e);
+                            }
+                        }
                     }
                 }
-            }
+            });
         }
+    }
+
+    private interface DownloadCallback {
+        void onResult(String path);
     }
 
     private boolean isHeadphonesPlugged(AudioManager audioManager) {

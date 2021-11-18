@@ -85,7 +85,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     /**
      * 可以被邀请的人员监听
      */
-    public BehaviorSubject<List<User>> obInviteSeatListChangeSuject = BehaviorSubject.create();
+    private BehaviorSubject<List<User>> obInviteSeatListChangeSuject = BehaviorSubject.create();
 
     public UiRoomModel currentUIRoomInfo = new UiRoomModel(roomInfoSubject);
 
@@ -205,8 +205,9 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
         synchronized (this) {
+            int size = null == list ? 0 : list.size();
             uiSeatModels.clear();
-            for (int i = 0; i < list.size(); i++) {
+            for (int i = 0; i < size; i++) {
                 //构建一个集合返回去
                 RCVoiceSeatInfo rcVoiceSeatInfo = list.get(i);
                 if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())
@@ -339,6 +340,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
             present.showPickReceivedDialog(true, userId);
         } else {
             //管理员邀请
+            present.showPickReceivedDialog(false, userId);
         }
     }
 
@@ -646,7 +648,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
         }).subscribeOn(dataModifyScheduler);
     }
 
-
 //    /**
 //     * 座位禁麦，根据点击的位置来禁止
 //     */
@@ -750,10 +751,12 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
 
     /**
      * 拒绝邀请
+     *
+     * @param userId 邀请人ID
      */
-    public void refuseInvite() {
+    public void refuseInvite(String userId) {
         RCVoiceRoomEngine.getInstance()
-                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, AccountStore.INSTANCE.getUserId(), null);
+                .notifyVoiceRoom(EVENT_REJECT_MANAGE_PICK, userId, null);
     }
 
     /**

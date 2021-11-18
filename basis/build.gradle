@@ -91,7 +91,7 @@ dependencies {
     api "cn.rongcloud.sdk:im_kit:$rongcloudSdkVersion"
 //    api "cn.rongcloud.sdk:call_lib:$rongcloudSdkVersion"
     api "cn.rongcloud.sdk:call_lib:5.1.10"
-    api "cn.rongcloud.sdk:player:$rongcloudSdkVersion"
+    api "cn.rongcloud.sdk:player:5.1.10"
 
     api 'com.tencent.bugly:crashreport:latest.release'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9

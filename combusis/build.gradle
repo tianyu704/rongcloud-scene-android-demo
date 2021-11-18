@@ -103,4 +103,6 @@ dependencies {
     api "com.scwang.smart:refresh-layout-kernel:2.0.3"
     api "com.scwang.smart:refresh-header-classics:2.0.3"
     api "com.scwang.smart:refresh-footer-classics:2.0.3"
+    // viewpager2
+    api 'androidx.viewpager2:viewpager2:1.1.0-alpha01'
 }

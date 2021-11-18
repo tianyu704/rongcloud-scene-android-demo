@@ -86,33 +86,35 @@ public class DialActivity extends BaseActionBarActivity implements View.OnClickL
         String title = isVideo ? "视频通话" : "语音通话";
         initDefalutActionBar(title);
         initView();
-        addDisposable(DatabaseManager.INSTANCE.obCallRecordList(userId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<CallRecordModel>>() {
-                    @Override
-                    public void accept(List<CallRecordModel> models) {
-                        records.clear();
-                        int size = null == models ? 0 : models.size();
-                        DialInfo dialInfo;
-                        for (int i = 0; i < size; i++) {
-                            CallRecordModel model = models.get(i);
-                            dialInfo = new DialInfo();
-                            if (model.getDirection() == CallRecordEntityKt.DIRECTION_CALL) {
-                                dialInfo.setPhone(TextUtils.isEmpty(model.getPeerNumber()) ? model.getPeerNumberFromInfo() : model.getPeerNumber());
-                                dialInfo.setUserId(model.getPeerId());
-                                dialInfo.setDate(model.getDate());
-                                dialInfo.setHead(model.getPeerPortrait());
-                            } else {
-                                dialInfo.setPhone(TextUtils.isEmpty(model.getCallerNumber()) ? model.getCallNumberFromInfo() : model.getCallerNumber());
-                                dialInfo.setUserId(model.getCallerId());
-                                dialInfo.setDate(model.getDate());
-                                dialInfo.setHead(model.getCallPortrait());
+        if (!TextUtils.isEmpty(userId)) {
+            addDisposable(DatabaseManager.INSTANCE.obCallRecordList(userId)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<List<CallRecordModel>>() {
+                        @Override
+                        public void accept(List<CallRecordModel> models) {
+                            records.clear();
+                            int size = null == models ? 0 : models.size();
+                            DialInfo dialInfo;
+                            for (int i = 0; i < size; i++) {
+                                CallRecordModel model = models.get(i);
+                                dialInfo = new DialInfo();
+                                if (model.getDirection() == CallRecordEntityKt.DIRECTION_CALL) {
+                                    dialInfo.setPhone(TextUtils.isEmpty(model.getPeerNumber()) ? model.getPeerNumberFromInfo() : model.getPeerNumber());
+                                    dialInfo.setUserId(model.getPeerId());
+                                    dialInfo.setDate(model.getDate());
+                                    dialInfo.setHead(model.getPeerPortrait());
+                                } else {
+                                    dialInfo.setPhone(TextUtils.isEmpty(model.getCallerNumber()) ? model.getCallNumberFromInfo() : model.getCallerNumber());
+                                    dialInfo.setUserId(model.getCallerId());
+                                    dialInfo.setDate(model.getDate());
+                                    dialInfo.setHead(model.getCallPortrait());
+                                }
+                                records.add(dialInfo);
                             }
-                            records.add(dialInfo);
+                            refreshRecords(records);
                         }
-                        refreshRecords(records);
-                    }
-                }));
+                    }));
+        }
         FeedbackHelper.getHelper().registeFeedbackObservice(this);
     }
 
