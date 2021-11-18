@@ -162,7 +162,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlMuteSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickMuteSeat(member.toUser(), (result, msg) -> {
+            mOnMemberSettingClickListener.clickMuteSeat(seatPosition, !isMute, (result, msg) -> {
                 if (result) {
                     dismiss();
                 } else {
@@ -171,13 +171,11 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             });
         });
         mLlCloseSeat.setOnClickListener(v -> {
-            mOnMemberSettingClickListener.clickCloseSeat(member.toUser(), (result, msg) -> {
+            mOnMemberSettingClickListener.clickCloseSeat(seatPosition, true, (result, msg) -> {
                 if (result) {
                     dismiss();
-                    EToast.showToast("座位已关闭");
-                } else {
-                    EToast.showToast(msg);
                 }
+                EToast.showToast(msg);
             });
         });
         mBtnSendGift.setOnClickListener(v -> {
@@ -409,7 +407,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         });
     }
 
-    public interface OnMemberSettingClickListener {
+    public interface OnMemberSettingClickListener extends SeatActionClickListener {
         /**
          * 设置管理员
          *
@@ -419,14 +417,6 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         void clickSettingAdmin(User user, ClickCallback<Boolean> callback);
 
         /**
-         * 邀请上麦
-         *
-         * @param user
-         * @param callback
-         */
-        void clickInviteSeat(User user, ClickCallback<Boolean> callback);
-
-        /**
          * 踢出房间
          *
          * @param user
@@ -434,29 +424,6 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
          */
         void clickKickRoom(User user, ClickCallback<Boolean> callback);
 
-        /**
-         * 下麦
-         *
-         * @param user
-         * @param callback
-         */
-        void clickKickSeat(User user, ClickCallback<Boolean> callback);
-
-        /**
-         * 静麦
-         *
-         * @param user
-         * @param callback
-         */
-        void clickMuteSeat(User user, ClickCallback<Boolean> callback);
-
-        /**
-         * 关闭座位
-         *
-         * @param user
-         * @param callback
-         */
-        void clickCloseSeat(User user, ClickCallback<Boolean> callback);
 
         /**
          * 发送礼物

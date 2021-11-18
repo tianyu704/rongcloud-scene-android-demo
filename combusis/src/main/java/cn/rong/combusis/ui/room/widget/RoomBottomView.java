@@ -366,6 +366,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     private void setViewState(RoomOwnerType roomOwnerType) {
         switch (roomOwnerType) {
             case VOICE_OWNER:
+            case LIVE_OWNER:
                 mSeatOrder.setVisibility(VISIBLE);
                 mPkView.setVisibility(VISIBLE);
                 mSendGiftView.setVisibility(VISIBLE);
@@ -375,6 +376,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 mSendVoiceMassageView.setVisibility(GONE);
                 break;
             case VOICE_VIEWER:
+            case LIVE_VIEWER:
                 mSeatOrder.setVisibility(GONE);
                 mPkView.setVisibility(GONE);
                 mSendGiftView.setVisibility(VISIBLE);

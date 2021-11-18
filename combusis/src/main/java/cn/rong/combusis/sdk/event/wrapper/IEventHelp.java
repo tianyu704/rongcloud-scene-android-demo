@@ -4,9 +4,11 @@ import com.kit.wapper.IResultBack;
 
 import java.util.List;
 
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
 import cn.rongcloud.voiceroom.model.RCVoiceRoomInfo;
@@ -74,10 +76,53 @@ public interface IEventHelp extends OnCloseMiniRoomListener {
     /**
      * 离开房间
      */
-    void  leaveRoom(LeaveRoomCallBack callback);
+    void leaveRoom(LeaveRoomCallBack callback);
+
+    /**
+     * 邀请上麦
+     */
+    void pickUserToSeat(String userId, ClickCallback<Boolean> callback);
+
+    /**
+     * 同意上麦
+     */
+    void acceptRequestSeat(String userId, ClickCallback<Boolean> callback);
+
+    /**
+     * 撤销麦位申请
+     */
+    void cancelRequestSeat(ClickCallback<Boolean> callback);
+
+    /**
+     * 锁麦
+     */
+    void lockSeat(int index, boolean isClose, ClickCallback<Boolean> callback);
+
+    /**
+     * 开麦或者静麦
+     *
+     * @param index
+     * @param isMute
+     * @param callback
+     */
+    void muteSeat(int index, boolean isMute, ClickCallback<Boolean> callback);
+
+    /**
+     * 踢出房间
+     */
+    void kickUserFromRoom(User user, ClickCallback<Boolean> callback);
+
+    /**
+     * 抱下麦位
+     *
+     * @param user
+     * @param callback
+     */
+    void kickUserFromSeat(User user, ClickCallback<Boolean> callback);
 
     /**
      * 更改所属于房间
+     *
      * @param roomId
      */
     void changeUserRoom(String roomId);

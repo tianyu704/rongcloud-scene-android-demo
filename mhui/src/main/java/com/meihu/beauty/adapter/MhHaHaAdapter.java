@@ -38,6 +38,11 @@ public class MhHaHaAdapter extends RecyclerView.Adapter {
         mCheckedDrawable = ContextCompat.getDrawable(context, R.drawable.bg_water_check);
         mColor0 = ContextCompat.getColor(context, R.color.textColor2);
         mColor1 = ContextCompat.getColor(context, R.color.global);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isChecked()) {
+                mCheckedPosition = i;
+            }
+        }
         mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

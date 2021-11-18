@@ -14,6 +14,7 @@ import com.meihu.beauty.bean.MeiYanValueBean;
 import com.meihu.beauty.bean.TieZhiBean;
 import com.meihu.beauty.interfaces.CommonCallback;
 import com.meihu.beauty.interfaces.IBeautyEffectListener;
+import com.meihu.beauty.interfaces.IBeautyHideTipCallBack;
 import com.meihu.beauty.views.BeautyViewHolder;
 import com.meihu.beautylibrary.MHSDK;
 import com.meihu.beautylibrary.constant.ResourceUrl;
@@ -41,10 +42,12 @@ public class MhDataManager {
     private BeautyViewHolder mBeautyViewHolder;
     private MeiYanDataBean mMeiYanDataBean;
 
+    public String mTieZhiName;
+
     private int mFilterId;
     private int mHahaName;
     private boolean mHahaTexiao;
-    private String mTieZhiName;
+    private IBeautyHideTipCallBack iBeautyHideTipCallBack;
     private int mTieZhiAction;
     private boolean mTieZhiShow;
     private boolean mTieZhiIsAction;
@@ -145,6 +148,10 @@ public class MhDataManager {
 ////        mSPUtil.commitString(Constants.TIEZHI_ACTION_NAME,actionStickerName);
 //    }
 
+    public MeiYanDataBean getmMeiYanDataBean() {
+        return mMeiYanDataBean;
+    }
+
     public MhDataManager create(Context context) {
 
         mContext = context;
@@ -204,7 +211,10 @@ public class MhDataManager {
             public void OnStickerAction(String name, int action, boolean show) {
 
                 Log.e(TAG, "OnStickerAction: name:" + name + ",action:" + action);
-
+                if (iBeautyHideTipCallBack != null && action != 0 && !show) {
+                    iBeautyHideTipCallBack.hideTip();
+                    mTieZhiShow = true;
+                }
                 if (mBeautyViewHolder != null && action != 0 && !show) { //动作贴纸
                     mBeautyViewHolder.hideTip();
                     mTieZhiShow = true;
@@ -215,6 +225,10 @@ public class MhDataManager {
         restoreMeiYanData();
 
         return this;
+    }
+
+    public void setIBeautyHideTipCallBack(IBeautyHideTipCallBack iBeautyHideTipCallBack) {
+        this.iBeautyHideTipCallBack = iBeautyHideTipCallBack;
     }
 
     private void saveMeiYanData() {

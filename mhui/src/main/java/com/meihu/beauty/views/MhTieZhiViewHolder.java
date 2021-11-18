@@ -60,8 +60,8 @@ public class MhTieZhiViewHolder extends AbsMhChildViewHolder implements View.OnC
     @Override
     public void init() {
 
-        findViewById(R.id.btn_hide).setOnClickListener(this);
-        findViewById(R.id.capture).setOnClickListener(this);
+//        findViewById(R.id.btn_hide).setOnClickListener(this);
+//        findViewById(R.id.capture).setOnClickListener(this);
         RecyclerView titleRecyclerView = findViewById(R.id.title_recyclerView);
         ImageView imgClose = findViewById(R.id.close);
 

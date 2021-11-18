@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhTeXiaoSpecialAdapter;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.bean.TeXiaoSpecialBean;
 import com.meihu.beauty.interfaces.OnItemClickListener;
 import com.meihu.beauty.utils.MhDataManager;
@@ -28,7 +29,7 @@ public class MhTeXiaoSpecialViewHolder extends MhTeXiaoChildViewHolder implement
     public void init() {
         List<MHCommonBean> beans = new ArrayList<>();
 
-        beans.add(new TeXiaoSpecialBean(MHSDK.SPECIAL_NONE, R.string.beauty_mh_filter_no, R.mipmap.ic_tx_no, true, MHConfigConstants.TE_XIAO_WU));
+        beans.add(new TeXiaoSpecialBean(MHSDK.SPECIAL_NONE, R.string.beauty_mh_filter_no, R.mipmap.ic_tx_no, false, MHConfigConstants.TE_XIAO_WU));
         beans.add(new TeXiaoSpecialBean(MHSDK.SPECIAL_LING_HUN, R.string.beauty_mh_texiao_linghun, R.mipmap.ic_tx_linghun, MHConfigConstants.TE_XIAO_LING_HUN_CHU_QIAO));
         beans.add(new TeXiaoSpecialBean(MHSDK.SPECIAL_DOU_DONG, R.string.beauty_mh_texiao_doudong, R.mipmap.ic_tx_doudong, MHConfigConstants.TE_XIAO_DOU_DONG));
         beans.add(new TeXiaoSpecialBean(MHSDK.SPECIAL_SHAN_BAI, R.string.beauty_mh_texiao_shanbai, R.mipmap.ic_tx_shanbai, MHConfigConstants.TE_XIAO_SHAN_BAI));
@@ -42,8 +43,17 @@ public class MhTeXiaoSpecialViewHolder extends MhTeXiaoChildViewHolder implement
         beans = MHSDK.getFunctionItems(beans, MHConfigConstants.TE_XIAO, MHConfigConstants.TE_XIAO_FUNCTION);
 
         List<TeXiaoSpecialBean> list = new ArrayList<>();
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
         for (int i = 0; i < beans.size(); i++) {
             TeXiaoSpecialBean bean = (TeXiaoSpecialBean) beans.get(i);
+            if (meiYanDataBean != null) {
+                if (bean.getId() == meiYanDataBean.getTeXiaoId()) {
+                    bean.setChecked(true);
+                }
+            } else {
+                //第一次进来的话，默认第一个选中
+                if (i == 0) bean.setChecked(true);
+            }
             list.add(bean);
         }
 

@@ -6,9 +6,7 @@ import static cn.rong.combusis.sdk.Api.EVENT_KICKED_OUT_OF_ROOM;
 import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_REJECT_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
-import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_CANCEL;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
-import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,12 +24,10 @@ import java.util.List;
 
 import cn.rong.combusis.common.utils.SharedPreferUtil;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
-import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
-import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
@@ -54,17 +50,12 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
 import io.reactivex.rxjava3.core.SingleOnSubscribe;
-import io.reactivex.rxjava3.functions.Action;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.functions.Function;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.BehaviorSubject;
-import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-import kotlin.jvm.functions.Function2;
 
 /**
  * 语聊房的逻辑处理
@@ -94,7 +85,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     /**
      * 可以被邀请的人员监听
      */
-    private BehaviorSubject<List<User>> obInviteSeatListChangeSuject = BehaviorSubject.create();
+    public BehaviorSubject<List<User>> obInviteSeatListChangeSuject = BehaviorSubject.create();
 
     public UiRoomModel currentUIRoomInfo = new UiRoomModel(roomInfoSubject);
 
@@ -208,20 +199,21 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     /**
      * 麦位信息发生了变化
      * 这里用同步锁，避免多线程操作的时候，影响麦位的显示
+     *
      * @param list
      */
     @Override
     public void onSeatInfoUpdate(List<RCVoiceSeatInfo> list) {
-        synchronized (this){
+        synchronized (this) {
             uiSeatModels.clear();
             for (int i = 0; i < list.size(); i++) {
                 //构建一个集合返回去
                 RCVoiceSeatInfo rcVoiceSeatInfo = list.get(i);
                 if (!TextUtils.isEmpty(rcVoiceSeatInfo.getUserId())
-                        &&rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
+                        && rcVoiceSeatInfo.getStatus().equals(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty)) {
                     rcVoiceSeatInfo.setStatus(RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing);
                 }
-                UiSeatModel uiSeatModel = new UiSeatModel(i,rcVoiceSeatInfo , seatInfoChangeSubject);
+                UiSeatModel uiSeatModel = new UiSeatModel(i, rcVoiceSeatInfo, seatInfoChangeSubject);
                 uiSeatModels.add(uiSeatModel);
             }
             seatListChangeSubject.onNext(uiSeatModels);
@@ -318,11 +310,12 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
 
     /**
      * 消息接收
+     *
      * @param message 收到的消息
      */
     @Override
     public void onMessageReceived(Message message) {
-        if (!TextUtils.isEmpty(present.getRoomId())&& message.getConversationType() == Conversation.ConversationType.CHATROOM) {
+        if (!TextUtils.isEmpty(present.getRoomId()) && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(present.getRoomId(), message.getContent());
         }
     }
@@ -331,7 +324,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     public void onRoomNotificationReceived(String name, String content) {
         ArrayList<String> contents = new ArrayList<>();
         contents.add(content);
-        roomEventSubject.onNext(new Pair<>(name,contents));
+        sendRoomEvent(new Pair<>(name, contents));
     }
 
     /**
@@ -341,7 +334,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onPickSeatReceivedFrom(String userId) {
-
         if (userId.equals(present.getCreateUserId())) {
             //当前是房主邀请的
             present.showPickReceivedDialog(true, userId);
@@ -357,7 +349,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onKickSeatReceived(int i) {
-        roomEventSubject.onNext(new Pair(EVENT_KICK_OUT_OF_SEAT, new ArrayList<>()));
+        sendRoomEvent(new Pair(EVENT_KICK_OUT_OF_SEAT, new ArrayList<>()));
         AudioManagerUtil.INSTANCE.choiceAudioModel();
     }
 
@@ -366,7 +358,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onRequestSeatAccepted() {
-        roomEventSubject.onNext(new Pair(EVENT_REQUEST_SEAT_AGREE, new ArrayList<>()));
+        sendRoomEvent(new Pair(EVENT_REQUEST_SEAT_AGREE, new ArrayList<>()));
     }
 
     /**
@@ -374,7 +366,16 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onRequestSeatRejected() {
-        roomEventSubject.onNext(new Pair(EVENT_REQUEST_SEAT_REFUSE, new ArrayList<>()));
+        sendRoomEvent(new Pair(EVENT_REQUEST_SEAT_REFUSE, new ArrayList<>()));
+    }
+
+    /**
+     * 发送房间事件
+     *
+     * @param pair
+     */
+    public void sendRoomEvent(Pair pair) {
+        roomEventSubject.onNext(pair);
     }
 
     /**
@@ -397,7 +398,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
                     for (User user : users) {
-                        if (user.getUserId().equals(requestUserId)&&getSeatInfoByUserId(user.getUserId())==null) {
+                        if (user.getUserId().equals(requestUserId) && getSeatInfoByUserId(user.getUserId()) == null) {
                             requestSeats.add(user);
                             break;
                         }
@@ -459,7 +460,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * 用户收到被踢出房间 然后弹窗告知，然后退出房间等操作
      *
      * @param targetId 被踢用户的标识
-     * @param userId 发起踢人用户的标识
+     * @param userId   发起踢人用户的标识
      */
     @Override
     public void onUserReceiveKickOutRoom(String targetId, String userId) {
@@ -467,7 +468,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
         ArrayList<String> strings = new ArrayList<>();
         strings.add(userId);
         strings.add(targetId);
-        roomEventSubject.onNext(new Pair(EVENT_KICKED_OUT_OF_ROOM, strings));
+        sendRoomEvent(new Pair(EVENT_KICKED_OUT_OF_ROOM, strings));
     }
 
     /**
@@ -477,8 +478,8 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      */
     @Override
     public void onNetworkStatus(int i) {
-        if (present!=null)
-        present.onNetworkStatus(i);
+        if (present != null)
+            present.onNetworkStatus(i);
     }
 
     @Override
@@ -567,7 +568,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     }
 
 
-
     /**
      * 当房间人员变化的时候监听，当有人上麦或者下麦的时候也要监听
      *
@@ -646,283 +646,51 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
         }).subscribeOn(dataModifyScheduler);
     }
 
-    /**
-     * 取消上麦
-     */
-    public void cancelRequestSeat(ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().cancelRequestSeat(new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //取消成功
-                        callback.onResult(true, "");
-                        //发送通知，当前为取消状态，去刷新Ui
-                        roomEventSubject.onNext(new Pair<>(EVENT_REQUEST_SEAT_CANCEL, new ArrayList<>()));
-                    }
 
-                    @Override
-                    public void onError(int i, String s) {
-                        //取消失败
-                        callback.onResult(false, s);
-                    }
-                });
-            }
-        }).subscribe());
-    }
+//    /**
+//     * 座位禁麦，根据点击的位置来禁止
+//     */
+//    public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
+//
+//        Log.e(TAG, "clickMuteSeat: " + isMute);
+//        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
+//            @Override
+//            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
+//                RCVoiceRoomEngine.getInstance()
+//                        .muteSeat(index, isMute, new RCVoiceRoomCallback() {
+//                            @Override
+//                            public void onSuccess() {
+//                                //座位禁麦成功
+//                                emitter.onComplete();
+//                                if (isMute) {
+//                                    EToast.showToast("此麦位已闭麦");
+//                                } else {
+//                                    EToast.showToast("已取消闭麦");
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(int i, String s) {
+//                                //座位禁麦失败
+//                                emitter.onError(new Throwable(s));
+//                            }
+//                        });
+//            }
+//        }).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .doOnError(new Consumer<Throwable>() {
+//                    @Override
+//                    public void accept(Throwable throwable) throws Throwable {
+//                        callback.onResult(false, throwable.getMessage());
+//                    }
+//                }).doOnComplete(new Action() {
+//                    @Override
+//                    public void run() throws Throwable {
+//                        callback.onResult(true, "");
+//                    }
+//                }).subscribe());
+//    }
 
-
-    /**
-     * 同意上麦
-     */
-    public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                int availableIndex = getAvailableIndex();
-                if (availableIndex < 0) {
-                    showToast("房间麦位已满");
-                    return;
-                }
-                RCVoiceRoomEngine.getInstance()
-                        .acceptRequestSeat(userId, new RCVoiceRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-                                emitter.onComplete();
-                                callback.onResult(true, "");
-                            }
-
-                            @Override
-                            public void onError(int i, String s) {
-                                emitter.onError(new Throwable(s));
-                            }
-                        });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe());
-    }
-
-
-    /**
-     * 邀请上麦
-     *
-     * @param userId
-     * @param callback
-     */
-    public void clickInviteSeat(String userId, ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                if (getAvailableIndex() < 0) {
-                    emitter.onError(new Throwable("麦位已满"));
-                    return;
-                }
-                RCVoiceRoomEngine.getInstance().pickUserToSeat(userId, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //邀请成功,集合会跟着变化
-                        emitter.onComplete();
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "邀请成功");
-                    }
-                }).doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).subscribe());
-    }
-
-    /**
-     * 踢出去房间
-     *
-     * @param user
-     * @param callback
-     */
-    public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //踢出房间成功以后，要发送消息给被踢出的人
-                        RCChatroomKickOut kickOut = new RCChatroomKickOut();
-                        kickOut.setUserId(AccountStore.INSTANCE.getUserId());
-                        kickOut.setUserName(AccountStore.INSTANCE.getUserName());
-                        kickOut.setTargetId(user.getUserId());
-                        kickOut.setTargetName(user.getUserName());
-                        RCChatRoomMessageManager.INSTANCE.sendChatMessage(present.getRoomId(),
-                                kickOut,
-                                true,
-                                new Function1<Integer, Unit>() {
-                                    @Override
-                                    public Unit invoke(Integer integer) {
-                                        //成功
-                                        emitter.onComplete();
-                                        return null;
-                                    }
-                                }
-                                , new Function2<IRongCoreEnum.CoreErrorCode, Integer, Unit>() {
-                                    @Override
-                                    public Unit invoke(IRongCoreEnum.CoreErrorCode coreErrorCode, Integer integer) {
-                                        //失败
-                                        emitter.onError(new Throwable(coreErrorCode + ""));
-                                        return null;
-                                    }
-                                }
-                        );
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).subscribe());
-    }
-
-    /**
-     * 抱下麦
-     *
-     * @param user
-     * @param callback
-     */
-    public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().kickUserFromSeat(user.getUserId(), new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        emitter.onComplete();
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).doOnComplete(new Action() {
-            @Override
-            public void run() throws Throwable {
-                callback.onResult(true, "");
-            }
-        }).doOnError(new Consumer<Throwable>() {
-            @Override
-            public void accept(Throwable throwable) throws Throwable {
-                callback.onResult(false, throwable.getMessage());
-            }
-        }).subscribe());
-    }
-
-
-    /**
-     * 座位禁麦，根据点击的位置来禁止
-     */
-    public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
-        Log.e(TAG, "clickMuteSeat: "+isMute );
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance()
-                        .muteSeat(index, isMute, new RCVoiceRoomCallback() {
-                            @Override
-                            public void onSuccess() {
-                                //座位禁麦成功
-                                emitter.onComplete();
-                                if (isMute) {
-                                    EToast.showToast("此麦位已闭麦");
-                                } else {
-                                    EToast.showToast("已取消闭麦");
-                                }
-                            }
-
-                            @Override
-                            public void onError(int i, String s) {
-                                //座位禁麦失败
-                                emitter.onError(new Throwable(s));
-                            }
-                        });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).subscribe());
-    }
-
-    /**
-     * 根据麦位的位置去关闭座位
-     */
-    public void clickCloseSeatByIndex(int index, boolean isClose, ClickCallback<Boolean> callback) {
-        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-            @Override
-            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-                RCVoiceRoomEngine.getInstance().lockSeat(index, isClose, new RCVoiceRoomCallback() {
-                    @Override
-                    public void onSuccess() {
-                        //锁座位成功
-                        emitter.onComplete();
-                    }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        //锁座位失败
-                        emitter.onError(new Throwable(s));
-                    }
-                });
-            }
-        }).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-                        callback.onResult(false, throwable.getMessage());
-                    }
-                }).doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Throwable {
-                        callback.onResult(true, "");
-                    }
-                }).subscribe());
-    }
 
     /**
      * 上麦

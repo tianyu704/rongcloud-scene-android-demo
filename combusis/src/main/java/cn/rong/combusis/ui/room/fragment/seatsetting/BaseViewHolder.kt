@@ -8,8 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import cn.rong.combusis.R
 import cn.rong.combusis.provider.user.User
-import cn.rongcloud.voiceroom.R
 
 /**
  * @author gusd

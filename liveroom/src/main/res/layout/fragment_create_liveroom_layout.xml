@@ -1,35 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <cn.rongcloud.rtc.api.stream.RCRTCVideoView
-        android:id="@+id/rtc_preview_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
 
     <RelativeLayout
+        android:id="@+id/rl_setting_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_create_liveroom_header">
 
-        <ImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_back"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginStart="10dp"
             android:src="@drawable/svg_back" />
 
-        <com.rongcloud.common.ui.widget.RadiusImageView
+        <RelativeLayout
             android:id="@+id/select_cover_view"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@id/iv_back"
             android:layout_marginStart="24dp"
             android:layout_marginTop="22dp"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/icon_select_backgroup" />
+            android:background="@drawable/bg_select_cover">
 
+            <com.rongcloud.common.ui.widget.RadiusImageView
+                android:id="@+id/iv_room_cover"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                app:radius="12dp"
+                app:srcCompat="@drawable/icon_select_backgroup" />
+        </RelativeLayout>
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_room_name"
             android:layout_width="match_parent"
@@ -78,4 +83,91 @@
         </RadioGroup>
     </RelativeLayout>
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_start_live"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="42dp"
+        android:layout_marginEnd="42dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/bg_start_live_btn"
+        android:gravity="center"
+        android:text="开始视频直播"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/btn_start_live"
+        android:layout_alignStart="@id/btn_start_live"
+        android:layout_alignEnd="@+id/btn_start_live"
+        android:layout_marginBottom="24dp"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_turn_camera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_turn_camera"
+            android:gravity="center"
+            android:text="翻转"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_tags"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_tags"
+            android:gravity="center"
+            android:tag="贴纸"
+            android:text="贴纸"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_beauty"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_beauty"
+            android:gravity="center"
+            android:tag="美颜"
+            android:text="美颜"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_beauty_makeup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_beauty_makeup"
+            android:gravity="center"
+            android:tag="美妆"
+            android:text="美妆"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_effects"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableTop="@drawable/ic_effects"
+            android:gravity="center"
+            android:tag="特效"
+            android:text="特效"
+            android:textColor="@color/white"
+            android:textSize="12sp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+    <!--    <com.meihu.beauty.views.MeiHuBeautyControl-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="match_parent"/>-->
 </RelativeLayout>

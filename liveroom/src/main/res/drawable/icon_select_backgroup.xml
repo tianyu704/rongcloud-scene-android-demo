@@ -3,10 +3,8 @@
     android:height="72dp"
     android:viewportWidth="72"
     android:viewportHeight="72">
-    <path
-        android:fillColor="#FFF"
-        android:pathData="M0 12c0-6.63 5.37-12 12-12h48c6.63 0 12 5.37 12 12v48c0 6.63-5.37 12-12 12h-48c-6.63 0-12-5.37-12-12z" />
-    <group>
+
+<group>
         <clip-path android:pathData="M0 12c0-6.63 5.37-12 12-12h48c6.63 0 12 5.37 12 12v48c0 6.63-5.37 12-12 12h-48c-6.63 0-12-5.37-12-12z" />
         <group>
             <path android:pathData="M0 0h108v72H0z" />
@@ -26,4 +24,5 @@
         android:fillColor="#FFF"
         android:fillType="evenOdd"
         android:pathData="M65.82 55.7c0.24 0.25 0.24 0.72 0 0.96l-1.09 1.32l-2.53-2.51l1.2-1.2c0.25-0.36 0.61-0.36 0.97 0l1.45 1.44zM54 66v-2.51l7.36-7.43l2.53 2.52L56.53 66H54z" />
+
 </vector>

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhMeiYanFilterAdapter;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.bean.MeiYanFilterBean;
 import com.meihu.beauty.interfaces.OnItemClickListener;
 import com.meihu.beauty.utils.MhDataManager;
@@ -27,7 +28,7 @@ public class MhMeiYanFilterViewHolder extends MhMeiYanChildViewHolder implements
     @Override
     public void init() {
         List<MHCommonBean> beans = new ArrayList<>();
-        beans.add(new MeiYanFilterBean(R.string.beauty_mh_filter_no, R.mipmap.ic_filter_no, MHSDK.FILTER_NONE, true, MHConfigConstants.MEI_YAN_LV_JING_YUAN_TU));
+        beans.add(new MeiYanFilterBean(R.string.beauty_mh_filter_no, R.mipmap.ic_filter_no, MHSDK.FILTER_NONE, false, MHConfigConstants.MEI_YAN_LV_JING_YUAN_TU));
         beans.add(new MeiYanFilterBean(R.string.beauty_mh_filter_langman, R.mipmap.ic_filter_langman, MHSDK.FILTER_LANG_MAN, MHConfigConstants.MEI_YAN_LV_JING_LANG_MAN));
         beans.add(new MeiYanFilterBean(R.string.beauty_mh_filter_qingxin, R.mipmap.ic_filter_qingxin, MHSDK.FILTER_QING_XIN, MHConfigConstants.MEI_YAN_LV_JING_QING_XIN));
         beans.add(new MeiYanFilterBean(R.string.beauty_mh_filter_weimei, R.mipmap.ic_filter_weimei, MHSDK.FILTER_WEI_MEI, MHConfigConstants.MEI_YAN_LV_JING_WEI_MEI));
@@ -58,11 +59,19 @@ public class MhMeiYanFilterViewHolder extends MhMeiYanChildViewHolder implements
         beans.add(new MeiYanFilterBean(R.string.beauty_mh_pro_filter_lianai, R.mipmap.ic_filter_lianai, MHSDK.FILTER_LIAN_AI, MHConfigConstants.MEI_YAN_LV_JING_LIAN_AI));
 
         beans = MHSDK.getFunctionItems(beans, MHConfigConstants.MEI_YAN, MHConfigConstants.MEI_YAN_LV_JING_FUNCTION);
-
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
         List<MeiYanFilterBean> list = new ArrayList<>();
         for (int i = 0; i < beans.size(); i++) {
             MeiYanFilterBean bean = (MeiYanFilterBean) beans.get(i);
             list.add(bean);
+            if (meiYanDataBean != null) {
+                if (bean.getFilterRes() == meiYanDataBean.getFilterId()) {
+                    bean.setChecked(true);
+                }
+            } else {
+                //第一次进来的话，默认第一个选中
+                if (i == 0) bean.setChecked(true);
+            }
         }
 
         RecyclerView recyclerView = (RecyclerView) mContentView;

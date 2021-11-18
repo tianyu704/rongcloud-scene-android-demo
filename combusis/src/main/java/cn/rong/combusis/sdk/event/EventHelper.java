@@ -1,5 +1,7 @@
 package cn.rong.combusis.sdk.event;
 
+import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,21 +14,27 @@ import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.manager.RCChatRoomMessageManager;
+import cn.rong.combusis.message.RCChatroomKickOut;
 import cn.rong.combusis.music.MusicManager;
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
 import cn.rong.combusis.sdk.event.wrapper.AbsPKHelper;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.sdk.event.wrapper.EventDialogHelper;
 import cn.rong.combusis.sdk.event.wrapper.IEventHelp;
 import cn.rong.combusis.sdk.event.wrapper.TipType;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -140,6 +148,140 @@ public class EventHelper extends AbsPKHelper {
             public void onError(int i, String s) {
                 if (callback != null)
                     callback.onError(i, s);
+            }
+        });
+    }
+
+    @Override
+    public void pickUserToSeat(String userId, ClickCallback<Boolean> callback) {
+        if (getAvailableSeatIndex() < 0) {
+            callback.onResult(false, "麦位已满");
+            return;
+        }
+        RCVoiceRoomEngine.getInstance().pickUserToSeat(userId, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                //邀请成功,集合会跟着变化
+                callback.onResult(true, "邀请成功");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                callback.onResult(false, s);
+            }
+        });
+    }
+
+    @Override
+    public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
+        if (getAvailableSeatIndex() < 0) {
+            showToast("房间麦位已满");
+            return;
+        }
+        RCVoiceRoomEngine.getInstance()
+                .acceptRequestSeat(userId, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        callback.onResult(true, "");
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        callback.onResult(false, s);
+                    }
+                });
+    }
+
+    @Override
+    public void cancelRequestSeat(ClickCallback<Boolean> callback) {
+        RCVoiceRoomEngine.getInstance().cancelRequestSeat(new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                //取消成功
+                callback.onResult(true, "");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                //取消失败
+                callback.onResult(false, s);
+            }
+        });
+    }
+
+    @Override
+    public void lockSeat(int index, boolean isClose, ClickCallback<Boolean> callback) {
+        RCVoiceRoomEngine.getInstance().lockSeat(index, isClose, new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                //锁座位成功
+                callback.onResult(true, isClose ? "座位已关闭" : "座位已开启");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                //锁座位失败
+                callback.onResult(false, s);
+            }
+        });
+    }
+
+    @Override
+    public void muteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
+        RCVoiceRoomEngine.getInstance()
+                .muteSeat(index, isMute, new RCVoiceRoomCallback() {
+                    @Override
+                    public void onSuccess() {
+                        //座位禁麦成功
+                        callback.onResult(true, "");
+                        if (isMute) {
+                            EToast.showToast("此麦位已闭麦");
+                        } else {
+                            EToast.showToast("已取消闭麦");
+                        }
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        //座位禁麦失败
+                        callback.onResult(false, s);
+                    }
+                });
+    }
+
+    @Override
+    public void kickUserFromRoom(User user, ClickCallback<Boolean> callback) {
+        RCVoiceRoomEngine.getInstance().kickUserFromRoom(user.getUserId(), new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                //踢出房间成功以后，要发送消息给被踢出的人
+                RCChatroomKickOut kickOut = new RCChatroomKickOut();
+                kickOut.setUserId(AccountStore.INSTANCE.getUserId());
+                kickOut.setUserName(AccountStore.INSTANCE.getUserName());
+                kickOut.setTargetId(user.getUserId());
+                kickOut.setTargetName(user.getUserName());
+                RCChatRoomMessageManager.INSTANCE.sendChatMessage(getRoomId(), kickOut, true, null, null);
+                callback.onResult(true, "踢出成功");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                callback.onResult(false, s);
+            }
+        });
+    }
+
+    @Override
+    public void kickUserFromSeat(User user, ClickCallback<Boolean> callback) {
+        RCVoiceRoomEngine.getInstance().kickUserFromSeat(user.getUserId(), new RCVoiceRoomCallback() {
+            @Override
+            public void onSuccess() {
+                callback.onResult(true, "");
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                callback.onResult(false, s);
             }
         });
     }

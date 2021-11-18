@@ -12,6 +12,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhTeXiaoActionAdapter;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.bean.TeXiaoActionBean;
 import com.meihu.beauty.bean.TieZhiBean;
 import com.meihu.beauty.interfaces.CommonCallback;
@@ -51,8 +52,17 @@ public class MhTeXiaoActionViewHolder extends MhTeXiaoChildViewHolder implements
         beans = MHSDK.getFunctionItems(beans, MHConfigConstants.TE_XIAO, MHConfigConstants.TE_XIAO_DONG_ZUO_FUNCTION);
 
         List<TeXiaoActionBean> list = new ArrayList<>();
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
         for (int i = 0; i < beans.size(); i++) {
             TeXiaoActionBean bean = (TeXiaoActionBean) beans.get(i);
+            if (meiYanDataBean != null) {
+                if (bean.getAction() == meiYanDataBean.getTieZhiAction()) {
+                    bean.setChecked(true);
+                }
+            } else {
+                //第一次进来的话，默认第一个选中
+                if (i == 0) bean.setChecked(true);
+            }
             list.add(bean);
         }
 

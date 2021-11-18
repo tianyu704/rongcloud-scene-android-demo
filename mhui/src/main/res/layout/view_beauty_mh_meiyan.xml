@@ -1,101 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#03062F"
     android:orientation="vertical">
 
-    <View
-        android:id="@+id/btn_hide"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-    <LinearLayout
+    <com.meihu.beauty.custom.TextSeekBar
+        android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
         android:orientation="vertical">
 
-        <com.meihu.beauty.custom.TextSeekBar
-            android:id="@+id/seek_bar"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/title_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            android:visibility="invisible" />
+            android:layout_height="40dp"
+            android:overScrollMode="never" />
 
-        <FrameLayout
-            android:id="@+id/bottom"
+        <View
+            android:id="@+id/line"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/view_beauty_height"
-            android:background="@color/bg_black"
-            android:translationY="@dimen/view_beauty_height">
+            android:layout_height="1dp"
+            android:background="@color/gray2" />
 
-            <LinearLayout
-                android:id="@+id/content"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/view_beauty_viewpager"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/title_recyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:overScrollMode="never" />
-
-                <View
-                    android:id="@+id/line"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/gray2" />
-
-                <androidx.viewpager.widget.ViewPager
-                    android:id="@+id/mh_meiyan_viewPager"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:overScrollMode="never" />
-
-            </LinearLayout>
-
-            <RelativeLayout
-                android:id="@+id/bottom_control"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|bottom"
-                android:layout_marginBottom="@dimen/view_beauty_capture_bottom">
-
-                <FrameLayout
-                    android:id="@+id/hide"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="20dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_gravity="center"
-                        android:src="@mipmap/ic_close">
-
-                    </ImageView>
-
-                </FrameLayout>
-
-
-                <ImageView
-                    android:id="@+id/capture"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_centerInParent="true"
-                    android:src="@mipmap/ic_capture"
-
-                    />
-
-            </RelativeLayout>
-
-
-        </FrameLayout>
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/mh_meiyan_viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/view_beauty_viewpager"
+            android:overScrollMode="never" />
 
     </LinearLayout>
+
 
 </LinearLayout>

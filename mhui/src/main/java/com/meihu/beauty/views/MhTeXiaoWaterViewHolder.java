@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhTeXiaoWaterAdapter;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.bean.TeXiaoWaterBean;
 import com.meihu.beauty.interfaces.OnItemClickListener;
 import com.meihu.beauty.utils.MhDataManager;
@@ -26,13 +27,24 @@ public class MhTeXiaoWaterViewHolder extends MhTeXiaoChildViewHolder implements 
     @Override
     public void init() {
         List<TeXiaoWaterBean> list = new ArrayList<>();
-        list.add(new TeXiaoWaterBean(R.mipmap.ic_mh_none, 0, MHSDK.WATER_NONE, true));
+        list.add(new TeXiaoWaterBean(R.mipmap.ic_mh_none, 0, MHSDK.WATER_NONE, false));
         list.add(new TeXiaoWaterBean(R.mipmap.ic_water_thumb_0, R.mipmap.ic_water_res_0, MHSDK.WATER_TOP_LEFT));
         list.add(new TeXiaoWaterBean(R.mipmap.ic_water_thumb_1, R.mipmap.ic_water_res_1, MHSDK.WATER_TOP_RIGHT));
         list.add(new TeXiaoWaterBean(R.mipmap.ic_water_thumb_2, R.mipmap.ic_water_res_2, MHSDK.WATER_BOTTOM_LEFT));
         list.add(new TeXiaoWaterBean(R.mipmap.ic_water_thumb_3, R.mipmap.ic_water_res_3, MHSDK.WATER_BOTTOM_RIGHT));
         RecyclerView recyclerView = (RecyclerView) mContentView;
         recyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false));
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
+        for (int i = 0; i < list.size(); i++) {
+            TeXiaoWaterBean teXiaoWaterBean = list.get(i);
+            if (meiYanDataBean != null) {
+                if (meiYanDataBean.getWaterRes() == teXiaoWaterBean.getRes()) {
+                    teXiaoWaterBean.setChecked(true);
+                }
+            } else {
+                if (i == 0) teXiaoWaterBean.setChecked(true);
+            }
+        }
         MhTeXiaoWaterAdapter adapter = new MhTeXiaoWaterAdapter(mContext, list);
         adapter.setOnItemClickListener(this);
         recyclerView.setAdapter(adapter);

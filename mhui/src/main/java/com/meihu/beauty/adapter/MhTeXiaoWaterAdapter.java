@@ -31,6 +31,11 @@ public class MhTeXiaoWaterAdapter extends RecyclerView.Adapter {
         mList = list;
         mInflater = LayoutInflater.from(context);
         mCheckedDrawable = ContextCompat.getDrawable(context, R.drawable.bg_water_check);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isChecked()) {
+                mCheckedPosition = i;
+            }
+        }
         mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

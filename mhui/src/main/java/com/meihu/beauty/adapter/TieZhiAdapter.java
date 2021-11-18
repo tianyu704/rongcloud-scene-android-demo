@@ -53,12 +53,19 @@ public class TieZhiAdapter extends RecyclerView.Adapter {
                 }
                 TieZhiBean bean = mList.get(position);
                 if (bean.isDownLoaded()) {
+                    //修改为贴纸为上次选中的状态
+                    for (int i = 0; i < mList.size(); i++) {
+                        if (mList.get(i).isChecked()) {
+                            mList.get(i).setChecked(false);
+                            notifyItemChanged(i, Constants.PAYLOAD);
+                        }
+                    }
                     bean.setChecked(true);
                     notifyItemChanged(position, Constants.PAYLOAD);
-                    if (mCheckedPosition >= 0) {
-                        mList.get(mCheckedPosition).setChecked(false);
-                        notifyItemChanged(mCheckedPosition, Constants.PAYLOAD);
-                    }
+//                    if (mCheckedPosition >= 0) {
+//                        mList.get(mCheckedPosition).setChecked(false);
+//                        notifyItemChanged(mCheckedPosition, Constants.PAYLOAD);
+//                    }
                     mCheckedPosition = position;
                     if (mOnItemClickListener != null) {
                         mOnItemClickListener.onItemClick(bean, position);
@@ -74,11 +81,17 @@ public class TieZhiAdapter extends RecyclerView.Adapter {
                             finalBean.setDownLoading(false);
                             finalBean.setDownLoaded(isSuccess);
                             if (isSuccess) {
-                                finalBean.setChecked(true);
-                                if (mCheckedPosition >= 0) {
-                                    mList.get(mCheckedPosition).setChecked(false);
-                                    notifyItemChanged(mCheckedPosition, Constants.PAYLOAD);
+                                for (int i = 0; i < mList.size(); i++) {
+                                    if (mList.get(i).isChecked()) {
+                                        mList.get(i).setChecked(false);
+                                        notifyItemChanged(i, Constants.PAYLOAD);
+                                    }
                                 }
+                                finalBean.setChecked(true);
+//                                if (mCheckedPosition >= 0) {
+//                                    mList.get(mCheckedPosition).setChecked(false);
+//                                    notifyItemChanged(mCheckedPosition, Constants.PAYLOAD);
+//                                }
                                 mCheckedPosition = finalPosition;
                                 if (mOnItemClickListener != null) {
                                     mOnItemClickListener.onItemClick(finalBean, finalPosition);
@@ -100,6 +113,11 @@ public class TieZhiAdapter extends RecyclerView.Adapter {
         if (position >= 0 && mList.get(position).getThumb() == null) {
             mList.get(position).setChecked(false);
             return;
+        }
+        for (int i = 0; i < mList.size(); i++) {
+            if (mList.get(i).isChecked()) {
+                mCheckedPosition = i;
+            }
         }
         if (mCheckedPosition == position) {
             return;

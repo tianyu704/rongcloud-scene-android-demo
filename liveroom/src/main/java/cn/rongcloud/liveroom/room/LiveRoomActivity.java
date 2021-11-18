@@ -1,9 +1,11 @@
 package cn.rongcloud.liveroom.room;
 
-import static cn.rong.combusis.intent.IntentWrap.KEY_IS_CREATE;
 
 import androidx.fragment.app.Fragment;
 
+import com.meihu.beauty.utils.MhDataManager;
+
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 
@@ -13,20 +15,18 @@ import cn.rong.combusis.ui.room.AbsRoomActivity;
  */
 public class LiveRoomActivity extends AbsRoomActivity {
 
+    boolean isCreate;
+
     @Override
     protected void initRoom() {
+        //初始化
+        MhDataManager.getInstance().create(this.getApplicationContext());
+        isCreate = getIntent().getBooleanExtra(IntentWrap.KEY_IS_CREATE, false);
     }
 
     @Override
     public Fragment getFragment(String roomId) {
-        boolean isCreate = getIntent().getBooleanExtra(KEY_IS_CREATE, false);
-        if (isCreate) {
-            //如果当时是创建房间的情况
-            return CreatLiveRoomFragment.getInstance();
-        } else {
-            //观众端和主播房还需要细分
-            return null;
-        }
+        return LiveRoomFragment.getInstance(roomId, isCreate);
     }
 
     @Override
@@ -34,4 +34,9 @@ public class LiveRoomActivity extends AbsRoomActivity {
         return RoomType.LIVE_ROOM;
     }
 
+    @Override
+    protected void onDestroy() {
+        MhDataManager.getInstance().release();
+        super.onDestroy();
+    }
 }

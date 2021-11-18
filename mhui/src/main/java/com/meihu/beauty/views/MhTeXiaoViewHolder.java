@@ -58,8 +58,8 @@ public class MhTeXiaoViewHolder extends AbsMhChildViewHolder implements View.OnC
 
     @Override
     public void init() {
-        findViewById(R.id.btn_hide).setOnClickListener(this);
-        mTip = findViewById(R.id.tip);
+//        findViewById(R.id.btn_hide).setOnClickListener(this);
+//        mTip = findViewById(R.id.tip);
 
         List<MHCommonBean> beans = new ArrayList<>();
         beans.add(new MeiYanTypeBean(R.string.beauty_mh_003, MHConfigConstants.TE_XIAO_FUNCTION));
@@ -208,7 +208,7 @@ public class MhTeXiaoViewHolder extends AbsMhChildViewHolder implements View.OnC
             vh.setOnTieZhiActionDownloadListener(new OnTieZhiActionDownloadListener() {
                 @Override
                 public void OnTieZhiActionDownload(int state) {
-                    showTieZhiDownloadTip(state);
+//                    showTieZhiDownloadTip(state);
                 }
             });
         }

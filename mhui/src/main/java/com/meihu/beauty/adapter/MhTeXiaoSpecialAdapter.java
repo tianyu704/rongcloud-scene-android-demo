@@ -37,6 +37,11 @@ public class MhTeXiaoSpecialAdapter extends RecyclerView.Adapter {
         mInflater = LayoutInflater.from(context);
         mColor0 = Color.parseColor("#FF6C6C6C");
         mColor1 = ContextCompat.getColor(context, R.color.textColor2);
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).isChecked()) {
+                mCheckedPosition = i;
+            }
+        }
         mOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhHaHaAdapter;
 import com.meihu.beauty.bean.HaHaBean;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.interfaces.OnItemClickListener;
 import com.meihu.beauty.utils.MhDataManager;
 import com.meihu.beautylibrary.MHSDK;
@@ -29,7 +30,7 @@ public class MhTeXiaoHaHaViewHolder extends MhTeXiaoChildViewHolder implements O
     public void init() {
 
         List<MHCommonBean> beans = new ArrayList<>();
-        beans.add(new HaHaBean(MHSDK.HAHA_NONE, 0, R.mipmap.ic_mh_none, true, MHConfigConstants.TE_XIAO_HA_HA_JING_WU));
+        beans.add(new HaHaBean(MHSDK.HAHA_NONE, 0, R.mipmap.ic_mh_none, false, MHConfigConstants.TE_XIAO_HA_HA_JING_WU));
         beans.add(new HaHaBean(MHSDK.HAHA_WAIXING, R.string.beauty_mh_haha_waixingren, R.mipmap.ic_haha_waixingren, MHConfigConstants.TE_XIAO_HA_HA_JING_WAI_XING_REN));
         beans.add(new HaHaBean(MHSDK.HAHA_LI, R.string.beauty_mh_haha_li, R.mipmap.ic_haha_li, MHConfigConstants.TE_XIAO_HA_HA_JING_LI_LI_LIAN));
         beans.add(new HaHaBean(MHSDK.HAHA_SHOU, R.string.beauty_mh_haha_shou, R.mipmap.ic_haha_shou, MHConfigConstants.TE_XIAO_HA_HA_JING_SHOU_SHOU_LIAN));
@@ -41,10 +42,18 @@ public class MhTeXiaoHaHaViewHolder extends MhTeXiaoChildViewHolder implements O
         beans.add(new HaHaBean(MHSDK.HAHA_ZUO_YOU, R.string.beauty_mh_haha_zuoyou, R.mipmap.ic_haha_zuoyou, MHConfigConstants.TE_XIAO_HA_HA_JING_ZUO_YOU_JING_XIANG));
 
         beans = MHSDK.getFunctionItems(beans, MHConfigConstants.TE_XIAO, MHConfigConstants.TE_XIAO_HA_HA_JING_FUNCTION);
-
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
         List<HaHaBean> list = new ArrayList<>();
         for (int i = 0; i < beans.size(); i++) {
             HaHaBean bean = (HaHaBean) beans.get(i);
+            if (meiYanDataBean != null) {
+                if (meiYanDataBean.getHahaName() == bean.getId()) {
+                    bean.setChecked(true);
+                }
+            } else {
+                //第一次进来的话，默认第一个选中
+                if (i == 0) bean.setChecked(true);
+            }
             list.add(bean);
         }
 

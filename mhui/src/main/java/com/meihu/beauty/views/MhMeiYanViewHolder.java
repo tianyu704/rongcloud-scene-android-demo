@@ -47,7 +47,7 @@ public class MhMeiYanViewHolder extends AbsMhChildViewHolder implements View.OnC
     @Override
     public void hideSeekBar() {
         if (mSeekBar != null) {
-            mSeekBar.setVisibility(View.INVISIBLE);
+            mSeekBar.setVisibility(View.GONE);
         }
     }
 
@@ -58,7 +58,7 @@ public class MhMeiYanViewHolder extends AbsMhChildViewHolder implements View.OnC
 
     @Override
     public void init() {
-        findViewById(R.id.btn_hide).setOnClickListener(this);
+//        findViewById(R.id.btn_hide).setOnClickListener(this);
         mSeekBar = findViewById(R.id.seek_bar);
         mSeekBar.setActionListener(this);
 
@@ -175,10 +175,10 @@ public class MhMeiYanViewHolder extends AbsMhChildViewHolder implements View.OnC
             case MHConfigConstants.MEI_YAN_MEI_XING_FUNCION:
                 vh = new MhMeiYanShapeViewHolder(mContext, parent);
                 break;
-            case MHConfigConstants.MEI_YAN_YI_JIAN_MEI_YAN_FUNCTION:
+            case MHConfigConstants.MEI_YAN_YI_JIAN_MEI_YAN_FUNCTION://一键美颜
                 vh = new MhMeiYanOneKeyViewHolder(mContext, parent);
                 break;
-            case MHConfigConstants.MEI_YAN_LV_JING_FUNCTION:
+            case MHConfigConstants.MEI_YAN_LV_JING_FUNCTION://滤镜
                 vh = new MhMeiYanFilterViewHolder(mContext, parent);
                 break;
         }
@@ -219,7 +219,7 @@ public class MhMeiYanViewHolder extends AbsMhChildViewHolder implements View.OnC
                 mSeekBar.setLeftText(text);
             } else {
                 if (mSeekBar.getVisibility() != View.INVISIBLE) {
-                    mSeekBar.setVisibility(View.INVISIBLE);
+                    mSeekBar.setVisibility(View.GONE);
                 }
             }
         }

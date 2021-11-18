@@ -73,6 +73,13 @@ public class MhTieZhiChildViewHolder extends AbsCommonViewHolder implements OnIt
                                 list.remove(bean);
                                 i--;
                                 continue;
+                            } else {
+                                //默认选中上次的
+                                String mTieZhiName = MhDataManager.getInstance().mTieZhiName;
+                                if (!TextUtils.isEmpty(mTieZhiName))
+                                    if (mTieZhiName.equals(bean.getName())) {
+                                        bean.setChecked(true);
+                                    }
                             }
                             bean.checkDownloaded();
                             bean.setKey(mKey);

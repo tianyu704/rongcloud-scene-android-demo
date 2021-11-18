@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.meihu.beauty.R;
 import com.meihu.beauty.adapter.MhMakeupAdapter;
 import com.meihu.beauty.bean.MakeupBean;
+import com.meihu.beauty.bean.MeiYanDataBean;
 import com.meihu.beauty.interfaces.OnItemClickListener;
 import com.meihu.beauty.utils.MhDataManager;
 import com.meihu.beautylibrary.MHSDK;
@@ -50,7 +51,7 @@ public class MhMakeupViewHolder extends AbsMhChildViewHolder implements View.OnC
     @Override
     public void init() {
 
-        findViewById(R.id.btn_hide).setOnClickListener(this);
+//        findViewById(R.id.btn_hide).setOnClickListener(this);
 
         List<MHCommonBean> beans = new ArrayList<>();
         beans.add(new MakeupBean(R.string.beauty_mh_makeup_none, R.mipmap.makeup_drawing_default, R.mipmap.makeup_drawing_sele, MHSDK.MAKEUP_NONE, MHConfigConstants.MEI_ZHUANG_YUAN_TU));
@@ -62,11 +63,26 @@ public class MhMakeupViewHolder extends AbsMhChildViewHolder implements View.OnC
         beans = MHSDK.getFunctionItems(beans, MHConfigConstants.MEI_ZHUANG, MHConfigConstants.MEI_ZHUANG_FUNCTION);
 
         List<MakeupBean> list = new ArrayList<>();
+        MeiYanDataBean meiYanDataBean = MhDataManager.getInstance().getmMeiYanDataBean();
         for (int i = 0; i < beans.size(); i++) {
             MakeupBean bean = (MakeupBean) beans.get(i);
+            //美妆状态为上次默认选中的
+            if (meiYanDataBean != null)
+                switch (bean.getMakeupId()) {
+                    case MHSDK.MAKEUP_NONE:
+                        break;
+                    case MHSDK.MAKEUP_EYELASH:
+                        bean.setChecked(meiYanDataBean.isMakeupEyelash());
+                        break;
+                    case MHSDK.MAKEUP_LIPSTICK:
+                        bean.setChecked(meiYanDataBean.isMakeupLipstick());
+                        break;
+                    case MHSDK.MAKEUP_BLUSH:
+                        bean.setChecked(meiYanDataBean.isMakeupBlush());
+                        break;
+                }
             list.add(bean);
         }
-
 
         RecyclerView recyclerView = findViewById(R.id.makeup_recyclerView);
         if (list.size() > 0) {

@@ -11,37 +11,47 @@ import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 public interface RadioRoomMemberSettingClickListener extends MemberSettingFragment.OnMemberSettingClickListener {
 
     @Override
-    public default void clickSettingAdmin(User user, ClickCallback<Boolean> callback) {
+    default void clickSettingAdmin(User user, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
+    default void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickKickRoom(User user, ClickCallback<Boolean> callback) {
+    default void clickKickRoom(User user, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickKickSeat(User user, ClickCallback<Boolean> callback) {
+    default void clickKickSeat(User user, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickMuteSeat(User user, ClickCallback<Boolean> callback) {
+    default void clickMuteSeat(int seatIndex, boolean isMute, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickCloseSeat(User user, ClickCallback<Boolean> callback) {
+    default void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback) {
 
     }
 
     @Override
-    public default void clickSendGift(User user) {
+    default void clickSendGift(User user) {
+
+    }
+
+    @Override
+    default void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    default void cancelRequestSeat(ClickCallback<Boolean> callback) {
 
     }
 }

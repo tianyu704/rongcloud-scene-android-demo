@@ -362,7 +362,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
                 || seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
             //点击空座位或者锁定座位的时候，弹出弹窗
-            present.enterSeatOwner(seatModel, position);
+            present.enterSeatOwner(seatModel);
         } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
             //弹窗设置弹窗
             // 点击别人头像
