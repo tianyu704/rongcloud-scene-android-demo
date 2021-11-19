@@ -504,7 +504,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         // 加载背景
         ImageLoaderUtil.INSTANCE.loadImage(requireContext(), mBackgroundImageView, voiceRoomBean.getBackgroundUrl(), R.color.black);
         // 设置title数据
-        mRoomTitleBar.setData(voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
+        mRoomTitleBar.setData(present.getRoomOwnerType(), voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
 
         // 设置底部按钮
         mRoomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());

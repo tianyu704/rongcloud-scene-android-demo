@@ -220,7 +220,7 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         // 加载背景
         setRoomBackground(voiceRoomBean.getBackgroundUrl());
         // 设置title数据
-        mRoomTitleBar.setData(voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
+        mRoomTitleBar.setData(roomOwnerType, voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
         mRoomTitleBar.setDelay(0, false);
         // 设置房主麦位信息
         mRoomSeatView.setData(voiceRoomBean.getCreateUserName(), voiceRoomBean.getCreateUserPortrait());

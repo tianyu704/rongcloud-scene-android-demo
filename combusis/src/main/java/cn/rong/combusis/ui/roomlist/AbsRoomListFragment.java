@@ -193,6 +193,7 @@ public abstract class AbsRoomListFragment extends BaseFragment
         } else {
             //如果是直播房，是直接进入直播间界面的
             ArrayList list = new ArrayList();
+            list.add("-1");
             launchRoomActivity("", list, 0, true);
         }
     }

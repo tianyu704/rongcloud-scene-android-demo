@@ -1,5 +1,7 @@
 package cn.rongcloud.liveroom.room;
 
+import androidx.fragment.app.FragmentManager;
+
 import com.basis.mvp.IBaseView;
 
 import java.util.List;
@@ -65,4 +67,11 @@ public interface LiveRoomView extends IBaseView {
      * @param name
      */
     void setRoomName(String name);
+
+    /**
+     * 获取fragment管理器
+     *
+     * @return
+     */
+    FragmentManager getLiveFragmentManager();
 }

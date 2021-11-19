@@ -1,6 +1,5 @@
 package cn.rongcloud.liveroom.room;
 
-import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
 
 import android.text.TextUtils;
 
@@ -36,7 +35,6 @@ import cn.rong.combusis.message.RCChatroomSeats;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
-import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
@@ -45,6 +43,9 @@ import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.fragment.seatsetting.ICommonDialog;
+import cn.rong.combusis.ui.room.fragment.seatsetting.RevokeSeatRequestFragment;
+import cn.rong.combusis.ui.room.fragment.seatsetting.SeatOperationViewPagerFragment;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
@@ -58,14 +59,16 @@ import io.rong.message.TextMessage;
  * 直播房
  */
 public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
-        ILiveRoomPresent, RoomTitleBar.OnFollowClickListener, MemberSettingFragment.OnMemberSettingClickListener {
+        ILiveRoomPresent, RoomTitleBar.OnFollowClickListener,
+        MemberSettingFragment.OnMemberSettingClickListener,
+        ICommonDialog {
 
-
-    public CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
     private VoiceRoomBean mVoiceRoomBean;//房间信息
     private RoomOwnerType roomOwnerType;//房间用户身份
     private List<Shield> shields = new ArrayList<>();//当前屏蔽词
     private List<Disposable> disposablesManager = new ArrayList<>();//监听管理器
+    private ArrayList<User> requestSeats = new ArrayList<>();//申请连麦的集合
+    private ArrayList<User> inviteSeats = new ArrayList<>();//可以被邀请的集合
     private boolean isInRoom;
 
     public LiveRoomPresenter(LiveRoomView mView, Lifecycle lifecycle) {
@@ -105,8 +108,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         if (isInRoom) {
                             //如果已经在房间里面了,那么需要重新设置监听
                             initLiveRoomListener(roomId);
-                            currentStatus = LiveEventHelper.getInstance().getCurrentStatus();
-                            mView.changeStatus(currentStatus);
+                            mView.changeStatus(LiveEventHelper.getInstance().getCurrentStatus());
 //                            voiceRoomModel.currentUIRoomInfo.setMute(EventHelper.helper().getMuteAllRemoteStreams());
 //                            voiceRoomModel.onSeatInfoUpdate(EventHelper.helper().getRCVoiceSeatInfoList());
                             mView.dismissLoading();
@@ -343,12 +345,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         }
                         //将消息显示到列表上
                         Class<? extends MessageContent> aClass = messageContent.getClass();
-                        if (RCChatroomVoice.class.equals(aClass) || RCChatroomLocationMessage.class.equals(aClass)
-                                || RCChatroomVoice.class.equals(aClass) || RCChatroomBarrage.class.equals(aClass)
-                                || RCChatroomEnter.class.equals(aClass) || RCChatroomKickOut.class.equals(aClass)
-                                || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
-                                || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
-                                || RCFollowMsg.class.equals(aClass) || TextMessage.class.equals(aClass)) {
+                        if (RCChatroomLocationMessage.class.equals(aClass) || RCChatroomVoice.class.equals(aClass)
+                                || RCChatroomBarrage.class.equals(aClass) || RCChatroomEnter.class.equals(aClass)
+                                || RCChatroomKickOut.class.equals(aClass) || RCChatroomGift.class.equals(aClass)
+                                || RCChatroomAdmin.class.equals(aClass) || RCChatroomSeats.class.equals(aClass)
+                                || RCChatroomGiftAll.class.equals(aClass) || RCFollowMsg.class.equals(aClass)
+                                || TextMessage.class.equals(aClass)) {
                             if (null != mView) mView.addMessageContent(messageContent, false);
                         }
                         if (RCChatroomGift.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)) {
@@ -364,11 +366,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         } else if (aClass.equals(RCChatroomAdmin.class)) {
                             MemberCache.getInstance().refreshAdminData(mVoiceRoomBean.getRoomId());
                         }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Throwable {
-
                     }
                 }));
     }
@@ -433,17 +430,33 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         unInitLiveRoomListener();
     }
 
+    /**
+     * 设置管理员
+     *
+     * @param user
+     * @param callback
+     */
     @Override
     public void clickSettingAdmin(User user, ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 踢出房间
+     *
+     * @param user
+     * @param callback
+     */
     @Override
     public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
 
     }
 
-
+    /**
+     * 点击发送礼物
+     *
+     * @param user
+     */
     @Override
     public void clickSendGift(User user) {
 
@@ -484,33 +497,96 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
     }
 
+    /**
+     * 邀请上麦
+     *
+     * @param user
+     * @param callback
+     */
     @Override
     public void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 同意上麦
+     *
+     * @param userId
+     * @param callback
+     */
     @Override
     public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 撤销申请
+     *
+     * @param callback
+     */
     @Override
     public void cancelRequestSeat(ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 踢下麦
+     *
+     * @param user
+     * @param callback
+     */
     @Override
     public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 开麦或禁麦
+     *
+     * @param seatIndex
+     * @param isMute
+     * @param callback
+     */
     @Override
     public void clickMuteSeat(int seatIndex, boolean isMute, ClickCallback<Boolean> callback) {
 
     }
 
+    /**
+     * 关闭座位或者打开座位
+     *
+     * @param seatIndex
+     * @param isLock
+     * @param callback
+     */
     @Override
     public void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback) {
 
+    }
+
+    /**
+     * 邀请弹窗
+     *
+     * @param index
+     */
+    @Override
+    public void showSeatOperationViewPagerFragment(int index) {
+        SeatOperationViewPagerFragment seatOperationViewPagerFragment
+                = new SeatOperationViewPagerFragment(requestSeats, inviteSeats);
+        seatOperationViewPagerFragment.setIndex(index);
+//        seatOperationViewPagerFragment.setObInviteSeatListChangeSuject(voiceRoomModel.obInviteSeatListChange());
+//        seatOperationViewPagerFragment.setObRequestSeatListChangeSuject(voiceRoomModel.obRequestSeatListChange());
+        seatOperationViewPagerFragment.setSeatActionClickListener(this);
+        seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
+    }
+
+    /**
+     * 撤销弹窗
+     */
+    @Override
+    public void showNewRevokeSeatRequestFragment() {
+        RevokeSeatRequestFragment revokeSeatRequestFragment = new RevokeSeatRequestFragment();
+        revokeSeatRequestFragment.setSeatActionClickListener(this);
+        revokeSeatRequestFragment.show(mView.getLiveFragmentManager());
     }
 }

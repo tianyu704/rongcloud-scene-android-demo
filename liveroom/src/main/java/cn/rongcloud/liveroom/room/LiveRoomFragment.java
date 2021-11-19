@@ -34,6 +34,7 @@ import cn.rong.combusis.message.RCChatroomBarrage;
 import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
@@ -45,6 +46,7 @@ import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
 import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
+import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyMakeUpFun;
@@ -59,6 +61,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSpecialEffectsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomTagsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSetFun;
+import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSettingFragment;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.GiftAnimationView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
@@ -109,6 +112,8 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private BeautyDialogFragment meiyanDialog;
     private BeautyDialogFragment meizhuangDialog;
     private BeautyDialogFragment texiaoDialog;
+    private MemberSettingFragment mMemberSettingFragment;
+    private RoomVideoSettingFragment roomVideoSettingFragment;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -271,8 +276,82 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      */
     @Override
     public void clickUser(User user) {
-
+        //如果点击的是本人的名称，那么无效
+        if (TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId())) {
+            return;
+        }
+        if (mMemberSettingFragment == null) {
+            mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
+        }
+//        if (uiSeatModel != null) {
+//            //说明当前用户在麦位上
+//            mMemberSettingFragment.setMemberIsOnSeat(uiSeatModel.getIndex() > -1);
+//            mMemberSettingFragment.setSeatPosition(uiSeatModel.getIndex());
+//            mMemberSettingFragment.setMute(uiSeatModel.isMute());
+//        } else {
+//            mMemberSettingFragment.setMemberIsOnSeat(false);
+//        }
+//        mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
     }
+
+//    /**
+//     * 麦位被点击的情况
+//     *
+//     * @param seatModel
+//     * @param position
+//     */
+//    private void onClickLiveRoomSeats(UiSeatModel seatModel, int position) {
+//        switch (present.getRoomOwnerType()) {
+//            case LIVE_OWNER://房主
+//                onClickVoiceRoomSeatsByOwner(seatModel, position);
+//                break;
+//            case LIVE_VIEWER://观众
+//                onClickVoiceRoomSeatsByViewer(seatModel, position);
+//                break;
+//        }
+//
+//    }
+//    /**
+//     * 观众点击麦位的时候
+//     *
+//     * @param seatModel
+//     * @param position
+//     */
+//    private void onClickVoiceRoomSeatsByViewer(UiSeatModel seatModel, int position) {
+//        if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+//            // 点击锁定座位
+//            showToast("该座位已锁定");
+//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
+//            //点击空座位 的时候
+//            present.enterSeatViewer(position);
+//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
+//            if (!TextUtils.isEmpty(seatModel.getUserId()) && seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
+//                // 点击自己头像
+//                present.showNewSelfSettingFragment(seatModel).show(getChildFragmentManager());
+//            } else {
+//                // 点击别人头像
+//                present.getUserInfo(seatModel.getUserId());
+//            }
+//        }
+//    }
+//
+//    /**
+//     * 房主点击麦位的时候
+//     *
+//     * @param seatModel
+//     * @param position
+//     */
+//    private void onClickVoiceRoomSeatsByOwner(UiSeatModel seatModel, int position) {
+//        if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
+//                || seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
+//            //点击空座位或者锁定座位的时候，弹出弹窗
+//            present.enterSeatOwner(seatModel);
+//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
+//            //弹窗设置弹窗
+//            // 点击别人头像
+//            present.getUserInfo(seatModel.getUserId());
+//        }
+//    }
 
     /**
      * 发送全服广播
@@ -437,7 +516,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 texiaoDialog = new BeautyDialogFragment(requireActivity(), MHConfigConstants.TE_XIAO);
             texiaoDialog.show();
         } else if (fun instanceof RoomVideoSetFun) {
-
+            if (roomVideoSettingFragment != null)
+                roomVideoSettingFragment = new RoomVideoSettingFragment();
+            //传进去当前的分辨率和帧率
+            roomVideoSettingFragment.show(getLiveFragmentManager());
         }
     }
 
@@ -541,8 +623,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         rlRoomFinishedId.setVisibility(View.GONE);
 
         // 设置title数据
-        roomTitleBar.setData(voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
+        roomTitleBar.setData(present.getRoomOwnerType(), voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
 
+        User createUser = voiceRoomBean.getCreateUser();
+        roomTitleBar.setCreatorName(createUser.getUserName());
+        roomTitleBar.setCreatorPortrait(createUser.getPortrait());
         // 设置底部按钮
         roomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
         // 设置消息列表数据
@@ -621,6 +706,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         }
     }
 
+
     @Override
     public void setRoomName(String roomName) {
         this.roomName = roomName;
@@ -628,7 +714,18 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void clickMessageUser(String userId) {
+    public FragmentManager getLiveFragmentManager() {
+        return getChildFragmentManager();
+    }
 
+    @Override
+    public void clickMessageUser(String userId) {
+        UserProvider.provider().getAsyn(userId, userInfo -> {
+            User user = new User();
+            user.setUserId(userId);
+            user.setUserName(userInfo.getName());
+            user.setPortrait(userInfo.getPortraitUri().toString());
+            clickUser(user);
+        });
     }
 }

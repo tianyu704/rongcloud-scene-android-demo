@@ -1,5 +1,7 @@
 package cn.rongcloud.liveroom.helper;
 
+import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
+
 import android.text.TextUtils;
 
 import java.util.ArrayList;
@@ -7,8 +9,11 @@ import java.util.List;
 
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCChatroomLocationMessage;
+import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
+import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.MessageContent;
 import kotlin.Unit;
@@ -27,18 +32,65 @@ public class LiveEventHelper implements ILiveEventHelper {
 
     private List<MessageContent> messageList;
     private String roomId;//直播房的房间ID
-    private CurrentStatusType currentStatus;
+    private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
 
     public static LiveEventHelper getInstance() {
         return helper.INSTANCE;
     }
 
+    @Override
     public CurrentStatusType getCurrentStatus() {
         return currentStatus;
     }
 
+    @Override
     public void setCurrentStatus(CurrentStatusType currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    @Override
+    public void leaveRoom(LeaveRoomCallBack callback) {
+
+    }
+
+    @Override
+    public void pickUserToSeat(String userId, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void cancelRequestSeat(ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void lockSeat(int index, boolean isClose, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void muteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void kickUserFromRoom(User user, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void kickUserFromSeat(User user, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
+    public void changeUserRoom(String roomId) {
+
     }
 
     public List<MessageContent> getMessageList() {

@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroom.room.dialogFragment;
+package cn.rong.combusis.ui.room.fragment.seatsetting;
 
 
 import android.view.View;
@@ -9,12 +9,11 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.Guideline;
 
+import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.SeatActionClickListener;
-import cn.rong.combusis.ui.room.fragment.seatsetting.ICommonDialog;
-import cn.rongcloud.voiceroom.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -44,7 +43,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
     private ICommonDialog iCommonDialog;
 
     public EmptySeatFragment() {
-        super(R.layout.fragment_new_empty_seat_setting);
+        super(R.layout.fragment_empty_seat_setting);
     }
 
     public void setData(int index, int seatStatus, boolean isMute, ICommonDialog iCommonDialog) {

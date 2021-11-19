@@ -27,7 +27,9 @@ import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.sdk.event.EventHelper;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
@@ -648,50 +650,6 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
         }).subscribeOn(dataModifyScheduler);
     }
 
-//    /**
-//     * 座位禁麦，根据点击的位置来禁止
-//     */
-//    public void clickMuteSeat(int index, boolean isMute, ClickCallback<Boolean> callback) {
-//
-//        Log.e(TAG, "clickMuteSeat: " + isMute);
-//        present.addDisposable(Completable.create(new CompletableOnSubscribe() {
-//            @Override
-//            public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
-//                RCVoiceRoomEngine.getInstance()
-//                        .muteSeat(index, isMute, new RCVoiceRoomCallback() {
-//                            @Override
-//                            public void onSuccess() {
-//                                //座位禁麦成功
-//                                emitter.onComplete();
-//                                if (isMute) {
-//                                    EToast.showToast("此麦位已闭麦");
-//                                } else {
-//                                    EToast.showToast("已取消闭麦");
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onError(int i, String s) {
-//                                //座位禁麦失败
-//                                emitter.onError(new Throwable(s));
-//                            }
-//                        });
-//            }
-//        }).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .doOnError(new Consumer<Throwable>() {
-//                    @Override
-//                    public void accept(Throwable throwable) throws Throwable {
-//                        callback.onResult(false, throwable.getMessage());
-//                    }
-//                }).doOnComplete(new Action() {
-//                    @Override
-//                    public void run() throws Throwable {
-//                        callback.onResult(true, "");
-//                    }
-//                }).subscribe());
-//    }
-
 
     /**
      * 上麦
@@ -769,29 +727,24 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
             @Override
             public void subscribe(@io.reactivex.rxjava3.annotations.NonNull CompletableEmitter emitter) throws Throwable {
                 RCVoiceRoomEngine.getInstance().disableAudioRecording(isMute);
-                RCVoiceRoomEngine.getInstance().muteSeat(0, isMute, new RCVoiceRoomCallback() {
+                EventHelper.helper().muteSeat(0, isMute, new ClickCallback<Boolean>() {
                     @Override
-                    public void onSuccess() {
-                        emitter.onComplete();
-                        if (isMute) {
-                            EToast.showToast("此麦位已闭麦");
+                    public void onResult(Boolean result, String msg) {
+                        if (result) {
+                            emitter.onComplete();
+                            //主播禁麦自己
+                            if (isMute) {//关闭耳返
+                                RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(false);
+                            } else {//根据缓存状态恢复耳返
+                                boolean enable = SharedPreferUtil.getBoolean("key_earMonitoring_" + present.getRoomId());
+                                RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(enable);
+                            }
                         } else {
-                            EToast.showToast("已取消闭麦");
+                            emitter.onError(new Throwable(msg));
                         }
                     }
-
-                    @Override
-                    public void onError(int i, String s) {
-                        emitter.onError(new Throwable(s));
-                    }
                 });
-                //主播禁麦自己
-                if (isMute) {//关闭耳返
-                    RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(false);
-                } else {//根据缓存状态恢复耳返
-                    boolean enable = SharedPreferUtil.getBoolean("key_earMonitoring_" + present.getRoomId());
-                    RCRTCEngine.getInstance().getDefaultAudioStream().enableEarMonitoring(enable);
-                }
+
             }
         }).subscribeOn(dataModifyScheduler)
                 .observeOn(AndroidSchedulers.mainThread());

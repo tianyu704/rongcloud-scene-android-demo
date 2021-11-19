@@ -53,13 +53,15 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         ArrayList<BaseFragment> fragments = new ArrayList<>();
         requestSeatFragment = new RequestSeatFragment(requestSeats);
         inviteSeatFragment = new InviteSeatFragment(inviteSeats);
+        LiveLyayoutSettingFragment liveLyayoutSettingFragment = new LiveLyayoutSettingFragment();
         fragments.add(requestSeatFragment);
         fragments.add(inviteSeatFragment);
+        fragments.add(liveLyayoutSettingFragment);
         vpPage.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         FragmentStateAdapter fragmentStateAdapter = new FragmentStateAdapter(getChildFragmentManager(), getLifecycle()) {
             @Override
             public int getItemCount() {
-                return 2;
+                return fragments.size();
             }
 
             @NonNull

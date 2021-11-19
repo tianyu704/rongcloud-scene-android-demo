@@ -31,6 +31,7 @@ import cn.rong.combusis.sdk.Api;
 import cn.rong.combusis.sdk.VoiceRoomApi;
 import cn.rong.combusis.sdk.event.listener.RoomListener;
 import cn.rong.combusis.sdk.event.listener.StatusListener;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine;
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomEventListener;
@@ -387,10 +388,12 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                 inviteDialog.dismiss();
                 if (currentStatus==STATUS_WAIT_FOR_SEAT) {
                     //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
-                    VoiceRoomApi.getApi().cancelRequestSeat(new IResultBack<Boolean>() {
+                    cancelRequestSeat(new ClickCallback<Boolean>() {
                         @Override
-                        public void onResult(Boolean aBoolean) {
-                            currentStatus=STATUS_ON_SEAT;
+                        public void onResult(Boolean result, String msg) {
+                            if (result) {
+                                currentStatus = STATUS_ON_SEAT;
+                            }
                         }
                     });
                 }
