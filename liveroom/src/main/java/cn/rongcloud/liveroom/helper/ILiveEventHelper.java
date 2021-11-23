@@ -49,6 +49,11 @@ public interface ILiveEventHelper {
     void leaveRoom(LeaveRoomCallBack callback);
 
     /**
+     * 加入房间
+     */
+    void joinRoom(String roomId, ClickCallback<Boolean> callback);
+
+    /**
      * 邀请上麦
      */
     void pickUserToSeat(String userId, ClickCallback<Boolean> callback);
@@ -96,5 +101,28 @@ public interface ILiveEventHelper {
      * @param roomId
      */
     void changeUserRoom(String roomId);
+
+    /**
+     * 关闭房间
+     */
+    void finisRoom(ClickCallback<Boolean> callback);
+
+    /**
+     * 开始直播
+     *
+     * @param roomId
+     * @param callback
+     */
+    void begin(String roomId, ClickCallback<Boolean> callback);
+
+    /**
+     * 准备直播
+     */
+    void prepare(ClickCallback<Boolean> callback);
+
+    /**
+     * 请求上麦直播
+     */
+    void requestLiveVideo(int index, ClickCallback<Boolean> callback);
 
 }

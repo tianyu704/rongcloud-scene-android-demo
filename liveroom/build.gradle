@@ -50,8 +50,5 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
-    annotationProcessor project(path: ':processor')
-    kapt project(path: ':processor')
-
     api project(path: ':combusis')
 }

@@ -662,7 +662,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             case STATUS_ON_SEAT:
                 break;
             case STATUS_WAIT_FOR_SEAT:
-                present.showNewRevokeSeatRequestFragment();
+                present.showRevokeSeatRequestFragment();
                 break;
             case STATUS_NOT_ON_SEAT:
                 present.enterSeatViewer(-1);

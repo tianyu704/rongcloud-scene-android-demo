@@ -236,21 +236,25 @@ public class RoomTitleBar extends ConstraintLayout {
     public void setViewState() {
         switch (roomOwnerType) {
             case LIVE_OWNER:
+                mDelayTextView.setVisibility(VISIBLE);
+                mCreaterImageview.setVisibility(VISIBLE);
+                mLeftView.setBackgroundResource(R.drawable.bg_live_room_title_left);
+                mCreaterImageview.setVisibility(VISIBLE);
+                mOnlineTextView.setVisibility(GONE);
+                tvRoomOnlineCount.setVisibility(VISIBLE);
+                mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_live_room));
+                setmLeftViewMarginStart(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding));
+                break;
             case LIVE_VIEWER:
-                //如果是直播房
-                if (roomOwnerType == RoomOwnerType.LIVE_OWNER) {
-                    mDelayTextView.setVisibility(VISIBLE);
-                } else {
-                    mDelayTextView.setVisibility(GONE);
-                }
+                mDelayTextView.setVisibility(GONE);
                 mCreaterImageview.setVisibility(VISIBLE);
                 mLeftView.setBackgroundResource(R.drawable.bg_live_room_title_left);
                 mCreaterImageview.setVisibility(VISIBLE);
                 mOnlineTextView.setVisibility(GONE);
                 mIDTextView.setVisibility(GONE);
                 tvRoomOnlineCount.setVisibility(VISIBLE);
-                mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_live_room));
                 setmLeftViewMarginStart(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding));
+                mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu));
                 break;
             default:
                 //非直播房

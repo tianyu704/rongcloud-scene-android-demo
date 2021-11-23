@@ -1094,7 +1094,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * 展示撤销麦位申请
      */
     @Override
-    public void showNewRevokeSeatRequestFragment() {
+    public void showRevokeSeatRequestFragment() {
         RevokeSeatRequestFragment revokeSeatRequestFragment = new RevokeSeatRequestFragment();
         revokeSeatRequestFragment.setSeatActionClickListener(this);
         revokeSeatRequestFragment.show(((VoiceRoomFragment) mView).getChildFragmentManager());

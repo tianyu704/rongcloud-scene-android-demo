@@ -1,6 +1,10 @@
 package cn.rongcloud.liveroom.room;
 
+import android.content.Context;
+import android.view.View;
+
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.MutableLiveData;
 
 import com.basis.mvp.IBaseView;
 
@@ -8,6 +12,8 @@ import java.util.List;
 
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
+import cn.rong.combusis.ui.room.model.Member;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -74,4 +80,56 @@ public interface LiveRoomView extends IBaseView {
      * @return
      */
     FragmentManager getLiveFragmentManager();
+
+    /**
+     * 关闭当前页面
+     */
+    void finish();
+
+    /**
+     * 显示直播view
+     */
+    void showRCLiveVideoView(View videoView);
+
+    /**
+     * 显示消息延迟
+     *
+     * @param delayMs
+     */
+    void showNetWorkStatus(long delayMs);
+
+    /**
+     * 显示在线人数
+     *
+     * @param onLineCount
+     */
+    void setOnlineCount(int onLineCount);
+
+    /**
+     * 显示发送礼物弹窗
+     *
+     * @param voiceRoomBean
+     * @param selectUserId
+     * @param members
+     */
+    void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members);
+
+    /**
+     * 显示音乐弹窗
+     */
+    void showMusicDialog();
+
+    /**
+     * 底部设置弹窗
+     *
+     * @param funList
+     */
+    void showRoomSettingFragment(List<MutableLiveData<IFun.BaseFun>> funList);
+
+    /**
+     * 获取上下文
+     *
+     * @return
+     */
+    Context getLiveActivity();
 }

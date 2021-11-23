@@ -1,9 +1,11 @@
 package cn.rongcloud.liveroom.room;
 
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -17,25 +19,29 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.basis.net.oklib.OkApi;
+import com.basis.net.oklib.OkParams;
+import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.wrapper.Wrapper;
 import com.meihu.beautylibrary.bean.MHConfigConstants;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.UiUtils;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
 import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
-import cn.rong.combusis.message.RCChatroomBarrage;
-import cn.rong.combusis.message.RCChatroomVoice;
 import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
+import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
@@ -43,10 +49,12 @@ import cn.rong.combusis.ui.beauty.BeautyDialogFragment;
 import cn.rong.combusis.ui.room.AbsRoomActivity;
 import cn.rong.combusis.ui.room.AbsRoomFragment;
 import cn.rong.combusis.ui.room.RoomMessageAdapter;
+import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
 import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyMakeUpFun;
@@ -62,6 +70,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSpecialEffectsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomTagsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSetFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSettingFragment;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.GiftAnimationView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
@@ -69,17 +78,17 @@ import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.R;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
-import io.rong.imkit.utils.RouteUtils;
+import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.StatusBarUtil;
-import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.MessageContent;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 /**
  * 直播房界面
  */
 public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
-        implements LiveRoomView, CreateLiveRoomFragment.CreateRoomCallBack,
-        RoomBottomView.OnBottomOptionClickListener, MemberListFragment.OnClickUserListener
+        implements LiveRoomView, CreateLiveRoomFragment.CreateRoomCallBack, MemberListFragment.OnClickUserListener
         , View.OnClickListener, AllBroadcastView.OnClickBroadcast,
         OnItemClickListener<MutableLiveData<IFun.BaseFun>>, RoomMessageAdapter.OnClickMessageUserListener {
 
@@ -114,6 +123,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private BeautyDialogFragment texiaoDialog;
     private MemberSettingFragment mMemberSettingFragment;
     private RoomVideoSettingFragment roomVideoSettingFragment;
+    private ConfirmDialog finishDiolog;
+    private ExitRoomPopupWindow mExitRoomPopupWindow;
+    private GiftFragment mGiftFragment;
+    private MemberListFragment mMemberListFragment;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -141,8 +154,8 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         initData();
         initDialog();
         fragmentManager = getActivity().getSupportFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
         if (isCreate) {
+            fragmentTransaction = fragmentManager.beginTransaction();
             clLiveRoomView.setVisibility(View.INVISIBLE);
             createLiveRoomFragment = CreateLiveRoomFragment.getInstance();
             createLiveRoomFragment.setCreateRoomCallBack(this);
@@ -184,7 +197,13 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     @Override
     public void onBackPressed() {
-        requireActivity().finish();
+        if (TextUtils.equals(mRoomId, "-1")) {
+            //说明房间没有生成的情况
+            LiveEventHelper.getInstance().unRegister();
+            finish();
+            return;
+        }
+        clickMenu();
     }
 
     @Override
@@ -206,6 +225,8 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void destroyRoom() {
         super.destroyRoom();
         present.unInitLiveRoomListener();
+        //取消对当前房间的监听
+        LiveEventHelper.getInstance().unRegister();
     }
 
     @Override
@@ -234,6 +255,77 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         rvMessage.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
         mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
         rvMessage.setAdapter(mRoomMessageAdapter);
+
+        roomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                clickMenu();
+            }
+        });
+        roomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                mMemberListFragment = new MemberListFragment(mRoomId, LiveRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
+            }
+        });
+    }
+
+    /**
+     * 显示是否关闭房间弹窗
+     */
+    private void showFinishDiolog() {
+        if (finishDiolog == null) {
+            finishDiolog = new ConfirmDialog(requireContext(), "是否结束当前直播", true,
+                    "确定", "取消", null, new Function0<Unit>() {
+                @Override
+                public Unit invoke() {
+                    present.finishLiveRoom();
+                    return null;
+                }
+            });
+        }
+        finishDiolog.show();
+    }
+
+    /**
+     * 点击右上角菜单按钮
+     */
+    private void clickMenu() {
+        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
+            showFinishDiolog();
+            return;
+        }
+        mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
+            @Override
+            public void clickPackRoom() {
+                //最小化窗口,判断是否有权限
+                if (checkDrawOverlaysPermission(false)) {
+
+                    requireActivity().finish();
+
+                    //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
+                    requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+//                    MiniRoomManager.getInstance().show(requireContext(),mRoomId, present.getThemePictureUrl(), requireActivity().getIntent(), EventHelper.helper());
+                } else {
+                    showOpenOverlaysPermissionDialog();
+                }
+            }
+
+            @Override
+            public void clickLeaveRoom() {
+                // 观众离开房间
+                present.leaveLiveRoom(null);
+            }
+
+            @Override
+            public void clickCloseRoom() {
+
+            }
+        });
+        mExitRoomPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
+        mExitRoomPopupWindow.showAtLocation(clLiveRoomView, Gravity.TOP, 0, 0);
     }
 
     /**
@@ -243,8 +335,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      */
     @Override
     public void onCreateSuccess(VoiceRoomBean voiceRoomBean) {
-        if (createLiveRoomFragment != null) {
+        if (createLiveRoomFragment != null && fragmentManager != null) {
+            fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(createLiveRoomFragment);
+            fragmentTransaction.commit();
         }
         mRoomId = voiceRoomBean.getRoomId();
         clLiveRoomView.setVisibility(View.VISIBLE);
@@ -260,6 +354,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void onCreateExist(VoiceRoomBean voiceRoomBean) {
 
+    }
+
+    @Override
+    public void prepareSuccess(View rcLiveVideoView) {
+        showRCLiveVideoView(rcLiveVideoView);
     }
 
     @Override
@@ -280,10 +379,16 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         if (TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId())) {
             return;
         }
-        if (mMemberSettingFragment == null) {
-            mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
-        }
-//        if (uiSeatModel != null) {
+        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{user.getUserId()}).build(), new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    List<Member> members = result.getList(Member.class);
+                    if (members != null && members.size() > 0) {
+                        if (mMemberSettingFragment == null) {
+                            mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
+                        }
+                        //        if (uiSeatModel != null) {
 //            //说明当前用户在麦位上
 //            mMemberSettingFragment.setMemberIsOnSeat(uiSeatModel.getIndex() > -1);
 //            mMemberSettingFragment.setSeatPosition(uiSeatModel.getIndex());
@@ -291,7 +396,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 //        } else {
 //            mMemberSettingFragment.setMemberIsOnSeat(false);
 //        }
-//        mMemberSettingFragment.show(getChildFragmentManager(), member, present.getCreateUserId());
+                        mMemberSettingFragment.show(getChildFragmentManager(), members.get(0), present.getCreateUserId());
+                    }
+                }
+            }
+        });
     }
 
 //    /**
@@ -363,107 +472,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     }
 
-    /**
-     * 发送消息
-     *
-     * @param message
-     */
-    @Override
-    public void clickSendMessage(String message) {
-        //发送文字消息
-        RCChatroomBarrage barrage = new RCChatroomBarrage();
-        barrage.setContent(message);
-        barrage.setUserId(AccountStore.INSTANCE.getUserId());
-        barrage.setUserName(AccountStore.INSTANCE.getUserName());
-        present.sendMessage(barrage);
-    }
-
-    /**
-     * 点击私信
-     */
-    @Override
-    public void clickPrivateMessage() {
-        RouteUtils.routeToSubConversationListActivity(
-                requireActivity(),
-                Conversation.ConversationType.PRIVATE,
-                "消息"
-        );
-    }
-
-
-    @Override
-    public void clickSeatOrder() {
-        showSeatOperationViewPagerFragment(0);
-    }
-
-    /**
-     * 显示申请列表弹窗
-     *
-     * @param i
-     */
-    private void showSeatOperationViewPagerFragment(int i) {
-//        SeatOperationViewPagerFragment seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(voiceRoomModel, index);
-//        seatOperationViewPagerFragment.show(((VoiceRoomFragment) mView).getChildFragmentManager());
-    }
-
-    /**
-     * 点击设置
-     */
-    @Override
-    public void clickSettings() {
-        List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
-                new MutableLiveData<>(new RoomLockFun(true ? 1 : 0)),
-                new MutableLiveData<>(new RoomNameFun(0)),
-                new MutableLiveData<>(new RoomNoticeFun(0)),
-                new MutableLiveData<>(new RoomShieldFun(0)),
-                new MutableLiveData<>(new RoomOverTurnFun(0)),
-                new MutableLiveData<>(new RoomTagsFun(0)),
-                new MutableLiveData<>(new RoomBeautyFun(0)),
-                new MutableLiveData<>(new RoomBeautyMakeUpFun(0)),
-                new MutableLiveData<>(new RoomSeatModeFun(0)),
-                new MutableLiveData<>(new RoomSpecialEffectsFun(0)),
-                new MutableLiveData<>(new RoomMusicFun(0)),
-                new MutableLiveData<>(new RoomVideoSetFun(0))
-        );
-        if (mRoomSettingFragment == null) {
-            mRoomSettingFragment = new RoomSettingFragment(this);
-        }
-        mRoomSettingFragment.show(getChildFragmentManager(), funList);
-    }
-
-    /**
-     * PK
-     */
-    @Override
-    public void clickPk() {
-
-    }
-
-    /**
-     * 点击申请连麦
-     */
-    @Override
-    public void clickRequestSeat() {
-        present.requestSeat(-1);
-    }
-
-    /**
-     * 发送礼物
-     */
-    @Override
-    public void onSendGift() {
-        present.sendGift();
-    }
-
-    /**
-     * 发送语音消息
-     *
-     * @param rcChatroomVoice
-     */
-    @Override
-    public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
-        present.sendMessage(rcChatroomVoice);
-    }
 
     @Override
     public void clickItem(MutableLiveData<IFun.BaseFun> item, int position) {
@@ -489,14 +497,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 present.setSeatMode(true);
             }
         } else if (fun instanceof RoomMusicFun) {
-            //音乐 判断房主是否在麦位上
-//            UiSeatModel seatInfoByUserId = voiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
-//            if (seatInfoByUserId != null && seatInfoByUserId.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-//                //在座位上，可以播放音乐
-//                showMusicDialog();
-//            } else {
-//                EToast.showToast("请先上麦之后再播放音乐");
-//            }
+            showMusicDialog();
         } else if (fun instanceof RoomOverTurnFun) {
 
         } else if (fun instanceof RoomBeautyFun) {
@@ -603,6 +604,19 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         mMusicDialog.show(getChildFragmentManager());
     }
 
+    @Override
+    public void showRoomSettingFragment(List<MutableLiveData<IFun.BaseFun>> funList) {
+        if (mRoomSettingFragment == null) {
+            mRoomSettingFragment = new RoomSettingFragment(this);
+        }
+        mRoomSettingFragment.show(getLiveFragmentManager(), funList);
+    }
+
+    @Override
+    public Context getLiveActivity() {
+        return requireActivity();
+    }
+
     /**
      * 当前房间已结束
      */
@@ -629,7 +643,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         roomTitleBar.setCreatorName(createUser.getUserName());
         roomTitleBar.setCreatorPortrait(createUser.getPortrait());
         // 设置底部按钮
-        roomBottomView.setData(present.getRoomOwnerType(), this, voiceRoomBean.getRoomId());
+        roomBottomView.setData(present.getRoomOwnerType(), present, voiceRoomBean.getRoomId());
         // 设置消息列表数据
         mRoomMessageAdapter.setRoomCreateId(voiceRoomBean.getCreateUserId());
     }
@@ -716,6 +730,46 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public FragmentManager getLiveFragmentManager() {
         return getChildFragmentManager();
+    }
+
+    @Override
+    public void finish() {
+        requireActivity().finish();
+    }
+
+    @Override
+    public void onDestroy() {
+        flLiveView.removeAllViews();
+        super.onDestroy();
+    }
+
+    @Override
+    public void showRCLiveVideoView(View videoView) {
+        flLiveView.removeAllViews();
+        if (videoView != null)
+            flLiveView.addView(videoView);
+    }
+
+    @Override
+    public void showNetWorkStatus(long delayMs) {
+        roomTitleBar.post(new Runnable() {
+            @Override
+            public void run() {
+                roomTitleBar.setDelay((int) delayMs, true);
+            }
+        });
+    }
+
+    @Override
+    public void setOnlineCount(int onLineCount) {
+        roomTitleBar.setOnlineNum(onLineCount);
+    }
+
+    @Override
+    public void showSendGiftDialog(VoiceRoomBean voiceRoomBean, String selectUserId, List<Member> members) {
+        mGiftFragment = new GiftFragment(voiceRoomBean, selectUserId, present);
+        mGiftFragment.refreshMember(members);
+        mGiftFragment.show(getChildFragmentManager());
     }
 
     @Override

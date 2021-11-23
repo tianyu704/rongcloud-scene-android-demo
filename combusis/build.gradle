@@ -97,6 +97,7 @@ dependencies {
     } else {
         println("------------------------>>>>use local module")
         api project(path: ':RCVoiceRoom')
+        api project(path: ':RCliveroom')
     }
     // SmartRefreshLayout
     // https://github.com/scwang90/SmartRefreshLayout

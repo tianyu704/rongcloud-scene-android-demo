@@ -40,7 +40,10 @@ import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.beauty.BeautyDialogFragment;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.liveroom.R;
+import cn.rongcloud.liveroom.api.RCLiveEngine;
+import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import io.rong.imkit.utils.StatusBarUtil;
 
 /**
@@ -120,7 +123,15 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         mLoading = new LoadTag(requireActivity(), requireActivity().getString(cn.rong.combusis.R.string.text_creating_room));
         initView();
         //开始准备直播事项，比如打开摄像头
-
+        LiveEventHelper.getInstance().register("-1");
+        LiveEventHelper.getInstance().prepare(new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    mCreateRoomCallBack.prepareSuccess(RCLiveEngine.getInstance().preview());
+                }
+            }
+        });
     }
 
     @Override
@@ -312,13 +323,17 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
                 texiaoDialog = new BeautyDialogFragment(requireActivity(), v.getTag().toString());
             texiaoDialog.show();
         } else if (id == ivBack.getId()) {
+            LiveEventHelper.getInstance().unRegister();
             requireActivity().finish();
         }
     }
+
 
     public interface CreateRoomCallBack {
         void onCreateSuccess(VoiceRoomBean voiceRoomBean);
 
         void onCreateExist(VoiceRoomBean voiceRoomBean);
+
+        void prepareSuccess(View rcLiveVideoView);
     }
 }

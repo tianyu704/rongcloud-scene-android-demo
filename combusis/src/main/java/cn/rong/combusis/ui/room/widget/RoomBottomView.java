@@ -366,7 +366,6 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
     private void setViewState(RoomOwnerType roomOwnerType) {
         switch (roomOwnerType) {
             case VOICE_OWNER:
-            case LIVE_OWNER:
                 mSeatOrder.setVisibility(VISIBLE);
                 mPkView.setVisibility(VISIBLE);
                 mSendGiftView.setVisibility(VISIBLE);
@@ -376,6 +375,24 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 mSendVoiceMassageView.setVisibility(GONE);
                 break;
             case VOICE_VIEWER:
+                mSeatOrder.setVisibility(GONE);
+                mPkView.setVisibility(GONE);
+                mSendGiftView.setVisibility(VISIBLE);
+                mPrivateMessageView.setVisibility(VISIBLE);
+                mRequestSeatView.setVisibility(VISIBLE);
+                mSettingView.setVisibility(GONE);
+                mSendVoiceMassageView.setVisibility(VISIBLE);
+                break;
+            case LIVE_OWNER:
+                mSeatOrder.setVisibility(VISIBLE);
+                mPkView.setVisibility(VISIBLE);
+                mSendGiftView.setVisibility(VISIBLE);
+                mPrivateMessageView.setVisibility(VISIBLE);
+                mRequestSeatView.setVisibility(GONE);
+                mSettingView.setVisibility(VISIBLE);
+                mSendVoiceMassageView.setVisibility(GONE);
+                mPkView.setVisibility(GONE);
+                break;
             case LIVE_VIEWER:
                 mSeatOrder.setVisibility(GONE);
                 mPkView.setVisibility(GONE);
@@ -384,6 +401,7 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
                 mRequestSeatView.setVisibility(VISIBLE);
                 mSettingView.setVisibility(GONE);
                 mSendVoiceMassageView.setVisibility(VISIBLE);
+                mPkView.setVisibility(GONE);
                 break;
             case RADIO_OWNER:
                 mSeatOrder.setVisibility(GONE);

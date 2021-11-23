@@ -31,6 +31,7 @@ public class ExitRoomPopupWindow extends PopupWindow {
         switch (roomOwnerType) {
             case RADIO_VIEWER:
             case VOICE_VIEWER:
+            case LIVE_VIEWER:
                 closeRoomView.setVisibility(View.GONE);
                 break;
         }

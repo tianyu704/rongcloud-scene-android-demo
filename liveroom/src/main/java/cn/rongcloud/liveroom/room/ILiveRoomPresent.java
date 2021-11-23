@@ -7,6 +7,7 @@ import com.basis.mvp.IBasePresent;
 
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import io.rong.imlib.model.MessageContent;
 
@@ -63,7 +64,7 @@ interface ILiveRoomPresent extends IBasePresent {
     /**
      * 设置当前房间
      */
-    void setCurrentRoom(VoiceRoomBean mVoiceRoomBean);
+    void setCurrentRoom(VoiceRoomBean mVoiceRoomBean, boolean isCreate);
 
     /**
      * 设置直播房的各种消息监听
@@ -95,4 +96,24 @@ interface ILiveRoomPresent extends IBasePresent {
      * 发送礼物
      */
     void sendGift();
+
+    /**
+     * 准备直播
+     */
+    void prepare(String roomId, boolean isCreate);
+
+    /**
+     * 开始直播
+     */
+    void begin(String roomId, boolean isCreate);
+
+    /**
+     * 关闭直播间
+     */
+    void finishLiveRoom();
+
+    /**
+     * 离开直播间
+     */
+    void leaveLiveRoom(ClickCallback callBack);
 }

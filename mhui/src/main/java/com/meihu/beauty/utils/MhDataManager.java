@@ -382,7 +382,7 @@ public class MhDataManager {
     public int render(int texture, int width, int height) {
         if (mMhManager != null) {
             try {
-                texture = mMhManager.render12(texture, width, height, 2, 1);
+                texture = mMhManager.render17(texture, width, height);
             } catch (Exception e) {
                 e.printStackTrace();
             }

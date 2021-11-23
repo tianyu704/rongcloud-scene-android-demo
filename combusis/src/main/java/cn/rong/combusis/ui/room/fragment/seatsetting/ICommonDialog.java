@@ -19,5 +19,5 @@ public interface ICommonDialog {
     /**
      * 展示撤销弹窗
      */
-    void showNewRevokeSeatRequestFragment();
+    void showRevokeSeatRequestFragment();
 }
