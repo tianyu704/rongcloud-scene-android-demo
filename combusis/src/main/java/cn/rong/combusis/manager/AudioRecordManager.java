@@ -35,14 +35,10 @@ import io.rong.common.RLog;
 import io.rong.imkit.IMCenter;
 import io.rong.imkit.R;
 import io.rong.imkit.config.RongConfigCenter;
-import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.RongIMClient;
 import io.rong.imlib.common.SavePathUtils;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.typingmessage.TypingMessageManager;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
-import kotlin.jvm.functions.Function2;
 
 
 public class AudioRecordManager implements Handler.Callback {
@@ -92,7 +88,25 @@ public class AudioRecordManager implements Handler.Callback {
     }
 
 
-  @Override
+    boolean isRecording = false;
+
+    private void initView(View root) {
+
+        LayoutInflater inflater = LayoutInflater.from(root.getContext());
+        View view = inflater.inflate(R.layout.rc_voice_record_popup, null);
+
+        mStateIV = (ImageView) view.findViewById(R.id.rc_audio_state_image);
+        mStateTV = (TextView) view.findViewById(R.id.rc_audio_state_text);
+        mTimerTV = (TextView) view.findViewById(R.id.rc_audio_timer);
+
+        mRecordWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mRecordWindow.showAtLocation(root, Gravity.CENTER, 0, 0);
+        mRecordWindow.setFocusable(true);
+        mRecordWindow.setOutsideTouchable(false);
+        mRecordWindow.setTouchable(false);
+    }
+
+    @Override
     final public boolean handleMessage(android.os.Message msg) {
         RLog.i(TAG, "handleMessage " + msg.what);
         switch (msg.what) {
@@ -113,45 +127,6 @@ public class AudioRecordManager implements Handler.Callback {
                 break;
         }
         return false;
-    }
-
-    private void initView(View root) {
-
-        LayoutInflater inflater = LayoutInflater.from(root.getContext());
-        View view = inflater.inflate(R.layout.rc_voice_record_popup, null);
-
-        mStateIV = (ImageView) view.findViewById(R.id.rc_audio_state_image);
-        mStateTV = (TextView) view.findViewById(R.id.rc_audio_state_text);
-        mTimerTV = (TextView) view.findViewById(R.id.rc_audio_timer);
-
-        mRecordWindow = new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mRecordWindow.showAtLocation(root, Gravity.CENTER, 0, 0);
-        mRecordWindow.setFocusable(true);
-        mRecordWindow.setOutsideTouchable(false);
-        mRecordWindow.setTouchable(false);
-    }
-
-    private void setTimeoutView(int counter) {
-        if (counter > 0) {
-            if (mRecordWindow != null) {
-                mStateIV.setVisibility(View.GONE);
-                mStateTV.setVisibility(View.VISIBLE);
-                mStateTV.setText(R.string.rc_voice_rec);
-                mStateTV.setBackgroundResource(android.R.color.transparent);
-                mTimerTV.setText(String.format("%s", counter));
-                Log.e(TAG, "setTimeoutView: "+counter );
-                mTimerTV.setVisibility(View.VISIBLE);
-            }
-        } else {
-            if (mRecordWindow != null) {
-                mStateIV.setVisibility(View.VISIBLE);
-                mStateIV.setImageResource(R.drawable.rc_voice_volume_warning);
-                mStateTV.setText(R.string.rc_voice_too_long);
-                mStateTV.setBackgroundResource(android.R.color.transparent);
-                mTimerTV.setVisibility(View.GONE);
-            }
-        }
-
     }
 
     private void setRecordingView() {
@@ -294,7 +269,30 @@ public class AudioRecordManager implements Handler.Callback {
         message.what = event;
         mCurAudioState.handleMessage(message);
     }
-    boolean isRecording=false;
+
+    private void setTimeoutView(int counter) {
+        if (counter > 0) {
+            if (mRecordWindow != null) {
+                mStateIV.setVisibility(View.GONE);
+                mStateTV.setVisibility(View.VISIBLE);
+                mStateTV.setText(R.string.rc_voice_rec);
+                mStateTV.setBackgroundResource(android.R.color.transparent);
+                mTimerTV.setText(String.format("%s", counter));
+                Log.e(TAG, "setTimeoutView: " + counter);
+                mTimerTV.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (mRecordWindow != null) {
+                mStateIV.setVisibility(View.VISIBLE);
+                mStateIV.setImageResource(R.drawable.rc_voice_volume_warning);
+                mStateTV.setText(R.string.rc_voice_too_long);
+                mStateTV.setBackgroundResource(android.R.color.transparent);
+                mTimerTV.setVisibility(View.GONE);
+            }
+        }
+
+    }
+
     private void startRec() {
         RLog.d(TAG, "startRec");
         try {
@@ -337,7 +335,7 @@ public class AudioRecordManager implements Handler.Callback {
             mMediaRecorder.setOutputFile(mAudioPath.getPath());
             mMediaRecorder.prepare();
             mMediaRecorder.start();
-            isRecording=true;
+            isRecording = true;
             android.os.Message message = android.os.Message.obtain();
             message.what = AUDIO_RECORD_EVENT_TIME_OUT;
             message.obj = 10;
@@ -361,7 +359,7 @@ public class AudioRecordManager implements Handler.Callback {
                 mMediaRecorder.stop();
                 mMediaRecorder.release();
                 mMediaRecorder = null;
-                isRecording=false;
+                isRecording = false;
             }
         } catch (Exception e) {
             RLog.e(TAG, "stopRec", e);
@@ -391,12 +389,12 @@ public class AudioRecordManager implements Handler.Callback {
                 return;
             }
             //上传音频
+            int duration = (int) (SystemClock.elapsedRealtime() - smStartRecTime) / 1000;
             FileBody body = new FileBody("multipart/form-data", file);
             OkApi.file(VRApi.FILE_UPLOAD, "file", body, new WrapperCallBack() {
                 @Override
                 public void onResult(Wrapper result) {
                     String url = result.getBody().getAsString();
-                    int duration = (int) (SystemClock.elapsedRealtime() - smStartRecTime) / 1000;
                     if (result.ok() && !TextUtils.isEmpty(url)) {
                         Log.e(TAG, "onResult: ");
                         //自定义msg，然后发送
@@ -406,7 +404,7 @@ public class AudioRecordManager implements Handler.Callback {
                         rcvrVoiceMessage.setPath(path);
                         rcvrVoiceMessage.setUserName(AccountStore.INSTANCE.getUserName());
                         rcvrVoiceMessage.setUserId(AccountStore.INSTANCE.getUserId());
-                        if (onSendVoiceMessageClickListener!=null){
+                        if (onSendVoiceMessageClickListener != null) {
                             onSendVoiceMessageClickListener.onSendVoiceMessage(rcvrVoiceMessage);
                         }
                     } else {
@@ -420,9 +418,10 @@ public class AudioRecordManager implements Handler.Callback {
 
     /**
      * 判断是否正在录音中
+     *
      * @return
      */
-    public boolean isRecording(){
+    public boolean isRecording() {
         return isRecording;
     }
 
@@ -747,13 +746,14 @@ public class AudioRecordManager implements Handler.Callback {
             }
         }
     }
+
     private OnSendVoiceMessageClickListener onSendVoiceMessageClickListener;
 
-    public void setOnSendVoiceMessageClickListener(OnSendVoiceMessageClickListener onSendVoiceMessageClickListener){
-        this.onSendVoiceMessageClickListener=onSendVoiceMessageClickListener;
+    public void setOnSendVoiceMessageClickListener(OnSendVoiceMessageClickListener onSendVoiceMessageClickListener) {
+        this.onSendVoiceMessageClickListener = onSendVoiceMessageClickListener;
     }
 
-    public interface OnSendVoiceMessageClickListener{
+    public interface OnSendVoiceMessageClickListener {
 
         void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice);
     }
