@@ -52,6 +52,7 @@ import cn.rong.combusis.ui.room.RoomMessageAdapter;
 import cn.rong.combusis.ui.room.dialog.ExitRoomPopupWindow;
 import cn.rong.combusis.ui.room.dialog.RoomNoticeDialog;
 import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
+import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
@@ -116,7 +117,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private ShieldDialog mShieldDialog;
     private MusicDialog mMusicDialog;
     private RoomMessageAdapter mRoomMessageAdapter;
-    private String roomName;//当前房间名称
     private BeautyDialogFragment tiezhiDilog;
     private BeautyDialogFragment meiyanDialog;
     private BeautyDialogFragment meizhuangDialog;
@@ -127,6 +127,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private ExitRoomPopupWindow mExitRoomPopupWindow;
     private GiftFragment mGiftFragment;
     private MemberListFragment mMemberListFragment;
+    private TextView tvGiftCount;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -233,6 +234,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void initListener() {
         super.initListener();
         btnGoBackList.setOnClickListener(this::onClick);
+        tvNotice.setOnClickListener(this::onClick);
     }
 
     private void initView() {
@@ -241,6 +243,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         clLiveRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_live_room_view);
         roomTitleBar = (RoomTitleBar) getView().findViewById(R.id.room_title_bar);
         tvNotice = (TextView) getView().findViewById(R.id.tv_notice);
+        tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
 
         viewAllBroadcast = (AllBroadcastView) getView().findViewById(R.id.view_all_broadcast);
         roomBottomView = (RoomBottomView) getView().findViewById(R.id.room_bottom_view);
@@ -292,6 +295,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
+        if (present.getRoomOwnerType() == null) {
+            finish();
+            return;
+        }
         if (present.getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
             showFinishDiolog();
             return;
@@ -365,6 +372,8 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void onClick(View v) {
         if (v.getId() == R.id.btn_go_back_list) {
             requireActivity().finish();
+        } else if (v.getId() == R.id.tv_notice) {
+            showNoticeDialog(false);
         }
     }
 
@@ -517,7 +526,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 texiaoDialog = new BeautyDialogFragment(requireActivity(), MHConfigConstants.TE_XIAO);
             texiaoDialog.show();
         } else if (fun instanceof RoomVideoSetFun) {
-            if (roomVideoSettingFragment != null)
+            if (roomVideoSettingFragment == null)
                 roomVideoSettingFragment = new RoomVideoSettingFragment();
             //传进去当前的分辨率和帧率
             roomVideoSettingFragment.show(getLiveFragmentManager());
@@ -530,13 +539,28 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      * @param isEdit
      */
     public void showNoticeDialog(boolean isEdit) {
-        mNoticeDialog.show("", isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+        LiveEventHelper.getInstance().getRoomInfoByKey("notice", new ClickCallback<Boolean>() {
             @Override
-            public void saveNotice(String notice) {
-                //修改公告信息
-                present.modifyNotice(notice);
+            public void onResult(Boolean result, String notice) {
+                if ((result && TextUtils.isEmpty(notice)) || !result) {
+                    notice = String.format("欢迎来到%s。", present.getRoomName());
+                }
+                mNoticeDialog.show(notice, isEdit, new RoomNoticeDialog.OnSaveNoticeListener() {
+                    @Override
+                    public void saveNotice(String notice) {
+                        //修改公告信息
+                        present.modifyNotice(notice);
+                    }
+                });
             }
         });
+    }
+
+    @Override
+    public void setNotice(String notice) {
+        if (null != mNoticeDialog) {
+            mNoticeDialog.setNotice(notice);
+        }
     }
 
     /**
@@ -569,7 +593,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 requireActivity(),
                 "修改房间标题",
                 "请输入房间名",
-                roomName,
+                present.getRoomName(),
                 10,
                 false,
                 () -> null,
@@ -601,7 +625,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void showMusicDialog() {
         if (mShieldDialog == null)
             mMusicDialog = new MusicDialog(mRoomId);
-        mMusicDialog.show(getChildFragmentManager());
+        mMusicDialog.show(getLiveFragmentManager());
     }
 
     @Override
@@ -635,12 +659,9 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void setRoomData(VoiceRoomBean voiceRoomBean) {
         clLiveRoomView.setVisibility(View.VISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
-
         // 设置title数据
-        roomTitleBar.setData(present.getRoomOwnerType(), voiceRoomBean.getRoomName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
-
         User createUser = voiceRoomBean.getCreateUser();
-        roomTitleBar.setCreatorName(createUser.getUserName());
+        roomTitleBar.setData(present.getRoomOwnerType(), createUser.getUserName(), voiceRoomBean.getId(), voiceRoomBean.getUserId(), present);
         roomTitleBar.setCreatorPortrait(createUser.getPortrait());
         // 设置底部按钮
         roomBottomView.setData(present.getRoomOwnerType(), present, voiceRoomBean.getRoomId());
@@ -720,13 +741,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         }
     }
 
-
-    @Override
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
-        roomTitleBar.setRoomName(roomName);
-    }
-
     @Override
     public FragmentManager getLiveFragmentManager() {
         return getChildFragmentManager();
@@ -763,6 +777,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void setOnlineCount(int onLineCount) {
         roomTitleBar.setOnlineNum(onLineCount);
+    }
+
+    @Override
+    public void setCreateUserGift(String giftCount) {
+        tvGiftCount.setText(giftCount);
     }
 
     @Override

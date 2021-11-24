@@ -68,13 +68,6 @@ public interface LiveRoomView extends IBaseView {
     void changeStatus(CurrentStatusType status);
 
     /**
-     * 设置房间名称
-     *
-     * @param name
-     */
-    void setRoomName(String name);
-
-    /**
      * 获取fragment管理器
      *
      * @return
@@ -106,6 +99,11 @@ public interface LiveRoomView extends IBaseView {
     void setOnlineCount(int onLineCount);
 
     /**
+     * 显示房主的礼物数量
+     */
+    void setCreateUserGift(String giftCount);
+
+    /**
      * 显示发送礼物弹窗
      *
      * @param voiceRoomBean
@@ -132,4 +130,11 @@ public interface LiveRoomView extends IBaseView {
      * @return
      */
     Context getLiveActivity();
+
+    /**
+     * 设置公告的内容
+     *
+     * @param notice
+     */
+    void setNotice(String notice);
 }

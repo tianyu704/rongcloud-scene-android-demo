@@ -33,9 +33,17 @@ import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.api.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.RCRect;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
+import cn.rongcloud.liveroom.api.callback.RCLiveResultCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
@@ -201,13 +209,16 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         RCLiveEngine.getInstance().finish(new RCLiveCallback() {
             @Override
             public void onSuccess() {
+                unRegister();
                 changeUserRoom("");
-                callback.onResult(true, "关闭成功");
+                if (callback != null)
+                    callback.onResult(true, "关闭成功");
             }
 
             @Override
             public void onError(int code, RCLiveError error) {
-                callback.onResult(false, "关闭失败");
+                if (callback != null)
+                    callback.onResult(false, "关闭失败");
             }
         });
     }
@@ -221,13 +232,15 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
                 //开启直播并且加入房间成功
                 Log.e(TAG, "onSuccess: ");
                 changeUserRoom(roomId);
-                callback.onResult(true, "开启直播成功");
+                if (callback != null)
+                    callback.onResult(true, "开启直播成功");
             }
 
             @Override
             public void onError(int code, RCLiveError error) {
                 Log.e("TAG", "onError: " + code);
-                callback.onResult(false, "开启直播失败");
+                if (callback != null)
+                    callback.onResult(false, "开启直播失败");
             }
         });
     }
@@ -237,7 +250,8 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         RCLiveEngine.getInstance().prepare(new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                callback.onResult(true, "准备直播成功");
+                if (callback != null)
+                    callback.onResult(true, "准备直播成功");
             }
 
             @Override
@@ -272,6 +286,67 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
                 EToast.showToast("请求连麦失败");
             }
         });
+    }
+
+    @Override
+    public void updateRoomInfoKv(String key, String vaule, ClickCallback<Boolean> callback) {
+        Map<String, String> kv = new HashMap<>();
+        kv.put(key, vaule);
+        RCLiveEngine.getInstance().setRoomInfo(kv, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) {
+                    callback.onResult(true, "更新" + key + "成功");
+                }
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) {
+                    callback.onResult(false, "更新" + key + "失败:" + error.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * @param key
+     * @param callback
+     */
+    @Override
+    public void getRoomInfoByKey(String key, ClickCallback<Boolean> callback) {
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(@NonNull ObservableEmitter<String> emitter) throws Throwable {
+                RCLiveEngine.getInstance().getRoomInfo(key, new RCLiveResultCallback<String>() {
+                    @Override
+                    public void onResult(String vaule) {
+                        emitter.onNext(vaule);
+                    }
+
+                    @Override
+                    public void onError(int code, RCLiveError error) {
+                        emitter.onError(new Throwable(error.getMessage()));
+                    }
+                });
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String vaule) throws Throwable {
+                        if (callback != null) {
+                            callback.onResult(true, vaule);
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Throwable {
+                        if (callback != null) {
+                            callback.onResult(false, throwable.getMessage());
+                        }
+                    }
+                });
     }
 
     public List<MessageContent> getMessageList() {
@@ -348,21 +423,38 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void onRoomInfoReady() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onRoomInfoReady();
+        }
         Log.e(TAG, "onRoomInfoReady: ");
     }
 
+    /**
+     * @param key   直播间信息的存kv的key
+     * @param value 直播间信息的存kv的value
+     */
     @Override
     public void onRoomInfoUpdate(String key, String value) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onRoomInfoUpdate(key, value);
+        }
         Log.e(TAG, "onRoomInfoUpdate: ");
     }
 
+
     @Override
     public void onUserEnter(String userId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onUserEnter(userId);
+        }
         Log.e(TAG, "onUserEnter: " + userId);
     }
 
     @Override
     public void onUserExit(String userId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onUserExit(userId);
+        }
         Log.e(TAG, "onUserExit: " + userId);
     }
 
@@ -374,6 +466,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
      */
     @Override
     public void onUserKitOut(String userId, String operatorId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onUserKitOut(userId, operatorId);
+        }
         Log.e(TAG, "onUserKitOut: ");
     }
 
@@ -384,61 +479,97 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
      */
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoUpdate(lineMicUserIds);
+        }
         Log.e(TAG, "onLiveVideoUpdate: " + lineMicUserIds);
     }
 
     @Override
     public void onLiveVideoRequestChanage() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoRequestChanage();
+        }
         Log.e(TAG, "onLiveVideoRequestChanage: ");
     }
 
     @Override
     public void onLiveVideoRequestAccepted() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoRequestAccepted();
+        }
         Log.e(TAG, "onLiveVideoRequestAccepted: ");
     }
 
     @Override
     public void onLiveVideoRequestRejected() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoRequestRejected();
+        }
         Log.e(TAG, "onLiveVideoRequestRejected: ");
     }
 
     @Override
     public void onReceiveLiveVideoRequest() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onReceiveLiveVideoRequest();
+        }
         Log.e(TAG, "onReceiveLiveVideoRequest: ");
     }
 
     @Override
     public void onLiveVideoRequestCanceled() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoRequestCanceled();
+        }
         Log.e(TAG, "onLiveVideoRequestCanceled: ");
     }
 
     @Override
     public void onliveVideoInvitationReceived() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onliveVideoInvitationReceived();
+        }
         Log.e(TAG, "onliveVideoInvitationReceived: ");
     }
 
     @Override
     public void onliveVideoInvitationCanceled() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onliveVideoInvitationCanceled();
+        }
         Log.e(TAG, "onliveVideoInvitationCanceled: ");
     }
 
     @Override
     public void onliveVideoInvitationAccepted(String userId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onliveVideoInvitationAccepted(userId);
+        }
         Log.e(TAG, "onliveVideoInvitationAccepted: ");
     }
 
     @Override
     public void onliveVideoInvitationRejected(String userId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onliveVideoInvitationRejected(userId);
+        }
         Log.e(TAG, "onliveVideoInvitationRejected: ");
     }
 
     @Override
     public void onLiveVideoStarted() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoStarted();
+        }
         Log.e(TAG, "onLiveVideoStarted: ");
     }
 
     @Override
     public void onLiveVideoStoped() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoStoped();
+        }
         Log.e(TAG, "onLiveVideoStoped: ");
     }
 
@@ -475,16 +606,25 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void onLiveVideoUserClick(String userId) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveVideoUserClick(userId);
+        }
         Log.e(TAG, "onLiveVideoUserClick: " + userId);
     }
 
     @Override
     public void onLiveUserLayout(Map<String, RCRect> frameInfo) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onLiveUserLayout(frameInfo);
+        }
         Log.e(TAG, "onLiveUserLayout: " + frameInfo);
     }
 
     @Override
     public void onRoomDestory() {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onRoomDestory();
+        }
         ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
                 , "确定", "", null, new Function0<Unit>() {
             @Override
@@ -499,6 +639,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void onRoomMixTypeChange(RCLiveMixType mixType) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onRoomMixTypeChange(mixType);
+        }
         Log.e(TAG, "onRoomMixTypeChange: " + mixType);
     }
 

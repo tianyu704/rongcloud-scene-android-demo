@@ -1,6 +1,10 @@
 package cn.rongcloud.liveroom.room;
 
 
+import static cn.rong.combusis.EventBus.TAG.UPDATE_SHIELD;
+import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
+
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 
 import androidx.lifecycle.Lifecycle;
@@ -12,15 +16,21 @@ import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
+import com.google.gson.JsonArray;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.EventBus;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
@@ -63,6 +73,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSetFun;
 import cn.rong.combusis.ui.room.fragment.seatsetting.ICommonDialog;
 import cn.rong.combusis.ui.room.fragment.seatsetting.RevokeSeatRequestFragment;
 import cn.rong.combusis.ui.room.fragment.seatsetting.SeatOperationViewPagerFragment;
+import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
@@ -94,7 +105,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     private VoiceRoomBean mVoiceRoomBean;//房间信息
     private RoomOwnerType roomOwnerType;//房间用户身份
-    private List<Shield> shields = new ArrayList<>();//当前屏蔽词
+    private List<String> shields = new ArrayList<>();//当前屏蔽词
     private List<Disposable> disposablesManager = new ArrayList<>();//监听管理器
     private ArrayList<User> requestSeats = new ArrayList<>();//申请连麦的集合
     private ArrayList<User> inviteSeats = new ArrayList<>();//可以被邀请的集合
@@ -217,14 +228,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * 获取屏蔽词
      */
     private void getShield() {
-        OkApi.get(VRApi.getShield(mVoiceRoomBean.getRoomId()), null, new WrapperCallBack() {
+        LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_SHIELDS, new ClickCallback<Boolean>() {
             @Override
-            public void onResult(Wrapper result) {
-                if (result.ok()) {
-                    List<Shield> list = result.getList(Shield.class);
+            public void onResult(Boolean result, String msg) {
+                if (result) {
                     shields.clear();
-                    if (list != null) {
-                        shields.addAll(list);
+                    try {
+                        JSONArray jsonArray = new JSONArray(msg);
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            String shile = (String) jsonArray.get(i);
+                            shields.add(shile);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -316,21 +332,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     public void onResult(Wrapper result) {
                         if (result.ok()) {
                             EToast.showToast("修改成功");
-                            mView.setRoomName(name);
                             mVoiceRoomBean.setRoomName(name);
-//                            RCVoiceRoomInfo rcRoomInfo = voiceRoomModel.currentUIRoomInfo.getRcRoomInfo();
-//                            rcRoomInfo.setRoomName(name);
-//                            RCVoiceRoomEngine.getInstance().setRoomInfo(rcRoomInfo, new RCVoiceRoomCallback() {
-//                                @Override
-//                                public void onSuccess() {
-//                                    Log.e(TAG, "onSuccess: ");
-//                                }
-//
-//                                @Override
-//                                public void onError(int i, String s) {
-//                                    Log.e(TAG, "onError: ");
-//                                }
-//                            });
+                            LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_NAME, name, null);
                         } else {
                             mView.showToast("修改失败");
                         }
@@ -381,7 +384,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
         //显示直播布局
         mView.showRCLiveVideoView(RCLiveEngine.getInstance().preview());
-        mView.setRoomName(mVoiceRoomBean.getRoomName());
         getShield();
         getGiftCount(mVoiceRoomBean.getRoomId());
         mView.setRoomData(mVoiceRoomBean);
@@ -395,6 +397,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void initLiveRoomListener(String roomId) {
         setObMessageListener(roomId);
+        setObShieldListener();
         LiveEventHelper.getInstance().addLiveRoomListeners(this);
         //监听房间里面的人
         MemberCache.getInstance().getMemberList()
@@ -423,6 +426,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
         disposablesManager.clear();
         LiveEventHelper.getInstance().removeLiveRoomListeners();
+        EventBus.get().off(UPDATE_SHIELD, null);
     }
 
     @Override
@@ -433,7 +437,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 if (result.ok()) {
                     Map<String, String> map = result.getMap();
                     Logger.e("================" + map.toString());
-
+                    for (String userId : map.keySet()) {
+                        if (TextUtils.equals(userId, mVoiceRoomBean.getCreateUserId())) {
+                            //创建者礼物数量
+                            mView.setCreateUserGift(map.get(userId));
+                        }
+                    }
                 }
             }
         });
@@ -441,7 +450,17 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void modifyNotice(String notice) {
-
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_NOTICE, notice, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    TextMessage noticeMsg = TextMessage.obtain("房间公告已更新!");
+                    sendMessage(noticeMsg);
+                } else {
+                    EToast.showToast(msg);
+                }
+            }
+        });
     }
 
     /**
@@ -543,6 +562,32 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     /**
+     * 监听自己删除或者添加屏蔽词
+     */
+    private void setObShieldListener() {
+        EventBus.get().on(UPDATE_SHIELD, new EventBus.EventCallback() {
+            @SuppressLint("NewApi")
+            @Override
+            public void onEvent(String tag, Object... args) {
+                shields.clear();
+                ArrayList<Shield> shieldArrayList = (ArrayList<Shield>) args[0];
+                for (Shield shield : shieldArrayList) {
+                    if (!shield.isDefault()) {
+                        //说明是正常的屏蔽词
+                        shields.add(shield.getName());
+                    }
+                }
+                JsonArray jsonElements = new JsonArray();
+                for (String shield : shields) {
+                    jsonElements.add(shield);
+                }
+                //发送KV消息
+                LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_SHIELDS, jsonElements.toString(), null);
+            }
+        });
+    }
+
+    /**
      * 在这里处理接收所有的消息
      */
     private void setObMessageListener(String roomId) {
@@ -615,9 +660,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     private boolean isContainsShield(MessageContent messageContent) {
         boolean isContains = false;
         if (shields != null) {
-            for (Shield shield : shields) {
+            for (String shield : shields) {
                 if (messageContent instanceof RCChatroomBarrage) {
-                    if (((RCChatroomBarrage) messageContent).getContent().contains(shield.getName())) {
+                    if (((RCChatroomBarrage) messageContent).getContent().contains(shield)) {
                         isContains = true;
                         break;
                     }
@@ -652,7 +697,33 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickSettingAdmin(User user, ClickCallback<Boolean> callback) {
-
+        if (mVoiceRoomBean == null) {
+            return;
+        }
+        boolean isAdmin = !MemberCache.getInstance().isAdmin(user.getUserId());
+        HashMap<String, Object> params = new OkParams()
+                .add("roomId", mVoiceRoomBean.getRoomId())
+                .add("userId", user.getUserId())
+                .add("isManage", isAdmin)
+                .build();
+        // 先请求 设置/取消 管理员
+        OkApi.put(VRApi.ADMIN_MANAGE, params, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    RCChatroomAdmin admin = new RCChatroomAdmin();
+                    admin.setAdmin(isAdmin);
+                    admin.setUserId(user.getUserId());
+                    admin.setUserName(user.getUserName());
+                    // 成功后发送管理变更的消息
+                    sendMessage(admin);
+                    callback.onResult(true, "");
+                } else {
+                    showToast(result.getMessage());
+                    callback.onResult(true, result.getMessage());
+                }
+            }
+        });
     }
 
     /**
@@ -673,7 +744,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickSendGift(User user) {
-
+        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
     }
 
     /**
@@ -811,7 +882,17 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onRoomInfoUpdate(String key, String value) {
-
+        switch (key) {
+            case LiveRoomKvKey.LIVE_ROOM_NAME://房间名
+                mVoiceRoomBean.setRoomName(value);
+                break;
+            case LiveRoomKvKey.LIVE_ROOM_NOTICE://房间公告
+                mView.setNotice(value);
+                break;
+            case LiveRoomKvKey.LIVE_ROOM_SHIELDS://房间屏蔽词
+                getShield();
+                break;
+        }
     }
 
     @Override
@@ -948,6 +1029,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         return "";
     }
 
+    public String getRoomName() {
+        if (mVoiceRoomBean != null) {
+            return mVoiceRoomBean.getRoomName();
+        }
+        return "";
+    }
+
     @Override
     public void clickSendMessage(String message) {
         //发送文字消息
@@ -1010,4 +1098,5 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     public void onSendVoiceMessage(RCChatroomVoice rcChatroomVoice) {
         sendMessage(rcChatroomVoice);
     }
+
 }

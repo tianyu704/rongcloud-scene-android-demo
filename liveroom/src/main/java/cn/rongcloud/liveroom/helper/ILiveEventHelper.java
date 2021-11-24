@@ -125,4 +125,14 @@ public interface ILiveEventHelper {
      */
     void requestLiveVideo(int index, ClickCallback<Boolean> callback);
 
+    /**
+     * 更新房间的KV消息
+     */
+    void updateRoomInfoKv(String key, String vaule, ClickCallback<Boolean> callback);
+
+    /**
+     * 更新房间的KV消息
+     */
+    void getRoomInfoByKey(String key, ClickCallback<Boolean> callback);
+
 }

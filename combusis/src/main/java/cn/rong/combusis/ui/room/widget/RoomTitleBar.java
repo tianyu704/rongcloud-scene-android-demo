@@ -92,7 +92,12 @@ public class RoomTitleBar extends ConstraintLayout {
         this.onFollowClickListener = onFollowClickListener;
         this.roomOwnerType = roomOwnerType;
         setViewState();
-        setRoomName(name);
+        if (roomOwnerType == RoomOwnerType.LIVE_OWNER || roomOwnerType == RoomOwnerType.LIVE_VIEWER) {
+            //如果是直播房，那么房间名直接显示创建者的ID
+            setCreatorName(name);
+        } else {
+            setRoomName(name);
+        }
         setRoomId(id);
         getFollowStatus(roomUserId);
     }
