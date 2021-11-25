@@ -17,6 +17,7 @@ import java.util.List;
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.ui.room.fragment.SeatActionClickListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -37,13 +38,26 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
     private RequestSeatFragment requestSeatFragment;
     private InviteSeatFragment inviteSeatFragment;
     private SeatActionClickListener seatActionClickListener;
+    private RoomOwnerType roomOwnerType;
 
-    public SeatOperationViewPagerFragment(ArrayList<User> requestSeats, ArrayList<User> inviteSeats) {
+    public SeatOperationViewPagerFragment(RoomOwnerType roomOwnerType) {
         super(R.layout.fragment_viewpage_list);
-        this.requestSeats = requestSeats;
-        this.inviteSeats = inviteSeats;
+        this.roomOwnerType = roomOwnerType;
     }
 
+    public void setRequestSeats(ArrayList<User> requestSeats) {
+        this.requestSeats = requestSeats;
+        if (requestSeatFragment != null) {
+            requestSeatFragment.refreshData(requestSeats);
+        }
+    }
+
+    public void setInviteSeats(ArrayList<User> inviteSeats) {
+        this.inviteSeats = inviteSeats;
+        if (inviteSeatFragment != null) {
+            inviteSeatFragment.refreshData(inviteSeats);
+        }
+    }
 
     @Override
     public void initView() {
@@ -56,7 +70,9 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         LiveLyayoutSettingFragment liveLyayoutSettingFragment = new LiveLyayoutSettingFragment();
         fragments.add(requestSeatFragment);
         fragments.add(inviteSeatFragment);
-        fragments.add(liveLyayoutSettingFragment);
+        if (roomOwnerType == RoomOwnerType.LIVE_OWNER) {
+            fragments.add(liveLyayoutSettingFragment);
+        }
         vpPage.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         FragmentStateAdapter fragmentStateAdapter = new FragmentStateAdapter(getChildFragmentManager(), getLifecycle()) {
             @Override

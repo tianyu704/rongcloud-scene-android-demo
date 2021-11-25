@@ -49,7 +49,7 @@ public class MemberCache {
      *
      * @param roomId
      */
-    private void refreshMemberData(String roomId) {
+    public void refreshMemberData(String roomId) {
         OkApi.get(VRApi.getMembers(roomId), null, new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {

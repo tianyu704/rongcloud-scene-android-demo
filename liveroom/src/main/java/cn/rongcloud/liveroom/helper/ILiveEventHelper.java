@@ -1,5 +1,7 @@
 package cn.rongcloud.liveroom.helper;
 
+import java.util.List;
+
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
@@ -56,7 +58,15 @@ public interface ILiveEventHelper {
     /**
      * 邀请上麦
      */
-    void pickUserToSeat(String userId, ClickCallback<Boolean> callback);
+    void pickUserToSeat(String userId, int index, ClickCallback<Boolean> callback);
+
+    /**
+     * 取消上麦邀请
+     *
+     * @param userId   目标用户id
+     * @param callback 结果回调
+     */
+    void cancelInvitation(String userId, ClickCallback<Boolean> callback);
 
     /**
      * 同意上麦
@@ -126,6 +136,11 @@ public interface ILiveEventHelper {
     void requestLiveVideo(int index, ClickCallback<Boolean> callback);
 
     /**
+     * 上麦直播
+     */
+    void enterSeat(int index, ClickCallback<Boolean> callback);
+
+    /**
      * 更新房间的KV消息
      */
     void updateRoomInfoKv(String key, String vaule, ClickCallback<Boolean> callback);
@@ -134,5 +149,16 @@ public interface ILiveEventHelper {
      * 更新房间的KV消息
      */
     void getRoomInfoByKey(String key, ClickCallback<Boolean> callback);
+
+
+    /**
+     * 获取申请上麦用户人数
+     */
+    void getRequestLiveVideoIds(ClickCallback<List<String>> callback);
+
+    /**
+     * 获取当前邀请上麦的用户人数
+     */
+    void getInvitateLiveVideoIds(ClickCallback<List<String>> callback);
 
 }

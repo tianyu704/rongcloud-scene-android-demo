@@ -43,4 +43,11 @@ class ConfirmDialog(
         if (TextUtils.isEmpty(cancel)) btn_cancel.visibility = View.GONE
         btn_confirm.text = confirm
     }
+
+    /**
+     * 更新UI
+     */
+    fun updateMessage(message: String) {
+        tv_message.text = message
+    }
 }

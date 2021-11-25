@@ -107,9 +107,11 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     private RoomOwnerType roomOwnerType;//房间用户身份
     private List<String> shields = new ArrayList<>();//当前屏蔽词
     private List<Disposable> disposablesManager = new ArrayList<>();//监听管理器
+
     private ArrayList<User> requestSeats = new ArrayList<>();//申请连麦的集合
     private ArrayList<User> inviteSeats = new ArrayList<>();//可以被邀请的集合
     private boolean isInRoom;
+    private SeatOperationViewPagerFragment seatOperationViewPagerFragment;
 
     public LiveRoomPresenter(LiveRoomView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -254,44 +256,46 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         if (currentStatus == CurrentStatusType.STATUS_ON_SEAT) {
             return;
         }
-        //如果当前正在等待并且不可以自有上麦的模式
-//        if (currentStatus == CurrentStatusType.STATUS_WAIT_FOR_SEAT && !voiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
-//            showRevokeSeatRequestFragment();
-//            return;
-//        }
-        //如果是自由上麦模式
-//        if (voiceRoomModel.currentUIRoomInfo.isFreeEnterSeat()) {
-//            int index = position;
-//            if (index == -1) {
-//                index = voiceRoomModel.getAvailableIndex();
-//            }
-//            if (index == -1) {
-//                mView.showToast("当前麦位已满");
-//                return;
-//            }
-//            RCVoiceRoomEngine.getInstance().enterSeat(index, new RCVoiceRoomCallback() {
-//                @Override
-//                public void onSuccess() {
-//                    mView.showToast("上麦成功");
-//                    AudioManagerUtil.INSTANCE.choiceAudioModel();
-//                }
-//
-//                @Override
-//                public void onError(int code, String message) {
-//                    mView.showToast(message);
-//                }
-//            });
-//        } else {
-//            //申请视频直播
-//            LiveEventHelper.getInstance().requestLiveVideo(position, new ClickCallback<Boolean>() {
-//                @Override
-//                public void onResult(Boolean result, String msg) {
-//                    if (result) {
-//                        mView.changeStatus(CurrentStatusType.STATUS_WAIT_FOR_SEAT);
-//                    }
-//                }
-//            });
-//        }
+        //获取上麦模式
+        LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String mode) {
+                if (currentStatus == CurrentStatusType.STATUS_WAIT_FOR_SEAT
+                        && TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_RequestEnterSeat)) {
+                    showRevokeSeatRequestFragment();
+                    return;
+                }
+                //如果是自由上麦
+                if (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat)) {
+                    //在这里需要计算一下可用的麦位
+                    if (position == -1) {
+//                        position
+                    }
+                    LiveEventHelper.getInstance().enterSeat(position, new ClickCallback<Boolean>() {
+                        @Override
+                        public void onResult(Boolean result, String msg) {
+                            if (result) {
+                                //上麦成功
+                                mView.changeStatus(CurrentStatusType.STATUS_ON_SEAT);
+                            } else {
+                                //上麦失败
+                            }
+                        }
+                    });
+                } else {
+                    //如果是申请上麦
+                    LiveEventHelper.getInstance().requestLiveVideo(position, new ClickCallback<Boolean>() {
+                        @Override
+                        public void onResult(Boolean result, String msg) {
+                            if (result) {
+                                mView.changeStatus(CurrentStatusType.STATUS_WAIT_FOR_SEAT);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
     }
 
     @Override
@@ -356,7 +360,21 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void setSeatMode(boolean isFreeEnterSeat) {
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, isFreeEnterSeat ? "1" : "0", new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    if (isFreeEnterSeat) {
+                        EToast.showToast("当前观众可自由上麦");
+                    } else {
+                        EToast.showToast("当前观众上麦要申请");
+                    }
+                } else {
+                    EToast.showToast(msg);
+                }
 
+            }
+        });
     }
 
     @Override
@@ -382,6 +400,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             // 发送默认消息
             sendDefaultMessage();
         }
+        //初次进入的时候，获取房间内的人数信息
+        MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
+        LiveEventHelper.getInstance().setCreateUserId(mVoiceRoomBean.getCreateUserId());
         //显示直播布局
         mView.showRCLiveVideoView(RCLiveEngine.getInstance().preview());
         getShield();
@@ -405,6 +426,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     @Override
                     public void onChanged(List<User> users) {
                         mView.setOnlineCount(users.size());
+                        onInvitateLiveVideoIds(users);
                     }
                 });
         MemberCache.getInstance().getAdminList()
@@ -734,7 +756,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickKickRoom(User user, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().kickUserFromRoom(user, callback);
     }
 
     /**
@@ -790,7 +812,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().pickUserToSeat(user.getUserId(), -1, callback);
     }
 
     /**
@@ -801,7 +823,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void acceptRequestSeat(String userId, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().acceptRequestSeat(userId, callback);
     }
 
     /**
@@ -811,7 +833,18 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void cancelRequestSeat(ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().cancelRequestSeat(new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (callback != null) callback.onResult(result, msg);
+                if (result) {
+                    mView.changeStatus(CurrentStatusType.STATUS_NOT_ON_SEAT);
+                    EToast.showToast("已撤回连线申请");
+                } else {
+                    EToast.showToast(msg);
+                }
+            }
+        });
     }
 
     /**
@@ -822,7 +855,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickKickSeat(User user, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().kickUserFromSeat(user, callback);
     }
 
     /**
@@ -834,7 +867,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickMuteSeat(int seatIndex, boolean isMute, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().muteSeat(seatIndex, isMute, callback);
     }
 
     /**
@@ -846,7 +879,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback) {
-
+        LiveEventHelper.getInstance().lockSeat(seatIndex, isLock, callback);
     }
 
     /**
@@ -856,12 +889,11 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void showSeatOperationViewPagerFragment(int index) {
-        SeatOperationViewPagerFragment seatOperationViewPagerFragment
-                = new SeatOperationViewPagerFragment(requestSeats, inviteSeats);
+        seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(getRoomOwnerType());
+        seatOperationViewPagerFragment.setRequestSeats(requestSeats);
+        seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
         seatOperationViewPagerFragment.setIndex(index);
-//        seatOperationViewPagerFragment.setObInviteSeatListChangeSuject(voiceRoomModel.obInviteSeatListChange());
-//        seatOperationViewPagerFragment.setObRequestSeatListChangeSuject(voiceRoomModel.obRequestSeatListChange());
-        seatOperationViewPagerFragment.setSeatActionClickListener(this);
+        seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
     }
 
@@ -897,12 +929,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onUserEnter(String userId) {
-
+        MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
     @Override
     public void onUserExit(String userId) {
-
+        MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
     @Override
@@ -942,7 +974,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onliveVideoInvitationReceived() {
-
     }
 
     @Override
@@ -1062,21 +1093,29 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void clickSettings() {
-        List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
-                new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
-                new MutableLiveData<>(new RoomNameFun(0)),
-                new MutableLiveData<>(new RoomNoticeFun(0)),
-                new MutableLiveData<>(new RoomShieldFun(0)),
-                new MutableLiveData<>(new RoomOverTurnFun(0)),
-                new MutableLiveData<>(new RoomTagsFun(0)),
-                new MutableLiveData<>(new RoomBeautyFun(0)),
-                new MutableLiveData<>(new RoomBeautyMakeUpFun(0)),
-                new MutableLiveData<>(new RoomSeatModeFun(0)),
-                new MutableLiveData<>(new RoomSpecialEffectsFun(0)),
-                new MutableLiveData<>(new RoomMusicFun(0)),
-                new MutableLiveData<>(new RoomVideoSetFun(0))
-        );
-        mView.showRoomSettingFragment(funList);
+        LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String mode) {
+                if (result) {
+                    List<MutableLiveData<IFun.BaseFun>> funList = Arrays.asList(
+                            new MutableLiveData<>(new RoomLockFun(mVoiceRoomBean.isPrivate() ? 1 : 0)),
+                            new MutableLiveData<>(new RoomNameFun(0)),
+                            new MutableLiveData<>(new RoomNoticeFun(0)),
+                            new MutableLiveData<>(new RoomShieldFun(0)),
+                            new MutableLiveData<>(new RoomOverTurnFun(0)),
+                            new MutableLiveData<>(new RoomTagsFun(0)),
+                            new MutableLiveData<>(new RoomBeautyFun(0)),
+                            new MutableLiveData<>(new RoomBeautyMakeUpFun(0)),
+                            new MutableLiveData<>(new RoomSeatModeFun
+                                    (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat) ? 1 : 0)),
+                            new MutableLiveData<>(new RoomSpecialEffectsFun(0)),
+                            new MutableLiveData<>(new RoomMusicFun(0)),
+                            new MutableLiveData<>(new RoomVideoSetFun(0))
+                    );
+                    mView.showRoomSettingFragment(funList);
+                }
+            }
+        });
     }
 
     @Override
@@ -1099,4 +1138,41 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         sendMessage(rcChatroomVoice);
     }
 
+    /**
+     * 正在申请上麦的用户
+     * 不在房间的用户和已经在麦位上的用户  不显示
+     *
+     * @param requestLives
+     */
+    @Override
+    public void onRequestLiveVideoIds(List<String> requestLives) {
+        requestSeats.clear();
+        for (String userId : requestLives) {
+            User user = MemberCache.getInstance().getMember(userId);
+            requestSeats.add(user);
+        }
+        mView.showUnReadRequestNumber(requestSeats.size());
+        if (seatOperationViewPagerFragment != null) {
+            seatOperationViewPagerFragment.setRequestSeats(requestSeats);
+        }
+    }
+
+    /**
+     * 可以被邀请的用户
+     * 在房间里面  并且不在麦位上
+     *
+     * @param roomUsers
+     */
+    @Override
+    public void onInvitateLiveVideoIds(List<User> roomUsers) {
+        inviteSeats.clear();
+        for (User roomUser : roomUsers) {
+            if (!TextUtils.equals(roomUser.getUserId(), AccountStore.INSTANCE.getUserId())) {
+                inviteSeats.add(roomUser);
+            }
+        }
+        if (seatOperationViewPagerFragment != null) {
+            seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
+        }
+    }
 }

@@ -9,9 +9,19 @@ package cn.rongcloud.liveroom.room;
  */
 public class LiveRoomKvKey {
     //房间名称
-    final static String LIVE_ROOM_NAME = "name";
+    public final static String LIVE_ROOM_NAME = "name";
     //公告
-    final static String LIVE_ROOM_NOTICE = "notice";
+    public final static String LIVE_ROOM_NOTICE = "notice";
     //屏蔽词
-    final static String LIVE_ROOM_SHIELDS = "shields";
+    public final static String LIVE_ROOM_SHIELDS = "shields";
+    //房间上麦模式
+    public final static String LIVE_ROOM_ENTER_SEAT_MODE = "FreeEnterSeat";
+
+    public class EnterSeatMode {
+        //申请上麦
+        public final static String LIVE_ROOM_RequestEnterSeat = "0";
+        //自由上麦
+        public final static String LIVE_ROOM_FreeEnterSeat = "1";
+
+    }
 }

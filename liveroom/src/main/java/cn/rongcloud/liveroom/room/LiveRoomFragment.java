@@ -563,6 +563,14 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         }
     }
 
+    @Override
+    public void showUnReadRequestNumber(int requestNumber) {
+        //如果不是房主，不设置
+        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
+            roomBottomView.setmSeatOrderNumber(requestNumber);
+        }
+    }
+
     /**
      * 显示密码设置弹窗
      *
@@ -619,12 +627,12 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         mShieldDialog.show();
     }
 
+
     /**
      * 显示音乐弹窗
      */
     public void showMusicDialog() {
-        if (mShieldDialog == null)
-            mMusicDialog = new MusicDialog(mRoomId);
+        mMusicDialog = new MusicDialog(mRoomId);
         mMusicDialog.show(getLiveFragmentManager());
     }
 

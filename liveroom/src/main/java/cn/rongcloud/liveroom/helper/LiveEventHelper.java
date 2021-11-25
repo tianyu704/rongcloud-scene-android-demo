@@ -1,7 +1,9 @@
 package cn.rongcloud.liveroom.helper;
 
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
+import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_WAIT_FOR_SEAT;
 
+import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -11,11 +13,13 @@ import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.meihu.beauty.utils.MhDataManager;
+import com.rongcloud.common.utils.AccountStore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
@@ -36,12 +40,14 @@ import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.callback.RCLiveResultCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
 import cn.rongcloud.liveroom.manager.SeatManager;
+import cn.rongcloud.liveroom.room.LiveRoomKvKey;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
@@ -67,6 +73,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     private List<MessageContent> messageList;
     private String roomId;//直播房的房间ID
+    private String createUserId;//房间创建人ID
     private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
     private List<LiveRoomListener> liveRoomListeners = new ArrayList<>();
 
@@ -82,6 +89,27 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     @Override
     public void setCurrentStatus(CurrentStatusType currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    @Override
+    public void register(String roomId) {
+        this.roomId = roomId;
+        this.messageList = new ArrayList<>();
+        RCLiveEngine.getInstance().setLiveEventListener(this);
+        liveRoomListeners.clear();
+    }
+
+    @Override
+    public void unRegister() {
+        this.roomId = null;
+        this.createUserId = null;
+        messageList.clear();
+        RCLiveEngine.getInstance().setLiveEventListener(null);
+        liveRoomListeners.clear();
+    }
+
+    public void setCreateUserId(String createUserId) {
+        this.createUserId = createUserId;
     }
 
     @Override
@@ -124,9 +152,44 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         });
     }
 
+    /**
+     * 如果麦位为-1，会自动查询第一个麦位
+     *
+     * @param userId
+     * @param index
+     * @param callback
+     */
     @Override
-    public void pickUserToSeat(String userId, ClickCallback<Boolean> callback) {
+    public void pickUserToSeat(String userId, int index, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().invitateLiveVideo(userId, index, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "邀请用户已成功");
+            }
 
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(false, "邀请用户已失败");
+            }
+        });
+    }
+
+    /**
+     * 撤销麦位邀请
+     */
+    @Override
+    public void cancelInvitation(String userId, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().cancelInvitation(userId, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "撤销麦位邀请成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(true, "撤销麦位邀请失败");
+            }
+        });
     }
 
     /**
@@ -181,7 +244,17 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void kickUserFromRoom(User user, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().kictOutRoom(user.getUserId(), new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "踢出成功");
+            }
 
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(false, error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -263,12 +336,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void requestLiveVideo(int index, ClickCallback<Boolean> callback) {
-        //判断当前是否有足够的视频位置
-        RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByIndex(index);
-        if (rcLiveSeatInfo == null) {
-            EToast.showToast("申请麦位索引不正确！");
-            return;
-        }
         RCLiveEngine.getInstance().requestLiveVideo(index, new RCLiveCallback() {
             @Override
             public void onSuccess() {
@@ -286,6 +353,16 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
                 EToast.showToast("请求连麦失败");
             }
         });
+    }
+
+    @Override
+    public void enterSeat(int index, ClickCallback<Boolean> callback) {
+        //判断当前是否有足够的视频位置
+        RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByIndex(index);
+        if (rcLiveSeatInfo == null) {
+            EToast.showToast("麦位已满！");
+            return;
+        }
     }
 
     @Override
@@ -310,6 +387,8 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
+     * 获取KV消息
+     *
      * @param key
      * @param callback
      */
@@ -321,6 +400,14 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
                 RCLiveEngine.getInstance().getRoomInfo(key, new RCLiveResultCallback<String>() {
                     @Override
                     public void onResult(String vaule) {
+                        if (TextUtils.equals(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, key)) {
+                            //如果是查询上麦模式
+                            if (TextUtils.isEmpty(vaule)) {
+                                //默认为申请上麦
+                                emitter.onNext("0");
+                                return;
+                            }
+                        }
                         emitter.onNext(vaule);
                     }
 
@@ -349,28 +436,57 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
                 });
     }
 
+    /**
+     * 获取正在申请的人
+     *
+     * @param callback
+     */
+    @Override
+    public void getRequestLiveVideoIds(ClickCallback<List<String>> callback) {
+        RCLiveEngine.getInstance().getRequestLiveVideoIds(new RCLiveResultCallback<List<String>>() {
+            @Override
+            public void onResult(List<String> result) {
+                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+                    liveRoomListener.onRequestLiveVideoIds(result);
+                }
+                if (callback != null) {
+                    callback.onResult(result, "");
+                }
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+
+            }
+        });
+    }
+
+    /**
+     * 获取邀请上麦的人数
+     *
+     * @param callback
+     */
+    @Override
+    public void getInvitateLiveVideoIds(ClickCallback<List<String>> callback) {
+        RCLiveEngine.getInstance().getInvitateLiveVideoIds(new RCLiveResultCallback<List<String>>() {
+            @Override
+            public void onResult(List<String> result) {
+                if (callback != null) callback.onResult(result, "");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                Log.e(TAG, "getInvitateLiveVideoIds: " + "获取邀请上麦的人数失败：" + error);
+            }
+        });
+    }
+
     public List<MessageContent> getMessageList() {
         return messageList;
     }
 
     public String getRoomId() {
         return roomId;
-    }
-
-    @Override
-    public void register(String roomId) {
-        this.roomId = roomId;
-        this.messageList = new ArrayList<>();
-        RCLiveEngine.getInstance().setLiveEventListener(this);
-        liveRoomListeners.clear();
-    }
-
-    @Override
-    public void unRegister() {
-        this.roomId = null;
-        messageList.clear();
-        RCLiveEngine.getInstance().setLiveEventListener(null);
-        liveRoomListeners.clear();
     }
 
     /**
@@ -490,6 +606,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestChanage();
         }
+        getRequestLiveVideoIds(null);
         Log.e(TAG, "onLiveVideoRequestChanage: ");
     }
 
@@ -525,14 +642,83 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onLiveVideoRequestCanceled: ");
     }
 
+    /**
+     * 收到连线邀请
+     */
     @Override
     public void onliveVideoInvitationReceived() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationReceived();
         }
+        getInvitateLiveVideoIds(new ClickCallback<List<String>>() {
+            @Override
+            public void onResult(List<String> result, String msg) {
+                for (String s : result) {
+                    if (TextUtils.equals(s, AccountStore.INSTANCE.getUserId())) {
+                        showPickReceivedDialog();
+                        break;
+                    }
+                }
+            }
+        });
         Log.e(TAG, "onliveVideoInvitationReceived: ");
     }
 
+    /**
+     * 弹窗收到上麦邀请弹窗
+     */
+    public void showPickReceivedDialog() {
+        ConfirmDialog pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
+                "主播邀请您连线，是否同意? 10S", true,
+                "同意", "拒绝", new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                //拒绝邀请
+                RCLiveEngine.getInstance().rejectInvitation(null);
+                return null;
+            }
+        }, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                //同意邀请
+                RCLiveEngine.getInstance().acceptInvitation(null);
+                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+                    //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
+                    cancelRequestSeat(null);
+                }
+                return null;
+            }
+        }
+        );
+        Disposable subscribe = Observable.interval(0, 1, TimeUnit.SECONDS)
+                .take(11)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Long>() {
+                    @Override
+                    public void accept(Long aLong) throws Throwable {
+                        pickReceivedDialog.updateMessage("主播邀请您连线，是否同意? " + (10 - aLong) + "s");
+                        if (10 == aLong) {
+                            //超时自动拒绝
+                            RCLiveEngine.getInstance().rejectInvitation(null);
+                            pickReceivedDialog.dismiss();
+                        }
+                    }
+                });
+        pickReceivedDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                if (subscribe != null) {
+                    subscribe.dispose();
+                }
+            }
+        });
+        pickReceivedDialog.show();
+    }
+
+    /**
+     * 取消连线邀请
+     */
     @Override
     public void onliveVideoInvitationCanceled() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -546,6 +732,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationAccepted(userId);
         }
+        if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
+            EToast.showToast("用户连线成功");
+        }
         Log.e(TAG, "onliveVideoInvitationAccepted: ");
     }
 
@@ -553,6 +742,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     public void onliveVideoInvitationRejected(String userId) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationRejected(userId);
+        }
+        if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
+            EToast.showToast("用户拒绝邀请");
         }
         Log.e(TAG, "onliveVideoInvitationRejected: ");
     }
@@ -590,7 +782,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onNetworkStatus(delayMs);
         }
-        Log.e(TAG, "onNetworkStatus: " + delayMs);
     }
 
     /**

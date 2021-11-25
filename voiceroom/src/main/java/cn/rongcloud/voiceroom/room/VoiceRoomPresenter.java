@@ -1082,7 +1082,9 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     @Override
     public void showSeatOperationViewPagerFragment(int index) {
         SeatOperationViewPagerFragment seatOperationViewPagerFragment
-                = new SeatOperationViewPagerFragment(voiceRoomModel.getRequestSeats(), voiceRoomModel.getInviteSeats());
+                = new SeatOperationViewPagerFragment(getRoomOwnerType());
+        seatOperationViewPagerFragment.setRequestSeats(voiceRoomModel.getRequestSeats());
+        seatOperationViewPagerFragment.setInviteSeats(voiceRoomModel.getInviteSeats());
         seatOperationViewPagerFragment.setIndex(index);
         seatOperationViewPagerFragment.setObInviteSeatListChangeSuject(voiceRoomModel.obInviteSeatListChange());
         seatOperationViewPagerFragment.setObRequestSeatListChangeSuject(voiceRoomModel.obRequestSeatListChange());

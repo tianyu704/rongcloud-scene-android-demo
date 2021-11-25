@@ -137,4 +137,10 @@ public interface LiveRoomView extends IBaseView {
      * @param notice
      */
     void setNotice(String notice);
+
+    /**
+     * 展示申请人数
+     */
+    void showUnReadRequestNumber(int requestNumber);
+
 }
