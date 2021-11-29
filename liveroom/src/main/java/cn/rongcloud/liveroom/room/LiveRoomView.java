@@ -63,9 +63,8 @@ public interface LiveRoomView extends IBaseView {
     /**
      * 当前用户的麦位状态
      *
-     * @param status
      */
-    void changeStatus(CurrentStatusType status);
+    void changeStatus();
 
     /**
      * 获取fragment管理器

@@ -1,6 +1,7 @@
 package cn.rongcloud.liveroom.helper;
 
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
+import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_ON_SEAT;
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_WAIT_FOR_SEAT;
 
 import android.content.DialogInterface;
@@ -76,6 +77,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     private String createUserId;//房间创建人ID
     private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
     private List<LiveRoomListener> liveRoomListeners = new ArrayList<>();
+    private ConfirmDialog pickReceivedDialog;
 
     public static LiveEventHelper getInstance() {
         return helper.INSTANCE;
@@ -103,6 +105,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     public void unRegister() {
         this.roomId = null;
         this.createUserId = null;
+        setCurrentStatus(STATUS_NOT_ON_SEAT);
         messageList.clear();
         RCLiveEngine.getInstance().setLiveEventListener(null);
         liveRoomListeners.clear();
@@ -210,7 +213,30 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
             @Override
             public void onError(int code, RCLiveError error) {
                 if (callback != null)
-                    callback.onResult(false, "接受请求连麦成功:" + error.getMessage());
+                    callback.onResult(false, "接受请求连麦失败:" + error.getMessage());
+            }
+        });
+    }
+
+    /**
+     * 拒绝用户的上麦申请
+     *
+     * @param userId
+     * @param callback
+     */
+    @Override
+    public void rejectRequestSeat(String userId, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().rejectRequest(userId, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null)
+                    callback.onResult(true, "拒绝请求连麦成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null)
+                    callback.onResult(false, "拒绝请求连麦申请失败:" + error.getMessage());
             }
         });
     }
@@ -220,8 +246,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         RCLiveEngine.getInstance().cancelRequest(new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                if (callback != null)
+                if (callback != null) {
+                    setCurrentStatus(STATUS_NOT_ON_SEAT);
                     callback.onResult(true, "取消请求连麦成功");
+                }
+
             }
 
             @Override
@@ -278,7 +307,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     @Override
-    public void finisRoom(ClickCallback<Boolean> callback) {
+    public void finishRoom(ClickCallback<Boolean> callback) {
         RCLiveEngine.getInstance().finish(new RCLiveCallback() {
             @Override
             public void onSuccess() {
@@ -339,6 +368,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         RCLiveEngine.getInstance().requestLiveVideo(index, new RCLiveCallback() {
             @Override
             public void onSuccess() {
+                setCurrentStatus(STATUS_WAIT_FOR_SEAT);
                 if (callback != null) {
                     callback.onResult(true, "");
                 }
@@ -363,6 +393,8 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
             EToast.showToast("麦位已满！");
             return;
         }
+        //上麦成功的话
+        setCurrentStatus(STATUS_ON_SEAT);
     }
 
     @Override
@@ -585,6 +617,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onUserKitOut(userId, operatorId);
         }
+        //被踢出房间，调用离开房间接口和反注册
+        if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
+            EToast.showToast("你已被踢出房间");
+            leaveRoom(null);
+        }
         Log.e(TAG, "onUserKitOut: ");
     }
 
@@ -601,31 +638,44 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onLiveVideoUpdate: " + lineMicUserIds);
     }
 
+    /**
+     * 申请麦位列表发生了变化
+     */
     @Override
     public void onLiveVideoRequestChanage() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestChanage();
         }
-        getRequestLiveVideoIds(null);
         Log.e(TAG, "onLiveVideoRequestChanage: ");
     }
 
+    /**
+     * 申请上麦被同意：只有申请者收到回调
+     */
     @Override
     public void onLiveVideoRequestAccepted() {
+        setCurrentStatus(STATUS_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestAccepted();
         }
         Log.e(TAG, "onLiveVideoRequestAccepted: ");
     }
 
+    /**
+     * 申请上麦被拒绝：只有申请者收到回调
+     */
     @Override
     public void onLiveVideoRequestRejected() {
+        setCurrentStatus(STATUS_NOT_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestRejected();
         }
         Log.e(TAG, "onLiveVideoRequestRejected: ");
     }
 
+    /**
+     * 接收到上麦申请：只有被申请者收到回调
+     */
     @Override
     public void onReceiveLiveVideoRequest() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -634,6 +684,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onReceiveLiveVideoRequest: ");
     }
 
+    /**
+     * 申请上麦已被取消：只有被申请者收到回调
+     */
     @Override
     public void onLiveVideoRequestCanceled() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -668,7 +721,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
      * 弹窗收到上麦邀请弹窗
      */
     public void showPickReceivedDialog() {
-        ConfirmDialog pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
+        pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
                 "主播邀请您连线，是否同意? 10S", true,
                 "同意", "拒绝", new Function0<Unit>() {
             @Override
@@ -717,13 +770,14 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 取消连线邀请
+     * 收到取消上麦邀请：只有被邀请者收到
      */
     @Override
     public void onliveVideoInvitationCanceled() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationCanceled();
         }
+        if (pickReceivedDialog != null) pickReceivedDialog.dismiss();
         Log.e(TAG, "onliveVideoInvitationCanceled: ");
     }
 

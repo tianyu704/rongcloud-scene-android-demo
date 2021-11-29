@@ -146,7 +146,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         mVoiceRoomBean = roomBean;
                         if (isInRoom) {
                             //如果已经在房间里面了,那么需要重新设置监听
-                            mView.changeStatus(LiveEventHelper.getInstance().getCurrentStatus());
+                            mView.changeStatus();
                             setCurrentRoom(mVoiceRoomBean, isCreate);
 //                            voiceRoomModel.currentUIRoomInfo.setMute(EventHelper.helper().getMuteAllRemoteStreams());
 //                            voiceRoomModel.onSeatInfoUpdate(EventHelper.helper().getRCVoiceSeatInfoList());
@@ -276,7 +276,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         public void onResult(Boolean result, String msg) {
                             if (result) {
                                 //上麦成功
-                                mView.changeStatus(CurrentStatusType.STATUS_ON_SEAT);
+                                mView.changeStatus();
                             } else {
                                 //上麦失败
                             }
@@ -288,7 +288,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         @Override
                         public void onResult(Boolean result, String msg) {
                             if (result) {
-                                mView.changeStatus(CurrentStatusType.STATUS_WAIT_FOR_SEAT);
+                                mView.changeStatus();
                             }
                         }
                     });
@@ -402,6 +402,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
         //初次进入的时候，获取房间内的人数信息
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
+        //设置创建者id
         LiveEventHelper.getInstance().setCreateUserId(mVoiceRoomBean.getCreateUserId());
         //显示直播布局
         mView.showRCLiveVideoView(RCLiveEngine.getInstance().preview());
@@ -426,6 +427,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     @Override
                     public void onChanged(List<User> users) {
                         mView.setOnlineCount(users.size());
+                        LiveEventHelper.getInstance().getRequestLiveVideoIds(null);
                         onInvitateLiveVideoIds(users);
                     }
                 });
@@ -539,7 +541,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void finishLiveRoom() {
         mView.showLoading("正在关闭房间");
-        LiveEventHelper.getInstance().finisRoom(new ClickCallback<Boolean>() {
+        LiveEventHelper.getInstance().finishRoom(new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 //房主关闭房间，调用删除房间接口
@@ -827,6 +829,17 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     /**
+     * 拒绝上麦申请
+     *
+     * @param userId
+     * @param callback
+     */
+    @Override
+    public void rejectRequestSeat(String userId, ClickCallback<Boolean> callback) {
+        LiveEventHelper.getInstance().rejectRequestSeat(userId, callback);
+    }
+
+    /**
      * 撤销申请
      *
      * @param callback
@@ -838,7 +851,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             public void onResult(Boolean result, String msg) {
                 if (callback != null) callback.onResult(result, msg);
                 if (result) {
-                    mView.changeStatus(CurrentStatusType.STATUS_NOT_ON_SEAT);
+                    mView.changeStatus();
                     EToast.showToast("已撤回连线申请");
                 } else {
                     EToast.showToast(msg);
@@ -890,9 +903,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void showSeatOperationViewPagerFragment(int index) {
         seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(getRoomOwnerType());
+        seatOperationViewPagerFragment.setIndex(index);
         seatOperationViewPagerFragment.setRequestSeats(requestSeats);
         seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
-        seatOperationViewPagerFragment.setIndex(index);
         seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
     }
@@ -927,11 +940,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
     }
 
+    /**
+     * 有人加入房间
+     * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
+     */
     @Override
     public void onUserEnter(String userId) {
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
+    /**
+     * 有人退出房间
+     * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
+     */
     @Override
     public void onUserExit(String userId) {
         MemberCache.getInstance().refreshMemberData(getRoomId());
@@ -939,7 +960,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onUserKitOut(String userId, String operatorId) {
-
+        if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
+            mView.finish();
+            unInitLiveRoomListener();
+        }
     }
 
     @Override
@@ -947,19 +971,28 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     }
 
+    /**
+     * 有人申请了麦位，这个时候需要去请求房间里面人得信息，不然拿不到
+     */
     @Override
     public void onLiveVideoRequestChanage() {
-
+        MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
+    /**
+     * 请求上麦被允许
+     */
     @Override
     public void onLiveVideoRequestAccepted() {
-
+        mView.changeStatus();
     }
 
+    /**
+     * 请求上麦被拒绝
+     */
     @Override
     public void onLiveVideoRequestRejected() {
-
+        mView.changeStatus();
     }
 
     @Override

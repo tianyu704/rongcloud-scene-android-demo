@@ -51,6 +51,11 @@ public interface RadioRoomMemberSettingClickListener extends MemberSettingFragme
     }
 
     @Override
+    default void rejectRequestSeat(String userId, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
     default void cancelRequestSeat(ClickCallback<Boolean> callback) {
 
     }

@@ -28,6 +28,14 @@ public interface SeatActionClickListener {
     void acceptRequestSeat(String userId, ClickCallback<Boolean> callback);
 
     /**
+     * 拒绝上麦
+     *
+     * @param userId
+     * @param callback
+     */
+    void rejectRequestSeat(String userId, ClickCallback<Boolean> callback);
+
+    /**
      * 撤销麦位申请
      */
     void cancelRequestSeat(ClickCallback<Boolean> callback);

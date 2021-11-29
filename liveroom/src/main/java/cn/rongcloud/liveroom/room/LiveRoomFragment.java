@@ -728,10 +728,9 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void changeStatus(CurrentStatusType status) {
-        LiveEventHelper.getInstance().setCurrentStatus(status);
+    public void changeStatus() {
         //修改底部的状态
-        switch (status) {
+        switch (LiveEventHelper.getInstance().getCurrentStatus()) {
             case STATUS_NOT_ON_SEAT:
                 //申请中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_request_enter_seat);

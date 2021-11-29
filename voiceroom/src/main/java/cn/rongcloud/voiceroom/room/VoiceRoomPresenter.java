@@ -962,6 +962,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     }
 
     @Override
+    public void rejectRequestSeat(String userId, ClickCallback<Boolean> callback) {
+
+    }
+
+    @Override
     public void cancelRequestSeat(ClickCallback<Boolean> callback) {
         EventHelper.helper().cancelRequestSeat(new ClickCallback<Boolean>() {
             @Override

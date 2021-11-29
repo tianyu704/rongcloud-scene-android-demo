@@ -33,8 +33,8 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
     private TabLayout tlTitle;
     private ViewPager2 vpPage;
     private int index;
-    private ArrayList<User> requestSeats;
-    private ArrayList<User> inviteSeats;
+    private ArrayList<User> requestSeats = new ArrayList<>();
+    private ArrayList<User> inviteSeats = new ArrayList<>();
     private RequestSeatFragment requestSeatFragment;
     private InviteSeatFragment inviteSeatFragment;
     private SeatActionClickListener seatActionClickListener;
@@ -45,15 +45,21 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         this.roomOwnerType = roomOwnerType;
     }
 
+    public RoomOwnerType getRoomOwnerType() {
+        return roomOwnerType;
+    }
+
     public void setRequestSeats(ArrayList<User> requestSeats) {
-        this.requestSeats = requestSeats;
+        this.requestSeats.clear();
+        this.requestSeats.addAll(requestSeats);
         if (requestSeatFragment != null) {
             requestSeatFragment.refreshData(requestSeats);
         }
     }
 
     public void setInviteSeats(ArrayList<User> inviteSeats) {
-        this.inviteSeats = inviteSeats;
+        this.inviteSeats.clear();
+        this.inviteSeats.addAll(inviteSeats);
         if (inviteSeatFragment != null) {
             inviteSeatFragment.refreshData(inviteSeats);
         }

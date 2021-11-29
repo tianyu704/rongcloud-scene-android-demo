@@ -2,7 +2,6 @@ package cn.rong.combusis.ui.room.fragment.seatsetting;
 
 
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -10,18 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.jakewharton.rxbinding4.view.RxView;
 import com.kit.utils.ImageLoader;
 import com.rongcloud.common.base.BaseFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.provider.user.User;
+import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
-import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.BaseListAdapter;
-import cn.rongcloud.voiceroom.room.dialogFragment.seatoperation.BaseViewHolder;
+import io.reactivex.rxjava3.functions.Consumer;
+import kotlin.Unit;
 
 /**
  * 请求连麦fragment
@@ -30,8 +34,8 @@ public class RequestSeatFragment extends BaseFragment {
 
 
     private RecyclerView rvList;
-    private MyAdapter myAdapter;
     private ArrayList<User> requestSeats;
+    private RequestSeatAdapter requestSeatAdapter;
 
     public RequestSeatFragment(ArrayList<User> requestSeats) {
         super(R.layout.layout_list);
@@ -40,11 +44,21 @@ public class RequestSeatFragment extends BaseFragment {
 
     @Override
     public void initView() {
-        rvList = (RecyclerView) getView().findViewById(R.id.rv_list);
+        rvList = getView().findViewById(R.id.rv_list);
         rvList.setLayoutManager(new LinearLayoutManager(getContext()));
-        myAdapter = new MyAdapter();
-        rvList.setAdapter(myAdapter);
-        refreshData(requestSeats);
+        requestSeatAdapter = new RequestSeatAdapter(R.layout.item_seat_layout);
+        requestSeatAdapter.setDiffCallback(new DIffUserCallBack());
+        rvList.setAdapter(requestSeatAdapter);
+        requestSeatAdapter.setNewInstance(requestSeats);
+    }
+
+    /**
+     * 获取父布局
+     *
+     * @return
+     */
+    private SeatOperationViewPagerFragment getSeatOperationViewPagerFragment() {
+        return ((SeatOperationViewPagerFragment) getParentFragment());
     }
 
     @NonNull
@@ -59,58 +73,80 @@ public class RequestSeatFragment extends BaseFragment {
      * @param uiMemberModels
      */
     public void refreshData(List<User> uiMemberModels) {
-        if (myAdapter != null) {
-            myAdapter.refreshData(uiMemberModels);
+        if (requestSeatAdapter != null) requestSeatAdapter.setList(uiMemberModels);
+    }
+
+    class RequestSeatAdapter extends BaseQuickAdapter<User, BaseViewHolder> {
+
+        public RequestSeatAdapter(int layoutResId) {
+            super(layoutResId);
+        }
+
+        @Override
+        protected void convert(@NonNull BaseViewHolder baseViewHolder, User user) {
+            if (user == null) return;
+            baseViewHolder.setText(R.id.tv_operation, "接收");
+            baseViewHolder.setText(R.id.tv_member_name, user.getUserName());
+            ImageView imageView = baseViewHolder.getView(R.id.iv_user_portrait);
+            ImageLoader.loadUrl(imageView, user.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);
+            RxView.clicks(baseViewHolder.getView(R.id.tv_operation)).throttleFirst(1, TimeUnit.SECONDS)
+                    .subscribe(new Consumer<Unit>() {
+                        @Override
+                        public void accept(Unit unit) throws Throwable {
+                            acceptRequest(user.getUserId());
+                        }
+                    });
+            TextView tvRejecet = baseViewHolder.getView(R.id.tv_reject);
+            if (getSeatOperationViewPagerFragment().getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
+                tvRejecet.setVisibility(View.VISIBLE);
+                baseViewHolder.setText(R.id.tv_reject, "拒绝");
+                RxView.clicks(tvRejecet).throttleFirst(1, TimeUnit.SECONDS)
+                        .subscribe(new Consumer<Unit>() {
+                            @Override
+                            public void accept(Unit unit) throws Throwable {
+                                rejectRequest(user.getUserId());
+                            }
+                        });
+            } else {
+                tvRejecet.setVisibility(View.GONE);
+            }
         }
     }
 
     /**
-     * 创建适配器
+     * 拒绝请求
+     *
+     * @param userId
      */
-    class MyAdapter extends BaseListAdapter<MyAdapter.MyViewHolder> {
-
-        @NonNull
-        @Override
-        public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new MyViewHolder(parent);
-        }
-
-
-        class MyViewHolder extends BaseViewHolder {
-
-            public MyViewHolder(@NonNull ViewGroup parent) {
-                super(parent);
-            }
-
+    private void rejectRequest(String userId) {
+        getSeatOperationViewPagerFragment().getSeatActionClickListener().rejectRequestSeat(userId, new ClickCallback<Boolean>() {
             @Override
-            public void bindView(@NonNull User uiMemberModel, @NonNull View itemView) {
-                ImageView iv_user_portrait = itemView.findViewById(R.id.iv_user_portrait);
-                TextView tv_member_name = itemView.findViewById(R.id.tv_member_name);
-                TextView tv_operation = itemView.findViewById(R.id.tv_operation);
-                ImageLoader.loadUrl(iv_user_portrait, uiMemberModel.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);
-                tv_member_name.setText(uiMemberModel.getUserName());
-                tv_operation.setText("接受");
-                tv_operation.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        tv_operation.setEnabled(false);
-                        if (getParentFragment() instanceof SeatOperationViewPagerFragment) {
-                            ((SeatOperationViewPagerFragment) getParentFragment())
-                                    .getSeatActionClickListener().acceptRequestSeat(uiMemberModel.getUserId(), new ClickCallback<Boolean>() {
-                                @Override
-                                public void onResult(Boolean result, String msg) {
-                                    if (result) {
-                                        ((SeatOperationViewPagerFragment) getParentFragment()).dismiss();
-                                    } else {
-                                        EToast.showToast(msg);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    getSeatOperationViewPagerFragment().dismiss();
+                } else {
+                    EToast.showToast(msg);
+                }
             }
-        }
+        });
+    }
+
+    /**
+     * 同意请求
+     *
+     * @param userId
+     */
+    private void acceptRequest(String userId) {
+        getSeatOperationViewPagerFragment().getSeatActionClickListener().acceptRequestSeat(userId, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (result) {
+                    getSeatOperationViewPagerFragment().dismiss();
+                } else {
+                    EToast.showToast(msg);
+                }
+            }
+        });
     }
 
 }

@@ -74,6 +74,11 @@ public interface ILiveEventHelper {
     void acceptRequestSeat(String userId, ClickCallback<Boolean> callback);
 
     /**
+     * 拒绝上麦申请
+     */
+    void rejectRequestSeat(String userId, ClickCallback<Boolean> callback);
+
+    /**
      * 撤销麦位申请
      */
     void cancelRequestSeat(ClickCallback<Boolean> callback);
@@ -115,7 +120,7 @@ public interface ILiveEventHelper {
     /**
      * 关闭房间
      */
-    void finisRoom(ClickCallback<Boolean> callback);
+    void finishRoom(ClickCallback<Boolean> callback);
 
     /**
      * 开始直播
