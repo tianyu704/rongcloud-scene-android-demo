@@ -32,9 +32,10 @@ include ':liveroom'
 if (!(USE_AAR).toBoolean()) {
     println("------------------>>>>load local sdk module")
     include ':RCVoiceRoom'
+    include ':RCliveroom'
     Properties properties = new Properties()
     File propertyFile = new File(rootDir.getAbsolutePath() + "/local.properties")
     properties.load(propertyFile.newDataInputStream())
     project(':RCVoiceRoom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/voiceroom")
+    project(':RCliveroom').projectDir = new File("${properties.get("VOICE_ROOM_SDK_DIR")}/liveroom")
 }
-include ':liveroom'
