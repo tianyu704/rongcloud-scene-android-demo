@@ -14,6 +14,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.model.Member;
+import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -81,7 +82,7 @@ public interface LiveRoomView extends IBaseView {
     /**
      * 显示直播view
      */
-    void showRCLiveVideoView(View videoView);
+    void showRCLiveVideoView(RCLiveView rcLiveView);
 
     /**
      * 显示消息延迟

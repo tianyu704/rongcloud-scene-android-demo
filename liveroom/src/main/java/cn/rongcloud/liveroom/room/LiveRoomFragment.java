@@ -78,7 +78,9 @@ import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.R;
+import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
+import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.StatusBarUtil;
 import io.rong.imlib.model.MessageContent;
@@ -364,7 +366,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void prepareSuccess(View rcLiveVideoView) {
+    public void prepareSuccess(RCLiveView rcLiveVideoView) {
         showRCLiveVideoView(rcLiveVideoView);
     }
 
@@ -508,7 +510,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         } else if (fun instanceof RoomMusicFun) {
             showMusicDialog();
         } else if (fun instanceof RoomOverTurnFun) {
-
+            RCLiveEngine.getInstance().switchCamera(null);
         } else if (fun instanceof RoomBeautyFun) {
             if (meiyanDialog == null)
                 meiyanDialog = new BeautyDialogFragment(requireActivity(), MHConfigConstants.MEI_YAN);
@@ -765,10 +767,9 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void showRCLiveVideoView(View videoView) {
+    public void showRCLiveVideoView(RCLiveView videoView) {
         flLiveView.removeAllViews();
-        if (videoView != null)
-            flLiveView.addView(videoView);
+        videoView.attachParent(flLiveView,null);
     }
 
     @Override

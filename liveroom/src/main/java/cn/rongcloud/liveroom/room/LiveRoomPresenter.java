@@ -6,6 +6,7 @@ import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
@@ -55,6 +56,7 @@ import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.ui.room.fragment.LiveLayoutSettingCallBack;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
@@ -80,6 +82,8 @@ import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.api.RCRect;
+import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
+import cn.rongcloud.liveroom.api.error.RCLiveError;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.helper.LiveRoomListener;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
@@ -99,7 +103,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         ILiveRoomPresent, RoomTitleBar.OnFollowClickListener,
         MemberSettingFragment.OnMemberSettingClickListener,
         ICommonDialog, LiveRoomListener, GiftFragment.OnSendGiftListener
-        , RoomBottomView.OnBottomOptionClickListener {
+        , RoomBottomView.OnBottomOptionClickListener, LiveLayoutSettingCallBack {
 
     private String TAG = "LiveRoomPresenter";
 
@@ -907,6 +911,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         seatOperationViewPagerFragment.setRequestSeats(requestSeats);
         seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
         seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
+        seatOperationViewPagerFragment.setLiveLayoutSettingCallBack(this::onRCMixLayoutChange);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
     }
 
@@ -1059,9 +1064,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     }
 
+    /**
+     * 房间销毁
+     */
     @Override
     public void onRoomDestory() {
-
+        mView.finish();
     }
 
     @Override
@@ -1207,5 +1215,25 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         if (seatOperationViewPagerFragment != null) {
             seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
         }
+    }
+
+    /**
+     * 布局修改
+     * @param rcLiveMixType
+     */
+    @Override
+    public void onRCMixLayoutChange(RCLiveMixType rcLiveMixType) {
+        Log.e(TAG, "onRCMixLayoutChange: "+rcLiveMixType);
+        RCLiveEngine.getInstance().setMixType(rcLiveMixType, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                EToast.showToast("布局设置成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                EToast.showToast("布局设置失败"+error.getMessage());
+            }
+        });
     }
 }

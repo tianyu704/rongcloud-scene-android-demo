@@ -109,6 +109,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         messageList.clear();
         RCLiveEngine.getInstance().setLiveEventListener(null);
         liveRoomListeners.clear();
+        RCLiveEngine.getInstance().unPrepare(null);
     }
 
     public void setCreateUserId(String createUserId) {
@@ -494,7 +495,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 获取邀请上麦的人数
+     * 获取邀请人的ID
      *
      * @param callback
      */
@@ -639,7 +640,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 申请麦位列表发生了变化
+     * 申请列表发生变化
      */
     @Override
     public void onLiveVideoRequestChanage() {
@@ -662,10 +663,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 申请上麦被拒绝：只有申请者收到回调
+     * 申请被拒绝了
      */
     @Override
     public void onLiveVideoRequestRejected() {
+        cancelRequestSeat(null);
         setCurrentStatus(STATUS_NOT_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestRejected();
@@ -674,7 +676,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 接收到上麦申请：只有被申请者收到回调
+     * 收到上麦申请
      */
     @Override
     public void onReceiveLiveVideoRequest() {
@@ -685,7 +687,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 申请上麦已被取消：只有被申请者收到回调
+     * 申请上麦被取消：只有房主收到回调
      */
     @Override
     public void onLiveVideoRequestCanceled() {
@@ -706,8 +708,8 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         getInvitateLiveVideoIds(new ClickCallback<List<String>>() {
             @Override
             public void onResult(List<String> result, String msg) {
-                for (String s : result) {
-                    if (TextUtils.equals(s, AccountStore.INSTANCE.getUserId())) {
+                for (String userId : result) {
+                    if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
                         showPickReceivedDialog();
                         break;
                     }
@@ -770,7 +772,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     }
 
     /**
-     * 收到取消上麦邀请：只有被邀请者收到
+     * 邀请被取消
      */
     @Override
     public void onliveVideoInvitationCanceled() {
@@ -781,6 +783,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onliveVideoInvitationCanceled: ");
     }
 
+    /**
+     * 邀请被同意
+     * @param userId
+     */
     @Override
     public void onliveVideoInvitationAccepted(String userId) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -792,6 +798,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onliveVideoInvitationAccepted: ");
     }
 
+    /**
+     * 邀请被拒绝
+     * @param userId 用户唯一标识
+     */
     @Override
     public void onliveVideoInvitationRejected(String userId) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -819,6 +829,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onLiveVideoStoped: ");
     }
 
+    /**
+     * 收到消息
+     * @param message
+     */
     @Override
     public void onReceiveMessage(Message message) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
@@ -847,6 +861,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     public void onOutputSampleBuffer(RCRTCVideoFrame frame) {
         int render = MhDataManager.getInstance().render(frame.getTextureId(), frame.getWidth(), frame.getWidth());
         frame.setTextureId(render);
+        Log.e(TAG, "onOutputSampleBuffer: " );
     }
 
     @Override
@@ -867,13 +882,13 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     @Override
     public void onRoomDestory() {
-        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onRoomDestory();
-        }
         ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
                 , "确定", "", null, new Function0<Unit>() {
             @Override
             public Unit invoke() {
+                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+                    liveRoomListener.onRoomDestory();
+                }
                 leaveRoom(null);
                 return null;
             }
@@ -882,6 +897,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onRoomDestory: ");
     }
 
+    /**
+     * 房间合流类型发生改变
+     * @param mixType 合流类型
+     */
     @Override
     public void onRoomMixTypeChange(RCLiveMixType mixType) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {

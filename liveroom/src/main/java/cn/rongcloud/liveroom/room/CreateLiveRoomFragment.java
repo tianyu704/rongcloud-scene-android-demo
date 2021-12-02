@@ -44,6 +44,7 @@ import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.liveroom.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
+import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.rong.imkit.utils.StatusBarUtil;
 
 /**
@@ -305,7 +306,7 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         } else if (id == R.id.btn_start_live) {
             preCreateRoom();
         } else if (id == R.id.tv_turn_camera) {
-
+            RCLiveEngine.getInstance().switchCamera(null);
         } else if (id == R.id.tv_tags) {
             if (tiezhiDilog == null)
                 tiezhiDilog = new BeautyDialogFragment(requireActivity(), v.getTag().toString());
@@ -334,6 +335,6 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
 
         void onCreateExist(VoiceRoomBean voiceRoomBean);
 
-        void prepareSuccess(View rcLiveVideoView);
+        void prepareSuccess(RCLiveView rcLiveVideoView);
     }
 }
