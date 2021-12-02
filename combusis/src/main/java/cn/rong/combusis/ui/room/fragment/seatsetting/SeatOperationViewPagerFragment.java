@@ -18,6 +18,7 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.ui.room.fragment.LiveLayoutSettingCallBack;
 import cn.rong.combusis.ui.room.fragment.SeatActionClickListener;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -38,6 +39,7 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
     private RequestSeatFragment requestSeatFragment;
     private InviteSeatFragment inviteSeatFragment;
     private SeatActionClickListener seatActionClickListener;
+    private LiveLayoutSettingCallBack liveLayoutSettingCallBack;
     private RoomOwnerType roomOwnerType;
 
     public SeatOperationViewPagerFragment(RoomOwnerType roomOwnerType) {
@@ -73,11 +75,11 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         ArrayList<BaseFragment> fragments = new ArrayList<>();
         requestSeatFragment = new RequestSeatFragment(requestSeats);
         inviteSeatFragment = new InviteSeatFragment(inviteSeats);
-        LiveLyayoutSettingFragment liveLyayoutSettingFragment = new LiveLyayoutSettingFragment();
+        LivelayoutSettingFragment livelayoutSettingFragment = new LivelayoutSettingFragment();
         fragments.add(requestSeatFragment);
         fragments.add(inviteSeatFragment);
         if (roomOwnerType == RoomOwnerType.LIVE_OWNER) {
-            fragments.add(liveLyayoutSettingFragment);
+            fragments.add(livelayoutSettingFragment);
         }
         vpPage.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         FragmentStateAdapter fragmentStateAdapter = new FragmentStateAdapter(getChildFragmentManager(), getLifecycle()) {
@@ -159,6 +161,19 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
      */
     public void setSeatActionClickListener(SeatActionClickListener seatActionClickListener) {
         this.seatActionClickListener = seatActionClickListener;
+    }
+
+
+    /**
+     * 布局设置接口
+     * @param liveLayoutSettingCallBack
+     */
+    public void setLiveLayoutSettingCallBack(LiveLayoutSettingCallBack liveLayoutSettingCallBack){
+        this.liveLayoutSettingCallBack=liveLayoutSettingCallBack;
+    }
+
+    public LiveLayoutSettingCallBack getLiveLayoutSettingCallBack() {
+        return liveLayoutSettingCallBack;
     }
 
     @Override
