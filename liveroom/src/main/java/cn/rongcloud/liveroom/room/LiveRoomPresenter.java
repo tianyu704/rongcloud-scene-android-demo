@@ -7,7 +7,14 @@ import static cn.rong.combusis.sdk.event.wrapper.EToast.showToast;
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
@@ -18,6 +25,7 @@ import com.basis.net.oklib.OkParams;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.google.gson.JsonArray;
+import com.jakewharton.rxbinding4.view.RxView;
 import com.kit.UIKit;
 import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
@@ -27,12 +35,18 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import cn.rong.combusis.R;
 
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.widget.WaveView;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
@@ -81,11 +95,16 @@ import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
+import cn.rongcloud.liveroom.api.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.api.RCParamter;
 import cn.rongcloud.liveroom.api.RCRect;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.helper.LiveRoomListener;
+import cn.rongcloud.liveroom.manager.RCDataManager;
+import cn.rongcloud.liveroom.manager.SeatManager;
+import cn.rongcloud.liveroom.weight.RCLiveView;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -95,6 +114,7 @@ import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
 import io.rong.message.TextMessage;
+import kotlin.Unit;
 
 /**
  * 直播房
@@ -496,7 +516,51 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void sendGift() {
-
+        ArrayList<Member> memberArrayList = new ArrayList<>();
+        //房间内所有人
+        List<RCLiveSeatInfo> rcLiveSeatInfos = SeatManager.get().getSeatList();
+        for (RCLiveSeatInfo rcLiveSeatInfo : rcLiveSeatInfos) {
+            String userId = rcLiveSeatInfo.getUserId();
+            if (TextUtils.isEmpty(userId)) {
+                //当前麦位没有用户
+                return;
+            }
+            if (TextUtils.equals(userId, getCreateUserId())) {
+                //如果是房主麦位，不用管房主是否存在
+                User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
+                Member member = null;
+                if (user == null) {
+                    member = new Member();
+                    member.setUserName(mVoiceRoomBean.getCreateUserName());
+                    member.setUserId(mVoiceRoomBean.getCreateUserId());
+                } else {
+                    member = new Member().toMember(user);
+                }
+                member.setSeatIndex(rcLiveSeatInfo.getIndex());
+                memberArrayList.add(member);
+                continue;
+            } else {
+                //当前用户在麦位上
+                User user = MemberCache.getInstance().getMember(userId);
+                Member member = null;
+                if (user == null) {
+                    member = new Member();
+                    member.setUserId(userId);
+                } else {
+                    member = new Member().toMember(user);
+                }
+                member.setSeatIndex(rcLiveSeatInfo.getIndex());
+                memberArrayList.add(member);
+            }
+        }
+        //按照麦位从小到大拍讯
+        Collections.sort(memberArrayList, new Comparator<Member>() {
+            @Override
+            public int compare(Member o1, Member o2) {
+                return o1.getSeatIndex() - o2.getSeatIndex();
+            }
+        });
+        mView.showSendGiftDialog(mVoiceRoomBean, "", memberArrayList);
     }
 
     /**
@@ -947,6 +1011,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 有人加入房间
+     *
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
@@ -956,6 +1021,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 有人退出房间
+     *
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
@@ -1031,12 +1097,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onLiveVideoStarted() {
-
+        mView.changeStatus();
     }
 
     @Override
     public void onLiveVideoStoped() {
-
+        mView.changeStatus();
     }
 
     @Override
@@ -1189,8 +1255,11 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     public void onRequestLiveVideoIds(List<String> requestLives) {
         requestSeats.clear();
         for (String userId : requestLives) {
-            User user = MemberCache.getInstance().getMember(userId);
-            requestSeats.add(user);
+            RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(userId);
+            if (rcLiveSeatInfo == null) {
+                User user = MemberCache.getInstance().getMember(userId);
+                requestSeats.add(user);
+            }
         }
         mView.showUnReadRequestNumber(requestSeats.size());
         if (seatOperationViewPagerFragment != null) {
@@ -1208,9 +1277,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     public void onInvitateLiveVideoIds(List<User> roomUsers) {
         inviteSeats.clear();
         for (User roomUser : roomUsers) {
-            if (!TextUtils.equals(roomUser.getUserId(), AccountStore.INSTANCE.getUserId())) {
-                inviteSeats.add(roomUser);
-            }
+            RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(roomUser.getUserId());
+            if (rcLiveSeatInfo == null) inviteSeats.add(roomUser);
         }
         if (seatOperationViewPagerFragment != null) {
             seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
@@ -1219,11 +1287,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 布局修改
+     *
      * @param rcLiveMixType
      */
     @Override
     public void onRCMixLayoutChange(RCLiveMixType rcLiveMixType) {
-        Log.e(TAG, "onRCMixLayoutChange: "+rcLiveMixType);
+        Log.e(TAG, "onRCMixLayoutChange: " + rcLiveMixType);
+        RCLiveView videoView = RCLiveEngine.getInstance().preview();
+        if (rcLiveMixType == RCLiveMixType.RCMixTypeOneToOne) {
+            //如果是1V1的时候
+            videoView.setDevTop(0);
+        } else {
+            videoView.setDevTop(mView.getMarginTop());
+        }
         RCLiveEngine.getInstance().setMixType(rcLiveMixType, new RCLiveCallback() {
             @Override
             public void onSuccess() {
@@ -1232,8 +1308,132 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
             @Override
             public void onError(int code, RCLiveError error) {
-                EToast.showToast("布局设置失败"+error.getMessage());
+                EToast.showToast("布局设置失败" + error.getMessage());
             }
         });
+    }
+
+    @Override
+    public View setSeatViewProvider(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+        RCLiveMixType mixType = RCDataManager.get().getMixType();
+        String userId = seatInfo.getUserId();
+        Log.e(TAG, "setSeatViewProvider: width" + rcParamter.getWidth());
+        Log.e(TAG, "setSeatViewProvider: heigth" + rcParamter.getHeight());
+        View view = null;
+        //麦位为默认的1V1的时候
+        if (!TextUtils.isEmpty(userId)) {
+            if (TextUtils.equals(userId, getCreateUserId()) && mixType == RCLiveMixType.RCMixTypeOneToOne) {
+                //1V1 房主不设置视图
+                view = null;
+            }
+            view = createMicLayout(seatInfo, rcParamter);
+        } else {
+            // 麦位没人的时候
+            view = createEmptyMicLayout(seatInfo, rcParamter);
+        }
+        if (view != null) {
+            //设置点击事件
+            setClickSeatListener(view, seatInfo);
+        }
+        return view;
+    }
+
+    //点击麦位
+    private void setClickSeatListener(View view, RCLiveSeatInfo seatInfo) {
+        RxView.clicks(view).throttleFirst(1, TimeUnit.SECONDS)
+                .subscribe(new Consumer<Unit>() {
+                    @Override
+                    public void accept(Unit unit) throws Throwable {
+                        EToast.showToast("点击了" + seatInfo.getIndex() + "号麦位");
+                    }
+                });
+    }
+
+    /**
+     * 构建布局
+     *
+     * @param seatInfo
+     * @param rcParamter
+     * @return
+     */
+    private View createEmptyMicLayout(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+        int seatHeight = rcParamter.getHeight();
+        int seatWidth = rcParamter.getWidth();
+        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_offline_layout, null);
+        ConstraintLayout.LayoutParams layoutParams =
+                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
+        view.setLayoutParams(layoutParams);
+        TextView name = view.findViewById(R.id.tv_member_name);
+        name.setText(seatInfo.getIndex() + "号麦位");
+        ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
+        if (seatInfo.isMute()) {
+            isMuteView.setVisibility(View.VISIBLE);
+        } else {
+            isMuteView.setVisibility(View.GONE);
+        }
+        ImageView seatStatusView = view.findViewById(R.id.iv_seat_status);
+        if (seatInfo.isLock()) {
+            name.setVisibility(View.GONE);
+            seatStatusView.setImageResource(R.drawable.ic_seat_status_locked);
+        } else {
+            name.setVisibility(View.VISIBLE);
+            seatStatusView.setImageResource(R.drawable.ic_seat_status_enter);
+        }
+        return view;
+    }
+
+    /**
+     * 构建连麦布局
+     *
+     * @param seatInfo
+     * @param rcParamter
+     */
+    private View createMicLayout(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+        int seatHeight = rcParamter.getHeight();
+        int seatWidth = rcParamter.getWidth();
+        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_online_layout, null);
+        TextView name = view.findViewById(R.id.tv_member_name);
+        name.setText(MemberCache.getInstance().getMember(seatInfo.getUserId()).getUserName());
+        ConstraintLayout.LayoutParams layoutParams =
+                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
+        view.setLayoutParams(layoutParams);
+        RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
+        ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
+        WaveView waveView = view.findViewById(R.id.wv_creator_background);
+        TextView tv_gift_count = view.findViewById(R.id.tv_gift_count);
+        if (TextUtils.equals(seatInfo.getUserId(), getCreateUserId())) {
+            tv_gift_count.setVisibility(View.GONE);
+        } else {
+            tv_gift_count.setVisibility(View.VISIBLE);
+        }
+        ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
+        if (seatInfo.isMute()) {
+            isMuteView.setVisibility(View.VISIBLE);
+        } else {
+            isMuteView.setVisibility(View.GONE);
+        }
+        setViewLayoutParams(imageView, seatWidth / 3, seatHeight / 3);
+        setViewLayoutParams(waveView, seatWidth / 3 + 20, seatHeight / 3 + 20);
+        if (seatInfo.isEnableAudio()) {
+            //当前位音频连线
+            rl_mic_audio_value.setVisibility(View.VISIBLE);
+        } else {
+            //视频连线
+            rl_mic_audio_value.setVisibility(View.GONE);
+        }
+        return view;
+    }
+
+
+    /**
+     * 重设 view 的宽高
+     */
+    public static void setViewLayoutParams(View view, int nWidth, int nHeight) {
+        ViewGroup.LayoutParams lp = view.getLayoutParams();
+        if (lp.height != nHeight || lp.width != nWidth) {
+            lp.width = nWidth;
+            lp.height = nHeight;
+            view.setLayoutParams(lp);
+        }
     }
 }

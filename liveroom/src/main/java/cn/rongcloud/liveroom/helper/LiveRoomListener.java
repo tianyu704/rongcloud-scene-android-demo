@@ -1,10 +1,15 @@
 package cn.rongcloud.liveroom.helper;
 
 
+import android.view.View;
+
 import java.util.List;
 
 import cn.rong.combusis.provider.user.User;
 import cn.rongcloud.liveroom.api.RCLiveEventListener;
+import cn.rongcloud.liveroom.api.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.api.RCParamter;
+import cn.rongcloud.liveroom.api.SeatViewProvider;
 
 /**
  * @author lihao
@@ -26,4 +31,6 @@ public interface LiveRoomListener extends RCLiveEventListener {
      * 可以被邀请的用户
      */
     void onInvitateLiveVideoIds(List<User> roomUsers);
+
+    View setSeatViewProvider(RCLiveSeatInfo seatInfo, RCParamter rcParamter);
 }

@@ -143,4 +143,6 @@ public interface LiveRoomView extends IBaseView {
      */
     void showUnReadRequestNumber(int requestNumber);
 
+    int getMarginTop();
+
 }

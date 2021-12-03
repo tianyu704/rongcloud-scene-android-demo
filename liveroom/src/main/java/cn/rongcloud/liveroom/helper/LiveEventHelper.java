@@ -5,8 +5,11 @@ import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_ON_SE
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_WAIT_FOR_SEAT;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.basis.UIStack;
 import com.basis.net.oklib.OkApi;
@@ -15,6 +18,7 @@ import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.meihu.beauty.utils.MhDataManager;
 import com.rongcloud.common.utils.AccountStore;
+import com.rongcloud.common.utils.UiUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +40,9 @@ import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveEventListener;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.api.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.api.RCParamter;
 import cn.rongcloud.liveroom.api.RCRect;
+import cn.rongcloud.liveroom.api.SeatViewProvider;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.callback.RCLiveResultCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
@@ -52,6 +58,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
+import io.rong.imlib.RongCoreClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
@@ -99,6 +106,15 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         this.messageList = new ArrayList<>();
         RCLiveEngine.getInstance().setLiveEventListener(this);
         liveRoomListeners.clear();
+        RCLiveEngine.getInstance().setSeatViewProvider(new SeatViewProvider() {
+            @Override
+            public View provideSeatView(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+                    return liveRoomListener.setSeatViewProvider(seatInfo, rcParamter);
+                }
+                return null;
+            }
+        });
     }
 
     @Override
@@ -110,7 +126,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         RCLiveEngine.getInstance().setLiveEventListener(null);
         liveRoomListeners.clear();
         RCLiveEngine.getInstance().unPrepare(null);
+        RCLiveEngine.getInstance().setSeatViewProvider(null);
     }
+
 
     public void setCreateUserId(String createUserId) {
         this.createUserId = createUserId;
@@ -395,7 +413,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
             return;
         }
         //上麦成功的话
-        setCurrentStatus(STATUS_ON_SEAT);
+//        setCurrentStatus(STATUS_ON_SEAT);
     }
 
     @Override
@@ -639,6 +657,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onLiveVideoUpdate: " + lineMicUserIds);
     }
 
+
     /**
      * 申请列表发生变化
      */
@@ -655,7 +674,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
      */
     @Override
     public void onLiveVideoRequestAccepted() {
-        setCurrentStatus(STATUS_ON_SEAT);
+//        setCurrentStatus(STATUS_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestAccepted();
         }
@@ -785,6 +804,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     /**
      * 邀请被同意
+     *
      * @param userId
      */
     @Override
@@ -800,6 +820,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     /**
      * 邀请被拒绝
+     *
      * @param userId 用户唯一标识
      */
     @Override
@@ -813,24 +834,33 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         Log.e(TAG, "onliveVideoInvitationRejected: ");
     }
 
+    /**
+     * 连麦开始
+     */
     @Override
     public void onLiveVideoStarted() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoStarted();
         }
+        setCurrentStatus(STATUS_ON_SEAT);
         Log.e(TAG, "onLiveVideoStarted: ");
     }
 
+    /**
+     * 连麦结束
+     */
     @Override
     public void onLiveVideoStoped() {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoStoped();
         }
+        setCurrentStatus(STATUS_NOT_ON_SEAT);
         Log.e(TAG, "onLiveVideoStoped: ");
     }
 
     /**
      * 收到消息
+     *
      * @param message
      */
     @Override
@@ -861,7 +891,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
     public void onOutputSampleBuffer(RCRTCVideoFrame frame) {
         int render = MhDataManager.getInstance().render(frame.getTextureId(), frame.getWidth(), frame.getWidth());
         frame.setTextureId(render);
-        Log.e(TAG, "onOutputSampleBuffer: " );
+        Log.e(TAG, "onOutputSampleBuffer: ");
     }
 
     @Override
@@ -899,6 +929,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
 
     /**
      * 房间合流类型发生改变
+     *
      * @param mixType 合流类型
      */
     @Override
@@ -908,6 +939,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener {
         }
         Log.e(TAG, "onRoomMixTypeChange: " + mixType);
     }
+
 
     private static class helper {
         static final LiveEventHelper INSTANCE = new LiveEventHelper();

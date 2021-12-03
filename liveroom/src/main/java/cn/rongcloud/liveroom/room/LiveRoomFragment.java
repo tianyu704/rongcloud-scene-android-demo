@@ -79,7 +79,9 @@ import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
+import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
+import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.StatusBarUtil;
@@ -130,6 +132,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private GiftFragment mGiftFragment;
     private MemberListFragment mMemberListFragment;
     private TextView tvGiftCount;
+    private int marginTop;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -149,6 +152,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public int setLayoutId() {
         return R.layout.fragment_live_room;
+    }
+
+    @Override
+    public int getMarginTop() {
+        return marginTop;
     }
 
     @Override
@@ -245,6 +253,12 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         clLiveRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_live_room_view);
         roomTitleBar = (RoomTitleBar) getView().findViewById(R.id.room_title_bar);
         tvNotice = (TextView) getView().findViewById(R.id.tv_notice);
+        tvNotice.post(new Runnable() {
+            @Override
+            public void run() {
+                marginTop = (int) (tvNotice.getY()+tvNotice.getHeight()+10);
+            }
+        });
         tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
 
         viewAllBroadcast = (AllBroadcastView) getView().findViewById(R.id.view_all_broadcast);
@@ -769,6 +783,12 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void showRCLiveVideoView(RCLiveView videoView) {
         flLiveView.removeAllViews();
+        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne){
+            //如果是1V1的时候
+            videoView.setDevTop(0);
+        }else {
+            videoView.setDevTop(marginTop);
+        }
         videoView.attachParent(flLiveView,null);
     }
 
