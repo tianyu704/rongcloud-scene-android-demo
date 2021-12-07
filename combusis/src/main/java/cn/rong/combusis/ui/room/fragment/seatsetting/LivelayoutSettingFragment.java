@@ -92,7 +92,7 @@ public class LivelayoutSettingFragment extends BaseFragment {
 
         @Override
         protected void convert(@NonNull BaseViewHolder baseViewHolder, RCLiveMixType rcLiveMixType) {
-            boolean isSelect=rcLiveMixType.equals(RCDataManager.get().getMixType());
+            boolean isSelect=rcLiveMixType.getValue()==RCDataManager.get().getMixType();
             View view = baseViewHolder.getView(R.id.rl_mix_type);
             //判断当前是否为选中
             if (isSelect){

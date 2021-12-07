@@ -6,7 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    tools:ignore="MissingDefaultResource">
 
     <View
         android:layout_width="match_parent"
@@ -16,13 +17,15 @@
         app:layout_constraintTop_toBottomOf="@+id/gl_bg" />
 
     <View
+        android:id="@+id/iv_member_portrait_bg"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:background="@drawable/bg_setting_fragment_portrait"
         app:layout_constraintBottom_toBottomOf="@+id/iv_member_portrait"
         app:layout_constraintEnd_toEndOf="@+id/iv_member_portrait"
         app:layout_constraintStart_toStartOf="@+id/iv_member_portrait"
-        app:layout_constraintTop_toTopOf="@+id/iv_member_portrait" />
+        app:layout_constraintTop_toTopOf="@+id/iv_member_portrait"
+        />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_bg"
@@ -59,38 +62,54 @@
         tools:text="1111111" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btn_mute_self"
+        android:id="@+id/tv_switch_link_status"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="30dp"
-        android:background="#33CDCDCD"
+        android:background="@drawable/live_room_btn_shape_gradient"
         android:gravity="center"
-        android:text="关闭麦克风"
-        android:textColor="#EF499A"
+        android:text="切换到语音连线"
+        android:textColor="@color/white"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_member_name" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/btn_out_of_seat"
+        android:id="@+id/btn_mute_self"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/shape_set_live_layout_bg_selected"
+        android:gravity="center"
+        android:text="关闭麦克风"
+        android:textColor="#EF499A"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_disconnect"
+        app:layout_constraintTop_toBottomOf="@+id/tv_switch_link_status" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btn_disconnect"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="20dp"
-        android:background="#33CDCDCD"
+        android:background="@drawable/shape_set_live_layout_bg_selected"
         android:gravity="center"
-        android:text="断开连接"
-        android:textColor="#FFFFFFFF"
+        android:text="断开链接"
+        android:textColor="#EF499A"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_mute_self" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

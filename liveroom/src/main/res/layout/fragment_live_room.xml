@@ -6,16 +6,17 @@
     android:layout_height="match_parent"
     tools:ignore="MissingDefaultResource">
 
+    <cn.rong.combusis.ui.room.widget.GiftAnimationView
+        android:id="@+id/gift_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/live_room_video_view_shape_gradient"/>
+
     <FrameLayout
         android:id="@+id/fl_live_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/black" />
-
-    <cn.rong.combusis.ui.room.widget.GiftAnimationView
-        android:id="@+id/gift_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_live_room_view"

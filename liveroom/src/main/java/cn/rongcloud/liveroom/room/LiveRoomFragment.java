@@ -80,8 +80,12 @@ import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rongcloud.liveroom.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
+
+import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.fragment.LiveRoomCreatorSettingFragment;
 import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.manager.RCDataManager;
+import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.rong.imkit.utils.StatusBarUtil;
@@ -404,7 +408,12 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         if (TextUtils.equals(user.getUserId(), AccountStore.INSTANCE.getUserId())) {
             return;
         }
-        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{user.getUserId()}).build(), new WrapperCallBack() {
+        showMemberSettingFragment(user.getUserId());
+    }
+
+    @Override
+    public void showMemberSettingFragment(String userId){
+        OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{userId}).build(), new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
                 if (result.ok()) {
@@ -413,14 +422,15 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                         if (mMemberSettingFragment == null) {
                             mMemberSettingFragment = new MemberSettingFragment(present.getRoomOwnerType(), present);
                         }
-                        //        if (uiSeatModel != null) {
-//            //说明当前用户在麦位上
-//            mMemberSettingFragment.setMemberIsOnSeat(uiSeatModel.getIndex() > -1);
-//            mMemberSettingFragment.setSeatPosition(uiSeatModel.getIndex());
-//            mMemberSettingFragment.setMute(uiSeatModel.isMute());
-//        } else {
-//            mMemberSettingFragment.setMemberIsOnSeat(false);
-//        }
+                        RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(userId);
+                        if (rcLiveSeatInfo != null) {
+                            //说明当前用户在麦位上
+                            mMemberSettingFragment.setMemberIsOnSeat(rcLiveSeatInfo.getIndex() > -1);
+                            mMemberSettingFragment.setSeatPosition(rcLiveSeatInfo.getIndex());
+                            mMemberSettingFragment.setMute(rcLiveSeatInfo.isMute());
+                        } else {
+                            mMemberSettingFragment.setMemberIsOnSeat(false);
+                        }
                         mMemberSettingFragment.show(getChildFragmentManager(), members.get(0), present.getCreateUserId());
                     }
                 }
@@ -428,7 +438,20 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         });
     }
 
-//    /**
+    @Override
+    public void showCreatorSettingFragment(RCLiveSeatInfo rcLiveSeatInfo) {
+        boolean isOwner=false;
+        if (present.getCreateUserId().equals(rcLiveSeatInfo.getUserId())) {
+            //创建者
+            isOwner=true;
+        }
+        LiveRoomCreatorSettingFragment liveRoomCreatorSettingFragment = new LiveRoomCreatorSettingFragment(rcLiveSeatInfo.getIndex(),
+                LiveEventHelper.getInstance().isMute(), rcLiveSeatInfo.isEnableVideo()
+                , present.getCreateUser(), present,isOwner);
+        liveRoomCreatorSettingFragment.show(getLiveFragmentManager());
+    }
+
+    //    /**
 //     * 麦位被点击的情况
 //     *
 //     * @param seatModel
@@ -783,7 +806,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void showRCLiveVideoView(RCLiveView videoView) {
         flLiveView.removeAllViews();
-        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne){
+        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
             //如果是1V1的时候
             videoView.setDevTop(0);
         }else {

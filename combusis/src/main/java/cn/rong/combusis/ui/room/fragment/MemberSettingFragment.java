@@ -232,6 +232,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
     private void refreshBottomView(boolean selfIsAdmin, boolean memberIsAdmin, boolean memberIsOnSeat, boolean memberIsOwner) {
         switch (mRoomOwnerType) {
             case VOICE_OWNER:
+            case LIVE_OWNER:
                 mClMemberSetting.setVisibility(View.VISIBLE);
                 // 上下麦
                 if (memberIsOnSeat) {
@@ -256,6 +257,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                 // 可以踢人
                 mLlKickRoom.setVisibility(View.VISIBLE);
                 break;
+            case LIVE_VIEWER:
             case VOICE_VIEWER:
                 // 自己和对方都是管理,或对方是房主,不显示底部操作
                 if (selfIsAdmin && memberIsAdmin || memberIsOwner) {

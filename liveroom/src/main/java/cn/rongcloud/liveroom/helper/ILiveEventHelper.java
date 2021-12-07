@@ -98,6 +98,16 @@ public interface ILiveEventHelper {
     void muteSeat(int index, boolean isMute, ClickCallback<Boolean> callback);
 
     /**
+     * 切换视频和语音
+     */
+    void switchVideoOrAudio(int index,boolean isVideo,ClickCallback<Boolean> callback);
+
+    /**
+     * 打开或者关闭麦克风
+     */
+    void MuteSelf(int index, boolean isMute, ClickCallback<Boolean> callback);
+
+    /**
      * 踢出房间
      */
     void kickUserFromRoom(User user, ClickCallback<Boolean> callback);

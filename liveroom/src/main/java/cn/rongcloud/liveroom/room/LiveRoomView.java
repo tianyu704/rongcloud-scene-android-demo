@@ -14,6 +14,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.model.Member;
+import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.rong.imlib.model.MessageContent;
 
@@ -143,6 +144,22 @@ public interface LiveRoomView extends IBaseView {
      */
     void showUnReadRequestNumber(int requestNumber);
 
+    /**
+     * 获取连麦视图距离顶部的距离
+     * @return
+     */
     int getMarginTop();
+
+    /**
+     * 显示人员设置弹窗
+     * @param userId
+     */
+    void showMemberSettingFragment(String userId);
+
+    /**
+     * 主播点击自己的麦位
+     * @param rcLiveSeatInfo
+     */
+    void showCreatorSettingFragment(RCLiveSeatInfo rcLiveSeatInfo);
 
 }
