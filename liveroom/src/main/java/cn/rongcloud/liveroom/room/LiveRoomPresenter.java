@@ -287,6 +287,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 申请上麦的逻辑
+     *
      * @param position
      */
     @Override
@@ -462,11 +463,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                         onInvitateLiveVideoIds(users);
                     }
                 });
+        //监听管理员变化
         MemberCache.getInstance().getAdminList()
                 .observe(((LiveRoomFragment) mView).getViewLifecycleOwner(), new Observer<List<String>>() {
                     @Override
                     public void onChanged(List<String> strings) {
-//                mView.refreshSeat();
+                        mView.refreshMessageList();
                     }
                 });
     }
@@ -977,12 +979,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 切换麦位
+     *
      * @param seatIndex
      * @param callback
      */
     @Override
     public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
-        LiveEventHelper.getInstance().swichToSeat(seatIndex,callback);
+        LiveEventHelper.getInstance().swichToSeat(seatIndex, callback);
     }
 
     /**
@@ -1411,7 +1414,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     private void onClickLiveRoomSeatsByViewer(RCLiveSeatInfo rcLiveSeatInfo) {
         if (TextUtils.isEmpty(rcLiveSeatInfo.getUserId())) {
             //点击的是空麦位
-            if (LiveEventHelper.getInstance().getCurrentStatus()!= CurrentStatusType.STATUS_ON_SEAT) {
+            if (LiveEventHelper.getInstance().getCurrentStatus() != CurrentStatusType.STATUS_ON_SEAT) {
                 //如果当前用户不在麦位上,那么去申请麦位
                 requestSeat(rcLiveSeatInfo.getIndex());
             }
@@ -1440,7 +1443,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             }
             int seatStatus = rcLiveSeatInfo.isLock() ? 1 : 0;
             emptySeatFragment.setData(rcLiveSeatInfo.getIndex(), seatStatus, rcLiveSeatInfo.isMute(), this);
-            emptySeatFragment.setShowSwitchSeatBtn(RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeGridNine.getValue());
+            emptySeatFragment.setShowSwitchSeatBtn(RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeGridNine.getValue());
             emptySeatFragment.setSeatActionClickListener(this);
             emptySeatFragment.show(mView.getLiveFragmentManager());
         } else {

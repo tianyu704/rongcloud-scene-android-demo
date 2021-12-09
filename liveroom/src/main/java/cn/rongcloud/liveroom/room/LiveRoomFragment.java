@@ -342,6 +342,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         disConnectDiolog.show();
     }
 
+    @Override
+    public void refreshMessageList() {
+        mRoomMessageAdapter.notifyDataSetChanged();
+    }
+
     /**
      * 点击右上角菜单按钮
      */

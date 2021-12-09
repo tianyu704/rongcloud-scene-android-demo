@@ -326,6 +326,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         switch (mRoomOwnerType) {
             case VOICE_OWNER:
             case RADIO_OWNER:
+            case LIVE_OWNER:
                 mRlSettingAdmin.setVisibility(View.VISIBLE);
                 if (memberIsAdmin) {
                     mTvSettingAdmin.setText("撤回管理");

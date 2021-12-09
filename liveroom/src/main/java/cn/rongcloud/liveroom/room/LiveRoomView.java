@@ -162,4 +162,8 @@ public interface LiveRoomView extends IBaseView {
      */
     void showCreatorSettingFragment(RCLiveSeatInfo rcLiveSeatInfo);
 
+    /**
+     * 刷新消息集合
+     */
+    void refreshMessageList();
 }

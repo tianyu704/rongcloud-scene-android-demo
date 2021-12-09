@@ -750,7 +750,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         }
         //被踢出房间，调用离开房间接口和反注册
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
-            EToast.showToast("你已被踢出房间");
+            EToast.showToast(TextUtils.equals(operatorId,createUserId)?"您被房主踢出房间":"您被管理员踢出房间");
             leaveRoom(null);
         }
         Log.e(TAG, "onUserKitOut: ");
