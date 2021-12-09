@@ -123,6 +123,19 @@ public class RoomTitleBar extends ConstraintLayout {
         tvRoomOnlineCount.setText(num + "");
     }
 
+    /**
+     * 是否在麦位上
+     */
+    public void setIsLinkSeat(boolean isLinkSeat){
+        if (roomOwnerType.equals(RoomOwnerType.LIVE_VIEWER)) {
+            if (isLinkSeat){
+                mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_live_room));
+            }else {
+                mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_menu));
+            }
+        }
+    }
+
     public void setDelay(int delay) {
         setDelay(delay, true);
     }

@@ -147,6 +147,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     private boolean isInRoom;
     private SeatOperationViewPagerFragment seatOperationViewPagerFragment;
     private EmptySeatFragment emptySeatFragment;
+    private Map<String, String> giftMap;
 
     public LiveRoomPresenter(LiveRoomView mView, Lifecycle lifecycle) {
         super(mView, lifecycle);
@@ -284,13 +285,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         });
     }
 
-
+    /**
+     * 申请上麦的逻辑
+     * @param position
+     */
     @Override
     public void requestSeat(int position) {
         CurrentStatusType currentStatus = LiveEventHelper.getInstance().getCurrentStatus();
-        if (currentStatus == CurrentStatusType.STATUS_ON_SEAT) {
-            return;
-        }
         //获取上麦模式
         LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, new ClickCallback<Boolean>() {
             @Override
@@ -302,18 +303,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 }
                 //如果是自由上麦
                 if (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat)) {
-                    //在这里需要计算一下可用的麦位
-                    if (position == -1) {
-//                        position
-                    }
                     LiveEventHelper.getInstance().enterSeat(position, new ClickCallback<Boolean>() {
                         @Override
                         public void onResult(Boolean result, String msg) {
+                            EToast.showToast(msg);
                             if (result) {
                                 //上麦成功
                                 mView.changeStatus();
-                            } else {
-                                //上麦失败
                             }
                         }
                     });
@@ -494,12 +490,17 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             @Override
             public void onResult(Wrapper result) {
                 if (result.ok()) {
-                    Map<String, String> map = result.getMap();
-                    Logger.e("================" + map.toString());
-                    for (String userId : map.keySet()) {
+                    giftMap = result.getMap();
+                    Logger.e("================" + giftMap.toString());
+                    for (String userId : giftMap.keySet()) {
+                        RCLiveSeatInfo seat = SeatManager.get().getSeatByUserId(userId);
+                        if (seat != null) {
+                            //在麦位上的人,更新麦位上人的礼物
+                            SeatManager.get().update(seat.getIndex(), seat, true);
+                        }
                         if (TextUtils.equals(userId, mVoiceRoomBean.getCreateUserId())) {
                             //创建者礼物数量
-                            mView.setCreateUserGift(map.get(userId));
+                            mView.setCreateUserGift(giftMap.get(userId));
                         }
                     }
                 }
@@ -975,6 +976,16 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     /**
+     * 切换麦位
+     * @param seatIndex
+     * @param callback
+     */
+    @Override
+    public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+        LiveEventHelper.getInstance().swichToSeat(seatIndex,callback);
+    }
+
+    /**
      * 邀请弹窗
      *
      * @param index
@@ -1050,7 +1061,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
-
+        MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
     /**
@@ -1128,13 +1139,14 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     @Override
-    public void onLiveVideoUserClick(String userId) {
-
-    }
-
-    @Override
-    public void onLiveUserLayout(Map<String, RCRect> frameInfo) {
-
+    public void onRoomMixTypeChange(RCLiveMixType mixType, int customerType) {
+        RCLiveView videoView = RCLiveEngine.getInstance().preview();
+        if (mixType == RCLiveMixType.RCMixTypeOneToOne) {
+            //如果是1V1的时候
+            videoView.setDevTop(0);
+        } else {
+            videoView.setDevTop(mView.getMarginTop());
+        }
     }
 
     /**
@@ -1145,10 +1157,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         mView.finish();
     }
 
-    @Override
-    public void onRoomMixTypeChange(RCLiveMixType mixType) {
-
-    }
 
     @Override
     public void onSendGiftSuccess(List<MessageContent> messages) {
@@ -1246,6 +1254,15 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void clickRequestSeat() {
+        if (LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
+            //如果当前在麦位上，那么弹出可以断开链接的弹窗
+            for (RCLiveSeatInfo seatInfo : RCLiveEngine.getInstance().getSeatManager().getSeatInfos()) {
+                if (TextUtils.equals(seatInfo.getUserId(), RongCoreClient.getInstance().getCurrentUserId())) {
+                    mView.showCreatorSettingFragment(seatInfo);
+                    return;
+                }
+            }
+        }
         requestSeat(-1);
     }
 
@@ -1339,15 +1356,15 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             if (TextUtils.equals(userId, getCreateUserId()) && mixType == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
                 //如果是1V1，而且当前是房主，也不应该显示视图
                 view = null;
-            }else {
+            } else {
                 view = createMicLayout(seatInfo, rcParamter);
             }
         } else {
             // 麦位没人的时候
-            if (mixType == RCLiveMixType.RCMixTypeOneToOne.getValue()){
+            if (mixType == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
                 //如果当前是1V1，那么小视图应该不显示覆盖
-                view=null;
-            }else {
+                view = null;
+            } else {
                 view = createEmptyMicLayout(seatInfo, rcParamter);
             }
         }
@@ -1392,9 +1409,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param rcLiveSeatInfo
      */
     private void onClickLiveRoomSeatsByViewer(RCLiveSeatInfo rcLiveSeatInfo) {
-        if (TextUtils.isEmpty(rcLiveSeatInfo.getUserId())){
-            //空麦位
-        }else {
+        if (TextUtils.isEmpty(rcLiveSeatInfo.getUserId())) {
+            //点击的是空麦位
+            if (LiveEventHelper.getInstance().getCurrentStatus()!= CurrentStatusType.STATUS_ON_SEAT) {
+                //如果当前用户不在麦位上,那么去申请麦位
+                requestSeat(rcLiveSeatInfo.getIndex());
+            }
+        } else {
             //麦位有人
             if (TextUtils.equals(rcLiveSeatInfo.getUserId(), RongCoreClient.getInstance().getCurrentUserId())) {
                 //观众端-点击自己的麦位
@@ -1419,6 +1440,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             }
             int seatStatus = rcLiveSeatInfo.isLock() ? 1 : 0;
             emptySeatFragment.setData(rcLiveSeatInfo.getIndex(), seatStatus, rcLiveSeatInfo.isMute(), this);
+            emptySeatFragment.setShowSwitchSeatBtn(RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeGridNine.getValue());
             emptySeatFragment.setSeatActionClickListener(this);
             emptySeatFragment.show(mView.getLiveFragmentManager());
         } else {
@@ -1490,6 +1512,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             tv_gift_count.setVisibility(View.GONE);
         } else {
             tv_gift_count.setVisibility(View.VISIBLE);
+            String giftCount = giftMap.get(seatInfo.getUserId());
+            tv_gift_count.setText(TextUtils.isEmpty(giftCount) ? "0" : giftCount);
         }
         ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
         if (seatInfo.isMute()) {
@@ -1510,7 +1534,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             rl_mic_audio_value.setVisibility(View.VISIBLE);
             ivBackGroup.setVisibility(View.VISIBLE);
             Glide.with(mView.getLiveActivity()).load(member.getPortraitUrl())
-                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(1,25)))
+                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(1, 25)))
                     .into(ivBackGroup);
         }
         return view;
@@ -1561,6 +1585,11 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void disConnect(int index) {
-        EToast.showToast("断开了链接");
+        LiveEventHelper.getInstance().leaveSeat(new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                EToast.showToast(msg);
+            }
+        });
     }
 }

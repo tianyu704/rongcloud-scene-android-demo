@@ -89,6 +89,11 @@ public interface ILiveEventHelper {
     void lockSeat(int index, boolean isClose, ClickCallback<Boolean> callback);
 
     /**
+     * 切换麦位
+     */
+    void swichToSeat(int seatIndex,ClickCallback<Boolean> callback);
+
+    /**
      * 开麦或者静麦
      *
      * @param index
@@ -154,6 +159,11 @@ public interface ILiveEventHelper {
      * 上麦直播
      */
     void enterSeat(int index, ClickCallback<Boolean> callback);
+
+    /**
+     * 下麦
+     */
+    void leaveSeat(ClickCallback<Boolean> callback);
 
     /**
      * 更新房间的KV消息

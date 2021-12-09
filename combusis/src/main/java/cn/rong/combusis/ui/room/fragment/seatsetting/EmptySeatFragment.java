@@ -35,11 +35,13 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
     private LinearLayout llMuteSeat;
     private AppCompatImageView ivMuteSeat;
     private AppCompatTextView tvMuteSeat;
+    private AppCompatTextView tvSwitchSeat;
     private SeatActionClickListener seatActionClickListener;
 
     private int index;
     private int seatStatus;
     private boolean isMute;
+    private boolean isShowSwitchSeatBtn;
     private ICommonDialog iCommonDialog;
 
     public EmptySeatFragment() {
@@ -51,6 +53,10 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
         this.seatStatus = seatStatus;
         this.isMute = isMute;
         this.iCommonDialog = iCommonDialog;
+    }
+
+    public void setShowSwitchSeatBtn(boolean isShow) {
+        this.isShowSwitchSeatBtn = isShow;
     }
 
     /**
@@ -77,6 +83,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
         llMuteSeat = (LinearLayout) getView().findViewById(R.id.ll_mute_seat);
         ivMuteSeat = (AppCompatImageView) getView().findViewById(R.id.iv_mute_seat);
         tvMuteSeat = (AppCompatTextView) getView().findViewById(R.id.tv_mute_seat);
+        tvSwitchSeat = getView().findViewById(R.id.btn_swich_seat);
         refreshView();
     }
 
@@ -86,6 +93,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
         llCloseSeat.setOnClickListener(this::onClick);
         llMuteSeat.setOnClickListener(this::onClick);
         btnInviteUserIntoSeat.setOnClickListener(this::onClick);
+        tvSwitchSeat.setOnClickListener(this::onClick);
     }
 
     /**
@@ -143,6 +151,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
             ivCloseSeat.setImageResource(R.drawable.ic_room_setting_lock_all);
             tvCloseSeat.setText("关闭座位");
         }
+        tvSwitchSeat.setVisibility(isShowSwitchSeatBtn ? View.VISIBLE : View.GONE);
         tvMemberName.setText(index + "号麦位");
     }
 
@@ -158,6 +167,15 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
                 iCommonDialog.showSeatOperationViewPagerFragment(1);
             }
             dismiss();
+        } else if (id == R.id.btn_swich_seat) {
+            if (seatActionClickListener != null)
+                seatActionClickListener.swichToSeat(index, new ClickCallback<Boolean>() {
+                    @Override
+                    public void onResult(Boolean result, String msg) {
+                        EToast.showToast(msg);
+                        if (result) dismiss();
+                    }
+                });
         }
     }
 }

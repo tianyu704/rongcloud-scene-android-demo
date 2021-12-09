@@ -65,4 +65,9 @@ public interface SeatActionClickListener {
      * @param callback
      */
     void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback);
+
+    /**
+     * 切换麦位
+     */
+    void swichToSeat(int seatIndex,ClickCallback<Boolean> callback);
 }

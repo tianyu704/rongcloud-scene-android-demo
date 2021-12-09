@@ -56,6 +56,8 @@ public class LiveRoomCreatorSettingFragment extends BaseBottomSheetDialogFragmen
             btn_disconnect.setVisibility(View.VISIBLE);
             iv_member_portrait_bg.setVisibility(View.INVISIBLE);
             mIvMemberPortrait.setVisibility(View.INVISIBLE);
+        }else {
+            btn_disconnect.setVisibility(View.GONE);
         }
         refreshMuteBtn();
         refreshLinkStatus();

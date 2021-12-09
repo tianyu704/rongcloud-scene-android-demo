@@ -1009,6 +1009,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         EventHelper.helper().lockSeat(seatIndex, isLock, callback);
     }
 
+    @Override
+    public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+
+    }
+
     /**
      * 点击底部送礼物，礼物可以送给麦位和房主，无论房主是否在房间
      */

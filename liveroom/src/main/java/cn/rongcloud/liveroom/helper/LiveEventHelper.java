@@ -17,7 +17,6 @@ import com.basis.net.oklib.wrapper.Wrapper;
 import com.meihu.beauty.utils.MhDataManager;
 import com.rongcloud.common.utils.AccountStore;
 
-import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,14 +34,13 @@ import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
-import cn.rongcloud.liveroom.api.RCLiveEventListener;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.api.RCParamter;
-import cn.rongcloud.liveroom.api.RCRect;
 import cn.rongcloud.liveroom.api.SeatViewProvider;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.callback.RCLiveResultCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
+import cn.rongcloud.liveroom.api.interfaces.RCLiveEventListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveSeatListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
@@ -58,6 +56,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
+import io.rong.imlib.NativeClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;
@@ -133,7 +132,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         liveRoomListeners.clear();
         RCLiveEngine.getInstance().unPrepare(null);
         RCLiveEngine.getInstance().setSeatViewProvider(null);
-        isMute=false;
+        isMute = false;
     }
 
 
@@ -301,7 +300,22 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public void onError(int code, RCLiveError error) {
                 //锁座位失败
-                callback.onResult(false, error.getMessage());
+                if (callback != null) callback.onResult(false, error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().switchTo(seatIndex, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "切换麦位成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(false, error.getMessage());
             }
         });
     }
@@ -323,7 +337,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public void onError(int code, RCLiveError error) {
                 //座位禁麦失败
-                callback.onResult(false, error.getMessage());
+                if (callback != null) callback.onResult(false, error.getMessage());
             }
         });
     }
@@ -343,14 +357,14 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
             @Override
             public void onError(int code, RCLiveError error) {
-                callback.onResult(false, error.getMessage());
+                if (callback != null) callback.onResult(false, error.getMessage());
             }
         });
     }
 
     @Override
     public void MuteSelf(int index, boolean isMute, ClickCallback<Boolean> callback) {
-        this.isMute=isMute;
+        this.isMute = isMute;
         RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(isMute);
     }
 
@@ -377,7 +391,17 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void kickUserFromSeat(User user, ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().kictOutSeat(user.getUserId(), new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "抱下麦位成功");
+            }
 
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(false, error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -476,14 +500,32 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     @Override
     public void enterSeat(int index, ClickCallback<Boolean> callback) {
-        //判断当前是否有足够的视频位置
-//        RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByIndex(index);
-//        if (rcLiveSeatInfo == null) {
-//            EToast.showToast("麦位已满！");
-//            return;
-//        }
-        //上麦成功的话
-//        setCurrentStatus(STATUS_ON_SEAT);
+        RCLiveEngine.getInstance().enterSeat(index, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "连麦成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(true, error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void leaveSeat(ClickCallback<Boolean> callback) {
+        RCLiveEngine.getInstance().leaveSeat(new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback != null) callback.onResult(true, "断开链接成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback != null) callback.onResult(false, error.getMessage());
+            }
+        });
     }
 
     @Override
@@ -744,7 +786,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onLiveVideoRequestAccepted() {
-//        setCurrentStatus(STATUS_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestAccepted();
         }
@@ -899,10 +940,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onLiveVideoStarted() {
+        setCurrentStatus(STATUS_ON_SEAT);
+        EToast.showToast("连线成功");
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoStarted();
         }
-        setCurrentStatus(STATUS_ON_SEAT);
         Log.e(TAG, "onLiveVideoStarted: ");
     }
 
@@ -911,10 +953,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onLiveVideoStoped() {
+        setCurrentStatus(STATUS_NOT_ON_SEAT);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoStoped();
         }
-        setCurrentStatus(STATUS_NOT_ON_SEAT);
         Log.e(TAG, "onLiveVideoStoped: ");
     }
 
@@ -954,20 +996,13 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     }
 
     @Override
-    public void onLiveVideoUserClick(String userId) {
+    public void onRoomMixTypeChange(RCLiveMixType mixType, int customerType) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onLiveVideoUserClick(userId);
+            liveRoomListener.onRoomMixTypeChange(mixType, customerType);
         }
-        Log.e(TAG, "onLiveVideoUserClick: " + userId);
+        Log.e(TAG, "onRoomMixTypeChange: " + mixType);
     }
 
-    @Override
-    public void onLiveUserLayout(Map<String, RCRect> frameInfo) {
-        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onLiveUserLayout(frameInfo);
-        }
-        Log.e(TAG, "onLiveUserLayout: " + frameInfo);
-    }
 
     @Override
     public void onRoomDestory() {
@@ -986,18 +1021,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         Log.e(TAG, "onRoomDestory: ");
     }
 
-    /**
-     * 房间合流类型发生改变
-     *
-     * @param mixType 合流类型
-     */
-    @Override
-    public void onRoomMixTypeChange(RCLiveMixType mixType) {
-        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onRoomMixTypeChange(mixType);
-        }
-        Log.e(TAG, "onRoomMixTypeChange: " + mixType);
-    }
 
     @Override
     public void onSeatLocked(RCLiveSeatInfo seatInfo, boolean locked) {

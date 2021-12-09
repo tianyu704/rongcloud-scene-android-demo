@@ -84,17 +84,37 @@
         android:layout_height="45dp"
         android:layout_marginStart="30dp"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginEnd="30dp"
-        android:background="#33CDCDCD"
+        android:background="@drawable/live_room_btn_shape_gradient"
         android:gravity="center"
         android:text="邀请用户上麦"
         android:textColor="#FFFFFFFF"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/cl_member_setting"
+        app:layout_constraintBottom_toTopOf="@+id/btn_swich_seat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_member_name" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/btn_swich_seat"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/shape_set_live_layout_bg_selected"
+        android:gravity="center"
+        android:text="切换麦位"
+        android:textColor="#EF499A"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/cl_member_setting"
+        app:layout_constraintTop_toBottomOf="@+id/btn_invite_user_into_seat"
+        android:visibility="gone"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_member_setting"
@@ -102,8 +122,7 @@
         android:layout_height="115dp"
         android:layout_marginTop="20dp"
         android:background="#352D66"
-        app:layout_constraintTop_toBottomOf="@+id/btn_invite_user_into_seat">
-
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:id="@+id/ll_close_seat"

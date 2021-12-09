@@ -37,6 +37,7 @@ import cn.rong.combusis.common.ui.dialog.EditDialog;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
@@ -137,6 +138,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private MemberListFragment mMemberListFragment;
     private TextView tvGiftCount;
     private int marginTop;
+    private ConfirmDialog disConnectDiolog;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -254,13 +256,24 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private void initView() {
         flLiveView = (FrameLayout) getView().findViewById(R.id.fl_live_view);
         giftView = (GiftAnimationView) getView().findViewById(R.id.gift_view);
+        giftView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
+            @Override
+            public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
+                present.sendMessage(rcChatroomLike,false);
+            }
+
+            @Override
+            public void onSingleTap() {
+                roomBottomView.hideSoftKeyboardAndInput();
+            }
+        });
         clLiveRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_live_room_view);
         roomTitleBar = (RoomTitleBar) getView().findViewById(R.id.room_title_bar);
         tvNotice = (TextView) getView().findViewById(R.id.tv_notice);
         tvNotice.post(new Runnable() {
             @Override
             public void run() {
-                marginTop = (int) (tvNotice.getY()+tvNotice.getHeight()+10);
+                marginTop = (int) (tvNotice.getY() + tvNotice.getHeight() + 10);
             }
         });
         tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
@@ -288,8 +301,9 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         roomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
             @Override
             public void accept(Object o) throws Throwable {
-                mMemberListFragment = new MemberListFragment(mRoomId, LiveRoomFragment.this);
-                mMemberListFragment.show(getChildFragmentManager());
+                if (present.getRoomOwnerType()== RoomOwnerType.LIVE_VIEWER) {
+                    showMemberSettingFragment(present.getCreateUserId());
+                }
             }
         });
     }
@@ -299,7 +313,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      */
     private void showFinishDiolog() {
         if (finishDiolog == null) {
-            finishDiolog = new ConfirmDialog(requireContext(), "是否结束当前直播", true,
+            finishDiolog = new ConfirmDialog(requireContext(), "是否结束当前直播?", true,
                     "确定", "取消", null, new Function0<Unit>() {
                 @Override
                 public Unit invoke() {
@@ -312,6 +326,23 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     /**
+     * 显示是否结束连麦
+     */
+    private void showDisConnectDiolog() {
+        if (disConnectDiolog == null) {
+            disConnectDiolog = new ConfirmDialog(requireContext(), "是否结束本次连麦？", true,
+                    "确定", "取消", null, new Function0<Unit>() {
+                @Override
+                public Unit invoke() {
+                    present.disConnect(-1);
+                    return null;
+                }
+            });
+        }
+        disConnectDiolog.show();
+    }
+
+    /**
      * 点击右上角菜单按钮
      */
     private void clickMenu() {
@@ -319,8 +350,15 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             finish();
             return;
         }
+        //如果是房主
         if (present.getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
             showFinishDiolog();
+            return;
+        }
+        //如果是观众，但是观众在麦位上
+        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER
+                && LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
+            showDisConnectDiolog();
             return;
         }
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
@@ -412,7 +450,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void showMemberSettingFragment(String userId){
+    public void showMemberSettingFragment(String userId) {
         OkApi.post(VRApi.GET_USER, new OkParams().add("userIds", new String[]{userId}).build(), new WrapperCallBack() {
             @Override
             public void onResult(Wrapper result) {
@@ -440,75 +478,17 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     @Override
     public void showCreatorSettingFragment(RCLiveSeatInfo rcLiveSeatInfo) {
-        boolean isOwner=false;
+        boolean isOwner = false;
         if (present.getCreateUserId().equals(rcLiveSeatInfo.getUserId())) {
             //创建者
-            isOwner=true;
+            isOwner = true;
         }
         LiveRoomCreatorSettingFragment liveRoomCreatorSettingFragment = new LiveRoomCreatorSettingFragment(rcLiveSeatInfo.getIndex(),
                 LiveEventHelper.getInstance().isMute(), rcLiveSeatInfo.isEnableVideo()
-                , present.getCreateUser(), present,isOwner);
+                , present.getCreateUser(), present, isOwner);
         liveRoomCreatorSettingFragment.show(getLiveFragmentManager());
     }
 
-    //    /**
-//     * 麦位被点击的情况
-//     *
-//     * @param seatModel
-//     * @param position
-//     */
-//    private void onClickLiveRoomSeats(UiSeatModel seatModel, int position) {
-//        switch (present.getRoomOwnerType()) {
-//            case LIVE_OWNER://房主
-//                onClickVoiceRoomSeatsByOwner(seatModel, position);
-//                break;
-//            case LIVE_VIEWER://观众
-//                onClickVoiceRoomSeatsByViewer(seatModel, position);
-//                break;
-//        }
-//
-//    }
-//    /**
-//     * 观众点击麦位的时候
-//     *
-//     * @param seatModel
-//     * @param position
-//     */
-//    private void onClickVoiceRoomSeatsByViewer(UiSeatModel seatModel, int position) {
-//        if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
-//            // 点击锁定座位
-//            showToast("该座位已锁定");
-//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty) {
-//            //点击空座位 的时候
-//            present.enterSeatViewer(position);
-//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-//            if (!TextUtils.isEmpty(seatModel.getUserId()) && seatModel.getUserId().equals(AccountStore.INSTANCE.getUserId())) {
-//                // 点击自己头像
-//                present.showNewSelfSettingFragment(seatModel).show(getChildFragmentManager());
-//            } else {
-//                // 点击别人头像
-//                present.getUserInfo(seatModel.getUserId());
-//            }
-//        }
-//    }
-//
-//    /**
-//     * 房主点击麦位的时候
-//     *
-//     * @param seatModel
-//     * @param position
-//     */
-//    private void onClickVoiceRoomSeatsByOwner(UiSeatModel seatModel, int position) {
-//        if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusEmpty
-//                || seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusLocking) {
-//            //点击空座位或者锁定座位的时候，弹出弹窗
-//            present.enterSeatOwner(seatModel);
-//        } else if (seatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-//            //弹窗设置弹窗
-//            // 点击别人头像
-//            present.getUserInfo(seatModel.getUserId());
-//        }
-//    }
 
     /**
      * 发送全服广播
@@ -774,15 +754,18 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 //申请中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_request_enter_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
+                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_WAIT_FOR_SEAT:
                 //等待中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_wait_enter_seat);
+                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_ON_SEAT:
                 //已经在麦上
                 roomBottomView.setRequestSeatImage(R.drawable.ic_on_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(false);
+                roomTitleBar.setIsLinkSeat(true);
                 break;
         }
     }
@@ -806,13 +789,13 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void showRCLiveVideoView(RCLiveView videoView) {
         flLiveView.removeAllViews();
-        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
+        if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
             //如果是1V1的时候
             videoView.setDevTop(0);
-        }else {
+        } else {
             videoView.setDevTop(marginTop);
         }
-        videoView.attachParent(flLiveView,null);
+        videoView.attachParent(flLiveView, null);
     }
 
     @Override
