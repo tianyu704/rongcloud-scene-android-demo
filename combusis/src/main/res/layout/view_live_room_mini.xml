@@ -4,10 +4,4 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/live_room_video_view_shape_gradient">
-
-    <cn.rongcloud.rtc.api.stream.RCRTCVideoView
-        android:id="@+id/rtc_video_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true" />
 </RelativeLayout>

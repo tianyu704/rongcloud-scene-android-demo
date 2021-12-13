@@ -385,7 +385,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                     LiveEventHelper.getInstance().removeSeatViewProvider();
                     MiniRoomManager.getInstance().show(requireActivity(), mRoomId, requireActivity().getIntent()
                             , LiveEventHelper.getInstance());
-                    LiveEventHelper.getInstance().setOnLiveRoomChangeListener(MiniRoomManager.getInstance());
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }

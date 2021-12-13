@@ -34,15 +34,12 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
-import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
-import cn.rong.combusis.widget.miniroom.OnLiveRoomChangeListener;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 import cn.rongcloud.liveroom.api.RCLiveSeatViewProvider;
 import cn.rongcloud.liveroom.api.RCParamter;
-import cn.rongcloud.liveroom.api.SeatViewProvider;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.callback.RCLiveResultCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
@@ -817,7 +814,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoUpdate(lineMicUserIds);
         }
-        if (roomChangeListener!=null) roomChangeListener.onRoomStreamChange();
         Log.e(TAG, "onLiveVideoUpdate: " + lineMicUserIds);
     }
 
@@ -1060,11 +1056,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         Log.e(TAG, "onRoomMixTypeChange: " + mixType);
     }
 
-    private OnLiveRoomChangeListener roomChangeListener;
-    @Override
-    public void setOnLiveRoomChangeListener(OnLiveRoomChangeListener onLiveRoomChangeListener) {
-        this.roomChangeListener=onLiveRoomChangeListener;
-    }
 
     @Override
     public void onRoomDestory() {

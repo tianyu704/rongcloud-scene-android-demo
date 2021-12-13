@@ -168,7 +168,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     public void init(String roomId, boolean isCreate) {
         LiveEventHelper.getInstance().addLiveRoomListeners(this);
-        LiveEventHelper.getInstance().setOnLiveRoomChangeListener(null);
         isInRoom = TextUtils.equals(LiveEventHelper.getInstance().getRoomId(), roomId);
         getRoomInfo(roomId, isCreate);
     }
@@ -311,7 +310,20 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 }
                 //如果是自由上麦
                 if (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat)) {
-                    LiveEventHelper.getInstance().enterSeat(position, new ClickCallback<Boolean>() {
+                    int index = position;
+                    if (index==-1){
+                        for (RCLiveSeatInfo seatInfo : RCLiveEngine.getInstance().getSeatManager().getSeatInfos()) {
+                            if (TextUtils.isEmpty(seatInfo.getUserId())) {
+                                index=seatInfo.getIndex();
+                                break;
+                            }
+                        }
+                        if (index==-1){
+                            EToast.showToast("没有空闲的麦位!");
+                            return;
+                        }
+                    }
+                    LiveEventHelper.getInstance().enterSeat(index, new ClickCallback<Boolean>() {
                         @Override
                         public void onResult(Boolean result, String msg) {
                             EToast.showToast(msg);

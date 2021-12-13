@@ -10,6 +10,7 @@ import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.rongcloud.common.utils.ImageLoaderUtil;
 import com.rongcloud.common.utils.UiUtils;
@@ -19,26 +20,16 @@ import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
 
-import java.util.Arrays;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
-import cn.rongcloud.liveroom.api.RCLiveMixType;
-import cn.rongcloud.liveroom.core.Dispatcher;
-import cn.rongcloud.liveroom.utils.VMLog;
 import cn.rongcloud.liveroom.weight.RCLiveView;
-import cn.rongcloud.rtc.api.RCRTCEngine;
-import cn.rongcloud.rtc.api.RCRTCRoom;
-import cn.rongcloud.rtc.api.callback.IRCRTCResultCallback;
-import cn.rongcloud.rtc.api.stream.RCRTCCDNInputStream;
-import cn.rongcloud.rtc.api.stream.RCRTCVideoView;
-import cn.rongcloud.rtc.base.RTCErrorCode;
 
 /**
  * 语聊房的最小窗口管理器
  */
-public class MiniRoomManager implements OnMiniRoomListener, OnLiveRoomChangeListener {
+public class MiniRoomManager implements OnMiniRoomListener {
 
     public static final String TAG = "MiniRoomManager";
     private View miniWindows;
@@ -85,7 +76,7 @@ public class MiniRoomManager implements OnMiniRoomListener, OnLiveRoomChangeList
 
         }
     };
-    private RCRTCVideoView rcrtcVideoView;
+
 
     public static MiniRoomManager getInstance() {
         return MiniRoomManager.Holder.INSTANCE;
@@ -104,15 +95,27 @@ public class MiniRoomManager implements OnMiniRoomListener, OnLiveRoomChangeList
         this.roomId = roomId;
         this.onCloseMiniRoomListener = onCloseMiniRoomListener;
         miniWindows = LayoutInflater.from(context.getApplicationContext()).inflate(R.layout.view_live_room_mini, null);
-        rcrtcVideoView = miniWindows.findViewById(R.id.rtc_video_view);
-        RCRTCRoom room = RCRTCEngine.getInstance().getRoom();
-        if (room != null) {
-            RCRTCCDNInputStream cdnStream = room.getCDNStream();
-            if (cdnStream != null) {
-                cdnStream.setVideoView(rcrtcVideoView);
-                room.getLocalUser().subscribeStream(cdnStream, null);
-            }
+        RelativeLayout relativeLayout = miniWindows.findViewById(R.id.fl_content_id);
+        // 这里改成DP值
+        RCLiveView rcLiveView = RCLiveEngine.getInstance().preview();
+        if (relativeLayout != null) {
+            relativeLayout.removeAllViews();
         }
+        ViewParent parent = rcLiveView.getParent();
+        if (parent instanceof ViewGroup) {
+            ((ViewGroup) parent).removeAllViews();
+        }
+        FrameLayout.LayoutParams layoutParams =
+                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        rcLiveView.setLayoutParams(layoutParams);
+        rcLiveView.setDevTop(UiUtils.INSTANCE.dp2Px(context, 20));
+        relativeLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                relativeLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                rcLiveView.attachParent(relativeLayout, null);
+            }
+        });
         FloatWindow.with(context.getApplicationContext())
                 .setTag(TAG)
                 .setView(miniWindows)
@@ -138,24 +141,6 @@ public class MiniRoomManager implements OnMiniRoomListener, OnLiveRoomChangeList
         }
     }
 
-    @Override
-    public void onRoomStreamChange() {
-        Dispatcher.get().runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                if (rcrtcVideoView != null) {
-                    RCRTCRoom room = RCRTCEngine.getInstance().getRoom();
-                    if (room != null) {
-                        RCRTCCDNInputStream cdnStream = room.getCDNStream();
-                        if (cdnStream != null) {
-                            cdnStream.setVideoView(rcrtcVideoView);
-                            room.getLocalUser().subscribeStream(cdnStream, null);
-                        }
-                    }
-                }
-            }
-        }, 500);
-    }
 
     /**
      * 语聊房 电台房小窗口
