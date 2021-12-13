@@ -7,6 +7,7 @@ import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_WAIT_
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 
 import com.basis.UIStack;
@@ -33,8 +34,13 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
+import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
+import cn.rong.combusis.widget.miniroom.OnLiveRoomChangeListener;
+import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
+import cn.rongcloud.liveroom.api.RCLiveSeatViewProvider;
 import cn.rongcloud.liveroom.api.RCParamter;
 import cn.rongcloud.liveroom.api.SeatViewProvider;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
@@ -44,6 +50,7 @@ import cn.rongcloud.liveroom.api.interfaces.RCLiveEventListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveSeatListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
 import cn.rongcloud.liveroom.room.LiveRoomKvKey;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
@@ -73,7 +80,7 @@ import kotlin.jvm.functions.Function2;
  * 用来直播房的各种监听事件  发送消息 麦位操作等
  * 维护一定的集合来返回事件
  */
-public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, RCLiveLinkListener, RCLiveSeatListener {
+public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, RCLiveLinkListener, RCLiveSeatListener, OnCloseMiniRoomListener {
 
     private String TAG = "LiveEventHelper";
 
@@ -85,6 +92,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     private ConfirmDialog pickReceivedDialog;
     //麦克风是否被关闭
     private boolean isMute = false;
+    private SparseArray<RCHolder> holdes = new SparseArray<>(16);
 
     public boolean isMute() {
         return isMute;
@@ -111,16 +119,22 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         RCLiveEngine.getInstance().setLiveEventListener(this);
         RCLiveEngine.getInstance().getLinkManager().setLiveLinkListener(this);
         RCLiveEngine.getInstance().getSeatManager().setLiveSeatListener(this);
-        liveRoomListeners.clear();
-        RCLiveEngine.getInstance().setSeatViewProvider(new SeatViewProvider() {
-            @Override
-            public View provideSeatView(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
-                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-                    return liveRoomListener.setSeatViewProvider(seatInfo, rcParamter);
-                }
-                return null;
-            }
-        });
+        setSeatViewProvider();
+    }
+
+    @Override
+    public RCHolder getHold(int index) {
+        if (holdes.size() > index) {
+            return holdes.get(index);
+        }
+        return null;
+    }
+
+    @Override
+    public void onSeatSpeak(RCLiveSeatInfo seatInfo, int audioLevel) {
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onSeatSpeak(seatInfo, audioLevel);
+        }
     }
 
     @Override
@@ -129,10 +143,45 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         this.createUserId = null;
         setCurrentStatus(STATUS_NOT_ON_SEAT);
         messageList.clear();
-        liveRoomListeners.clear();
+        removeLiveRoomListeners();
         RCLiveEngine.getInstance().unPrepare(null);
         RCLiveEngine.getInstance().setSeatViewProvider(null);
         isMute = false;
+        holdes.clear();
+        removeSeatViewProvider();
+    }
+
+    /**
+     * 设置provider
+     */
+    public void setSeatViewProvider() {
+        RCLiveEngine.getInstance().setSeatViewProvider(new RCLiveSeatViewProvider() {
+            @Override
+            public void conver(RCHolder holder, RCLiveSeatInfo seat, RCParamter paramter) {
+                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+                    liveRoomListener.onBindView(holder, seat, paramter);
+                }
+            }
+
+            @Override
+            public View inflate(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+                for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+                    return liveRoomListener.inflaterSeatView(seatInfo, rcParamter);
+                }
+                return null;
+            }
+
+            @Override
+            public void onListenerHolds(SparseArray<RCHolder> rcHolderSparseArray) {
+                holdes = rcHolderSparseArray;
+            }
+        });
+    }
+    /**
+     * 移除provider
+     */
+    public void removeSeatViewProvider() {
+        RCLiveEngine.getInstance().setSeatViewProvider(null);
     }
 
 
@@ -294,7 +343,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 //锁座位成功
                 if (callback != null)
                     callback.onResult(true, isClose ? "座位已关闭" : "座位已开启");
-                RCLiveEngine.getInstance().preview().updateLayout();
             }
 
             @Override
@@ -658,6 +706,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * @param liveRoomListener
      */
     public void addLiveRoomListeners(LiveRoomListener liveRoomListener) {
+        Log.e(TAG, "addLiveRoomListeners: ");
         liveRoomListeners.add(liveRoomListener);
     }
 
@@ -665,6 +714,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * 清除直播房fragment监听
      */
     public void removeLiveRoomListeners() {
+        Log.e(TAG, "removeLiveRoomListeners: ");
         liveRoomListeners.clear();
     }
 
@@ -679,6 +729,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         if (!TextUtils.isEmpty(roomId))
             if (messageContent instanceof RCChatroomLocationMessage) {
                 RCChatRoomMessageManager.INSTANCE.sendLocationMessage(roomId, messageContent);
+                messageList.add(messageContent);
             } else {
                 RCChatRoomMessageManager.INSTANCE.sendChatMessage(roomId, messageContent, isShowLocation
                         , new Function1<Integer, Unit>() {
@@ -750,7 +801,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         }
         //被踢出房间，调用离开房间接口和反注册
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
-            EToast.showToast(TextUtils.equals(operatorId,createUserId)?"您被房主踢出房间":"您被管理员踢出房间");
+            EToast.showToast(TextUtils.equals(operatorId, createUserId) ? "您被房主踢出房间" : "您被管理员踢出房间");
             leaveRoom(null);
         }
         Log.e(TAG, "onUserKitOut: ");
@@ -766,6 +817,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoUpdate(lineMicUserIds);
         }
+        if (roomChangeListener!=null) roomChangeListener.onRoomStreamChange();
         Log.e(TAG, "onLiveVideoUpdate: " + lineMicUserIds);
     }
 
@@ -952,10 +1004,15 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * 连麦结束
      */
     @Override
-    public void onLiveVideoStoped() {
+    public void onLiveVideoStoped(RCLivevideoFinishReason reason) {
         setCurrentStatus(STATUS_NOT_ON_SEAT);
+        if (reason == RCLivevideoFinishReason.RCLivevideoFinishReasonKick) {
+            EToast.showToast("您被抱下麦位");
+        }else if (reason==RCLivevideoFinishReason.RCLivevideoFinishReasonMix){
+            EToast.showToast("麦位切换模式，请重新上麦");
+        }
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onLiveVideoStoped();
+            liveRoomListener.onLiveVideoStoped(reason);
         }
         Log.e(TAG, "onLiveVideoStoped: ");
     }
@@ -1003,6 +1060,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         Log.e(TAG, "onRoomMixTypeChange: " + mixType);
     }
 
+    private OnLiveRoomChangeListener roomChangeListener;
+    @Override
+    public void setOnLiveRoomChangeListener(OnLiveRoomChangeListener onLiveRoomChangeListener) {
+        this.roomChangeListener=onLiveRoomChangeListener;
+    }
 
     @Override
     public void onRoomDestory() {
@@ -1048,6 +1110,23 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onSeatVideoEnable(seatInfo, enable);
         }
+    }
+
+    @Override
+    public void onCloseMiniRoom(CloseResult closeResult) {
+        leaveRoom(new LeaveRoomCallBack() {
+            @Override
+            public void onSuccess() {
+                if (closeResult != null) {
+                    closeResult.onClose();
+                }
+            }
+
+            @Override
+            public void onError(int code, String message) {
+
+            }
+        });
     }
 
 

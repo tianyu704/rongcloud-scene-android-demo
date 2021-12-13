@@ -6,6 +6,7 @@ import android.view.View;
 import java.util.List;
 
 import cn.rong.combusis.provider.user.User;
+import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCParamter;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveEventListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
@@ -39,5 +40,11 @@ public interface LiveRoomListener extends RCLiveEventListener, RCLiveLinkListene
      * @param rcParamter
      * @return
      */
-    View setSeatViewProvider(RCLiveSeatInfo seatInfo, RCParamter rcParamter);
+    View inflaterSeatView(RCLiveSeatInfo seatInfo, RCParamter rcParamter);
+
+
+    /**
+     * 绑定数据到view上
+     */
+    void onBindView(RCHolder holder, RCLiveSeatInfo seat, RCParamter paramter);
 }

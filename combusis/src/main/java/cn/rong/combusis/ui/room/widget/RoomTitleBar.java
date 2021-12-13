@@ -79,6 +79,9 @@ public class RoomTitleBar extends ConstraintLayout {
         });
 
     }
+    public Observable setOnLineMemberClickListener() {
+        return RxView.clicks(tvRoomOnlineCount).throttleFirst(1, TimeUnit.SECONDS);
+    }
 
     public Observable setOnMemberClickListener() {
         return RxView.clicks(mLeftView).throttleFirst(1, TimeUnit.SECONDS);
@@ -127,7 +130,7 @@ public class RoomTitleBar extends ConstraintLayout {
      * 是否在麦位上
      */
     public void setIsLinkSeat(boolean isLinkSeat){
-        if (roomOwnerType.equals(RoomOwnerType.LIVE_VIEWER)) {
+        if (roomOwnerType!=null&&roomOwnerType.equals(RoomOwnerType.LIVE_VIEWER)) {
             if (isLinkSeat){
                 mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_live_room));
             }else {

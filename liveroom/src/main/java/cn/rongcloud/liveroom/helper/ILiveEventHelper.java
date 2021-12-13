@@ -6,6 +6,8 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.widget.miniroom.OnLiveRoomChangeListener;
+import cn.rongcloud.liveroom.api.RCHolder;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -22,6 +24,11 @@ public interface ILiveEventHelper {
      * @param roomId
      */
     void register(String roomId);
+
+    /**
+     * 获取hodele
+     */
+    RCHolder getHold(int index);
 
     /**
      * 反注册
@@ -186,4 +193,10 @@ public interface ILiveEventHelper {
      */
     void getInvitateLiveVideoIds(ClickCallback<List<String>> callback);
 
+
+    /**
+     * 设置最小化窗口的直播房监听
+     * @param roomChangeListener
+     */
+    void setOnLiveRoomChangeListener(OnLiveRoomChangeListener roomChangeListener);
 }

@@ -78,6 +78,7 @@ import cn.rong.combusis.ui.room.widget.GiftAnimationView;
 import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.liveroom.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
@@ -259,7 +260,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         giftView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
             @Override
             public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
-                present.sendMessage(rcChatroomLike,false);
+                present.sendMessage(rcChatroomLike, false);
             }
 
             @Override
@@ -301,9 +302,16 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         roomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
             @Override
             public void accept(Object o) throws Throwable {
-                if (present.getRoomOwnerType()== RoomOwnerType.LIVE_VIEWER) {
+                if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER) {
                     showMemberSettingFragment(present.getCreateUserId());
                 }
+            }
+        });
+        roomTitleBar.setOnLineMemberClickListener().subscribe(new Consumer() {
+            @Override
+            public void accept(Object o) throws Throwable {
+                mMemberListFragment = new MemberListFragment(present.getRoomId(), LiveRoomFragment.this);
+                mMemberListFragment.show(getChildFragmentManager());
             }
         });
     }
@@ -371,13 +379,13 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             public void clickPackRoom() {
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
-
-                    requireActivity().finish();
-
+                    finish();
                     //缩放动画,并且显示悬浮窗，在这里要做悬浮窗判断
                     requireActivity().overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-
-//                    MiniRoomManager.getInstance().show(requireContext(),mRoomId, present.getThemePictureUrl(), requireActivity().getIntent(), EventHelper.helper());
+                    LiveEventHelper.getInstance().removeSeatViewProvider();
+                    MiniRoomManager.getInstance().show(requireActivity(), mRoomId, requireActivity().getIntent()
+                            , LiveEventHelper.getInstance());
+                    LiveEventHelper.getInstance().setOnLiveRoomChangeListener(MiniRoomManager.getInstance());
                 } else {
                     showOpenOverlaysPermissionDialog();
                 }
@@ -678,6 +686,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      */
     @Override
     public void showFinishView() {
+        flLiveView.setVisibility(View.INVISIBLE);
         clLiveRoomView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.VISIBLE);
     }
@@ -690,6 +699,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void setRoomData(VoiceRoomBean voiceRoomBean) {
         clLiveRoomView.setVisibility(View.VISIBLE);
+        flLiveView.setVisibility(View.VISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
         // 设置title数据
         User createUser = voiceRoomBean.getCreateUser();
@@ -764,6 +774,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             case STATUS_WAIT_FOR_SEAT:
                 //等待中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_wait_enter_seat);
+                ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
                 roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_ON_SEAT:
