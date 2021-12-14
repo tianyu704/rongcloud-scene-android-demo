@@ -16,7 +16,10 @@ public class LiveRoomKvKey {
     public final static String LIVE_ROOM_SHIELDS = "shields";
     //房间上麦模式
     public final static String LIVE_ROOM_ENTER_SEAT_MODE = "FreeEnterSeat";
-
+    //分辨率
+    public final static String LIVE_ROOM_VIDEO_RESOLUTION = "RCRTCVideoResolution";
+    //帧率
+    public final static String LIVE_ROOM_VIDEO_FPS = "RCRTCVideoFps";
     public class EnterSeatMode {
         //申请上麦
         public final static String LIVE_ROOM_RequestEnterSeat = "0";

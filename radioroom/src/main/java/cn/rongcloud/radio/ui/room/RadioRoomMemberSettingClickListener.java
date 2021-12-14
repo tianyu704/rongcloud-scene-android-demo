@@ -61,7 +61,7 @@ public interface RadioRoomMemberSettingClickListener extends MemberSettingFragme
     }
 
     @Override
-    default void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+    default void switchToSeat(int seatIndex, ClickCallback<Boolean> callback) {
 
     }
 }

@@ -1,6 +1,7 @@
 package cn.rongcloud.liveroom.helper;
 
 import java.util.List;
+import java.util.Map;
 
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
@@ -181,16 +182,21 @@ public interface ILiveEventHelper {
      */
     void getRoomInfoByKey(String key, ClickCallback<Boolean> callback);
 
+    /**
+     * 获取房间内的KV消息
+     */
+    void getRoomInfoByKey(List<String> keys, ClickCallback<Map<String, String>> callback);
+
 
     /**
      * 获取申请上麦用户人数
      */
     void getRequestLiveVideoIds(ClickCallback<List<String>> callback);
 
-    /**
-     * 获取当前邀请上麦的用户人数
-     */
-    void getInvitateLiveVideoIds(ClickCallback<List<String>> callback);
+//    /**
+//     * 获取当前邀请上麦的用户人数
+//     */
+//    void getInvitateLiveVideoIds(ClickCallback<List<String>> callback);
 
 
 }

@@ -169,7 +169,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
             dismiss();
         } else if (id == R.id.btn_swich_seat) {
             if (seatActionClickListener != null)
-                seatActionClickListener.swichToSeat(index, new ClickCallback<Boolean>() {
+                seatActionClickListener.switchToSeat(index, new ClickCallback<Boolean>() {
                     @Override
                     public void onResult(Boolean result, String msg) {
                         EToast.showToast(msg);

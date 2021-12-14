@@ -29,7 +29,9 @@ import com.rongcloud.common.utils.UiUtils;
 import com.yanzhenjie.recyclerview.widget.DefaultItemDecoration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.ConfirmDialog;
@@ -71,7 +73,7 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSpecialEffectsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomTagsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSetFun;
-import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSettingFragment;
+import cn.rong.combusis.ui.room.fragment.RoomVideoSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.GiftAnimationView;
@@ -557,10 +559,15 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 texiaoDialog = new BeautyDialogFragment(requireActivity(), MHConfigConstants.TE_XIAO);
             texiaoDialog.show();
         } else if (fun instanceof RoomVideoSetFun) {
-            if (roomVideoSettingFragment == null)
-                roomVideoSettingFragment = new RoomVideoSettingFragment();
-            //传进去当前的分辨率和帧率
-            roomVideoSettingFragment.show(getLiveFragmentManager());
+            List<String> keys = Arrays.asList(LiveRoomKvKey.LIVE_ROOM_VIDEO_RESOLUTION, LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS);
+            LiveEventHelper.getInstance().getRoomInfoByKey(keys, new ClickCallback<Map<String, String>>() {
+                @Override
+                public void onResult(Map<String, String> result, String msg) {
+                    //传进去最新的分辨率和帧率
+                    roomVideoSettingFragment = new RoomVideoSettingFragment(result.get(LiveRoomKvKey.LIVE_ROOM_VIDEO_RESOLUTION), result.get(LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS), present);
+                    roomVideoSettingFragment.show(getLiveFragmentManager());
+                }
+            });
         }
     }
 

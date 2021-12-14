@@ -69,5 +69,5 @@ public interface SeatActionClickListener {
     /**
      * 切换麦位
      */
-    void swichToSeat(int seatIndex,ClickCallback<Boolean> callback);
+    void switchToSeat(int seatIndex, ClickCallback<Boolean> callback);
 }

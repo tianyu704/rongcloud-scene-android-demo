@@ -1010,7 +1010,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     }
 
     @Override
-    public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+    public void switchToSeat(int seatIndex, ClickCallback<Boolean> callback) {
 
     }
 

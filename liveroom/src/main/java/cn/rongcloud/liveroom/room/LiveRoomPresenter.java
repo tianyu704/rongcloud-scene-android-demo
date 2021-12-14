@@ -77,6 +77,7 @@ import cn.rong.combusis.ui.room.dialog.shield.Shield;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.LiveLayoutSettingCallBack;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.RoomVideoSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyFun;
@@ -117,6 +118,7 @@ import cn.rongcloud.liveroom.helper.LiveRoomListener;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
+import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -139,7 +141,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         MemberSettingFragment.OnMemberSettingClickListener,
         ICommonDialog, LiveRoomListener, GiftFragment.OnSendGiftListener
         , RoomBottomView.OnBottomOptionClickListener, LiveLayoutSettingCallBack
-        , LiveRoomCreatorSettingFragment.OnCreatorSettingClickListener {
+        , LiveRoomCreatorSettingFragment.OnCreatorSettingClickListener
+        , RoomVideoSettingFragment.OnVideoConfigSetting {
 
     private String TAG = "LiveRoomPresenter";
 
@@ -1013,7 +1016,14 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param callback
      */
     @Override
-    public void swichToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+    public void switchToSeat(int seatIndex, ClickCallback<Boolean> callback) {
+        RCLiveSeatInfo rcLiveSeatInfo = RCLiveEngine.getInstance().getSeatManager().getSeatInfos().get(seatIndex);
+        if (rcLiveSeatInfo!=null){
+            if (rcLiveSeatInfo.isLock()) {
+                EToast.showToast("麦位已上锁！");
+                return;
+            }
+        }
         LiveEventHelper.getInstance().swichToSeat(seatIndex, callback);
     }
 
@@ -1127,7 +1137,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     @Override
-    public void onliveVideoInvitationReceived() {
+    public void onliveVideoInvitationReceived(String userId, int index) {
+
     }
 
     @Override
@@ -1682,5 +1693,15 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 }
             }
         }
+    }
+
+    @Override
+    public void updateVideoResolution(RCRTCParamsType.RCRTCVideoResolution resolution) {
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_RESOLUTION,resolution.getLabel(),null);
+    }
+
+    @Override
+    public void updateVideoFps(RCRTCParamsType.RCRTCVideoFps fps) {
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS,fps.getFps()+"",null);
     }
 }
