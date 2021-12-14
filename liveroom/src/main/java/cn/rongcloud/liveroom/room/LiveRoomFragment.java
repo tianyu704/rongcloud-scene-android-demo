@@ -444,6 +444,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     public void onClick(View v) {
         if (v.getId() == R.id.btn_go_back_list) {
             requireActivity().finish();
+            LiveEventHelper.getInstance().unRegister();
         } else if (v.getId() == R.id.tv_notice) {
             showNoticeDialog(false);
         }

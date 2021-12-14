@@ -265,6 +265,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     mView.dismissLoading();
                     if (result) {
                         setCurrentRoom(mVoiceRoomBean, isCreate);
+                    }else {
+                        //房间不存在了
+                        mView.showFinishView();
+                        leaveRoom(roomId, isCreate, false);
                     }
                 }
             });
