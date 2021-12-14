@@ -1,6 +1,7 @@
 package cn.rong.combusis.ui.room.fragment;
 
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.manager.RCDataManager;
+import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 
 /**
@@ -26,7 +28,6 @@ import cn.rongcloud.rtc.base.RCRTCParamsType;
  * @date 2021/11/19
  */
 public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
-
 
     private TextView tvTitle;
     private View vDivider;
@@ -36,14 +37,23 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
     private RecyclerView rvFrame;
     private TextView tvCodeRateTitle;
     private TextView tvCodeRate;
-    private RCRTCParamsType.RCRTCVideoResolution resolution = RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640;
-    private RCRTCParamsType.RCRTCVideoFps videoFps = RCRTCParamsType.RCRTCVideoFps.Fps_15;
+    private RCRTCParamsType.RCRTCVideoResolution resolution;
+    private RCRTCParamsType.RCRTCVideoFps videoFps;
     private OnVideoConfigSetting onVideoConfigSetting;
 
     public RoomVideoSettingFragment(String resolution, String fps, OnVideoConfigSetting onVideoConfigSetting) {
         super(R.layout.fragment_room_video_settings);
-//        RCRTCParamsType.RCRTCVideoResolution.parseVideoResolution(2, 3);
-        RCRTCParamsType.RCRTCVideoFps.parseVideoFps(Integer.parseInt(fps));
+        if (!TextUtils.isEmpty(resolution)) {
+            String[] xes = resolution.split("x");
+            this.resolution = RCRTCParamsType.RCRTCVideoResolution.parseVideoResolution(Integer.parseInt(xes[0]), Integer.parseInt(xes[1]));
+        }else {
+            this.resolution= RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoResolution();
+        }
+        if (!TextUtils.isEmpty(fps)) {
+            this.videoFps = RCRTCParamsType.RCRTCVideoFps.parseVideoFps(Integer.parseInt(fps));
+        }else {
+            this.videoFps=RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoFps();
+        }
         this.onVideoConfigSetting = onVideoConfigSetting;
     }
 
