@@ -34,6 +34,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
@@ -817,6 +818,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         //被踢出房间，调用离开房间接口和反注册
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
             EToast.showToast(TextUtils.equals(operatorId, createUserId) ? "您被房主踢出房间" : "您被管理员踢出房间");
+            MiniRoomManager.getInstance().close();
             leaveRoom(null);
         }
         Log.e(TAG, "onUserKitOut: ");
