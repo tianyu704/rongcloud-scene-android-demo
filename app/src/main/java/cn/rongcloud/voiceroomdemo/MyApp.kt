@@ -72,11 +72,8 @@ class MyApp : ComApplication() {
 //        cn.rongcloud.voiceroomdemo
 //        授权码：
 //        46a8c05ea8fedb279d53d9bd238637fe
-        if (BuildConfig.DEBUG) {
-            MHSDK.init(this, "cbb3a9f01d9fa52c0367ef8703f64327")
-        } else {
-            MHSDK.init(this, "46a8c05ea8fedb279d53d9bd238637fe")
-        }
+
+        MHSDK.init(this, BuildConfig.MH_APP_KEY)
         // 退出或者账号被挤下线的流程
         AccountStore.obLogoutSubject().subscribe {
             try {

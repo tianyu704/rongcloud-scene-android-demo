@@ -34,6 +34,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.liveroom.api.RCHolder;
@@ -303,6 +304,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onSuccess() {
                 if (callback != null)
                     callback.onResult(true, "拒绝请求连麦成功");
+                MemberCache.getInstance().refreshMemberData(roomId);
             }
 
             @Override
@@ -501,7 +503,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onError(int code, RCLiveError error) {
                 Log.e("TAG", "onError: " + code);
                 if (callback != null)
-                    callback.onResult(false, "开启直播失败");
+                    callback.onResult(false, "开启直播失败"+":"+code);
             }
         });
     }
@@ -867,6 +869,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     public void onLiveVideoRequestRejected() {
         cancelRequestSeat(null);
         setCurrentStatus(STATUS_NOT_ON_SEAT);
+        EToast.showToast("房主拒绝了您的上麦申请");
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoRequestRejected();
         }

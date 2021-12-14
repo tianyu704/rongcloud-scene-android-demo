@@ -99,6 +99,7 @@ android {
 //            buildConfigField("String","BASE_SERVER_ADDRES","\"http://172.29.208.9:8081/\"")
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://rcrtc-api.rongcloud.net/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
+            buildConfigField("String", "MH_APP_KEY", "\"cbb3a9f01d9fa52c0367ef8703f64327\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name_test"]
         }
         releaseEnvironment {
@@ -109,6 +110,7 @@ android {
 //            buildConfigField("String", "BASE_SERVER_ADDRES", "\"http://120.92.102.127:8081/\"")
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://apiv1-rcrtc.rongcloud.cn/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
+            buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name"]
         }
     }

@@ -29,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.google.gson.JsonArray;
 import com.jakewharton.rxbinding4.view.RxView;
 import com.kit.UIKit;
+import com.kit.utils.KToast;
 import com.kit.utils.Logger;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
@@ -654,6 +655,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 mView.dismissLoading();
                 if (result) {
                     setCurrentRoom(mVoiceRoomBean, isCreate);
+                }else {
+                    KToast.show(msg);
                 }
             }
         });
@@ -1016,6 +1019,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback) {
+        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
+            EToast.showToast("默认模式不支持关闭座位");
+            return;
+        }
         LiveEventHelper.getInstance().lockSeat(seatIndex, isLock, callback);
     }
 
