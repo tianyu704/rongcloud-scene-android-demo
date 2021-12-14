@@ -100,7 +100,7 @@ public abstract class AbsPKHelper extends AbsEvenHelper {
      * @param rcpkInfo
      */
     @Override
-    public void onPKConnect(@NonNull RCPKInfo rcpkInfo) {
+    public void onPKGoing(@NonNull RCPKInfo rcpkInfo) {
         Logger.e(TAG, "onPKConnect");
         //邀请同意 开始PK 释放被邀请信息
         VoiceRoomApi.getApi().releasePKInvitee();

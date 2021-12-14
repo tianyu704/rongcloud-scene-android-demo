@@ -5,8 +5,6 @@
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
 import androidx.appcompat.app.AppCompatActivity
-import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
-import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
 import com.kit.cache.GsonUtil
@@ -14,6 +12,8 @@ import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.scopes.ActivityScoped
+import io.rong.imkit.RongIM
+import io.rong.imlib.RongIMClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -48,7 +48,6 @@ class LoginPresenter @Inject constructor(
                     }
                     .subscribe({ bean ->
                         view.apply {
-
                             if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                                 setNextVerificationDuring(60 * 1000L)
                             } else {
@@ -82,21 +81,23 @@ class LoginPresenter @Inject constructor(
                                     this.phone = phoneNumber
                                 })
                                 if (!AccountStore.getImToken().isNullOrBlank()) {
-                                    RCVoiceRoomEngine
-                                        .getInstance()
-                                        .connectWithToken(
-                                            AccountStore.getImToken(),
-                                            object : RCVoiceRoomCallback {
-                                                override fun onError(code: Int, message: String?) {
-                                                    view.hideWaitingDialog()
-                                                    view.showError(code, message)
-                                                }
+                                    RongIM.connect(
+                                        AccountStore.getImToken(),
+                                        object : RongIMClient.ConnectCallback() {
+                                            override fun onSuccess(t: String?) {
+                                                view.hideWaitingDialog()
+                                                view.onLoginSuccess()
+                                            }
 
-                                                override fun onSuccess() {
-                                                    view.hideWaitingDialog()
-                                                    view.onLoginSuccess()
-                                                }
-                                            })
+                                            override fun onError(e: RongIMClient.ConnectionErrorCode?) {
+                                                view.hideWaitingDialog()
+                                                e?.value?.let { view.showError(it, e.name) }
+                                            }
+
+                                            override fun onDatabaseOpened(code: RongIMClient.DatabaseOpenStatus?) {
+                                                TODO("Not yet implemented")
+                                            }
+                                        })
                                 }
                             } else {
                                 view.showError(bean.code, bean.msg)
