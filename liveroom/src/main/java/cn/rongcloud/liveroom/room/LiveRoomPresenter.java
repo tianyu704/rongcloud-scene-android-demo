@@ -314,14 +314,14 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 //如果是自由上麦
                 if (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat)) {
                     int index = position;
-                    if (index==-1){
+                    if (index == -1) {
                         for (RCLiveSeatInfo seatInfo : RCLiveEngine.getInstance().getSeatManager().getSeatInfos()) {
                             if (TextUtils.isEmpty(seatInfo.getUserId())) {
-                                index=seatInfo.getIndex();
+                                index = seatInfo.getIndex();
                                 break;
                             }
                         }
-                        if (index==-1){
+                        if (index == -1) {
                             EToast.showToast("没有空闲的麦位!");
                             return;
                         }
@@ -541,6 +541,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         });
     }
 
+    /**
+     * 更改公告信息
+     * @param notice 公告内容
+     */
     @Override
     public void modifyNotice(String notice) {
         LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_NOTICE, notice, new ClickCallback<Boolean>() {
@@ -724,8 +728,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         });
     }
 
+
     /**
-     * 在这里处理接收所有的消息
+     * 监听接收房间的所有信息
+     * @param roomId
      */
     private void setObMessageListener(String roomId) {
         disposablesManager.add(RCChatRoomMessageManager.INSTANCE.
@@ -1018,7 +1024,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void switchToSeat(int seatIndex, ClickCallback<Boolean> callback) {
         RCLiveSeatInfo rcLiveSeatInfo = RCLiveEngine.getInstance().getSeatManager().getSeatInfos().get(seatIndex);
-        if (rcLiveSeatInfo!=null){
+        if (rcLiveSeatInfo != null) {
             if (rcLiveSeatInfo.isLock()) {
                 EToast.showToast("麦位已上锁！");
                 return;
@@ -1389,7 +1395,229 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
 
     /**
+     * 构建布局
+     *
+     * @param rcParamter
+     * @return
+     */
+    private View createEmptyMicLayout(RCParamter rcParamter) {
+        int seatHeight = rcParamter.getHeight();
+        int seatWidth = rcParamter.getWidth();
+        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_offline_layout, null);
+        ConstraintLayout.LayoutParams layoutParams =
+                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
+        view.setLayoutParams(layoutParams);
+        return view;
+    }
+
+    /**
+     * 构建连麦布局
+     *
+     * @param rcParamter
+     */
+    private View createMicLayout(RCParamter rcParamter) {
+        int seatHeight = rcParamter.getHeight();
+        int seatWidth = rcParamter.getWidth();
+        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_online_layout, null);
+        ConstraintLayout.LayoutParams layoutParams =
+                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
+        view.setLayoutParams(layoutParams);
+        ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
+        WaveView waveView = view.findViewById(R.id.wv_creator_background);
+        setViewLayoutParams(imageView, seatWidth / 3, seatHeight / 3);
+        setViewLayoutParams(waveView, seatWidth, seatHeight);
+        return view;
+    }
+
+
+    /**
+     * 重设 view 的宽高
+     */
+    public static void setViewLayoutParams(View view, int nWidth, int nHeight) {
+        ViewGroup.LayoutParams lp = view.getLayoutParams();
+        if (lp.height != nHeight || lp.width != nWidth) {
+            lp.width = nWidth;
+            lp.height = nHeight;
+            view.setLayoutParams(lp);
+        }
+    }
+
+    @Override
+    public void onSeatLocked(RCLiveSeatInfo seatInfo, boolean locked) {
+
+    }
+
+    @Override
+    public void onSeatMute(RCLiveSeatInfo seatInfo, boolean mute) {
+
+    }
+
+    @Override
+    public void onSeatAudioEnable(RCLiveSeatInfo seatInfo, boolean enable) {
+
+    }
+
+    @Override
+    public void onSeatVideoEnable(RCLiveSeatInfo seatInfo, boolean enable) {
+
+    }
+
+    /**
+     * 切换音视频
+     *
+     * @param index
+     * @param isVideo
+     */
+    @Override
+    public void clickSwitchLinkStatus(int index, boolean isVideo) {
+        LiveEventHelper.getInstance().switchVideoOrAudio(index, isVideo, null);
+    }
+
+    /**
+     * 开关本地麦克风
+     *
+     * @param index
+     * @param isMute
+     */
+    @Override
+    public void clickMuteSelf(int index, boolean isMute) {
+        LiveEventHelper.getInstance().MuteSelf(index, isMute, null);
+    }
+
+    /**
+     * 断开链接
+     *
+     * @param index
+     */
+    @Override
+    public void disConnect(int index) {
+        LiveEventHelper.getInstance().leaveSeat(new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                EToast.showToast(msg);
+            }
+        });
+    }
+
+    /**
+     * 生成布局
+     *
+     * @param seatInfo
+     * @param rcParamter
+     * @return
+     */
+    @Override
+    public View inflaterSeatView(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
+        String userId = seatInfo.getUserId();
+        Log.e(TAG, "setSeatViewProvider: width" + rcParamter.getWidth());
+        Log.e(TAG, "setSeatViewProvider: heigth" + rcParamter.getHeight());
+        View view = null;
+        //麦位为默认的1V1的时候
+        if (!TextUtils.isEmpty(userId)) {
+            if (TextUtils.equals(userId, getCreateUserId()) && rcParamter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+                //如果是1V1，而且当前是房主，也不应该显示视图
+                view = null;
+            } else {
+                view = createMicLayout(rcParamter);
+            }
+        } else {
+            // 麦位没人的时候
+            if (rcParamter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+                //如果当前是1V1，那么小视图应该不显示覆盖
+                view = null;
+            } else {
+                view = createEmptyMicLayout(rcParamter);
+            }
+        }
+        return view;
+    }
+
+    /**
+     * 刷新视图的信息
+     *
+     * @param holder   麦位布局
+     * @param seatInfo 麦位信息
+     * @param paramter 当前麦位布局的参数信息
+     */
+    @Override
+    public void onBindView(RCHolder holder, RCLiveSeatInfo seatInfo, RCParamter paramter) {
+        if (holder != null) {
+            View view = holder.rootView();
+            if (TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
+                //如果麦位为空的话，那么应该是空布局
+                TextView name = view.findViewById(R.id.tv_member_name);
+                name.setText(seatInfo.getIndex() + "号麦位");
+                ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
+                if (seatInfo.isMute()) {
+                    isMuteView.setVisibility(View.VISIBLE);
+                } else {
+                    isMuteView.setVisibility(View.GONE);
+                }
+                ImageView seatStatusView = view.findViewById(R.id.iv_seat_status);
+                if (seatInfo.isLock()) {
+                    name.setVisibility(View.GONE);
+                    seatStatusView.setImageResource(R.drawable.ic_seat_status_locked);
+                } else {
+                    name.setVisibility(View.VISIBLE);
+                    seatStatusView.setImageResource(R.drawable.ic_seat_status_enter);
+                }
+            } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
+                //有人在麦位上的布局
+                TextView name = view.findViewById(R.id.tv_member_name);
+                RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
+                ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
+                //根据麦位信息来判断是否开启还是关闭动画效果
+                ImageView ivBackGroup = view.findViewById(R.id.iv_background);
+                TextView tv_gift_count = view.findViewById(R.id.tv_gift_count);
+
+                if (TextUtils.equals(seatInfo.getUserId(), getCreateUserId())) {
+                    tv_gift_count.setVisibility(View.GONE);
+                } else {
+                    tv_gift_count.setVisibility(View.VISIBLE);
+                    if (giftMap != null) {
+                        String giftCount = giftMap.get(seatInfo.getUserId());
+                        tv_gift_count.setText(TextUtils.isEmpty(giftCount) ? "0" : giftCount);
+                    }
+                }
+                ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
+                if (seatInfo.isMute()) {
+                    isMuteView.setVisibility(View.VISIBLE);
+                } else {
+                    isMuteView.setVisibility(View.GONE);
+                }
+                UserProvider.provider().getAsyn(seatInfo.getUserId(), new IResultBack<UserInfo>() {
+                    @Override
+                    public void onResult(UserInfo userInfo) {
+                        name.setText(userInfo.getName());
+                        ImageLoaderUtil.INSTANCE.loadImage(mView.getLiveActivity(), imageView, userInfo.getPortraitUri(), R.drawable.img_default_room_cover);
+                        if (seatInfo.isEnableVideo()) {
+                            //视频连线开启的时候
+                            rl_mic_audio_value.setVisibility(View.GONE);
+                            ivBackGroup.setVisibility(View.GONE);
+                        } else {
+                            //当前位音频连线
+                            rl_mic_audio_value.setVisibility(View.VISIBLE);
+                            ivBackGroup.setVisibility(View.VISIBLE);
+                            Glide.with(mView.getLiveActivity()).load(userInfo.getPortraitUri())
+                                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(1, 25)))
+                                    .into(ivBackGroup);
+                        }
+                    }
+                });
+            }
+
+            if (view != null) {
+                //设置点击事件
+                setClickSeatListener(view, seatInfo);
+            }
+        }
+    }
+
+    /**
      * 点击麦位
+     *
+     * @param view
+     * @param seatInfo
      */
     private void setClickSeatListener(View view, RCLiveSeatInfo seatInfo) {
         RxView.clicks(view).throttleFirst(1, TimeUnit.SECONDS)
@@ -1475,211 +1703,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
     }
 
+
     /**
-     * 构建布局
+     * 音量
      *
      * @param seatInfo
-     * @param rcParamter
-     * @return
+     * @param audioLevel 音量
      */
-    private View createEmptyMicLayout(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
-        int seatHeight = rcParamter.getHeight();
-        int seatWidth = rcParamter.getWidth();
-        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_offline_layout, null);
-        ConstraintLayout.LayoutParams layoutParams =
-                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
-        view.setLayoutParams(layoutParams);
-        return view;
-    }
-
-    /**
-     * 构建连麦布局
-     *
-     * @param seatInfo
-     * @param rcParamter
-     */
-    private View createMicLayout(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
-        int seatHeight = rcParamter.getHeight();
-        int seatWidth = rcParamter.getWidth();
-        View view = LayoutInflater.from(mView.getLiveActivity()).inflate(R.layout.item_live_seat_online_layout, null);
-        ConstraintLayout.LayoutParams layoutParams =
-                new ConstraintLayout.LayoutParams(seatWidth, seatHeight);
-        view.setLayoutParams(layoutParams);
-        ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
-        WaveView waveView = view.findViewById(R.id.wv_creator_background);
-        setViewLayoutParams(imageView, seatWidth / 3, seatHeight / 3);
-        setViewLayoutParams(waveView, seatWidth, seatHeight);
-        return view;
-    }
-
-
-    /**
-     * 重设 view 的宽高
-     */
-    public static void setViewLayoutParams(View view, int nWidth, int nHeight) {
-        ViewGroup.LayoutParams lp = view.getLayoutParams();
-        if (lp.height != nHeight || lp.width != nWidth) {
-            lp.width = nWidth;
-            lp.height = nHeight;
-            view.setLayoutParams(lp);
-        }
-    }
-
-    @Override
-    public void onSeatLocked(RCLiveSeatInfo seatInfo, boolean locked) {
-
-    }
-
-    @Override
-    public void onSeatMute(RCLiveSeatInfo seatInfo, boolean mute) {
-
-    }
-
-    @Override
-    public void onSeatAudioEnable(RCLiveSeatInfo seatInfo, boolean enable) {
-
-    }
-
-    @Override
-    public void onSeatVideoEnable(RCLiveSeatInfo seatInfo, boolean enable) {
-
-    }
-
-    @Override
-    public void clickSwitchLinkStatus(int index, boolean isVideo) {
-        LiveEventHelper.getInstance().switchVideoOrAudio(index, isVideo, null);
-    }
-
-    @Override
-    public void clickMuteSelf(int index, boolean isMute) {
-        LiveEventHelper.getInstance().MuteSelf(index, isMute, null);
-    }
-
-    @Override
-    public void disConnect(int index) {
-        LiveEventHelper.getInstance().leaveSeat(new ClickCallback<Boolean>() {
-            @Override
-            public void onResult(Boolean result, String msg) {
-                EToast.showToast(msg);
-            }
-        });
-    }
-
-    /**
-     * 生成布局
-     *
-     * @param seatInfo
-     * @param rcParamter
-     * @return
-     */
-    @Override
-    public View inflaterSeatView(RCLiveSeatInfo seatInfo, RCParamter rcParamter) {
-        String userId = seatInfo.getUserId();
-        Log.e(TAG, "setSeatViewProvider: width" + rcParamter.getWidth());
-        Log.e(TAG, "setSeatViewProvider: heigth" + rcParamter.getHeight());
-        View view = null;
-        //麦位为默认的1V1的时候
-        if (!TextUtils.isEmpty(userId)) {
-            if (TextUtils.equals(userId, getCreateUserId()) && rcParamter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
-                //如果是1V1，而且当前是房主，也不应该显示视图
-                view = null;
-            } else {
-                view = createMicLayout(seatInfo, rcParamter);
-            }
-        } else {
-            // 麦位没人的时候
-            if (rcParamter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
-                //如果当前是1V1，那么小视图应该不显示覆盖
-                view = null;
-            } else {
-                view = createEmptyMicLayout(seatInfo, rcParamter);
-            }
-        }
-        return view;
-    }
-
-    /**
-     * 刷新视图的信息
-     *
-     * @param holder
-     * @param seatInfo
-     * @param paramter
-     */
-    @Override
-    public void onBindView(RCHolder holder, RCLiveSeatInfo seatInfo, RCParamter paramter) {
-        if (holder != null) {
-            View view = holder.rootView();
-            if (TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
-                //如果麦位为空的话，那么应该是空布局
-                TextView name = view.findViewById(R.id.tv_member_name);
-                name.setText(seatInfo.getIndex() + "号麦位");
-                ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
-                if (seatInfo.isMute()) {
-                    isMuteView.setVisibility(View.VISIBLE);
-                } else {
-                    isMuteView.setVisibility(View.GONE);
-                }
-                ImageView seatStatusView = view.findViewById(R.id.iv_seat_status);
-                if (seatInfo.isLock()) {
-                    name.setVisibility(View.GONE);
-                    seatStatusView.setImageResource(R.drawable.ic_seat_status_locked);
-                } else {
-                    name.setVisibility(View.VISIBLE);
-                    seatStatusView.setImageResource(R.drawable.ic_seat_status_enter);
-                }
-            } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
-                //有人在麦位上的布局
-                TextView name = view.findViewById(R.id.tv_member_name);
-                RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
-                ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
-                //根据麦位信息来判断是否开启还是关闭动画效果
-                ImageView ivBackGroup = view.findViewById(R.id.iv_background);
-                TextView tv_gift_count = view.findViewById(R.id.tv_gift_count);
-
-                if (TextUtils.equals(seatInfo.getUserId(), getCreateUserId())) {
-                    tv_gift_count.setVisibility(View.GONE);
-                } else {
-                    tv_gift_count.setVisibility(View.VISIBLE);
-                    if (giftMap != null) {
-                        String giftCount = giftMap.get(seatInfo.getUserId());
-                        tv_gift_count.setText(TextUtils.isEmpty(giftCount) ? "0" : giftCount);
-                    }
-                }
-                ImageView isMuteView = view.findViewById(R.id.iv_is_mute);
-                if (seatInfo.isMute()) {
-                    isMuteView.setVisibility(View.VISIBLE);
-                } else {
-                    isMuteView.setVisibility(View.GONE);
-                }
-                UserProvider.provider().getAsyn(seatInfo.getUserId(), new IResultBack<UserInfo>() {
-                    @Override
-                    public void onResult(UserInfo userInfo) {
-                        name.setText(userInfo.getName());
-                        ImageLoaderUtil.INSTANCE.loadImage(mView.getLiveActivity(), imageView, userInfo.getPortraitUri(), R.drawable.img_default_room_cover);
-                        if (seatInfo.isEnableVideo()) {
-                            //视频连线开启的时候
-                            rl_mic_audio_value.setVisibility(View.GONE);
-                            ivBackGroup.setVisibility(View.GONE);
-                        } else {
-                            //当前位音频连线
-                            rl_mic_audio_value.setVisibility(View.VISIBLE);
-                            ivBackGroup.setVisibility(View.VISIBLE);
-                            Glide.with(mView.getLiveActivity()).load(userInfo.getPortraitUri())
-                                    .apply(RequestOptions.bitmapTransform(new BlurTransformation(1, 25)))
-                                    .into(ivBackGroup);
-                        }
-                    }
-                });
-            }
-
-            if (view != null) {
-                //设置点击事件
-                setClickSeatListener(view, seatInfo);
-            }
-        }
-    }
-
-
     @Override
     public void onSeatSpeak(RCLiveSeatInfo seatInfo, int audioLevel) {
         RCHolder hold = LiveEventHelper.getInstance().getHold(seatInfo.getIndex());
@@ -1695,13 +1725,23 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
     }
 
+    /**
+     * 更新分辨率KV
+     *
+     * @param resolution 分辨率
+     */
     @Override
     public void updateVideoResolution(RCRTCParamsType.RCRTCVideoResolution resolution) {
-        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_RESOLUTION,resolution.getLabel(),null);
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_RESOLUTION, resolution.getLabel(), null);
     }
 
+    /**
+     * 更新帧率KV
+     *
+     * @param fps 帧率
+     */
     @Override
     public void updateVideoFps(RCRTCParamsType.RCRTCVideoFps fps) {
-        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS,fps.getFps()+"",null);
+        LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS, fps.getFps() + "", null);
     }
 }

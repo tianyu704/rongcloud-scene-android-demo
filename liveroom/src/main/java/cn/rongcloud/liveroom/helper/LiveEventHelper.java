@@ -34,6 +34,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
+import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
@@ -707,26 +708,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         });
     }
 
-//    /**
-//     * 获取邀请人的ID
-//     *
-//     * @param callback
-//     */
-//    @Override
-//    public void getInvitateLiveVideoIds(ClickCallback<List<String>> callback) {
-//        RCLiveEngine.getInstance().getLinkManager().getInvitateLiveVideoIds(new RCLiveResultCallback<List<String>>() {
-//            @Override
-//            public void onResult(List<String> result) {
-//                if (callback != null) callback.onResult(result, "");
-//            }
-//
-//            @Override
-//            public void onError(int code, RCLiveError error) {
-//                Log.e(TAG, "getInvitateLiveVideoIds: " + "获取邀请上麦的人数失败：" + error);
-//            }
-//        });
-//    }
-
     public List<MessageContent> getMessageList() {
         return messageList;
     }
@@ -837,6 +818,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         //被踢出房间，调用离开房间接口和反注册
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
             EToast.showToast(TextUtils.equals(operatorId, createUserId) ? "您被房主踢出房间" : "您被管理员踢出房间");
+            MiniRoomManager.getInstance().close();
             leaveRoom(null);
         }
         Log.e(TAG, "onUserKitOut: ");
@@ -912,17 +894,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             liveRoomListener.onliveVideoInvitationReceived(userId, index);
         }
         showPickReceivedDialog(userId, index);
-//        getInvitateLiveVideoIds(new ClickCallback<List<String>>() {
-//            @Override
-//            public void onResult(List<String> result, String msg) {
-//                for (String userId : result) {
-//                    if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
-//                        showPickReceivedDialog(userId,index);
-//                        break;
-//                    }
-//                }
-//            }
-//        });
         Log.e(TAG, "onliveVideoInvitationReceived: ");
     }
 
@@ -934,8 +905,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * @param index
      */
     public void showPickReceivedDialog(String userId, int index) {
+        String pickName = TextUtils.equals(userId,createUserId) ? "主播" : "管理员";
         pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
-                "主播邀请您连线，是否同意? 10S", true,
+                pickName+"邀请您连线，是否同意? 10S", true,
                 "同意", "拒绝", new Function0<Unit>() {
             @Override
             public Unit invoke() {
@@ -963,7 +935,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Throwable {
-                        pickReceivedDialog.updateMessage("主播邀请您连线，是否同意? " + (10 - aLong) + "s");
+                        pickReceivedDialog.updateMessage(pickName+"邀请您连线，是否同意? " + (10 - aLong) + "s");
                         if (10 == aLong) {
                             //超时自动拒绝
                             RCLiveEngine.getInstance().getLinkManager().rejectInvitation(userId, null);
