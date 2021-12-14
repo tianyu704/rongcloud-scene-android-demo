@@ -36,6 +36,7 @@ import com.rongcloud.common.utils.AccountStore
 import dagger.hilt.android.AndroidEntryPoint
 import de.hdodenhof.circleimageview.CircleImageView
 import io.rong.callkit.DialActivity
+import io.rong.imkit.RongIM
 import io.rong.imkit.manager.UnReadMessageManager
 import io.rong.imkit.utils.RouteUtils
 import io.rong.imkit.utils.StatusBarUtil
@@ -178,7 +179,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     }
 
     fun logout() {
-        RCVoiceRoomEngine.getInstance().disconnect(false)
+        RongIM.getInstance().disconnect()
         super.onLogout()
     }
 

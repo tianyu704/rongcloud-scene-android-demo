@@ -281,7 +281,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * @param s
      */
     @Override
-    public void onAudienceEnter(String s) {
+    public void onAudienceEnter(String s, int count) {
         Log.e(TAG, "onAudienceEnter: ");
         present.refreshRoomMember();
     }
@@ -292,7 +292,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * @param s
      */
     @Override
-    public void onAudienceExit(String s) {
+    public void onAudienceExit(String s, int count) {
         Log.e(TAG, "onAudienceExit: ");
         present.refreshRoomMember();
     }
@@ -301,13 +301,13 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
      * 麦位的信息变化监听
      *
      * @param i
-     * @param b
+     * @param audioLevel
      */
     @Override
-    public void onSpeakingStateChanged(int i, boolean b) {
+    public void onSpeakingStateChanged(int i, int audioLevel) {
         if (uiSeatModels.size() > i) {
             UiSeatModel uiSeatModel = uiSeatModels.get(i);
-            uiSeatModel.setSpeaking(b);
+            uiSeatModel.setSpeaking(audioLevel > 0);
         }
     }
 
@@ -487,7 +487,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     }
 
     @Override
-    public void onPKConnect(@NonNull RCPKInfo rcpkInfo) {
+    public void onPKGoing(@NonNull RCPKInfo rcpkInfo) {
 
     }
 

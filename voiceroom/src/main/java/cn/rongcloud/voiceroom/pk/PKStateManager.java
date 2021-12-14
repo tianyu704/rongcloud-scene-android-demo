@@ -230,7 +230,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
         VRCenterDialog dialog = new VRCenterDialog(activity, null);
         TextView textView = new TextView(dialog.getContext());
         textView.setTextSize(16);
-        textView.setTextColor(Color.parseColor("#ffffff"));
+        textView.setTextColor(Color.parseColor("#333333"));
         textView.setText(R.string.quit_pk_dialog_tip);
         dialog.replaceContent(UIKit.getResources().getString(R.string.dialog_tip),
                 UIKit.getResources().getString(R.string.dialog_cancle),

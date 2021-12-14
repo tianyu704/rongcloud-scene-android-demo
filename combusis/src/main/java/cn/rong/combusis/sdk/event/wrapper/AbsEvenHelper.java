@@ -52,8 +52,8 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     protected List<RCVoiceSeatInfo> mSeatInfos;//当前麦序
     protected RCVoiceRoomInfo roomInfo;//房间信息
     protected RCVoiceRoomEventListener rcVoiceRoomEventListener;
-    protected List<MessageContent> messageList=new LinkedList<>();
-    protected boolean isMute =false;
+    protected List<MessageContent> messageList = new LinkedList<>();
+    protected boolean isMute = false;
     public static final int STATUS_ON_SEAT = 0;
     public static final int STATUS_NOT_ON_SEAT = 1;
     public static final int STATUS_WAIT_FOR_SEAT = 2;
@@ -78,7 +78,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (null != listeners) listeners.clear();
         if (null != statusListeners) statusListeners.clear();
         messageList.clear();
-        isMute=false;
+        isMute = false;
         roomInfo = null;
         roomId = null;
     }
@@ -201,9 +201,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      * @param userId
      */
     @Override
-    public void onAudienceEnter(String userId) {
+    public void onAudienceEnter(String userId, int onlineCount) {
         if (rcVoiceRoomEventListener != null) {
-            rcVoiceRoomEventListener.onAudienceEnter(userId);
+            rcVoiceRoomEventListener.onAudienceEnter(userId, onlineCount);
         }
         Log.d(TAG, "onAudienceEnter: userId = " + userId);
         if (null != listeners) {
@@ -224,9 +224,9 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
      * @param userId
      */
     @Override
-    public void onAudienceExit(String userId) {
+    public void onAudienceExit(String userId, int onlineCount) {
         if (rcVoiceRoomEventListener != null) {
-            rcVoiceRoomEventListener.onAudienceExit(userId);
+            rcVoiceRoomEventListener.onAudienceExit(userId, onlineCount);
         }
         Log.d(TAG, "onAudienceExit: userId = " + userId);
         if (null != listeners) {
@@ -244,16 +244,17 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
     /**
      * 说话状态回调 比较频繁
      *
-     * @param index    麦位索引
-     * @param speaking 是否正在语音
+     * @param index      麦位索引
+     * @param audioLevel 是否正在语音
      */
     @Override
-    public void onSpeakingStateChanged(int index, boolean speaking) {
+    public void onSpeakingStateChanged(int index, int audioLevel) {
+        boolean speaking = audioLevel > 0;
         Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
         if (rcVoiceRoomEventListener != null) {
-            rcVoiceRoomEventListener.onSpeakingStateChanged(index, speaking);
+            rcVoiceRoomEventListener.onSpeakingStateChanged(index, audioLevel);
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             MiniRoomManager.getInstance().onSpeak(speaking);
         }
 //        Log.v(TAG, "onSpeakingStateChanged: index = " + index + " speaking = " + speaking);
@@ -276,7 +277,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                 || RCChatroomGift.class.equals(aClass) || RCChatroomAdmin.class.equals(aClass)
                 || RCChatroomSeats.class.equals(aClass) || RCChatroomGiftAll.class.equals(aClass)
                 || RCFollowMsg.class.equals(aClass) || TextMessage.class.equals(aClass))
-                &&message.getConversationType()== Conversation.ConversationType.CHATROOM) {
+                && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             addMessage(message.getContent());
         }
         if (message.getConversationType() == Conversation.ConversationType.PRIVATE) {
@@ -307,7 +308,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRoomNotificationReceived(name, content);
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             switch (name) {
                 case EVENT_ROOM_CLOSE://当前房间被关闭
                     ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
@@ -350,7 +351,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onPickSeatReceivedFrom(userId);
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             showPickReceivedDialog(true, userId);
         }
     }
@@ -386,7 +387,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
                     EToast.showToast("当前没有空余的麦位");
                 }
                 inviteDialog.dismiss();
-                if (currentStatus==STATUS_WAIT_FOR_SEAT) {
+                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
                     //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
                     cancelRequestSeat(new ClickCallback<Boolean>() {
                         @Override
@@ -414,7 +415,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onKickSeatReceived(index);
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             EToast.showToast("您已被抱下麦位");
         }
         Log.d(TAG, "onPickSeatReceivedFrom: index = " + index);
@@ -429,7 +430,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRequestSeatAccepted();
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             currentStatus = STATUS_ON_SEAT;
             //加入麦位
             int availableIndex = getAvailableSeatIndex();
@@ -450,7 +451,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onRequestSeatRejected();
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             currentStatus = STATUS_NOT_ON_SEAT;
         }
         Log.d(TAG, "onRequestSeatRejected: ");
@@ -577,7 +578,7 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         if (rcVoiceRoomEventListener != null) {
             rcVoiceRoomEventListener.onUserReceiveKickOutRoom(targetId, userId);
         }
-        if (MiniRoomManager.getInstance().isShowing()){
+        if (MiniRoomManager.getInstance().isShowing()) {
             if (targetId.equals(AccountStore.INSTANCE.getUserId())) {
                 EToast.showToast("你已被踢出房间");
                 MiniRoomManager.getInstance().close();
