@@ -574,10 +574,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     /**
      * 显示公告弹窗
      *
-     * @param isEdit
+     * @param isEdit 是否可编辑
      */
     public void showNoticeDialog(boolean isEdit) {
-        LiveEventHelper.getInstance().getRoomInfoByKey("notice", new ClickCallback<Boolean>() {
+        LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_NOTICE, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String notice) {
                 if ((result && TextUtils.isEmpty(notice)) || !result) {

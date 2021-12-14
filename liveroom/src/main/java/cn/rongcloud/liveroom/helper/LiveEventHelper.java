@@ -707,26 +707,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         });
     }
 
-//    /**
-//     * 获取邀请人的ID
-//     *
-//     * @param callback
-//     */
-//    @Override
-//    public void getInvitateLiveVideoIds(ClickCallback<List<String>> callback) {
-//        RCLiveEngine.getInstance().getLinkManager().getInvitateLiveVideoIds(new RCLiveResultCallback<List<String>>() {
-//            @Override
-//            public void onResult(List<String> result) {
-//                if (callback != null) callback.onResult(result, "");
-//            }
-//
-//            @Override
-//            public void onError(int code, RCLiveError error) {
-//                Log.e(TAG, "getInvitateLiveVideoIds: " + "获取邀请上麦的人数失败：" + error);
-//            }
-//        });
-//    }
-
     public List<MessageContent> getMessageList() {
         return messageList;
     }
@@ -912,17 +892,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             liveRoomListener.onliveVideoInvitationReceived(userId, index);
         }
         showPickReceivedDialog(userId, index);
-//        getInvitateLiveVideoIds(new ClickCallback<List<String>>() {
-//            @Override
-//            public void onResult(List<String> result, String msg) {
-//                for (String userId : result) {
-//                    if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
-//                        showPickReceivedDialog(userId,index);
-//                        break;
-//                    }
-//                }
-//            }
-//        });
         Log.e(TAG, "onliveVideoInvitationReceived: ");
     }
 
@@ -934,8 +903,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * @param index
      */
     public void showPickReceivedDialog(String userId, int index) {
+        String pickName = TextUtils.equals(userId,createUserId) ? "主播" : "管理员";
         pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
-                "主播邀请您连线，是否同意? 10S", true,
+                pickName+"邀请您连线，是否同意? 10S", true,
                 "同意", "拒绝", new Function0<Unit>() {
             @Override
             public Unit invoke() {
@@ -963,7 +933,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Throwable {
-                        pickReceivedDialog.updateMessage("主播邀请您连线，是否同意? " + (10 - aLong) + "s");
+                        pickReceivedDialog.updateMessage(pickName+"邀请您连线，是否同意? " + (10 - aLong) + "s");
                         if (10 == aLong) {
                             //超时自动拒绝
                             RCLiveEngine.getInstance().getLinkManager().rejectInvitation(userId, null);
