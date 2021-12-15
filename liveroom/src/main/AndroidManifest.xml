@@ -3,7 +3,7 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.rongcloud.liveroom">
+    package="cn.rongcloud.live">
 
     <uses-permission android:name="android.permission.REORDER_TASKS" />
     <application>

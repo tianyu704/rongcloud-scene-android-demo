@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.roomlist;
+package cn.rongcloud.live.roomlist;
 
 import androidx.fragment.app.Fragment;
 

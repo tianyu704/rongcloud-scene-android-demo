@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.room;
+package cn.rongcloud.live.room;
 
 
 import static cn.rong.combusis.EventBus.TAG.UPDATE_SHIELD;
@@ -103,21 +103,18 @@ import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
-import cn.rong.combusis.widget.miniroom.MiniRoomManager;
+import cn.rongcloud.live.fragment.LiveRoomCreatorSettingFragment;
+import cn.rongcloud.live.helper.LiveEventHelper;
+import cn.rongcloud.live.helper.LiveRoomListener;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 
 import cn.rongcloud.liveroom.api.RCParamter;
-import cn.rongcloud.liveroom.api.RCRect;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
-import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
-import cn.rongcloud.liveroom.fragment.LiveRoomCreatorSettingFragment;
-import cn.rongcloud.liveroom.helper.LiveEventHelper;
-import cn.rongcloud.liveroom.helper.LiveRoomListener;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;

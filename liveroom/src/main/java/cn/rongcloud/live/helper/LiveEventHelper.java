@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.helper;
+package cn.rongcloud.live.helper;
 
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_ON_SEAT;
@@ -50,7 +50,7 @@ import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveSeatListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
-import cn.rongcloud.liveroom.room.LiveRoomKvKey;
+import cn.rongcloud.live.room.LiveRoomKvKey;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -62,7 +62,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.functions.Consumer;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.rong.imlib.IRongCoreEnum;
-import io.rong.imlib.NativeClient;
 import io.rong.imlib.model.Conversation;
 import io.rong.imlib.model.Message;
 import io.rong.imlib.model.MessageContent;

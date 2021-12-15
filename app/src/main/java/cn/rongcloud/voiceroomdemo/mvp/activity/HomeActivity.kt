@@ -17,7 +17,7 @@ import cn.rong.combusis.umeng.RcUmEvent
 import cn.rong.combusis.umeng.UmengHelper
 import cn.rong.combusis.widget.miniroom.MiniRoomManager
 import cn.rongcloud.annotation.HiltBinding
-import cn.rongcloud.liveroom.roomlist.LiveRoomListActivity
+import cn.rongcloud.live.roomlist.LiveRoomListActivity
 import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback

@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.helper;
+package cn.rongcloud.live.helper;
 
 import java.util.List;
 import java.util.Map;

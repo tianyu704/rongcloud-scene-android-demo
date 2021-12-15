@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.roomlist;
+package cn.rongcloud.live.roomlist;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.room;
+package cn.rongcloud.live.room;
 
 
 import android.content.Context;
@@ -81,13 +81,13 @@ import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
-import cn.rongcloud.liveroom.R;
+import cn.rongcloud.live.fragment.LiveRoomCreatorSettingFragment;
+import cn.rongcloud.live.helper.LiveEventHelper;
+import cn.rongcloud.live.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
-import cn.rongcloud.liveroom.fragment.LiveRoomCreatorSettingFragment;
-import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;

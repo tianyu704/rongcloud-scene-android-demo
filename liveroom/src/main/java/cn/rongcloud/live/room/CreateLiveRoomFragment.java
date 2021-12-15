@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.room;
+package cn.rongcloud.live.room;
 
 
 import android.content.Intent;
@@ -41,9 +41,9 @@ import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.beauty.BeautyDialogFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
-import cn.rongcloud.liveroom.R;
+import cn.rongcloud.live.helper.LiveEventHelper;
+import cn.rongcloud.live.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
-import cn.rongcloud.liveroom.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.rong.imkit.utils.StatusBarUtil;
 

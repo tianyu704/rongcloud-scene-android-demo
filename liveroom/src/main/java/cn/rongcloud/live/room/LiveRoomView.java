@@ -1,4 +1,4 @@
-package cn.rongcloud.liveroom.room;
+package cn.rongcloud.live.room;
 
 import android.content.Context;
 import android.view.View;
