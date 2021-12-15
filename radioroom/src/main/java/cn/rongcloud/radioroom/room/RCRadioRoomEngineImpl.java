@@ -17,6 +17,7 @@ import java.util.Map;
 
 import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomLeave;
+import cn.rongcloud.liveroom.core.UiKit;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomBaseCallback;
@@ -45,7 +46,7 @@ import cn.rongcloud.rtc.base.RCRTCRoomType;
 import cn.rongcloud.rtc.base.RTCErrorCode;
 import cn.rongcloud.voiceroom.api.IMHelper;
 import cn.rongcloud.voiceroom.api.RCIMHelper;
-import cn.rongcloud.voiceroom.core.UiKit;
+//import cn.rongcloud.voiceroom.core.UiKit;
 import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
 import io.rong.imlib.IRongCoreListener;
