@@ -51,7 +51,9 @@ import cn.rong.combusis.R;
 
 import cn.rong.combusis.EventBus;
 import cn.rong.combusis.api.VRApi;
+import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.ui.widget.WaveView;
+import cn.rong.combusis.intent.IntentWrap;
 import cn.rong.combusis.manager.AllBroadcastManager;
 import cn.rong.combusis.manager.RCChatRoomMessageManager;
 import cn.rong.combusis.message.RCAllBroadcastMessage;
@@ -1178,8 +1180,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         mView.changeStatus();
     }
 
+
+
     @Override
-    public void onLiveVideoStoped(RCLivevideoFinishReason reason) {
+    public void onLiveVideoStopped(RCLivevideoFinishReason reason) {
         mView.changeStatus();
     }
 
@@ -1209,11 +1213,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         }
     }
 
+
     /**
      * 房间销毁
      */
     @Override
-    public void onRoomDestory() {
+    public void onRoomDestroy() {
         mView.finish();
     }
 
@@ -1754,5 +1759,81 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void updateVideoFps(RCRTCParamsType.RCRTCVideoFps fps) {
         LiveEventHelper.getInstance().updateRoomInfoKv(LiveRoomKvKey.LIVE_ROOM_VIDEO_FPS, fps.getFps() + "", null);
+    }
+
+
+    /**
+     * 点击全局广播后跳转到相应的房间
+     *
+     * @param message
+     */
+    public void jumpRoom(RCAllBroadcastMessage message) {
+        // 当前房间不跳转
+        if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId())
+                || LiveEventHelper.getInstance().getCurrentStatus()==CurrentStatusType.STATUS_ON_SEAT
+                || TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId()))
+            return;
+        OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
+            @Override
+            public void onResult(Wrapper result) {
+                if (result.ok()) {
+                    VoiceRoomBean roomBean = result.get(VoiceRoomBean.class);
+                    if (roomBean != null) {
+                        // 房间有密码需要弹框验证密码
+                        if (roomBean.isPrivate()) {
+                            new InputPasswordDialog(mView.getLiveActivity(), false, () -> null, s -> {
+                                if (TextUtils.isEmpty(s)) {
+                                    return null;
+                                }
+                                if (s.length() < 4) {
+                                    mView.showToast("请输入四位密码");
+                                    return null;
+                                }
+                                if (TextUtils.equals(s, roomBean.getPassword())) {
+                                    exitRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                                } else {
+                                    mView.showToast("密码错误");
+                                }
+                                return null;
+                            }).show();
+                        } else {
+                            exitRoom(roomBean.getRoomType(), roomBean.getRoomId());
+                        }
+                    }
+                } else {
+                    mView.dismissLoading();
+                    if (result.getCode() == 30001) {
+                        //房间不存在了
+                        mView.showToast("房间不存在了");
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int code, String msg) {
+                super.onError(code, msg);
+            }
+        });
+    }
+
+    private void exitRoom(int roomType, final String roomId) {
+        if (VoiceRoomProvider.provider().contains(roomId)) {
+            mView.switchOtherRoom(roomId);
+        } else {
+            mView.showLoading("");
+            LiveEventHelper.getInstance().leaveRoom(new LeaveRoomCallBack() {
+                @Override
+                public void onSuccess() {
+                    mView.finish();
+                    mView.dismissLoading();
+                    IntentWrap.launchRoom(mView.getLiveActivity(), roomType, roomId);
+                }
+
+                @Override
+                public void onError(int code, String message) {
+
+                }
+            });
+        }
     }
 }

@@ -166,4 +166,6 @@ public interface LiveRoomView extends IBaseView {
      * 刷新消息集合
      */
     void refreshMessageList();
+
+    void switchOtherRoom(String roomId);
 }

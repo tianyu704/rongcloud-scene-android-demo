@@ -503,7 +503,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onError(int code, RCLiveError error) {
                 Log.e("TAG", "onError: " + code);
                 if (callback != null)
-                    callback.onResult(false, "开启直播失败"+":"+code);
+                    callback.onResult(false, "开启直播失败" + ":" + code);
             }
         });
     }
@@ -908,9 +908,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * @param index
      */
     public void showPickReceivedDialog(String userId, int index) {
-        String pickName = TextUtils.equals(userId,createUserId) ? "主播" : "管理员";
+        String pickName = TextUtils.equals(userId, createUserId) ? "主播" : "管理员";
         pickReceivedDialog = new ConfirmDialog((UIStack.getInstance().getTopActivity()),
-                pickName+"邀请您连线，是否同意? 10S", true,
+                pickName + "邀请您连线，是否同意? 10S", true,
                 "同意", "拒绝", new Function0<Unit>() {
             @Override
             public Unit invoke() {
@@ -938,7 +938,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 .subscribe(new Consumer<Long>() {
                     @Override
                     public void accept(Long aLong) throws Throwable {
-                        pickReceivedDialog.updateMessage(pickName+"邀请您连线，是否同意? " + (10 - aLong) + "s");
+                        pickReceivedDialog.updateMessage(pickName + "邀请您连线，是否同意? " + (10 - aLong) + "s");
                         if (10 == aLong) {
                             //超时自动拒绝
                             RCLiveEngine.getInstance().getLinkManager().rejectInvitation(userId, null);
@@ -1018,7 +1018,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      * 连麦结束
      */
     @Override
-    public void onLiveVideoStoped(RCLivevideoFinishReason reason) {
+    public void onLiveVideoStopped(RCLivevideoFinishReason reason) {
         setCurrentStatus(STATUS_NOT_ON_SEAT);
         if (reason == RCLivevideoFinishReason.RCLivevideoFinishReasonKick) {
             EToast.showToast("您被抱下麦位");
@@ -1026,7 +1026,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             EToast.showToast("麦位切换模式，请重新上麦");
         }
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onLiveVideoStoped(reason);
+            liveRoomListener.onLiveVideoStopped(reason);
         }
         Log.e(TAG, "onLiveVideoStoped: ");
     }
@@ -1076,13 +1076,13 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
 
     @Override
-    public void onRoomDestory() {
+    public void onRoomDestroy() {
         ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
                 , "确定", "", null, new Function0<Unit>() {
             @Override
             public Unit invoke() {
                 for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-                    liveRoomListener.onRoomDestory();
+                    liveRoomListener.onRoomDestroy();
                 }
                 leaveRoom(null);
                 return null;

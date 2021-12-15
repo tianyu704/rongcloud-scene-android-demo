@@ -282,6 +282,8 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
 
         viewAllBroadcast = (AllBroadcastView) getView().findViewById(R.id.view_all_broadcast);
+        viewAllBroadcast.setOnClickBroadcast(this::clickBroadcast);
+
         roomBottomView = (RoomBottomView) getView().findViewById(R.id.room_bottom_view);
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
@@ -512,7 +514,13 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
      */
     @Override
     public void clickBroadcast(RCAllBroadcastMessage message) {
+        viewAllBroadcast.showMessage(null);
+        present.jumpRoom(message);
+    }
 
+    @Override
+    public void switchOtherRoom(String roomId) {
+        ((AbsRoomActivity) requireActivity()).switchOtherRoom(roomId);
     }
 
 
