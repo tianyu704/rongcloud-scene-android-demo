@@ -100,8 +100,14 @@ public class RoomMessageAdapter extends RcyAdapter<MessageContent, RcyHolder> {
      */
     private void setSystemMessage(RcyHolder holder, MessageContent messageContent) {
         if (messageContent instanceof RCChatroomLocationMessage) {
+            holder.setTextColor(R.id.tv_message_system,Color.parseColor("#6A9FFF"));
             holder.setText(R.id.tv_message_system, ((RCChatroomLocationMessage) messageContent).getContent());
         } else if (messageContent instanceof TextMessage) {
+            if (!TextUtils.isEmpty(messageContent.getExtra())&&messageContent.getExtra().equals("mixTypeChange")){
+                holder.setTextColor(R.id.tv_message_system,Color.parseColor("#EF499A"));
+            }else {
+                holder.setTextColor(R.id.tv_message_system,Color.parseColor("#6A9FFF"));
+            }
             holder.setText(R.id.tv_message_system, ((TextMessage) messageContent).getContent());
         }
 
