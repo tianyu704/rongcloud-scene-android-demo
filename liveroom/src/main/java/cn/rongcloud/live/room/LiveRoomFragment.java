@@ -262,7 +262,9 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         giftView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
             @Override
             public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
-                present.sendMessage(rcChatroomLike, false);
+                if (!TextUtils.equals(mRoomId, "-1")) {
+                    present.sendMessage(rcChatroomLike, false);
+                }
             }
 
             @Override

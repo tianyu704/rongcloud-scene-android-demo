@@ -265,7 +265,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     mView.dismissLoading();
                     if (result) {
                         setCurrentRoom(mVoiceRoomBean, isCreate);
-                    }else {
+                    } else {
                         //房间不存在了
                         mView.showFinishView();
                         leaveRoom(roomId, isCreate, false);
@@ -547,6 +547,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 更改公告信息
+     *
      * @param notice 公告内容
      */
     @Override
@@ -654,7 +655,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 mView.dismissLoading();
                 if (result) {
                     setCurrentRoom(mVoiceRoomBean, isCreate);
-                }else {
+                } else {
                     KToast.show(msg);
                 }
             }
@@ -737,6 +738,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 监听接收房间的所有信息
+     *
      * @param roomId
      */
     private void setObMessageListener(String roomId) {
@@ -1018,7 +1020,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickCloseSeat(int seatIndex, boolean isLock, ClickCallback<Boolean> callback) {
-        if (RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
+        if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
             EToast.showToast("默认模式不支持关闭座位");
             return;
         }
@@ -1176,7 +1178,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     public void onLiveVideoStarted() {
         mView.changeStatus();
     }
-
 
 
     @Override
@@ -1396,12 +1397,14 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         RCLiveEngine.getInstance().setMixType(rcLiveMixType, new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                EToast.showToast("布局设置成功");
+                TextMessage textMessage = TextMessage.obtain("麦位布局已修改，请重新上麦");
+                textMessage.setExtra("mixTypeChange");
+                sendMessage(textMessage);
             }
 
             @Override
             public void onError(int code, RCLiveError error) {
-                EToast.showToast("布局设置失败" + error.getMessage());
+                Log.e(TAG, "onError: " + error.getMessage());
             }
         });
     }
@@ -1767,7 +1770,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     public void jumpRoom(RCAllBroadcastMessage message) {
         // 当前房间不跳转
         if (message == null || TextUtils.isEmpty(message.getRoomId()) || TextUtils.equals(message.getRoomId(), getRoomId())
-                || LiveEventHelper.getInstance().getCurrentStatus()==CurrentStatusType.STATUS_ON_SEAT
+                || LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT
                 || TextUtils.equals(AccountStore.INSTANCE.getUserId(), getCreateUserId()))
             return;
         OkApi.get(VRApi.getRoomInfo(message.getRoomId()), null, new WrapperCallBack() {
