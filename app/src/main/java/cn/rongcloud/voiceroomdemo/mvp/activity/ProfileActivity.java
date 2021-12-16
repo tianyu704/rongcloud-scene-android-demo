@@ -53,10 +53,10 @@ public class ProfileActivity extends BaseActivity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ll_item_first:
-                ActCommentWeb.openCommentWeb(activity, "file:///android_asset/agreement_zh.html", "注册条款");
+                ActCommentWeb.openCommentWeb(activity, "https://cdn.ronghub.com/term_of_service_zh.html", "注册条款");
                 break;
             case R.id.ll_item_second:
-                ActCommentWeb.openCommentWeb(activity, "file:///android_asset/privacy_zh.html", "隐私政策");
+                ActCommentWeb.openCommentWeb(activity, "https://cdn.ronghub.com/Privacy_agreement_zh.html", "隐私政策");
                 break;
             case R.id.ll_item_third:
                 showUnregisterDialog();
