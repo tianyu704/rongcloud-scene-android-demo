@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rong.combusis.common.utils.UIKit;
 import cn.rong.combusis.message.RCChatroomEnter;
 import cn.rong.combusis.message.RCChatroomLeave;
-import cn.rongcloud.liveroom.core.UiKit;
 import cn.rongcloud.radioroom.IRCRadioRoomEngine;
 import cn.rongcloud.radioroom.RCRadioRoomEngine;
 import cn.rongcloud.radioroom.callback.RCRadioRoomBaseCallback;
@@ -409,8 +409,8 @@ public class RCRadioRoomEngineImpl extends RCRadioRoomEngine implements RongChat
                     .enableLowLatencyRecording(true);
         }
         RCRTCConfig config = builder.build();
-        RCRTCEngine.getInstance().init(UiKit.getApplication(), config);
-        RCRTCAudioRouteManager.getInstance().init(UiKit.getApplication());
+        RCRTCEngine.getInstance().init(UIKit.getContext(), config);
+        RCRTCAudioRouteManager.getInstance().init(UIKit.getContext());
     }
 
     @Override
