@@ -4,10 +4,13 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.presenter
 
+import android.app.Application
 import androidx.appcompat.app.AppCompatActivity
+import cn.rong.combusis.common.utils.UIKit
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.model.LoginModel
 import com.kit.cache.GsonUtil
+import com.rongcloud.common.AppConfig
 import com.rongcloud.common.base.BaseLifeCyclePresenter
 import com.rongcloud.common.net.ApiConstant
 import com.rongcloud.common.utils.AccountStore
@@ -76,18 +79,16 @@ class LoginPresenter @Inject constructor(
                         com.kit.utils.Logger.e(TAG, GsonUtil.obj2Json(bean))
                         if (null == bean) {
                         } else {
-                            com.kit.utils.Logger.e(TAG, "connect:onSuccess")
+                            RongIM.init(UIKit.getContext() as Application, AppConfig.APP_KEY, false)
+                            com.kit.utils.Logger.e(TAG, "RongIM.init:")
                             if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                                 AccountStore.saveAccountInfo(bean.data?.apply {
                                     this.phone = phoneNumber
                                 })
-                                com.kit.utils.Logger.e(TAG, "connect:onSuccess1")
                                 var token = AccountStore.getImToken()
                                 if (!token.isNullOrBlank()) {
-                                    com.kit.utils.Logger.e(TAG, "connect:onSuccess2")
                                     RongIM.connect(token, object : RongIMClient.ConnectCallback() {
                                         override fun onSuccess(t: String?) {
-                                            com.kit.utils.Logger.e(TAG, "connect:onSuccess")
                                             view.hideWaitingDialog()
                                             view.onLoginSuccess()
                                         }
@@ -99,7 +100,6 @@ class LoginPresenter @Inject constructor(
                                         }
 
                                         override fun onDatabaseOpened(code: RongIMClient.DatabaseOpenStatus?) {
-                                            com.kit.utils.Logger.e(TAG, "connect:onDatabaseOpened")
                                         }
                                     })
                                 } else {
