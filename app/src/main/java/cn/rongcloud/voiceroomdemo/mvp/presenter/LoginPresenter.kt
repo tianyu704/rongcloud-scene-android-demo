@@ -76,28 +76,34 @@ class LoginPresenter @Inject constructor(
                         com.kit.utils.Logger.e(TAG, GsonUtil.obj2Json(bean))
                         if (null == bean) {
                         } else {
+                            com.kit.utils.Logger.e(TAG, "connect:onSuccess")
                             if (bean.code == ApiConstant.REQUEST_SUCCESS_CODE) {
                                 AccountStore.saveAccountInfo(bean.data?.apply {
                                     this.phone = phoneNumber
                                 })
-                                if (!AccountStore.getImToken().isNullOrBlank()) {
-                                    RongIM.connect(
-                                        AccountStore.getImToken(),
-                                        object : RongIMClient.ConnectCallback() {
-                                            override fun onSuccess(t: String?) {
-                                                view.hideWaitingDialog()
-                                                view.onLoginSuccess()
-                                            }
+                                com.kit.utils.Logger.e(TAG, "connect:onSuccess1")
+                                var token = AccountStore.getImToken()
+                                if (!token.isNullOrBlank()) {
+                                    com.kit.utils.Logger.e(TAG, "connect:onSuccess2")
+                                    RongIM.connect(token, object : RongIMClient.ConnectCallback() {
+                                        override fun onSuccess(t: String?) {
+                                            com.kit.utils.Logger.e(TAG, "connect:onSuccess")
+                                            view.hideWaitingDialog()
+                                            view.onLoginSuccess()
+                                        }
 
-                                            override fun onError(e: RongIMClient.ConnectionErrorCode?) {
-                                                view.hideWaitingDialog()
-                                                e?.value?.let { view.showError(it, e.name) }
-                                            }
+                                        override fun onError(e: RongIMClient.ConnectionErrorCode?) {
+                                            com.kit.utils.Logger.e(TAG, "connect:onError")
+                                            view.hideWaitingDialog()
+                                            e?.value?.let { view.showError(it, e.name) }
+                                        }
 
-                                            override fun onDatabaseOpened(code: RongIMClient.DatabaseOpenStatus?) {
-                                                TODO("Not yet implemented")
-                                            }
-                                        })
+                                        override fun onDatabaseOpened(code: RongIMClient.DatabaseOpenStatus?) {
+                                            com.kit.utils.Logger.e(TAG, "connect:onDatabaseOpened")
+                                        }
+                                    })
+                                } else {
+                                    com.kit.utils.Logger.e(TAG, "connect:getImToken null")
                                 }
                             } else {
                                 view.showError(bean.code, bean.msg)

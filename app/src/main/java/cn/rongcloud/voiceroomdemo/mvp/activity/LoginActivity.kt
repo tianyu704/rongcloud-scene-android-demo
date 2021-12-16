@@ -89,7 +89,7 @@ class LoginActivity : BaseActivity(), ILoginView {
             override fun onClick(widget: View) {
                 ActCommentWeb.openCommentWeb(
                     this@LoginActivity,
-                    "file:///android_asset/agreement_zh.html", "注册条款"
+                    "https://cdn.ronghub.com/term_of_service_zh.html", "注册条款"
                 )
             }
 
@@ -102,7 +102,7 @@ class LoginActivity : BaseActivity(), ILoginView {
             override fun onClick(widget: View) {
                 ActCommentWeb.openCommentWeb(
                     this@LoginActivity,
-                    "file:///android_asset/privacy_zh.html", "隐私政策"
+                    "https://cdn.ronghub.com/Privacy_agreement_zh.html", "隐私政策"
                 )
             }
 
