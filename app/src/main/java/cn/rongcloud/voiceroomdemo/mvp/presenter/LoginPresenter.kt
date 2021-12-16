@@ -95,7 +95,6 @@ class LoginPresenter @Inject constructor(
                                             }
 
                                             override fun onDatabaseOpened(code: RongIMClient.DatabaseOpenStatus?) {
-                                                TODO("Not yet implemented")
                                             }
                                         })
                                 }

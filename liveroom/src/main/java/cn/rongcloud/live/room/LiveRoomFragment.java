@@ -337,22 +337,22 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         finishDiolog.show();
     }
 
-    /**
-     * 显示是否结束连麦
-     */
-    private void showDisConnectDiolog() {
-        if (disConnectDiolog == null) {
-            disConnectDiolog = new ConfirmDialog(requireContext(), "是否结束本次连麦？", true,
-                    "确定", "取消", null, new Function0<Unit>() {
-                @Override
-                public Unit invoke() {
-                    present.disConnect(-1);
-                    return null;
-                }
-            });
-        }
-        disConnectDiolog.show();
-    }
+//    /**
+//     * 显示是否结束连麦
+//     */
+//    private void showDisConnectDiolog() {
+//        if (disConnectDiolog == null) {
+//            disConnectDiolog = new ConfirmDialog(requireContext(), "是否结束本次连麦？", true,
+//                    "确定", "取消", null, new Function0<Unit>() {
+//                @Override
+//                public Unit invoke() {
+//                    present.disConnect(-1);
+//                    return null;
+//                }
+//            });
+//        }
+//        disConnectDiolog.show();
+//    }
 
     @Override
     public void refreshMessageList() {
@@ -373,11 +373,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             return;
         }
         //如果是观众，但是观众在麦位上
-        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER
-                && LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
-            showDisConnectDiolog();
-            return;
-        }
+//        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER
+//                && LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
+//            showDisConnectDiolog();
+//            return;
+//        }
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
@@ -784,19 +784,19 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 //申请中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_request_enter_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
-                roomTitleBar.setIsLinkSeat(false);
+//                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_WAIT_FOR_SEAT:
                 //等待中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_wait_enter_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
-                roomTitleBar.setIsLinkSeat(false);
+//                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_ON_SEAT:
                 //已经在麦上
                 roomBottomView.setRequestSeatImage(R.drawable.ic_on_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(false);
-                roomTitleBar.setIsLinkSeat(true);
+//                roomTitleBar.setIsLinkSeat(true);
                 break;
         }
     }
