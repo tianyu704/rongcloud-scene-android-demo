@@ -14,12 +14,10 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.base.BaseBottomSheetDialogFragment;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
-import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 
@@ -46,13 +44,13 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
         if (!TextUtils.isEmpty(resolution)) {
             String[] xes = resolution.split("x");
             this.resolution = RCRTCParamsType.RCRTCVideoResolution.parseVideoResolution(Integer.parseInt(xes[0]), Integer.parseInt(xes[1]));
-        }else {
-            this.resolution= RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoResolution();
+        } else {
+            this.resolution = RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoResolution();
         }
         if (!TextUtils.isEmpty(fps)) {
             this.videoFps = RCRTCParamsType.RCRTCVideoFps.parseVideoFps(Integer.parseInt(fps));
-        }else {
-            this.videoFps=RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoFps();
+        } else {
+            this.videoFps = RCRTCEngine.getInstance().getDefaultVideoStream().getVideoConfig().getVideoFps();
         }
         this.onVideoConfigSetting = onVideoConfigSetting;
     }
@@ -103,10 +101,10 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
      */
     private void initResolutionRatio() {
         ArrayList<RCRTCParamsType.RCRTCVideoResolution> videoResolutions = new ArrayList<>();
-        videoResolutions.add(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_480);
         videoResolutions.add(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640);
         videoResolutions.add(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_720);
         videoResolutions.add(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_720_1280);
+        videoResolutions.add(RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_1080_1920);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 2);
         rvDpi.setLayoutManager(gridLayoutManager);
         ResolutionAdapter resolutionAdapter = new ResolutionAdapter();
@@ -167,14 +165,14 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
         @Override
         protected void convert(@NonNull BaseViewHolder baseViewHolder, RCRTCParamsType.RCRTCVideoResolution rcrtcVideoResolution) {
             TextView textView = baseViewHolder.getView(R.id.tv_id);
-            if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_480) {
-                textView.setText("480 * 480 (1:1)");
-            } else if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640) {
+            if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640) {
                 textView.setText("640 * 480 (4:3)");
             } else if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_720) {
                 textView.setText("720 * 480 (3:2)");
             } else if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_720_1280) {
                 textView.setText("1280 * 720 (16:9)");
+            } else if (rcrtcVideoResolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_1080_1920) {
+                textView.setText("1920 * 1080 (16:9)");
             }
             if (resolution == rcrtcVideoResolution) {
                 textView.setBackground(requireContext().getDrawable(R.drawable.shape_video_setting_selected_bg));
@@ -192,14 +190,14 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
      * 设置推荐码率
      */
     private void setTvCodeRate() {
-        if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_480) {
-            setTvCodeRateForFps(800);
-        } else if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640) {
+        if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_640) {
             setTvCodeRateForFps(900);
         } else if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_480_720) {
             setTvCodeRateForFps(1000);
         } else if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_720_1280) {
             setTvCodeRateForFps(2200);
+        } else if (resolution == RCRTCParamsType.RCRTCVideoResolution.RESOLUTION_1080_1920) {
+            setTvCodeRateForFps(4000);
         }
     }
 
