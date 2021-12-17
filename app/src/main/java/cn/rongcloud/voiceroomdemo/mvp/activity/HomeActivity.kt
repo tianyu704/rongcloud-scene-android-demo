@@ -87,7 +87,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
     override fun initView() {
         StatusBarUtil.setStatusBarFontIconDark(this, StatusBarUtil.TYPE_M, true)
         iv_video_live.setOnClickListener {
-            checkAndRequestPermissions(VOICE_PERMISSIONS) {
+            checkAndRequestPermissions(CALL_PERMISSIONS) {
                 if (it) {
                     UmengHelper.get().event(RcUmEvent.LiveRoom)
                     LiveRoomListActivity.startActivity(this)

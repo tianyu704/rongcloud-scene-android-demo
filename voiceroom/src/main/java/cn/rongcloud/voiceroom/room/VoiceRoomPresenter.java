@@ -1058,7 +1058,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 return o1.getSeatIndex() - o2.getSeatIndex();
             }
         });
-        mView.showSendGiftDialog(mVoiceRoomBean, "", memberArrayList);
+        mView.showSendGiftDialog(mVoiceRoomBean, getCreateUserId(), memberArrayList);
     }
 
     /**

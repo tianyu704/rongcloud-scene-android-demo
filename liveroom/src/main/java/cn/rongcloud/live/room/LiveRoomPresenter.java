@@ -579,22 +579,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 //当前麦位没有用户
                 continue;
             }
-            if (TextUtils.equals(userId, getCreateUserId())) {
-                //如果是房主麦位，不用管房主是否存在
-                User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
-                Member member = null;
-                if (user == null) {
-                    member = new Member();
-                    member.setUserName(mVoiceRoomBean.getCreateUserName());
-                    member.setUserId(mVoiceRoomBean.getCreateUserId());
-                } else {
-                    member = new Member().toMember(user);
-                }
-                member.setSeatIndex(rcLiveSeatInfo.getIndex());
-                memberArrayList.add(member);
-                continue;
-            } else {
-                //当前用户在麦位上
+            if (!TextUtils.equals(userId, getCreateUserId())) {
+                //当前用户在麦位上,并且不是房主的情况
                 User user = MemberCache.getInstance().getMember(userId);
                 Member member = null;
                 if (user == null) {
@@ -614,7 +600,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 return o1.getSeatIndex() - o2.getSeatIndex();
             }
         });
-        mView.showSendGiftDialog(mVoiceRoomBean, "", memberArrayList);
+
+        //如果是房主麦位，不用管房主是否存在
+        User user = MemberCache.getInstance().getMember(mVoiceRoomBean.getCreateUserId());
+        Member member = null;
+        if (user == null) {
+            member = new Member();
+            member.setUserName(mVoiceRoomBean.getCreateUserName());
+            member.setUserId(mVoiceRoomBean.getCreateUserId());
+        } else {
+            member = new Member().toMember(user);
+        }
+        memberArrayList.add(0,member);
+        mView.showSendGiftDialog(mVoiceRoomBean, getCreateUserId(), memberArrayList);
     }
 
     /**
@@ -1121,6 +1119,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
+        if (lineMicUserIds.size() == 2 && TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())
+                && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+            //如果是房主，并且是默认的模式，并且有2人的时候
+            mView.changeSeatOrder(true);
+        } else {
+            mView.changeSeatOrder(false);
+        }
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
@@ -1280,6 +1285,16 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void clickSeatOrder() {
+        if (SeatManager.get().getInSeatUserIds().size() == 2 && TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())
+                && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+            for (String inSeatUserId : SeatManager.get().getInSeatUserIds()) {
+                if (!TextUtils.equals(inSeatUserId, getCreateUserId())) {
+                    mView.showPickOutFragment(inSeatUserId);
+                    continue;
+                }
+            }
+            return;
+        }
         showSeatOperationViewPagerFragment(0);
     }
 
@@ -1678,6 +1693,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             if (LiveEventHelper.getInstance().getCurrentStatus() != CurrentStatusType.STATUS_ON_SEAT) {
                 //如果当前用户不在麦位上,那么去申请麦位
                 requestSeat(rcLiveSeatInfo.getIndex());
+            } else {
+                //切换麦位
+                LiveEventHelper.getInstance().swichToSeat(rcLiveSeatInfo.getIndex(), null);
             }
         } else {
             //麦位有人
