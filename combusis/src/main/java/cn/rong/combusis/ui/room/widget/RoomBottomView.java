@@ -298,6 +298,13 @@ public class RoomBottomView extends ConstraintLayout implements UnReadMessageMan
         mRequestSeatView.setImageResource(drawable);
     }
 
+    /**
+     * 设置邀请连麦的按钮
+     */
+    public void setSeatOrderImage(int drawable){
+        mSeatOrder.setImageResource(drawable);
+    }
+
     public void clearInput() {
         mInputView.setText("");
     }
