@@ -15,8 +15,8 @@ import cn.rongcloud.live.R;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
- * @author gyn
- * @date 2021/10/12
+ * @author 李浩
+ * @date 2021/12/12
  */
 public class LiveRoomCreatorSettingFragment extends BaseBottomSheetDialogFragment {
 

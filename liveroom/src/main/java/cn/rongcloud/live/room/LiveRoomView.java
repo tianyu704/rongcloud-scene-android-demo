@@ -69,6 +69,10 @@ public interface LiveRoomView extends IBaseView {
     void changeStatus();
 
     /**
+     * 当前的连麦状态
+     */
+    void changeSeatOrder(boolean isLink);
+    /**
      * 获取fragment管理器
      *
      * @return
@@ -167,5 +171,15 @@ public interface LiveRoomView extends IBaseView {
      */
     void refreshMessageList();
 
+    /**
+     * 切换到其他房间
+     * @param roomId
+     */
     void switchOtherRoom(String roomId);
+
+    /**
+     * 默认连麦模式下，连麦状态中，房主点击的弹窗
+     */
+    void showPickOutFragment(String userId);
+
 }

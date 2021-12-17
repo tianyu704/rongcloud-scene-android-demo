@@ -1121,6 +1121,13 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
+        if (lineMicUserIds.size()==2&&TextUtils.equals(getCreateUserId(),AccountStore.INSTANCE.getUserId())
+                &&RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
+            //如果是房主，并且是默认的模式，并且有2人的时候
+            mView.changeSeatOrder(true);
+        }else {
+            mView.changeSeatOrder(false);
+        }
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
@@ -1280,6 +1287,16 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void clickSeatOrder() {
+        if (SeatManager.get().getInSeatUserIds().size()==2&&TextUtils.equals(getCreateUserId(),AccountStore.INSTANCE.getUserId())
+                &&RCDataManager.get().getMixType()==RCLiveMixType.RCMixTypeOneToOne.getValue()){
+            for (String inSeatUserId : SeatManager.get().getInSeatUserIds()) {
+                if (!TextUtils.equals(inSeatUserId,getCreateUserId())){
+                    mView.showPickOutFragment(inSeatUserId);
+                    continue;
+                }
+            }
+           return;
+        }
         showSeatOperationViewPagerFragment(0);
     }
 

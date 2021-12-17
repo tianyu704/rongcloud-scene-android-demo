@@ -82,6 +82,7 @@ import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.live.fragment.LiveRoomCreatorSettingFragment;
+import cn.rongcloud.live.fragment.LiveRoomPickOutFragment;
 import cn.rongcloud.live.helper.LiveEventHelper;
 import cn.rongcloud.live.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
@@ -508,6 +509,14 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         liveRoomCreatorSettingFragment.show(getLiveFragmentManager());
     }
 
+    @Override
+    public void showPickOutFragment(String userId) {
+        User user = new User();
+        user.setUserId(userId);
+        RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(userId);
+        LiveRoomPickOutFragment liveRoomPickOutFragment = new LiveRoomPickOutFragment(rcLiveSeatInfo.isEnableVideo(), user, present);
+        liveRoomPickOutFragment.show(getLiveFragmentManager());
+    }
 
     /**
      * 发送全服广播
@@ -800,6 +809,15 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(false);
 //                roomTitleBar.setIsLinkSeat(true);
                 break;
+        }
+    }
+
+    @Override
+    public void changeSeatOrder(boolean islink) {
+        if (islink) {
+            roomBottomView.setSeatOrderImage(R.drawable.ic_on_seat);
+        } else {
+            roomBottomView.setSeatOrderImage(R.drawable.ic_seat_order);
         }
     }
 

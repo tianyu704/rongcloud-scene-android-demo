@@ -285,7 +285,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public void onError(int code, RCLiveError error) {
                 if (callback != null)
-                    callback.onResult(false, "接受请求连麦失败:" + error.getMessage());
+                    callback.onResult(false, "没有空闲麦位");
             }
         });
     }
@@ -1043,6 +1043,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         //统一处理
         if (!TextUtils.isEmpty(roomId) && message.getConversationType() == Conversation.ConversationType.CHATROOM) {
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(roomId, message.getContent());
+            messageList.add(message.getContent());
         }
         Log.e(TAG, "onReceiveMessage: ");
     }
