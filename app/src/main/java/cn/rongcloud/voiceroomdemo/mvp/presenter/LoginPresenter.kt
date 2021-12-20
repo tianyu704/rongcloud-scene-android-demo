@@ -67,6 +67,8 @@ class LoginPresenter @Inject constructor(
     }
 
     fun login(phoneNumber: String, verifyCode: String) {
+        com.kit.utils.Logger.e(TAG, "phoneNumber = " + phoneNumber)
+        com.kit.utils.Logger.e(TAG, "verifyCode = " + verifyCode)
         view.showWaitingDialog()
         GlobalScope.launch(Dispatchers.IO) {
             addDisposable(

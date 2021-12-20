@@ -44,6 +44,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/BasisTheme" />
         <activity
+            android:name=".internationalization.RegionActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/BasisTheme" />
+        <activity
             android:name="cn.rongcloud.voiceroomdemo.webview.ActCommentWeb"
             android:screenOrientation="portrait"
             android:theme="@style/BasisTheme">

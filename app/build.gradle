@@ -145,4 +145,5 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.belerweb:pinyin4j:2.5.1'
 }

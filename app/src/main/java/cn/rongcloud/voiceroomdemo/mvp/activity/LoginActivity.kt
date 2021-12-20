@@ -4,6 +4,7 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.activity
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -18,6 +19,8 @@ import androidx.core.widget.addTextChangedListener
 import cn.rong.combusis.common.utils.UIKit
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
+import cn.rongcloud.voiceroomdemo.internationalization.Region
+import cn.rongcloud.voiceroomdemo.internationalization.RegionActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb
@@ -62,6 +65,11 @@ class LoginActivity : BaseActivity(), ILoginView {
                 showToast("请勾选同意注册条款")
                 return@setOnClickListener
             }
+            var reg = if (null == region) {
+                "86"
+            } else {
+                region?.region
+            }
             presenter.getVerificationCode(et_phone_number.text.toString())
         }
         et_verification_code.addTextChangedListener {
@@ -73,8 +81,29 @@ class LoginActivity : BaseActivity(), ILoginView {
                 showToast("请勾选同意注册条款")
                 return@setOnClickListener
             }
+            var reg = if (null == region) {
+                "86"
+            } else {
+                region?.region
+            }
             presenter.login(et_phone_number.text.toString(), et_verification_code.text.toString())
         }
+        tv_region.setOnClickListener {
+            RegionActivity.openRegionPage(this)
+        }
+    }
+
+    var region: Region? = null
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (Activity.RESULT_OK == resultCode && RegionActivity.CODE_REGION == requestCode) {
+            data?.let {
+                region = data.getSerializableExtra("region") as Region
+                region?.let {
+                    tv_region.text = "+" + region?.region
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     override fun initData() {
