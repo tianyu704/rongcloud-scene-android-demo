@@ -93,7 +93,7 @@ public class EventDialogHelper {
         pkTimer = new Timer(textView, roomId, userInfo);
         pkTimer.start();
         dialog.replaceContent(title,
-                "取消",
+                "拒绝",
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
