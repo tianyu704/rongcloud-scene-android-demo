@@ -105,7 +105,7 @@ public class InviteSeatFragment extends BaseFragment {
             public void onResult(Boolean result, String msg) {
                 if (result) {
                     getSeatOperationViewPagerFragment().dismiss();
-                    EToast.showToast("发送上麦通知成功");
+                    EToast.showToast("已邀请上麦");
                 } else {
                     EToast.showToast(msg);
                 }

@@ -141,7 +141,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         this.createUserId = null;
         setCurrentStatus(STATUS_NOT_ON_SEAT);
         messageList.clear();
-        removeLiveRoomListeners();
         RCLiveEngine.getInstance().unPrepare(null);
         RCLiveEngine.getInstance().setSeatViewProvider(null);
         isMute = false;
@@ -222,7 +221,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onError(int code, RCLiveError error) {
                 if (callback != null)
                     callback.onResult(false, error.getMessage());
-                EToast.showToast("加入房间失败:" + error.getMessage());
+//                EToast.showToast("加入房间失败:" + error.getMessage());
             }
         });
     }
@@ -994,8 +993,11 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationRejected(userId);
         }
-        if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
-            EToast.showToast("用户拒绝邀请");
+        User member = MemberCache.getInstance().getMember(userId);
+        if (member != null) {
+            EToast.showToast("用户 " + member.getUserName() + " 已拒绝上麦");
+        } else {
+            EToast.showToast("用户 " + userId + " 已拒绝上麦");
         }
         Log.e(TAG, "onliveVideoInvitationRejected: ");
     }

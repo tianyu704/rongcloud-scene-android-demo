@@ -310,8 +310,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         LiveEventHelper.getInstance().getRoomInfoByKey(LiveRoomKvKey.LIVE_ROOM_ENTER_SEAT_MODE, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String mode) {
-                if (currentStatus == CurrentStatusType.STATUS_WAIT_FOR_SEAT
-                        && TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_RequestEnterSeat)) {
+                //&& TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_RequestEnterSeat)
+                if (currentStatus == CurrentStatusType.STATUS_WAIT_FOR_SEAT) {
                     showRevokeSeatRequestFragment();
                     return;
                 }
@@ -320,7 +320,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     int index = position;
                     if (index == -1) {
                         for (RCLiveSeatInfo seatInfo : RCLiveEngine.getInstance().getSeatManager().getSeatInfos()) {
-                            if (TextUtils.isEmpty(seatInfo.getUserId())) {
+                            if (TextUtils.isEmpty(seatInfo.getUserId())&&!seatInfo.isLock()) {
+                                //麦位空闲并且没有被锁定
                                 index = seatInfo.getIndex();
                                 break;
                             }
@@ -500,7 +501,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
     /**
-     * 取消房间的各种监听
+     * 取消房间界面的各种监听
      */
     @Override
     public void unInitLiveRoomListener() {
@@ -835,8 +836,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e("LiveEventHelper", "onDestroy: ");
-        unInitLiveRoomListener();
     }
 
     /**
@@ -1109,11 +1108,17 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
+    /**
+     * 被踢出去
+     * @param userId     被踢用户唯一标识
+     * @param operatorId 踢人操作的执行用户的唯一标识
+     */
     @Override
     public void onUserKitOut(String userId, String operatorId) {
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
             mView.finish();
             unInitLiveRoomListener();
+            LiveEventHelper.getInstance().unRegister();
         }
     }
 
@@ -1595,6 +1600,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
                 //有人在麦位上的布局
                 TextView name = view.findViewById(R.id.tv_member_name);
+                name.setVisibility(paramter.getMixType()==RCLiveMixType.RCMixTypeOneToSix.getValue()?View.GONE:View.VISIBLE);
                 RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
                 ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
                 //根据麦位信息来判断是否开启还是关闭动画效果
@@ -1746,6 +1752,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void onSeatSpeak(RCLiveSeatInfo seatInfo, int audioLevel) {
+        Log.e(TAG, "onSeatSpeak: seatIndex :"+seatInfo.getIndex() +"seatAudio:"+audioLevel);
         RCHolder hold = LiveEventHelper.getInstance().getHold(seatInfo.getIndex());
         if (hold != null) {
             WaveView waveView = hold.getView(R.id.wv_creator_background);

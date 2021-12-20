@@ -136,7 +136,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
             mOnMemberSettingClickListener.clickInviteSeat(member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
-                    EToast.showToast("发送上麦通知成功");
+                    EToast.showToast("已邀请上麦");
                 } else {
                     EToast.showToast(msg);
                 }
@@ -233,6 +233,13 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
         switch (mRoomOwnerType) {
             case VOICE_OWNER:
             case LIVE_OWNER:
+                if (memberIsOwner){
+                    mClButtons.setVisibility(View.INVISIBLE);
+                    mClMemberSetting.setVisibility(View.GONE);
+                    mTvSeatPosition.setVisibility(View.INVISIBLE);
+                    mRlSettingAdmin.setVisibility(View.GONE);
+                    break;
+                }
                 mClMemberSetting.setVisibility(View.VISIBLE);
                 // 上下麦
                 if (memberIsOnSeat) {

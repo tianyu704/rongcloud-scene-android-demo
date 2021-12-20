@@ -142,7 +142,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private MemberListFragment mMemberListFragment;
     private TextView tvGiftCount;
     private int marginTop;
-    private ConfirmDialog disConnectDiolog;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -242,12 +241,13 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         super.preJoinRoom();
     }
 
+    /**
+     * 滑动切换房间，房间销毁的方法，取消掉对于当前界面的监听就可以了
+     */
     @Override
     public void destroyRoom() {
         super.destroyRoom();
         present.unInitLiveRoomListener();
-        //取消对当前房间的监听
-        LiveEventHelper.getInstance().unRegister();
     }
 
     @Override
@@ -309,9 +309,10 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         roomTitleBar.setOnMemberClickListener().subscribe(new Consumer() {
             @Override
             public void accept(Object o) throws Throwable {
-                if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER) {
-                    showMemberSettingFragment(present.getCreateUserId());
-                }
+//                if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER) {
+//                    showMemberSettingFragment(present.getCreateUserId());
+//                }
+                showMemberSettingFragment(present.getCreateUserId());
             }
         });
         roomTitleBar.setOnLineMemberClickListener().subscribe(new Consumer() {
@@ -375,15 +376,15 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             showFinishDiolog();
             return;
         }
-        //如果是观众，但是观众在麦位上
-//        if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER
-//                && LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
-//            showDisConnectDiolog();
-//            return;
-//        }
         mExitRoomPopupWindow = new ExitRoomPopupWindow(getContext(), present.getRoomOwnerType(), new ExitRoomPopupWindow.OnOptionClick() {
             @Override
             public void clickPackRoom() {
+                //如果是观众，但是观众在麦位上
+                if (present.getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER
+                        && LiveEventHelper.getInstance().getCurrentStatus() == CurrentStatusType.STATUS_ON_SEAT) {
+                    EToast.showToast("连麦中禁止此操作");
+                    return;
+                }
                 //最小化窗口,判断是否有权限
                 if (checkDrawOverlaysPermission(false)) {
                     finish();
@@ -448,7 +449,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_go_back_list) {
-            requireActivity().finish();
+            finish();
             LiveEventHelper.getInstance().unRegister();
         } else if (v.getId() == R.id.tv_notice) {
             showNoticeDialog(false);
@@ -826,8 +827,12 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         return getChildFragmentManager();
     }
 
+    /**
+     * 销毁整个界面，取消掉对于整个界面的监听
+     */
     @Override
     public void finish() {
+        present.unInitLiveRoomListener();
         requireActivity().finish();
     }
 

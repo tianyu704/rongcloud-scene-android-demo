@@ -35,6 +35,7 @@
                 app:radius="12dp"
                 app:srcCompat="@drawable/icon_select_backgroup" />
         </RelativeLayout>
+
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/et_room_name"
             android:layout_width="match_parent"
@@ -45,10 +46,9 @@
             android:layout_toRightOf="@id/select_cover_view"
             android:background="@drawable/bg_create_live_room_name"
             android:gravity="center|left"
+            android:hint="设置房间标题"
             android:lines="1"
             android:maxLines="1"
-            android:maxLength="10"
-            android:hint="设置房间标题"
             android:paddingStart="15dp"
             android:textSize="14sp" />
 

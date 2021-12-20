@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.RadioGroup;
@@ -35,6 +36,7 @@ import java.util.Map;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
+import cn.rong.combusis.common.utils.ChineseLengthFilter;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
@@ -160,6 +162,7 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         ivBack = (AppCompatImageView) getView().findViewById(R.id.iv_back);
         selectCoverView = (RelativeLayout) getView().findViewById(R.id.select_cover_view);
         etRoomName = (AppCompatEditText) getView().findViewById(R.id.et_room_name);
+        etRoomName.setFilters(new InputFilter[]{new ChineseLengthFilter(20)});
         rgIsPublic = (RadioGroup) getView().findViewById(R.id.rg_is_public);
         rbPrivate = (AppCompatRadioButton) getView().findViewById(R.id.rb_private);
         rbPublic = (AppCompatRadioButton) getView().findViewById(R.id.rb_public);
