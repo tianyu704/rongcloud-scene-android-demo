@@ -65,12 +65,9 @@ class LoginActivity : BaseActivity(), ILoginView {
                 showToast("请勾选同意注册条款")
                 return@setOnClickListener
             }
-            var reg = if (null == region) {
-                "86"
-            } else {
-                region?.region
-            }
-            presenter.getVerificationCode(et_phone_number.text.toString())
+
+            var reg = region?.region ?: "86"
+            presenter.getVerificationCode(et_phone_number.text.toString(), reg)
         }
         et_verification_code.addTextChangedListener {
             btn_login.isEnabled =
@@ -80,11 +77,6 @@ class LoginActivity : BaseActivity(), ILoginView {
             if (!checked) {
                 showToast("请勾选同意注册条款")
                 return@setOnClickListener
-            }
-            var reg = if (null == region) {
-                "86"
-            } else {
-                region?.region
             }
             presenter.login(et_phone_number.text.toString(), et_verification_code.text.toString())
         }

@@ -8,6 +8,7 @@ package cn.rongcloud.voiceroomdemo.net.api.bean.request
  * @author gusd
  * @Date 2021/06/07
  */
-data class GetVerificationCode(
+data class GetVerificationCodeInternational(
     val mobile: String,
+    val region: String
 )

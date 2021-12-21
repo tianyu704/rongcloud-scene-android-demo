@@ -30,16 +30,21 @@ object AppConfig {
     public var BASE_SERVER_ADDRESS: String? = null
         private set
 
+    public var isInternationalization: Boolean = false
+        private set
+
     fun initConfig(
         appKey: String,
         UMAppKey: String?,
         channelName: String?,
-        baseServerAddress: String
+        baseServerAddress: String,
+        INTERNATIONALIZATION: String
     ) {
         APP_KEY = appKey
         UM_APP_KEY = UMAppKey
         CHANNEL_NAME = channelName
         BASE_SERVER_ADDRESS = baseServerAddress
+        isInternationalization = INTERNATIONALIZATION.equals("true")
     }
 
 
