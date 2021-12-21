@@ -23,6 +23,7 @@ import com.yhao.floatwindow.ViewStateListener;
 
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
+import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 
@@ -96,11 +97,15 @@ public class MiniRoomManager implements OnMiniRoomListener {
         this.onCloseMiniRoomListener = onCloseMiniRoomListener;
         miniWindows = LayoutInflater.from(context.getApplicationContext()).inflate(R.layout.view_live_room_mini, null);
         RelativeLayout relativeLayout = miniWindows.findViewById(R.id.fl_content_id);
+        View view_close=miniWindows.findViewById(R.id.iv_close_id);
+        view_close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish("",null);
+            }
+        });
         // 这里改成DP值
         RCLiveView rcLiveView = RCLiveEngine.getInstance().preview();
-        if (relativeLayout != null) {
-            relativeLayout.removeAllViews();
-        }
         ViewParent parent = rcLiveView.getParent();
         if (parent instanceof ViewGroup) {
             ((ViewGroup) parent).removeAllViews();

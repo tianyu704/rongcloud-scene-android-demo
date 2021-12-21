@@ -41,7 +41,7 @@
             android:paddingStart="@dimen/dimen_room_padding"
             android:textSize="14sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/tv_room_delay"
+            app:layout_constraintBottom_toTopOf="@id/tv_room_id"
             app:layout_constraintStart_toEndOf="@+id/iv_creater_id"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Lily的房间aaaaaaaaaaaaaaaaaaaaaaa" />
@@ -84,6 +84,7 @@
             android:text="0"
             android:textColor="@color/white"
             android:textSize="9sp"
+            android:visibility="visible"
             app:layout_constraintStart_toEndOf="@id/tv_room_online"
             android:layout_marginStart="@dimen/dimen_room_padding"
             app:layout_constraintBottom_toBottomOf="parent"
