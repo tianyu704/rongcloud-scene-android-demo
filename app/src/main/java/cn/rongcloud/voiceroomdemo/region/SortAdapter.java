@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroomdemo.internationalization;
+package cn.rongcloud.voiceroomdemo.region;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroomdemo.internationalization.sort;
+package cn.rongcloud.voiceroomdemo.region.sort;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;

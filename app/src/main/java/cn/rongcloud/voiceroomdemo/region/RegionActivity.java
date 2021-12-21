@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroomdemo.internationalization;
+package cn.rongcloud.voiceroomdemo.region;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,10 +16,8 @@ import com.basis.adapter.recycle.RcyHolder;
 import com.basis.adapter.recycle.RcySAdapter;
 import com.basis.ui.BaseActivity;
 import com.basis.widget.SearchEditText;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.kit.UIKit;
+import com.kit.cache.GsonUtil;
 import com.kit.utils.ResUtil;
 import com.kit.utils.ScreenUtil;
 
@@ -28,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import cn.rongcloud.voiceroomdemo.R;
-import cn.rongcloud.voiceroomdemo.internationalization.sort.SideBar;
+import cn.rongcloud.voiceroomdemo.region.sort.SideBar;
 
 public class RegionActivity extends BaseActivity implements View.OnClickListener {
     public final static int CODE_REGION = 10023;
@@ -39,7 +37,6 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
     private SearchEditText editText;
     private View ivDelete, cancel;
     private RegionAdapter adapter;
-    private Region selected;
 
     public static void openRegionPage(Activity activity) {
         activity.startActivityForResult(new Intent(activity, RegionActivity.class), CODE_REGION);
@@ -93,9 +90,9 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
     }
 
     /**
-     * 搜索 输入变化和软件盘搜索
+     * 检索 输入变化和软件盘搜索
      *
-     * @param search
+     * @param search 检索文字
      */
     void search(String search) {
         if (null == data || data.isEmpty() || null == adapter) {
@@ -123,6 +120,7 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
         adapter = new RegionAdapter(activity);
         rvContacts.setAdapter(adapter);
         sideBar = findViewById(R.id.side_bar);
+        // 重置高度
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.MATCH_PARENT,
                 ScreenUtil.getScreemHeight() / 2);
@@ -134,29 +132,26 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
             public void onSelectStr(int index, String selectStr) {
                 for (int i = 0; i < data.size(); i++) {
                     if (selectStr.equalsIgnoreCase(data.get(i).getFirstLetter())) {
-                        layoutManager.scrollToPositionWithOffset(i, 0); // 选择到首字母出现的位置
+                        layoutManager.scrollToPositionWithOffset(i, 0);
                         return;
                     }
                 }
             }
         });
         parserRegion();
-        Collections.sort(data);
         adapter.setData(data, true);
         initSearch();
     }
 
     void parserRegion() {
         String json = ResUtil.readStringFromAssets("region.json");
-        JsonElement element = JsonParser.parseString(json);
-        if (element.isJsonArray()) {
-            JsonArray array = element.getAsJsonArray();
-            for (JsonElement e : array) {
-                if (e.isJsonObject()) {
-                    data.add(new Region(e.getAsJsonObject(), true));
-                }
+        data = GsonUtil.json2List(json, Region.class);
+        if (null != data && !data.isEmpty()) {
+            for (Region r : data) {
+                r.locale.initPinYin(true);
             }
         }
+        Collections.sort(data);
     }
 
     public static class RegionAdapter extends RcySAdapter<Region, RcyHolder> {

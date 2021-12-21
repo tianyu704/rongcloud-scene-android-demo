@@ -19,10 +19,10 @@ import androidx.core.widget.addTextChangedListener
 import cn.rong.combusis.common.utils.UIKit
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.voiceroomdemo.R
-import cn.rongcloud.voiceroomdemo.internationalization.Region
-import cn.rongcloud.voiceroomdemo.internationalization.RegionActivity
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.ILoginView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
+import cn.rongcloud.voiceroomdemo.region.Region
+import cn.rongcloud.voiceroomdemo.region.RegionActivity
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.showToast

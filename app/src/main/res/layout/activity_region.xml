@@ -61,10 +61,10 @@
         android:layout_marginTop="@dimen/basis_15px"
         android:background="#efeff4" />
 
-    <cn.rongcloud.voiceroomdemo.internationalization.sort.SideBar
+    <cn.rongcloud.voiceroomdemo.region.sort.SideBar
         android:id="@+id/side_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:paddingLeft="@dimen/basis_20px"
         android:paddingRight="@dimen/basis_20px"

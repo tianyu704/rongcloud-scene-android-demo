@@ -1,4 +1,4 @@
-package cn.rongcloud.voiceroomdemo.internationalization.sort;
+package cn.rongcloud.voiceroomdemo.region.sort;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -10,24 +10,22 @@ import android.view.MotionEvent;
 import cn.rongcloud.voiceroomdemo.R;
 
 public class SideBar extends androidx.appcompat.widget.AppCompatTextView {
-    /**
-     * 普通情况下字体大小
-     */
-    float singleTextH;
     private String[] letters = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I",
             "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
             "W", "X", "Y", "Z", "#"};
     private Paint textPaint;
     private Paint bigTextPaint;
     private Paint scaleTextPaint;
+
     private Canvas canvas;
     private int itemH;
     private int w;
     private int h;
     /**
-     * 缩放离原始的宽度
+     * 普通情况下字体大小
      */
-    private float scaleWidth;
+    float singleTextH;
+    int dev = 60;
     /**
      * 滑动的Y
      */
@@ -168,14 +166,19 @@ public class SideBar extends androidx.appcompat.widget.AppCompatTextView {
         drawLetters(y, currentSelectIndex);
     }
 
+    /**
+     * 缩放离原始的宽度
+     */
+    private float scaleWidth;
+
     private void drawLetters(float y, int index) {
         //第一次进来没有缩放情况，默认画原图
         if (index == -1) {
             w = getMeasuredWidth();
             h = getMeasuredHeight();
-            itemH = h / letters.length;
+            itemH = (h - dev) / letters.length;
             Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-            singleTextH = fontMetrics.descent - fontMetrics.ascent;
+            singleTextH = fontMetrics.descent - fontMetrics.ascent + dev;
             for (int i = 0; i < letters.length; i++) {
                 canvas.drawText(letters[i], w - getPaddingRight(), singleTextH + itemH * i, textPaint);
             }

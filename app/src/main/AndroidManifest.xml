@@ -44,7 +44,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/BasisTheme" />
         <activity
-            android:name=".internationalization.RegionActivity"
+            android:name=".region.RegionActivity"
             android:screenOrientation="portrait"
             android:theme="@style/BasisTheme" />
         <activity
