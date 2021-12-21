@@ -72,7 +72,7 @@ public class RoomOwerDialog extends BottomDialog {
                                             new IResultBack<Boolean>() {
                                                 @Override
                                                 public void onResult(Boolean aBoolean) {
-                                                    KToast.show(aBoolean ? "已邀请PK,等的对方接受" : "PK邀请失败");
+                                                    KToast.show(aBoolean ? "已邀请PK,等待对方接受" : "PK邀请失败");
                                                     if (null != resultBack)
                                                         resultBack.onResult(aBoolean);
                                                 }
