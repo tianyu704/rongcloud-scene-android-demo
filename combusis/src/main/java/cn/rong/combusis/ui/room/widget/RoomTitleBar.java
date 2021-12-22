@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -255,14 +256,17 @@ public class RoomTitleBar extends ConstraintLayout {
      * 设置不同房间的状态
      */
     public void setViewState() {
+        ConstraintLayout.LayoutParams layoutParams = (LayoutParams) mNameTextView.getLayoutParams();
         switch (roomOwnerType) {
             case LIVE_OWNER:
+                layoutParams.bottomToTop=mDelayTextView.getId();
+                mNameTextView.setLayoutParams(layoutParams);
                 mDelayTextView.setVisibility(VISIBLE);
                 mCreaterImageview.setVisibility(VISIBLE);
                 mLeftView.setBackgroundResource(R.drawable.bg_live_room_title_left);
-                mCreaterImageview.setVisibility(VISIBLE);
                 mOnlineTextView.setVisibility(GONE);
                 tvRoomOnlineCount.setVisibility(VISIBLE);
+                mIDTextView.setVisibility(GONE);
                 mMenuButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_close_live_room));
                 setmLeftViewMarginStart(getResources().getDimensionPixelOffset(R.dimen.dimen_room_padding));
                 break;
@@ -270,7 +274,6 @@ public class RoomTitleBar extends ConstraintLayout {
                 mDelayTextView.setVisibility(GONE);
                 mCreaterImageview.setVisibility(VISIBLE);
                 mLeftView.setBackgroundResource(R.drawable.bg_live_room_title_left);
-                mCreaterImageview.setVisibility(VISIBLE);
                 mOnlineTextView.setVisibility(GONE);
                 mIDTextView.setVisibility(GONE);
                 tvRoomOnlineCount.setVisibility(VISIBLE);
@@ -279,9 +282,10 @@ public class RoomTitleBar extends ConstraintLayout {
                 break;
             default:
                 //非直播房
+                layoutParams.bottomToTop=mIDTextView.getId();
+                mNameTextView.setLayoutParams(layoutParams);
                 mCreaterImageview.setVisibility(GONE);
                 mLeftView.setBackgroundResource(R.drawable.bg_room_title_left);
-                mCreaterImageview.setVisibility(GONE);
                 mOnlineTextView.setVisibility(VISIBLE);
                 mIDTextView.setVisibility(VISIBLE);
                 tvRoomOnlineCount.setVisibility(GONE);

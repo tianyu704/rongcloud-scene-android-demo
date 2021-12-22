@@ -85,7 +85,7 @@ public class RequestSeatFragment extends BaseFragment {
         @Override
         protected void convert(@NonNull BaseViewHolder baseViewHolder, User user) {
             if (user == null) return;
-            baseViewHolder.setText(R.id.tv_operation, "接收");
+            baseViewHolder.setText(R.id.tv_operation, "接受");
             baseViewHolder.setText(R.id.tv_member_name, user.getUserName());
             ImageView imageView = baseViewHolder.getView(R.id.iv_user_portrait);
             ImageLoader.loadUrl(imageView, user.getPortraitUrl(), R.drawable.default_portrait, ImageLoader.Size.SZ_100);

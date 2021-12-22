@@ -921,7 +921,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             welcome.setContent(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()));
             sendMessage(welcome);
             RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-            tips.setContent("感谢使用融云 RTC 语音房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
+            tips.setContent("感谢使用融云 RTC 直播房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
             sendMessage(tips);
             // 广播消息
             RCChatroomEnter enter = new RCChatroomEnter();

@@ -1079,6 +1079,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     @Override
     public void onRoomDestroy() {
+        MiniRoomManager.getInstance().close();
         ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
                 , "确定", "", null, new Function0<Unit>() {
             @Override
