@@ -371,6 +371,7 @@ public class MhDataManager {
                 e.printStackTrace();
             }
         }
+        sInstance=null;
 //        mMhManager = null;
 
     }
