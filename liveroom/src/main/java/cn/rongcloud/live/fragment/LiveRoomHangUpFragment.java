@@ -14,7 +14,7 @@ import cn.rongcloud.live.R;
  * @author 李浩
  * @date 2021/12/17
  */
-public class LiveRoomPickOutFragment extends BaseBottomSheetDialogFragment {
+public class LiveRoomHangUpFragment extends BaseBottomSheetDialogFragment {
 
     SeatActionClickListener seatActionClickListener;
     private boolean isVideo;
@@ -23,7 +23,7 @@ public class LiveRoomPickOutFragment extends BaseBottomSheetDialogFragment {
     private AppCompatTextView btn_pickout;
     private AppCompatTextView btn_cancel;
 
-    public LiveRoomPickOutFragment(boolean isVideo, User user, SeatActionClickListener seatActionClickListener) {
+    public LiveRoomHangUpFragment(boolean isVideo, User user, SeatActionClickListener seatActionClickListener) {
         super(R.layout.fragment_live_room_pick_out);
         this.seatActionClickListener = seatActionClickListener;
         this.isVideo = isVideo;

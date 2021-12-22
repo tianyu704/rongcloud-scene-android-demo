@@ -16,7 +16,7 @@ public interface RadioRoomMemberSettingClickListener extends MemberSettingFragme
     }
 
     @Override
-    default void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
+    default void clickInviteSeat(int seatIndex, User user, ClickCallback<Boolean> callback) {
 
     }
 
@@ -64,4 +64,10 @@ public interface RadioRoomMemberSettingClickListener extends MemberSettingFragme
     default void switchToSeat(int seatIndex, ClickCallback<Boolean> callback) {
 
     }
+
+    @Override
+    default void cancelInvitation(String userId, ClickCallback<Boolean> callback){
+
+    }
+
 }

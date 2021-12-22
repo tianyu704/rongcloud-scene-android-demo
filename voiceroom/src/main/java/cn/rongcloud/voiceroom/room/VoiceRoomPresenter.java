@@ -952,7 +952,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     }
 
     @Override
-    public void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
+    public void clickInviteSeat(int seatIndex, User user, ClickCallback<Boolean> callback) {
         EventHelper.helper().pickUserToSeat(user.getUserId(), callback);
     }
 
@@ -986,6 +986,11 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 }
             }
         });
+    }
+
+    @Override
+    public void cancelInvitation(String userId, ClickCallback<Boolean> callback) {
+
     }
 
     @Override
@@ -1090,7 +1095,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * @param index
      */
     @Override
-    public void showSeatOperationViewPagerFragment(int index) {
+    public void showSeatOperationViewPagerFragment(int index,int seatIndex) {
         SeatOperationViewPagerFragment seatOperationViewPagerFragment
                 = new SeatOperationViewPagerFragment(getRoomOwnerType());
         seatOperationViewPagerFragment.setRequestSeats(voiceRoomModel.getRequestSeats());

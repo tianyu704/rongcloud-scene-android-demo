@@ -133,7 +133,7 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                 EToast.showToast("当前PK中,无法进行该操作");
                 return;
             }
-            mOnMemberSettingClickListener.clickInviteSeat(member.toUser(), (result, msg) -> {
+            mOnMemberSettingClickListener.clickInviteSeat(-1, member.toUser(), (result, msg) -> {
                 if (result) {
                     dismiss();
                     EToast.showToast("已邀请上麦");

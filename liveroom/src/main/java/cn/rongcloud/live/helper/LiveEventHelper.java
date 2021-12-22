@@ -31,6 +31,7 @@ import cn.rong.combusis.message.RCChatroomLocationMessage;
 import cn.rong.combusis.music.MusicManager;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
+import cn.rong.combusis.provider.voiceroom.InviteStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
@@ -51,6 +52,7 @@ import cn.rongcloud.liveroom.api.interfaces.RCLiveSeatListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
 import cn.rongcloud.live.room.LiveRoomKvKey;
+import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -86,6 +88,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     private String roomId;//直播房的房间ID
     private String createUserId;//房间创建人ID
     private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
+    private InviteStatusType inviteStatusType = InviteStatusType.STATUS_NOT_INVITRED;
     private List<LiveRoomListener> liveRoomListeners = new ArrayList<>();
     private ConfirmDialog pickReceivedDialog;
     //麦克风是否被关闭
@@ -108,6 +111,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     @Override
     public void setCurrentStatus(CurrentStatusType currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    public InviteStatusType getInviteStatusType() {
+        return inviteStatusType;
     }
 
     @Override
@@ -174,6 +181,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             }
         });
     }
+
     /**
      * 移除provider
      */
@@ -238,6 +246,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         RCLiveEngine.getInstance().getLinkManager().invitateLiveVideo(userId, index, new RCLiveCallback() {
             @Override
             public void onSuccess() {
+                //如果为默认模式
+                if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()){
+                    inviteStatusType=InviteStatusType.STATUS_UNDER_INVITATION;
+                }
                 if (callback != null) callback.onResult(true, "邀请用户已成功");
             }
 
@@ -256,7 +268,8 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         RCLiveEngine.getInstance().getLinkManager().cancelInvitation(userId, new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                if (callback != null) callback.onResult(true, "撤销麦位邀请成功");
+                inviteStatusType=InviteStatusType.STATUS_NOT_INVITRED;
+                if (callback != null) callback.onResult(true, "撤销视频连线邀请成功");
             }
 
             @Override
@@ -831,6 +844,12 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
+        if (lineMicUserIds.size() == 2 && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+            //如果是默认连麦模式，并且已经是连麦中
+            inviteStatusType = InviteStatusType.STATUS_CONNECTTING;
+        } else {
+            inviteStatusType = InviteStatusType.STATUS_NOT_INVITRED;
+        }
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoUpdate(lineMicUserIds);
         }
@@ -990,6 +1009,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onliveVideoInvitationRejected(String userId) {
+        inviteStatusType=InviteStatusType.STATUS_NOT_INVITRED;
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationRejected(userId);
         }

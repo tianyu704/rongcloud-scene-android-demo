@@ -729,7 +729,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
     public void clickSeatOrder() {
         if (!checkPKState()) {
             //弹窗邀请弹窗 并且将申请的集合和可以被要求的传入
-            present.showSeatOperationViewPagerFragment(0);
+            present.showSeatOperationViewPagerFragment(0,-1);
         }
     }
 

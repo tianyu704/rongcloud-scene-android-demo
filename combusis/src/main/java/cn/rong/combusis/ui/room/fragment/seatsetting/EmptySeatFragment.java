@@ -164,7 +164,7 @@ public class EmptySeatFragment extends BaseBottomSheetDialogFragment implements 
             muteOrUnMuteSeat();
         } else if (id == R.id.btn_invite_user_into_seat) {
             if (iCommonDialog != null) {
-                iCommonDialog.showSeatOperationViewPagerFragment(1);
+                iCommonDialog.showSeatOperationViewPagerFragment(1,index);
             }
             dismiss();
         } else if (id == R.id.btn_swich_seat) {
