@@ -40,12 +40,12 @@ class LoginPresenter @Inject constructor(
     override fun onDestroy() {
     }
 
-    fun getVerificationCode(phoneNumber: String, region: String) {
+    fun getVerificationCode(region: String, phoneNumber: String) {
         view.showWaitingDialog()
         GlobalScope.launch(Dispatchers.IO) {
             addDisposable(
                 loginModel
-                    .getVerificationCode(phoneNumber, region)
+                    .getVerificationCode(region, phoneNumber)
                     .doFinally {
                         view.hideWaitingDialog()
                     }
@@ -67,14 +67,12 @@ class LoginPresenter @Inject constructor(
     }
 
 
-    fun login(phoneNumber: String, verifyCode: String) {
-        com.kit.utils.Logger.e(TAG, "phoneNumber = " + phoneNumber)
-        com.kit.utils.Logger.e(TAG, "verifyCode = " + verifyCode)
+    fun login(region: String, phoneNumber: String, verifyCode: String) {
         view.showWaitingDialog()
         GlobalScope.launch(Dispatchers.IO) {
             addDisposable(
                 loginModel
-                    .login(phoneNumber, verifyCode)
+                    .login(region, phoneNumber, verifyCode)
                     .doFinally {
                         view.hideWaitingDialog()
                     }

@@ -7,12 +7,10 @@ package cn.rongcloud.voiceroomdemo.mvp.model
 import androidx.appcompat.app.AppCompatActivity
 import cn.rongcloud.voiceroomdemo.net.CommonNetManager
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCode
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCodeInternational
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.LoginRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.LoginRespondBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.VerificationCodeRespondBean
 import com.kit.utils.Logger
-import com.rongcloud.common.AppConfig
 import com.rongcloud.common.base.BaseLifeCycleModel
 import com.rongcloud.common.utils.DeviceUtils
 import dagger.hilt.android.scopes.ActivityScoped
@@ -27,49 +25,32 @@ import javax.inject.Inject
 @ActivityScoped
 class LoginModel @Inject constructor(activity:AppCompatActivity):BaseLifeCycleModel(activity) {
     fun getVerificationCode(
-        phoneNumber: String,
-        region: String
+        region: String,
+        phoneNumber: String
     ): Single<VerificationCodeRespondBean> {
-        Logger.e(
-            TAG,
-            "isInternationalization = " + AppConfig.isInternationalization + " region = " + region
-        )
-        if (AppConfig.isInternationalization) {
-            var reg = region
-            if (!region.startsWith("+")) {
-                reg = "+" + region
-            }
-            Logger.e(TAG, "region = " + reg)
-            return CommonNetManager.commonService.getVerificationCodeInternational(
-                GetVerificationCodeInternational(phoneNumber, reg)
-            ).observeOn(AndroidSchedulers.mainThread())
-        } else {
-            return CommonNetManager.commonService.getVerificationCode(
-                GetVerificationCode(
-                    phoneNumber
-                )
-            ).observeOn(AndroidSchedulers.mainThread())
+        var reg = region
+        if (!region.startsWith("+")) {
+            reg = "+" + region
         }
+        Logger.e(TAG, "getVerificationCode: region = " + reg)
+        return CommonNetManager.commonService.getVerificationCode(
+            GetVerificationCode(phoneNumber, reg)
+        ).observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun login(phoneNumber: String, verifyCode: String): Single<LoginRespondBean> {
-        if (AppConfig.isInternationalization) {
-            return CommonNetManager.commonService.loginInternational(
-                LoginRequestBean(
-                    mobile = phoneNumber,
-                    verifyCode = verifyCode,
-                    deviceId = DeviceUtils.getDeviceId()
-                )
-            ).observeOn(AndroidSchedulers.mainThread())
-        } else {
-            return CommonNetManager.commonService.login(
-                LoginRequestBean(
-                    mobile = phoneNumber,
-                    verifyCode = verifyCode,
-                    deviceId = DeviceUtils.getDeviceId()
-                )
-            ).observeOn(AndroidSchedulers.mainThread())
+    fun login(region: String, phoneNumber: String, verifyCode: String): Single<LoginRespondBean> {
+        var reg = region
+        if (!region.startsWith("+")) {
+            reg = "+" + region
         }
-
+        Logger.e(TAG, "login: region = " + reg)
+        return CommonNetManager.commonService.login(
+            LoginRequestBean(
+                mobile = phoneNumber,
+                verifyCode = verifyCode,
+                deviceId = DeviceUtils.getDeviceId(),
+                region = reg
+            )
+        ).observeOn(AndroidSchedulers.mainThread())
     }
 }

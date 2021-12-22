@@ -10,4 +10,5 @@ package cn.rongcloud.voiceroomdemo.net.api.bean.request
  */
 data class GetVerificationCode(
     val mobile: String,
+    val region: String
 )

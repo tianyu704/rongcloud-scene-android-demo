@@ -8,9 +8,9 @@
     <TextView
         android:id="@+id/catalog"
         android:layout_width="match_parent"
-        android:layout_height="25dp"
+        android:layout_height="28dp"
         android:background="#EBEBEB"
-        android:paddingLeft="@dimen/basis_15px"
+        android:paddingLeft="@dimen/basis_20px"
         android:textColor="@color/basis_color_secondary"
         android:textSize="18sp" />
 
@@ -18,10 +18,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="42dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingLeft="@dimen/basis_15px">
+        android:paddingLeft="@dimen/basis_20px">
 
         <TextView
             android:id="@+id/name"

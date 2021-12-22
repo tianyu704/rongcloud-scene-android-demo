@@ -5,7 +5,6 @@
 package cn.rongcloud.voiceroomdemo.net.api
 
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCode
-import cn.rongcloud.voiceroomdemo.net.api.bean.request.GetVerificationCodeInternational
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.LoginRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.request.UpdateUserInfoRequestBean
 import cn.rongcloud.voiceroomdemo.net.api.bean.respond.LoginRespondBean
@@ -24,14 +23,8 @@ interface CommonApiService {
     @POST("/user/sendCode")
     fun getVerificationCode(@Body phoneNumber: GetVerificationCode): Single<VerificationCodeRespondBean>
 
-    @POST("/user/international/sendCode")
-    fun getVerificationCodeInternational(@Body phoneNumber: GetVerificationCodeInternational): Single<VerificationCodeRespondBean>
-
     @POST("/user/login")
     fun login(@Body loginRequestBean: LoginRequestBean): Single<LoginRespondBean>
-
-    @POST("/user/international/login")
-    fun loginInternational(@Body loginRequestBean: LoginRequestBean): Single<LoginRespondBean>
 
     @POST("/user/update")
     fun updateUserInfo(@Body updateUserInfoRequestBean: UpdateUserInfoRequestBean): Single<UpdateUserInfoRespond>
