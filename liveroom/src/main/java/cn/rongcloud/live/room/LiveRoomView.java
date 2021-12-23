@@ -1,7 +1,6 @@
 package cn.rongcloud.live.room;
 
 import android.content.Context;
-import android.view.View;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.MutableLiveData;
@@ -10,7 +9,6 @@ import com.basis.mvp.IBaseView;
 
 import java.util.List;
 
-import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.model.Member;
@@ -71,7 +69,7 @@ public interface LiveRoomView extends IBaseView {
     /**
      * 当前的连麦状态
      */
-    void changeSeatOrder(boolean isLink);
+    void changeSeatOrder();
     /**
      * 获取fragment管理器
      *
@@ -178,8 +176,13 @@ public interface LiveRoomView extends IBaseView {
     void switchOtherRoom(String roomId);
 
     /**
-     * 默认连麦模式下，连麦状态中，房主点击的弹窗
+     * 默认连麦模式下，连麦状态中，房主点击弹出挂断连接弹窗
      */
-    void showPickOutFragment(String userId);
+    void showHangUpFragment(String userId);
+
+    /**
+     * 展示撤销连麦邀请弹窗
+     */
+    void showUninviteVideoFragment(String userId);
 
 }

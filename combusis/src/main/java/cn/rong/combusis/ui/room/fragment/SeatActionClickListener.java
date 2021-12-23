@@ -14,10 +14,11 @@ public interface SeatActionClickListener {
     /**
      * 邀请上麦
      *
+     * @param seatIndex
      * @param user
      * @param callback
      */
-    void clickInviteSeat(User user, ClickCallback<Boolean> callback);
+    void clickInviteSeat(int seatIndex,User user, ClickCallback<Boolean> callback);
 
     /**
      * 同意上麦
@@ -39,6 +40,13 @@ public interface SeatActionClickListener {
      * 撤销麦位申请
      */
     void cancelRequestSeat(ClickCallback<Boolean> callback);
+
+    /**
+     * 取消上麦邀请
+     *  @param userId   目标用户id
+     * @param callback 结果回调
+     */
+    void cancelInvitation(String userId, ClickCallback<Boolean> callback);
 
     /**
      * 下麦

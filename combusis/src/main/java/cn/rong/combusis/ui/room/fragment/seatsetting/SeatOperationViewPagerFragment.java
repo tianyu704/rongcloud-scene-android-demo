@@ -67,6 +67,12 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         }
     }
 
+    private int seatIndex = -1;
+
+    public void setInviteSeatIndex(int seatIndex) {
+        this.seatIndex = seatIndex;
+    }
+
     @Override
     public void initView() {
         tlTitle = (TabLayout) getView().findViewById(R.id.tl_title);
@@ -75,6 +81,7 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
         ArrayList<BaseFragment> fragments = new ArrayList<>();
         requestSeatFragment = new RequestSeatFragment(requestSeats);
         inviteSeatFragment = new InviteSeatFragment(inviteSeats);
+        inviteSeatFragment.setInviteSeatIndex(seatIndex);
         LivelayoutSettingFragment livelayoutSettingFragment = new LivelayoutSettingFragment();
         fragments.add(requestSeatFragment);
         fragments.add(inviteSeatFragment);
@@ -166,10 +173,11 @@ public class SeatOperationViewPagerFragment extends BaseBottomSheetDialogFragmen
 
     /**
      * 布局设置接口
+     *
      * @param liveLayoutSettingCallBack
      */
-    public void setLiveLayoutSettingCallBack(LiveLayoutSettingCallBack liveLayoutSettingCallBack){
-        this.liveLayoutSettingCallBack=liveLayoutSettingCallBack;
+    public void setLiveLayoutSettingCallBack(LiveLayoutSettingCallBack liveLayoutSettingCallBack) {
+        this.liveLayoutSettingCallBack = liveLayoutSettingCallBack;
     }
 
     public LiveLayoutSettingCallBack getLiveLayoutSettingCallBack() {

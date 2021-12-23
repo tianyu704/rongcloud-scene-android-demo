@@ -51,6 +51,7 @@ public abstract class PermissionActivity extends AppCompatActivity {
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.RECORD_AUDIO,
     };
 
     @Override

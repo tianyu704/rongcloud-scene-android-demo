@@ -212,6 +212,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
 
     override fun onResume() {
         super.onResume()
+        portrait.loadPortrait(AccountStore.getUserPortrait() ?: "")
     }
 
     override fun initData() {

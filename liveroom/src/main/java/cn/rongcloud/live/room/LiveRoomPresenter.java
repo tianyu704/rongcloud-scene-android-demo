@@ -71,6 +71,7 @@ import cn.rong.combusis.message.RCFollowMsg;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
+import cn.rong.combusis.provider.voiceroom.InviteStatusType;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
@@ -320,7 +321,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     int index = position;
                     if (index == -1) {
                         for (RCLiveSeatInfo seatInfo : RCLiveEngine.getInstance().getSeatManager().getSeatInfos()) {
-                            if (TextUtils.isEmpty(seatInfo.getUserId())&&!seatInfo.isLock()) {
+                            if (TextUtils.isEmpty(seatInfo.getUserId()) && !seatInfo.isLock()) {
                                 //麦位空闲并且没有被锁定
                                 index = seatInfo.getIndex();
                                 break;
@@ -468,7 +469,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         getShield();
         getGiftCount(mVoiceRoomBean.getRoomId());
         mView.setRoomData(mVoiceRoomBean);
-        mView.changeStatus();
+
     }
 
     /**
@@ -612,7 +613,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         } else {
             member = new Member().toMember(user);
         }
-        memberArrayList.add(0,member);
+        memberArrayList.add(0, member);
         mView.showSendGiftDialog(mVoiceRoomBean, getCreateUserId(), memberArrayList);
     }
 
@@ -934,12 +935,21 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     /**
      * 邀请上麦
      *
+     * @param seatIndex
      * @param user
      * @param callback
      */
     @Override
-    public void clickInviteSeat(User user, ClickCallback<Boolean> callback) {
-        LiveEventHelper.getInstance().pickUserToSeat(user.getUserId(), -1, callback);
+    public void clickInviteSeat(int seatIndex, User user, ClickCallback<Boolean> callback) {
+        LiveEventHelper.getInstance().pickUserToSeat(user.getUserId(), seatIndex, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                callback.onResult(result, msg);
+                if (TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())) {
+                    mView.changeSeatOrder();
+                }
+            }
+        });
     }
 
     /**
@@ -981,6 +991,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 } else {
                     EToast.showToast(msg);
                 }
+            }
+        });
+    }
+
+    @Override
+    public void cancelInvitation(String userId, ClickCallback<Boolean> callback) {
+        LiveEventHelper.getInstance().cancelInvitation(userId, new ClickCallback<Boolean>() {
+            @Override
+            public void onResult(Boolean result, String msg) {
+                if (callback != null) {
+                    callback.onResult(result, msg);
+                }
+                mView.changeSeatOrder();
             }
         });
     }
@@ -1048,11 +1071,12 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param index
      */
     @Override
-    public void showSeatOperationViewPagerFragment(int index) {
+    public void showSeatOperationViewPagerFragment(int index, int seatIndex) {
         seatOperationViewPagerFragment = new SeatOperationViewPagerFragment(getRoomOwnerType());
         seatOperationViewPagerFragment.setIndex(index);
         seatOperationViewPagerFragment.setRequestSeats(requestSeats);
         seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
+        seatOperationViewPagerFragment.setInviteSeatIndex(seatIndex);
         seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
         seatOperationViewPagerFragment.setLiveLayoutSettingCallBack(this::onRCMixLayoutChange);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
@@ -1110,6 +1134,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     /**
      * 被踢出去
+     *
      * @param userId     被踢用户唯一标识
      * @param operatorId 踢人操作的执行用户的唯一标识
      */
@@ -1124,12 +1149,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
-        if (lineMicUserIds.size() == 2 && TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())
-                && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
-            //如果是房主，并且是默认的模式，并且有2人的时候
-            mView.changeSeatOrder(true);
-        } else {
-            mView.changeSeatOrder(false);
+        if (TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())) {
+            //如果是房主，那么更新
+            mView.changeSeatOrder();
         }
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
@@ -1181,7 +1203,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void onliveVideoInvitationRejected(String userId) {
-
+        mView.changeSeatOrder();
     }
 
     @Override
@@ -1290,17 +1312,23 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
     @Override
     public void clickSeatOrder() {
-        if (SeatManager.get().getInSeatUserIds().size() == 2 && TextUtils.equals(getCreateUserId(), AccountStore.INSTANCE.getUserId())
-                && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
+        if (LiveEventHelper.getInstance().getInviteStatusType() == InviteStatusType.STATUS_CONNECTTING) {
             for (String inSeatUserId : SeatManager.get().getInSeatUserIds()) {
                 if (!TextUtils.equals(inSeatUserId, getCreateUserId())) {
-                    mView.showPickOutFragment(inSeatUserId);
+                    mView.showHangUpFragment(inSeatUserId);
                     continue;
                 }
             }
-            return;
+        } else if (LiveEventHelper.getInstance().getInviteStatusType() == InviteStatusType.STATUS_UNDER_INVITATION) {
+            for (String inSeatUserId : RCDataManager.get().getInvitateIds()) {
+                if (!TextUtils.equals(inSeatUserId, getCreateUserId())) {
+                    mView.showUninviteVideoFragment(inSeatUserId);
+                    continue;
+                }
+            }
+        } else {
+            showSeatOperationViewPagerFragment(0, -1);
         }
-        showSeatOperationViewPagerFragment(0);
     }
 
     @Override
@@ -1375,9 +1403,19 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 requestSeats.add(user);
             }
         }
-        mView.showUnReadRequestNumber(requestSeats.size());
+        if (mView != null)
+            mView.showUnReadRequestNumber(requestSeats.size());
         if (seatOperationViewPagerFragment != null) {
             seatOperationViewPagerFragment.setRequestSeats(requestSeats);
+        }
+        if (getRoomOwnerType() == RoomOwnerType.LIVE_VIEWER) {
+            for (String userId : requestLives) {
+                if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
+                    LiveEventHelper.getInstance().setCurrentStatus(CurrentStatusType.STATUS_WAIT_FOR_SEAT);
+                    break;
+                }
+            }
+            if (mView != null) mView.changeStatus();
         }
     }
 
@@ -1600,7 +1638,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
                 //有人在麦位上的布局
                 TextView name = view.findViewById(R.id.tv_member_name);
-                name.setVisibility(paramter.getMixType()==RCLiveMixType.RCMixTypeOneToSix.getValue()?View.GONE:View.VISIBLE);
+                name.setVisibility(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToSix.getValue() ? View.GONE : View.VISIBLE);
                 RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
                 ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
                 //根据麦位信息来判断是否开启还是关闭动画效果
@@ -1752,7 +1790,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void onSeatSpeak(RCLiveSeatInfo seatInfo, int audioLevel) {
-        Log.e(TAG, "onSeatSpeak: seatIndex :"+seatInfo.getIndex() +"seatAudio:"+audioLevel);
+        Log.e(TAG, "onSeatSpeak: seatIndex :" + seatInfo.getIndex() + "seatAudio:" + audioLevel);
         RCHolder hold = LiveEventHelper.getInstance().getHold(seatInfo.getIndex());
         if (hold != null) {
             WaveView waveView = hold.getView(R.id.wv_creator_background);

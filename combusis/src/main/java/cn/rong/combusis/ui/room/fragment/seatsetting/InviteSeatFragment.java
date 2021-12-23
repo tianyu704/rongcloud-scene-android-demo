@@ -34,6 +34,7 @@ public class InviteSeatFragment extends BaseFragment {
     private RecyclerView rvList;
     private ArrayList<User> inviteSeats;
     private InviteSeatAdapter inviteSeatAdapter;
+    private int seatIndex=-1;
 
     public InviteSeatFragment(ArrayList<User> inviteSeats) {
         super(R.layout.layout_list);
@@ -73,6 +74,10 @@ public class InviteSeatFragment extends BaseFragment {
         if (inviteSeatAdapter != null) inviteSeatAdapter.setList(uiMemberModels);
     }
 
+    public void setInviteSeatIndex(int seatIndex) {
+        this.seatIndex=seatIndex;
+    }
+
 
     class InviteSeatAdapter extends BaseQuickAdapter<User, BaseViewHolder> {
 
@@ -100,7 +105,7 @@ public class InviteSeatFragment extends BaseFragment {
     }
 
     private void InviteSeat(User user) {
-        getSeatOperationViewPagerFragment().getSeatActionClickListener().clickInviteSeat(user, new ClickCallback<Boolean>() {
+        getSeatOperationViewPagerFragment().getSeatActionClickListener().clickInviteSeat(seatIndex, user, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
                 if (result) {

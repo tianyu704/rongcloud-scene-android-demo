@@ -82,7 +82,8 @@ import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rongcloud.live.fragment.LiveRoomCreatorSettingFragment;
-import cn.rongcloud.live.fragment.LiveRoomPickOutFragment;
+import cn.rongcloud.live.fragment.LiveRoomHangUpFragment;
+import cn.rongcloud.live.fragment.LiveRoomUnIninviteVideoFragment;
 import cn.rongcloud.live.helper.LiveEventHelper;
 import cn.rongcloud.live.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
@@ -511,12 +512,18 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     }
 
     @Override
-    public void showPickOutFragment(String userId) {
+    public void showHangUpFragment(String userId) {
         User user = new User();
         user.setUserId(userId);
         RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(userId);
-        LiveRoomPickOutFragment liveRoomPickOutFragment = new LiveRoomPickOutFragment(rcLiveSeatInfo.isEnableVideo(), user, present);
+        LiveRoomHangUpFragment liveRoomPickOutFragment = new LiveRoomHangUpFragment(rcLiveSeatInfo.isEnableVideo(), user, present);
         liveRoomPickOutFragment.show(getLiveFragmentManager());
+    }
+
+    @Override
+    public void showUninviteVideoFragment(String userId) {
+        LiveRoomUnIninviteVideoFragment liveRoomUnIninviteVideoFragment = new LiveRoomUnIninviteVideoFragment(userId, present);
+        liveRoomUnIninviteVideoFragment.show(getLiveFragmentManager());
     }
 
     /**
@@ -796,29 +803,32 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                 //申请中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_request_enter_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
-//                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_WAIT_FOR_SEAT:
                 //等待中
                 roomBottomView.setRequestSeatImage(R.drawable.ic_wait_enter_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(true);
-//                roomTitleBar.setIsLinkSeat(false);
                 break;
             case STATUS_ON_SEAT:
                 //已经在麦上
                 roomBottomView.setRequestSeatImage(R.drawable.ic_on_seat);
                 ((AbsRoomActivity) requireActivity()).setCanSwitch(false);
-//                roomTitleBar.setIsLinkSeat(true);
                 break;
         }
     }
 
     @Override
-    public void changeSeatOrder(boolean islink) {
-        if (islink) {
-            roomBottomView.setSeatOrderImage(R.drawable.ic_on_seat);
-        } else {
-            roomBottomView.setSeatOrderImage(R.drawable.ic_seat_order);
+    public void changeSeatOrder() {
+        switch (LiveEventHelper.getInstance().getInviteStatusType()){
+            case STATUS_NOT_INVITRED:
+                roomBottomView.setSeatOrderImage(R.drawable.ic_seat_order);
+                break;
+            case STATUS_UNDER_INVITATION:
+                roomBottomView.setSeatOrderImage(R.drawable.ic_wait_enter_seat);
+                break;
+            case STATUS_CONNECTTING:
+                roomBottomView.setSeatOrderImage(R.drawable.ic_on_seat);
+                break;
         }
     }
 
