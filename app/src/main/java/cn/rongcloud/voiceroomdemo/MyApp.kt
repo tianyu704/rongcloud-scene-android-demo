@@ -48,6 +48,7 @@ class MyApp : ComApplication() {
             BuildConfig.UM_APP_KEY,
             "rcrtc",
             BuildConfig.BASE_SERVER_ADDRES,
+            BuildConfig.BUSINESS_TOKEN
         )
         var process = UIKit.getCurrentProcessName()
         Log.d(TAG, "process : $process")
