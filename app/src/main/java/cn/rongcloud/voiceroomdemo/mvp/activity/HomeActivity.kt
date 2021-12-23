@@ -19,9 +19,9 @@ import cn.rong.combusis.widget.miniroom.MiniRoomManager
 import cn.rongcloud.annotation.HiltBinding
 import cn.rongcloud.live.roomlist.LiveRoomListActivity
 import cn.rongcloud.radio.ui.roomlist.RadioRoomListActivity
+import cn.rongcloud.voice.roomlist.VoiceRoomListActivity
 import cn.rongcloud.voiceroom.api.RCVoiceRoomEngine
 import cn.rongcloud.voiceroom.api.callback.RCVoiceRoomCallback
-import cn.rongcloud.voiceroom.roomlist.VoiceRoomListActivity
 import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
