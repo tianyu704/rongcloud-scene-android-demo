@@ -4,13 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/live_room_video_view_shape_gradient">
-    <ImageView
+    <FrameLayout
         android:id="@+id/iv_close_id"
-        android:layout_width="10dp"
-        android:layout_height="10dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:layout_alignParentRight="true"
-        android:src="@drawable/rc_cs_close"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
-        />
+        android:paddingTop="5dp">
+        <ImageView
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:src="@drawable/rc_cs_close"
+            />
+    </FrameLayout>>
+
 </RelativeLayout>

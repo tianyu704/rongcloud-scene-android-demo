@@ -250,7 +250,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()){
                     inviteStatusType=InviteStatusType.STATUS_UNDER_INVITATION;
                 }
-                if (callback != null) callback.onResult(true, "邀请用户已成功");
+                if (callback != null) callback.onResult(true, "已邀请视频连线，等待对方接受");
             }
 
             @Override
@@ -424,7 +424,17 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     @Override
     public void MuteSelf(int index, boolean isMute, ClickCallback<Boolean> callback) {
         this.isMute = isMute;
-        RCRTCEngine.getInstance().getDefaultAudioStream().setMicrophoneDisable(isMute);
+        RCLiveEngine.getInstance().getSeatManager().enableAudio(index, !isMute, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+                if (callback!=null) callback.onResult(true,"关闭麦克风成功");
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+                if (callback!=null) callback.onResult(true,"关闭麦克风失败");
+            }
+        });
     }
 
     @Override

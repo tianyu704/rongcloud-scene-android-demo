@@ -134,11 +134,9 @@ public class MemberSettingFragment extends BaseBottomSheetDialogFragment {
                 return;
             }
             mOnMemberSettingClickListener.clickInviteSeat(-1, member.toUser(), (result, msg) -> {
+                EToast.showToast(msg);
                 if (result) {
                     dismiss();
-                    EToast.showToast("已邀请上麦");
-                } else {
-                    EToast.showToast(msg);
                 }
             });
         });
