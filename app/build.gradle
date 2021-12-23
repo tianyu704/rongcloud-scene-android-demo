@@ -117,9 +117,9 @@ android {
         interialEnvironment {
             dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo.interial"
-            buildConfigField("String", "APP_KEY", "\"uwd1c0sxukso1\"")
+            buildConfigField("String", "APP_KEY", "\"8brlm7uf8liy3\"") // debug 8luwapkv8wb7l
             buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
-            buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://overseas-rcrtc.rongcloud.cn /\"")
+            buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://overseas-rcrtc.rongcloud.cn/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
             buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
