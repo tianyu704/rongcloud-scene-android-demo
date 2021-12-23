@@ -30,16 +30,24 @@ object AppConfig {
     public var BASE_SERVER_ADDRESS: String? = null
         private set
 
+    public var BUSINESS_TOKEN: String? = null
+        private set
+        get() {
+            return field
+        }
+
     fun initConfig(
         appKey: String,
         UMAppKey: String?,
         channelName: String?,
-        baseServerAddress: String
+        baseServerAddress: String,
+        businessToken: String
     ) {
         APP_KEY = appKey
         UM_APP_KEY = UMAppKey
         CHANNEL_NAME = channelName
         BASE_SERVER_ADDRESS = baseServerAddress
+        BUSINESS_TOKEN = businessToken
     }
 
 

@@ -18,12 +18,14 @@ import com.basis.ui.BaseActivity;
 import com.basis.widget.SearchEditText;
 import com.kit.UIKit;
 import com.kit.cache.GsonUtil;
+import com.kit.utils.Logger;
 import com.kit.utils.ResUtil;
 import com.kit.utils.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import cn.rongcloud.voiceroomdemo.R;
 import cn.rongcloud.voiceroomdemo.region.sort.SideBar;
@@ -144,11 +146,13 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
     }
 
     void parserRegion() {
+        String lan = Locale.getDefault().getLanguage();
+        Logger.e(TAG, "lan = " + lan);
         String json = ResUtil.readStringFromAssets("region.json");
         data = GsonUtil.json2List(json, Region.class);
         if (null != data && !data.isEmpty()) {
             for (Region r : data) {
-                r.locale.initPinYin(true);
+                r.locale.initPinYin(TextUtils.equals("zh", lan));
             }
         }
         Collections.sort(data);
@@ -170,7 +174,7 @@ public class RegionActivity extends BaseActivity implements View.OnClickListener
             } else {
                 holder.setVisible(R.id.catalog, false);
             }
-            holder.setText(R.id.name, region.locale.getZh());
+            holder.setText(R.id.name, region.locale.getLocal());
             holder.setText(R.id.num, "+" + region.getRegion());
             holder.rootView().setOnClickListener(new View.OnClickListener() {
                 @Override

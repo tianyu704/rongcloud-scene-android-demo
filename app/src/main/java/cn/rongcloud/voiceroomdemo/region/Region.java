@@ -32,14 +32,20 @@ public class Region implements Serializable, Comparable<Region> {
         // 业务字段
         private String pinyin; // 姓名对应的拼音
         private String firstLetter;
+        private boolean isZh;
 
 
         public void initPinYin(boolean isZh) {
+            this.isZh = isZh;
             pinyin = isZh ? Cn2Spell.getPinYin(zh) : en;
             firstLetter = pinyin.substring(0, 1).toUpperCase(); // 获取拼音首字母并转成大写
             if (!firstLetter.matches("[A-Z]")) { // 如果不在A-Z中则默认为“#”
                 firstLetter = "#";
             }
+        }
+
+        public String getLocal() {
+            return isZh ? zh : en;
         }
 
         public String getEn() {
