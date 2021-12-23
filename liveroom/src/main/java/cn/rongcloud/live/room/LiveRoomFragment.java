@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
@@ -143,6 +144,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private MemberListFragment mMemberListFragment;
     private TextView tvGiftCount;
     private int marginTop;
+    private FrameLayout messageContainerView;
 
     public static Fragment getInstance(String roomId, boolean isCreate) {
         Bundle bundle = new Bundle();
@@ -260,6 +262,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     private void initView() {
         flLiveView = (FrameLayout) getView().findViewById(R.id.fl_live_view);
+        messageContainerView = getView().findViewById(R.id.rl_message_id);
         giftView = (GiftAnimationView) getView().findViewById(R.id.gift_view);
         giftView.setOnBottomOptionClickListener(new GiftAnimationView.OnClickBackgroundListener() {
             @Override
@@ -280,7 +283,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         tvNotice.post(new Runnable() {
             @Override
             public void run() {
-                marginTop = (int) (tvNotice.getY() + tvNotice.getHeight() + 10);
+                marginTop = (int) (tvNotice.getY() + tvNotice.getHeight() + UiUtils.INSTANCE.dp2Px(requireContext(),8));
             }
         });
         tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
@@ -358,6 +361,29 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 //        }
 //        disConnectDiolog.show();
 //    }
+
+
+    @Override
+    public void changeMessageContainerHeight() {
+        int mixType = RCDataManager.get().getMixType();
+        ViewGroup.LayoutParams layoutParams = messageContainerView.getLayoutParams();
+        if (mixType == RCLiveMixType.RCMixTypeOneToOne.getValue() || mixType == RCLiveMixType.RCMixTypeOneToSix.getValue()) {
+            //如果是默认和1V6的时候，高度默认为260
+            layoutParams.height = UiUtils.INSTANCE.dp2Px(requireContext(), 260);
+            messageContainerView.setLayoutParams(layoutParams);
+        } else {
+            int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(requireContext());
+            RCLiveView preview = RCLiveEngine.getInstance().preview();
+            if (preview != null) {
+                int realHeight = preview.getRealHeight();
+                if (realHeight>0){
+                    layoutParams.height = screenHeight - marginTop - preview.getRealHeight()-roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
+                    messageContainerView.setLayoutParams(layoutParams);
+                }
+            }
+
+        }
+    }
 
     @Override
     public void refreshMessageList() {
@@ -819,7 +845,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     @Override
     public void changeSeatOrder() {
-        switch (LiveEventHelper.getInstance().getInviteStatusType()){
+        switch (LiveEventHelper.getInstance().getInviteStatusType()) {
             case STATUS_NOT_INVITRED:
                 roomBottomView.setSeatOrderImage(R.drawable.ic_seat_order);
                 break;
@@ -862,6 +888,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             videoView.setDevTop(marginTop);
         }
         videoView.attachParent(flLiveView, null);
+        changeMessageContainerHeight();
     }
 
     @Override

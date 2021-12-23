@@ -108,11 +108,9 @@ public class InviteSeatFragment extends BaseFragment {
         getSeatOperationViewPagerFragment().getSeatActionClickListener().clickInviteSeat(seatIndex, user, new ClickCallback<Boolean>() {
             @Override
             public void onResult(Boolean result, String msg) {
+                EToast.showToast(msg);
                 if (result) {
                     getSeatOperationViewPagerFragment().dismiss();
-                    EToast.showToast("已邀请上麦");
-                } else {
-                    EToast.showToast(msg);
                 }
             }
         });

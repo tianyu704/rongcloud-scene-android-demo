@@ -4,8 +4,8 @@
 
 package cn.rongcloud.voiceroomdemo.mvp.activity.iview
 
+import cn.rongcloud.voice.net.bean.respond.VoiceRoomBean
 import com.rongcloud.common.base.IBaseView
-import cn.rongcloud.voiceroom.net.bean.respond.VoiceRoomBean
 
 /**
  * @author gusd

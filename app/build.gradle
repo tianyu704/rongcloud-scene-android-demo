@@ -99,6 +99,7 @@ android {
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://rcrtc-api.rongcloud.net/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"cbb3a9f01d9fa52c0367ef8703f64327\"")
+            buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name_test"]
         }
         releaseEnvironment {
@@ -109,17 +110,19 @@ android {
             buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://apiv1-rcrtc.rongcloud.cn/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
+            buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name"]
         }
         // 国际环境
         interialEnvironment {
             dimension 'environment'
             applicationId "cn.rongcloud.voiceroomdemo.interial"
-            buildConfigField("String", "APP_KEY", "\"uwd1c0sxukso1\"")
+            buildConfigField("String", "APP_KEY", "\"8brlm7uf8liy3\"") // debug 8luwapkv8wb7l
             buildConfigField("String", "UM_APP_KEY", "\"60c062bf8d6cd512500c78ed\"")
-            buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://overseas-rcrtc.rongcloud.cn /\"")
+            buildConfigField("String", "BASE_SERVER_ADDRES", "\"https://overseas-rcrtc.rongcloud.cn/\"")
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
+            buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name"]
         }
     }

@@ -1241,6 +1241,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         } else {
             videoView.setDevTop(mView.getMarginTop());
         }
+        mView.changeMessageContainerHeight();
     }
 
 
@@ -1465,7 +1466,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 Log.e(TAG, "onError: " + error.getMessage());
             }
         });
+        mView.changeMessageContainerHeight();
     }
+
 
 
     /**
@@ -1664,7 +1667,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     @Override
                     public void onResult(UserInfo userInfo) {
                         name.setText(userInfo.getName());
-                        ImageLoaderUtil.INSTANCE.loadImage(mView.getLiveActivity(), imageView, userInfo.getPortraitUri(), R.drawable.img_default_room_cover);
+                        ImageLoaderUtil.INSTANCE.loadPortraitDef(mView.getLiveActivity(), imageView, userInfo.getPortraitUri().toString());
                         if (seatInfo.isEnableVideo()) {
                             //视频连线开启的时候
                             rl_mic_audio_value.setVisibility(View.GONE);

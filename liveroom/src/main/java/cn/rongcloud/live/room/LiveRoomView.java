@@ -185,4 +185,8 @@ public interface LiveRoomView extends IBaseView {
      */
     void showUninviteVideoFragment(String userId);
 
+    /**
+     * 动态修改 messageList的高度
+     */
+    void changeMessageContainerHeight();
 }

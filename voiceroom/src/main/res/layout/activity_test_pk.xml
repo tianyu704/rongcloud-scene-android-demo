@@ -23,7 +23,7 @@
             android:gravity="center"
             android:text="语聊房麦位视图" />
 
-        <cn.rongcloud.voiceroom.pk.widget.PKView
+        <cn.rongcloud.voice.pk.widget.PKView
             android:id="@+id/pk_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
