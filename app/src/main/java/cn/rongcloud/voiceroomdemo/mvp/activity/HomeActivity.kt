@@ -26,6 +26,7 @@ import cn.rongcloud.voiceroomdemo.R
 import cn.rongcloud.voiceroomdemo.mvp.activity.iview.IHomeView
 import cn.rongcloud.voiceroomdemo.mvp.presenter.HomePresenter
 import cn.rongcloud.voiceroomdemo.ui.dialog.UserInfoDialog
+import cn.rongcloud.voiceroomdemo.update.VersionHelper
 import com.basis.UIStack
 import com.basis.ui.IBasis
 import com.rongcloud.common.base.BaseActivity
@@ -145,6 +146,7 @@ class HomeActivity : BaseActivity(), IHomeView, UnReadMessageManager.IUnReadMess
                 }
             }
         }
+        VersionHelper.checkVersion(this, false)
     }
 
     override fun getActionTitle(): CharSequence? {

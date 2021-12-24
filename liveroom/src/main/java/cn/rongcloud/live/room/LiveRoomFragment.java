@@ -372,12 +372,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             layoutParams.height = UiUtils.INSTANCE.dp2Px(requireContext(), 260);
             messageContainerView.setLayoutParams(layoutParams);
         } else {
-            int screenHeight = UiUtils.INSTANCE.getFullScreenHeight(requireContext());
             RCLiveView preview = RCLiveEngine.getInstance().preview();
             if (preview != null) {
                 int realHeight = preview.getRealHeight();
                 if (realHeight>0){
-                    layoutParams.height = screenHeight - marginTop - preview.getRealHeight()-roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
+                    layoutParams.height = clLiveRoomView.getHeight() - marginTop - preview.getRealHeight()-roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
                     messageContainerView.setLayoutParams(layoutParams);
                 }
             }

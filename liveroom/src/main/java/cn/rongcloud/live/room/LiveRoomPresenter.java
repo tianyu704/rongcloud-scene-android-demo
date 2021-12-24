@@ -119,6 +119,8 @@ import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
+import cn.rongcloud.rtc.api.RCRTCEngine;
+import cn.rongcloud.rtc.api.stream.RCRTCCameraOutputStream;
 import cn.rongcloud.rtc.base.RCRTCParamsType;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -1118,7 +1120,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
-    public void onUserEnter(String userId) {
+    public void onUserEnter(String userId,int onlineCount) {
+        mView.setOnlineCount(onlineCount);
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
@@ -1128,14 +1131,14 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
-    public void onUserExit(String userId) {
+    public void onUserExit(String userId,int onlineCount) {
+        mView.setOnlineCount(onlineCount);
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
     /**
      * 被踢出去
-     *
-     * @param userId     被踢用户唯一标识
+     *  @param userId     被踢用户唯一标识
      * @param operatorId 踢人操作的执行用户的唯一标识
      */
     @Override
@@ -1143,7 +1146,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
             mView.finish();
             unInitLiveRoomListener();
-            LiveEventHelper.getInstance().unRegister();
         }
     }
 
@@ -1470,7 +1472,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     }
 
 
-
     /**
      * 构建布局
      *
@@ -1548,6 +1549,21 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
     @Override
     public void clickSwitchLinkStatus(int index, boolean isVideo) {
         LiveEventHelper.getInstance().switchVideoOrAudio(index, isVideo, null);
+    }
+
+    /**
+     * 当获取了焦点的时候，如果是房主，并且是视频模式，重复打开一下相机，避免出现相机被占用的情况
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getRoomOwnerType() == RoomOwnerType.LIVE_OWNER) {
+            RCLiveSeatInfo rcLiveSeatInfo = SeatManager.get().getSeatByUserId(AccountStore.INSTANCE.getUserId());
+            if (rcLiveSeatInfo != null && rcLiveSeatInfo.isEnableVideo()) {
+                RCRTCCameraOutputStream defaultVideoStream = RCRTCEngine.getInstance().getDefaultVideoStream();
+                if (defaultVideoStream != null) defaultVideoStream.startCamera(null);
+            }
+        }
     }
 
     /**
@@ -1667,7 +1683,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                     @Override
                     public void onResult(UserInfo userInfo) {
                         name.setText(userInfo.getName());
-                        ImageLoaderUtil.INSTANCE.loadPortraitDef(mView.getLiveActivity(), imageView, userInfo.getPortraitUri().toString());
+                        ImageLoaderUtil.INSTANCE.loadImage(mView.getLiveActivity(), imageView, userInfo.getPortraitUri().toString(), R.drawable.default_portrait);
                         if (seatInfo.isEnableVideo()) {
                             //视频连线开启的时候
                             rl_mic_audio_value.setVisibility(View.GONE);
@@ -1751,7 +1767,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 mView.showCreatorSettingFragment(rcLiveSeatInfo);
             } else {
                 //观众端-点击的他人的麦位
-
+                //如果观众端为管理员的话
+                if (MemberCache.getInstance().isAdmin(AccountStore.INSTANCE.getUserId())) {
+                    mView.showMemberSettingFragment(rcLiveSeatInfo.getUserId());
+                }
             }
         }
     }

@@ -53,7 +53,6 @@ import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
 import cn.rongcloud.live.room.LiveRoomKvKey;
 import cn.rongcloud.liveroom.manager.RCDataManager;
-import cn.rongcloud.rtc.api.RCRTCEngine;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -811,38 +810,39 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     }
 
 
+
     @Override
-    public void onUserEnter(String userId) {
+    public void onUserEnter(String userId, int onlineCount) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onUserEnter(userId);
+            liveRoomListener.onUserEnter(userId,onlineCount);
         }
         Log.e(TAG, "onUserEnter: " + userId);
     }
 
     @Override
-    public void onUserExit(String userId) {
+    public void onUserExit(String userId, int onlineCount) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onUserExit(userId);
+            liveRoomListener.onUserExit(userId,onlineCount);
         }
         Log.e(TAG, "onUserExit: " + userId);
     }
 
+
     /**
      * 用户被踢出房间
-     *
      * @param userId     被踢用户唯一标识
      * @param operatorId 踢人操作的执行用户的唯一标识
      */
     @Override
     public void onUserKitOut(String userId, String operatorId) {
-        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onUserKitOut(userId, operatorId);
-        }
         //被踢出房间，调用离开房间接口和反注册
         if (TextUtils.equals(userId, AccountStore.INSTANCE.getUserId())) {
             EToast.showToast(TextUtils.equals(operatorId, createUserId) ? "您被房主踢出房间" : "您被管理员踢出房间");
             MiniRoomManager.getInstance().close();
             leaveRoom(null);
+        }
+        for (LiveRoomListener liveRoomListener : liveRoomListeners) {
+            liveRoomListener.onUserKitOut(userId, operatorId);
         }
         Log.e(TAG, "onUserKitOut: ");
     }

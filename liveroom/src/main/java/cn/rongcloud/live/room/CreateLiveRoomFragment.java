@@ -125,6 +125,14 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
     public void init() {
         mLoading = new LoadTag(requireActivity(), requireActivity().getString(cn.rong.combusis.R.string.text_creating_room));
         initView();
+    }
+
+    /**
+     * 避免出现摄像头被占用的情况
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
         //开始准备直播事项，比如打开摄像头
         LiveEventHelper.getInstance().register("-1");
         LiveEventHelper.getInstance().prepare(new ClickCallback<Boolean>() {
