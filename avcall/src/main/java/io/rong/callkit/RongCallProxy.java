@@ -92,6 +92,11 @@ public class RongCallProxy implements IRongCallListener {
     }
 
     @Override
+    public void onRemoteUserAccept(String userId, RongCallCommon.CallMediaType mediaType) {
+
+    }
+
+    @Override
     public void onRemoteUserJoined(
             String userId,
             RongCallCommon.CallMediaType mediaType,

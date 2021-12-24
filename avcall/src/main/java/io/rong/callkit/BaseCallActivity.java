@@ -414,6 +414,11 @@ public class BaseCallActivity extends BaseNoActionBarActivity
     }
 
     @Override
+    public void onRemoteUserAccept(String userId, RongCallCommon.CallMediaType mediaType) {
+
+    }
+
+    @Override
     public void onCallDisconnected(
             RongCallSession callProfile, RongCallCommon.CallDisconnectedReason reason) {
         if (RongCallKit.getCustomerHandlerListener() != null) {

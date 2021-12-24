@@ -164,6 +164,11 @@ public class CallFloatBoxView {
                             }
 
                             @Override
+                            public void onRemoteUserAccept(String userId, RongCallCommon.CallMediaType mediaType) {
+
+                            }
+
+                            @Override
                             public void onCallDisconnected(
                                     RongCallSession callProfile,
                                     RongCallCommon.CallDisconnectedReason reason) {
@@ -669,6 +674,11 @@ public class CallFloatBoxView {
 
                             @Override
                             public void onRemoteUserRinging(String userId) {
+                            }
+
+                            @Override
+                            public void onRemoteUserAccept(String userId, RongCallCommon.CallMediaType mediaType) {
+
                             }
 
                             @Override
