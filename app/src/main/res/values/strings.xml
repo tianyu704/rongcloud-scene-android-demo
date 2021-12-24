@@ -26,6 +26,7 @@
     <string name="str_rejster_coms" tools:ignore="ExtraTranslation">注册条款</string>
     <string name="str_privite_coms" tools:ignore="ExtraTranslation">隐身政策</string>
     <string name="str_uninit_coms" tools:ignore="ExtraTranslation">账号注销</string>
+    <string name="str_check_version" tools:ignore="ExtraTranslation">检查版本</string>
     <string name="str_logout" tools:ignore="ExtraTranslation">退出登录</string>
 
 </resources>
