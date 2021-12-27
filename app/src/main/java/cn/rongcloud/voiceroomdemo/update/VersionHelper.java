@@ -47,7 +47,7 @@ public class VersionHelper {
                 if (isUpdate(version.version)) {
                     showUpdateDialog(weakReference, version);
                 } else {
-                    if (tip) KToast.show("已是最新版本");
+                    if (tip) KToast.show("当前已是最新版本");
                 }
             }
         });
@@ -58,7 +58,6 @@ public class VersionHelper {
             lastVersionName = lastVersionName.replaceAll("\\.", "");
             int lastVersion = Integer.parseInt(lastVersionName);
             String verStr = SystemUtil.getVerName();
-            Logger.e(TAG, "currentVersion = " + verStr);
             int current = Integer.parseInt(verStr.replaceAll("\\.", ""));
             // 对齐位数: 2.0.1 和 2.1 对比的问题
             int ll = String.valueOf(lastVersion).length();

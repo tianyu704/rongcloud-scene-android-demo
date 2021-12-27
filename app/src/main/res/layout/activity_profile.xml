@@ -107,7 +107,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableLeft="@drawable/ic_logout"
+            android:drawableLeft="@drawable/ic_update"
             android:drawablePadding="@dimen/basis_20px"
             android:gravity="center_vertical"
             android:text="@string/str_check_version" />
