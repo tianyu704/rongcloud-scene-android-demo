@@ -16,6 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 
 import com.basis.mvp.BaseModel;
+import com.kit.cache.GsonUtil;
+import com.kit.utils.Logger;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.AudioManagerUtil;
 
@@ -398,6 +400,7 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
             @Override
             public void onSuccess(List<String> requestUserIds) {
                 //获取到当前房间所有用户,申请人需要在房间，并且不在麦位上
+                Logger.e(TAG, "requestUserIds = " + GsonUtil.obj2Json(requestUserIds));
                 List<User> users = MemberCache.getInstance().getMemberList().getValue();
                 requestSeats.clear();
                 for (String requestUserId : requestUserIds) {
