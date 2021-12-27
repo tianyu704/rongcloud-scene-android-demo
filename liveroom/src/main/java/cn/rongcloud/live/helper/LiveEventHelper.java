@@ -3,6 +3,9 @@ package cn.rongcloud.live.helper;
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_NOT_ON_SEAT;
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_ON_SEAT;
 import static cn.rong.combusis.provider.voiceroom.CurrentStatusType.STATUS_WAIT_FOR_SEAT;
+import static cn.rong.combusis.provider.voiceroom.InviteStatusType.STATUS_CONNECTTING;
+import static cn.rong.combusis.provider.voiceroom.InviteStatusType.STATUS_NOT_INVITRED;
+import static cn.rong.combusis.provider.voiceroom.InviteStatusType.STATUS_UNDER_INVITATION;
 
 import android.content.DialogInterface;
 import android.text.TextUtils;
@@ -87,7 +90,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     private String roomId;//直播房的房间ID
     private String createUserId;//房间创建人ID
     private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
-    private InviteStatusType inviteStatusType = InviteStatusType.STATUS_NOT_INVITRED;
+    private InviteStatusType inviteStatusType = STATUS_NOT_INVITRED;
     private List<LiveRoomListener> liveRoomListeners = new ArrayList<>();
     private ConfirmDialog pickReceivedDialog;
     //麦克风是否被关闭
@@ -114,6 +117,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     public InviteStatusType getInviteStatusType() {
         return inviteStatusType;
+    }
+
+    public void setInviteStatusType(InviteStatusType inviteStatusType) {
+        this.inviteStatusType = inviteStatusType;
     }
 
     @Override
@@ -146,6 +153,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         this.roomId = null;
         this.createUserId = null;
         setCurrentStatus(STATUS_NOT_ON_SEAT);
+        setInviteStatusType(STATUS_NOT_INVITRED);
         messageList.clear();
         RCLiveEngine.getInstance().unPrepare(null);
         RCLiveEngine.getInstance().setSeatViewProvider(null);
@@ -222,13 +230,14 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
                 changeUserRoom(roomId);
                 if (callback != null)
                     callback.onResult(true, "加入房间成功");
+                Log.e(TAG, "onError: joinRoom Success:");
             }
 
             @Override
             public void onError(int code, RCLiveError error) {
                 if (callback != null)
                     callback.onResult(false, error.getMessage());
-//                EToast.showToast("加入房间失败:" + error.getMessage());
+                Log.e(TAG, "onError: joinRoom Fail:"+error.getMessage());
             }
         });
     }
@@ -247,7 +256,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onSuccess() {
                 //如果为默认模式
                 if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()){
-                    inviteStatusType=InviteStatusType.STATUS_UNDER_INVITATION;
+                    setInviteStatusType(STATUS_UNDER_INVITATION);
                 }
                 if (callback != null) callback.onResult(true, "已邀请视频连线，等待对方接受");
             }
@@ -267,7 +276,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         RCLiveEngine.getInstance().getLinkManager().cancelInvitation(userId, new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                inviteStatusType=InviteStatusType.STATUS_NOT_INVITRED;
+                setInviteStatusType(STATUS_NOT_INVITRED);
                 if (callback != null) callback.onResult(true, "撤销视频连线邀请成功");
             }
 
@@ -856,9 +865,9 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     public void onLiveVideoUpdate(List<String> lineMicUserIds) {
         if (lineMicUserIds.size() == 2 && RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
             //如果是默认连麦模式，并且已经是连麦中
-            inviteStatusType = InviteStatusType.STATUS_CONNECTTING;
+            setInviteStatusType(STATUS_CONNECTTING);
         } else {
-            inviteStatusType = InviteStatusType.STATUS_NOT_INVITRED;
+            setInviteStatusType(STATUS_NOT_INVITRED);
         }
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onLiveVideoUpdate(lineMicUserIds);
@@ -1019,7 +1028,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
      */
     @Override
     public void onliveVideoInvitationRejected(String userId) {
-        inviteStatusType=InviteStatusType.STATUS_NOT_INVITRED;
+        setInviteStatusType(STATUS_NOT_INVITRED);
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
             liveRoomListener.onliveVideoInvitationRejected(userId);
         }
@@ -1077,7 +1086,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(roomId, message.getContent());
             messageList.add(message.getContent());
         }
-        Log.e(TAG, "onReceiveMessage: ");
+        Log.e(TAG, "onReceiveMessage: "+message);
     }
 
     @Override

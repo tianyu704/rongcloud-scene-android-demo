@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +92,7 @@ import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
+import cn.rongcloud.liveroom.core.Dispatcher;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
@@ -365,23 +367,28 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     @Override
     public void changeMessageContainerHeight() {
-        int mixType = RCDataManager.get().getMixType();
-        ViewGroup.LayoutParams layoutParams = messageContainerView.getLayoutParams();
-        if (mixType == RCLiveMixType.RCMixTypeOneToOne.getValue() || mixType == RCLiveMixType.RCMixTypeOneToSix.getValue()) {
-            //如果是默认和1V6的时候，高度默认为260
-            layoutParams.height = UiUtils.INSTANCE.dp2Px(requireContext(), 260);
-            messageContainerView.setLayoutParams(layoutParams);
-        } else {
-            RCLiveView preview = RCLiveEngine.getInstance().preview();
-            if (preview != null) {
-                int realHeight = preview.getRealHeight();
-                if (realHeight>0){
-                    layoutParams.height = clLiveRoomView.getHeight() - marginTop - preview.getRealHeight()-roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
-                    messageContainerView.setLayoutParams(layoutParams);
+        Dispatcher.get().runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                int mixType = RCDataManager.get().getMixType();
+                ViewGroup.LayoutParams layoutParams = messageContainerView.getLayoutParams();
+                if (mixType == RCLiveMixType.RCMixTypeOneToOne.getValue() || mixType == RCLiveMixType.RCMixTypeOneToSix.getValue()) {
+                    //如果是默认和1V6的时候，高度默认为260
+                    layoutParams.height = UiUtils.INSTANCE.dp2Px(requireContext(), 260);
+                } else {
+                    RCLiveView preview = RCLiveEngine.getInstance().preview();
+                    if (preview != null) {
+                        int realHeight = preview.getRealHeight();
+                        if (realHeight>0){
+                            layoutParams.height = clLiveRoomView.getHeight() - marginTop - preview.getRealHeight()
+                                    -roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
+                        }
+                    }
                 }
+                messageContainerView.setLayoutParams(layoutParams);
+                Log.e(TAG, "changeMessageContainerHeight: "+messageContainerView.getHeight() );
             }
-
-        }
+        },500);
     }
 
     @Override
