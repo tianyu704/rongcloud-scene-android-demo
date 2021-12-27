@@ -24,6 +24,7 @@ import cn.rongcloud.voiceroomdemo.mvp.presenter.LoginPresenter
 import cn.rongcloud.voiceroomdemo.region.Region
 import cn.rongcloud.voiceroomdemo.region.RegionActivity
 import cn.rongcloud.voiceroomdemo.webview.ActCommentWeb
+import com.rongcloud.common.AppConfig
 import com.rongcloud.common.base.BaseActivity
 import com.rongcloud.common.extension.showToast
 import com.rongcloud.common.extension.ui
@@ -87,6 +88,12 @@ class LoginActivity : BaseActivity(), ILoginView {
         }
         tv_region.setOnClickListener {
             RegionActivity.openRegionPage(this)
+        }
+        // 国际环境才选择显示地区
+        if (AppConfig.INTERIAL) {
+            tv_region.visibility = View.VISIBLE
+        } else {
+            tv_region.visibility = View.GONE
         }
     }
 

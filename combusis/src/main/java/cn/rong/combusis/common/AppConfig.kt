@@ -4,6 +4,8 @@
 
 package com.rongcloud.common
 
+import android.text.TextUtils
+
 /**
  * @author gusd
  * @Date 2021/08/02
@@ -36,18 +38,26 @@ object AppConfig {
             return field
         }
 
+    public var INTERIAL: Boolean = false
+        private set
+        get() {
+            return field
+        }
+
     fun initConfig(
         appKey: String,
         UMAppKey: String?,
         channelName: String?,
         baseServerAddress: String,
-        businessToken: String
+        businessToken: String,
+        interial: String
     ) {
         APP_KEY = appKey
         UM_APP_KEY = UMAppKey
         CHANNEL_NAME = channelName
         BASE_SERVER_ADDRESS = baseServerAddress
         BUSINESS_TOKEN = businessToken
+        INTERIAL = TextUtils.equals("true", interial)
     }
 
 
