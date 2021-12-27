@@ -100,6 +100,7 @@ android {
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"cbb3a9f01d9fa52c0367ef8703f64327\"")
             buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
+            buildConfigField("String", "INTERIAL", "\"false\"")// 区分国内/国际 国内环境不显示UI 选择地区
             manifestPlaceholders = [APP_NAME: "@string/app_name_test"]
         }
         releaseEnvironment {
@@ -111,6 +112,7 @@ android {
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
             buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
+            buildConfigField("String", "INTERIAL", "\"false\"")
             manifestPlaceholders = [APP_NAME: "@string/app_name"]
         }
         // 国际环境
@@ -123,7 +125,8 @@ android {
             buildConfigField("String", "BUGLY_ID", "\"f3c227951e\"")
             buildConfigField("String", "MH_APP_KEY", "\"46a8c05ea8fedb279d53d9bd238637fe\"")
             buildConfigField("String", "BUSINESS_TOKEN", "\"vStHYPdrQoImm-7Ur0ks1g\"")
-            manifestPlaceholders = [APP_NAME: "@string/app_name"]
+            buildConfigField("String", "INTERIAL", "\"true\"")
+            manifestPlaceholders = [APP_NAME: "@string/app_name_interial"]
         }
     }
 }

@@ -4,6 +4,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">融云 RTC</string>
+    <string name="app_name_interial">RC RTC</string>
     <string name="app_name_test">融云 RTC-Test</string>
     <string name="please_input_phone_number">请输入手机号</string>
     <string name="please_input_verification_code">请输入验证码</string>
