@@ -8,15 +8,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/vr_shape_bottom_dialog_bg">
 
-    <cn.rong.combusis.common.ui.widget.RealtimeBlurView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:left_top_radius="20dp"
-        app:realtimeBlurRadius="21dp"
-        app:realtimeOverlayColor="#39FFFFFF"
-        app:right_top_radius="20dp"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
+<!--    <cn.rong.combusis.common.ui.widget.RealtimeBlurView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        app:left_top_radius="20dp"-->
+<!--        app:realtimeBlurRadius="21dp"-->
+<!--        app:realtimeOverlayColor="#39FFFFFF"-->
+<!--        app:right_top_radius="20dp"-->
+<!--        tools:layout_editor_absoluteX="0dp"-->
+<!--        tools:layout_editor_absoluteY="0dp" />-->
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/title"

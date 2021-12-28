@@ -39,7 +39,7 @@ public class ExitRoomPopupWindow extends PopupWindow {
                 break;
             case LIVE_VIEWER:
                 closeRoomView.setVisibility(View.GONE);
-                blurView.setOverlayColor(Color.parseColor("#CC03062F"));
+                blurView.setOverlayColor(Color.parseColor("#5C5095"));
                 break;
         }
         if (onOptionClick != null) {
