@@ -2,11 +2,14 @@ package cn.rongcloud.live.room;
 
 
 import android.content.Intent;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputFilter;
 import android.text.TextUtils;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
@@ -38,6 +41,8 @@ import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.utils.ChineseLengthFilter;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
+import cn.rong.combusis.common.utils.SoftKeyboardUtils;
+import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
@@ -94,6 +99,8 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
                             setCoverUri(result.getData().getData());
                         }
                     });
+    private GestureDetector mGestureDetector;
+    private View rl_content;
 
     public static CreateLiveRoomFragment getInstance() {
         Bundle bundle = new Bundle();
@@ -125,6 +132,14 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
     public void init() {
         mLoading = new LoadTag(requireActivity(), requireActivity().getString(cn.rong.combusis.R.string.text_creating_room));
         initView();
+        mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                SoftKeyboardUtils.hideSoftKeyboard(etRoomName);
+                return true;
+            }
+        });
+        mGestureDetector.setIsLongpressEnabled(false);
     }
 
     /**
@@ -166,6 +181,15 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
     }
 
     private void initView() {
+        rl_content = getView().findViewById(R.id.rl_content);
+        rl_content.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
+                    mGestureDetector.onTouchEvent(event);
+                return true;
+            }
+        });
         rlSettingId = (RelativeLayout) getView().findViewById(R.id.rl_setting_id);
         ivBack = (AppCompatImageView) getView().findViewById(R.id.iv_back);
         selectCoverView = (RelativeLayout) getView().findViewById(R.id.select_cover_view);
@@ -183,6 +207,7 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         ivRoomCover = (RadiusImageView) getView().findViewById(R.id.iv_room_cover);
         rlSettingId.setPadding(0, StatusBarUtil.getStatusBarHeight(requireContext()), 0, 0);
     }
+
 
     /**
      * 选择图片
