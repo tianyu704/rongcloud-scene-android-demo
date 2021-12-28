@@ -1657,6 +1657,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
                 //有人在麦位上的布局
                 TextView name = view.findViewById(R.id.tv_member_name);
+                view.setBackground(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()?null:mView.getLiveActivity().getDrawable(R.drawable.shape_live_seat_online_bg));
                 name.setVisibility(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToSix.getValue() ? View.GONE : View.VISIBLE);
                 RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
                 ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
