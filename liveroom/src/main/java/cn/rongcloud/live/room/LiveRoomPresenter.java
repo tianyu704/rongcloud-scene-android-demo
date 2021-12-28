@@ -896,7 +896,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      */
     @Override
     public void clickSendGift(User user) {
-        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(new Member().toMember(user)));
+        Member member = new Member().toMember(user);
+        int index = SeatManager.get().getIndexByUserId(user.getUserId());
+        member.setSeatIndex(index);
+        mView.showSendGiftDialog(mVoiceRoomBean, user.getUserId(), Arrays.asList(member));
     }
 
     /**
