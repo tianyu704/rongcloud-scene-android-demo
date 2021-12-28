@@ -958,11 +958,22 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public Unit invoke() {
                 //同意邀请
-                RCLiveEngine.getInstance().getLinkManager().acceptInvitation(userId, index, null);
-                if (currentStatus == STATUS_WAIT_FOR_SEAT) {
-                    //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
-                    cancelRequestSeat(null);
-                }
+                RCLiveEngine.getInstance().getLinkManager().acceptInvitation(userId, index, new RCLiveCallback() {
+                    @Override
+                    public void onSuccess() {
+                        if (currentStatus == STATUS_WAIT_FOR_SEAT) {
+                            //被邀请上麦了，并且同意了，如果该用户已经申请了上麦，那么主动撤销掉申请
+                            cancelRequestSeat(null);
+                        }
+                    }
+
+                    @Override
+                    public void onError(int code, RCLiveError error) {
+                        if (error.getCode()==80502){
+                            EToast.showToast("没有空余麦位");
+                        }
+                    }
+                });
                 return null;
             }
         }
