@@ -92,7 +92,6 @@ import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
 
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
-import cn.rongcloud.liveroom.core.Dispatcher;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
 import cn.rongcloud.liveroom.weight.RCLiveView;
@@ -367,7 +366,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
 
     @Override
     public void changeMessageContainerHeight() {
-        Dispatcher.get().runOnMainThread(new Runnable() {
+        messageContainerView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 int mixType = RCDataManager.get().getMixType();
