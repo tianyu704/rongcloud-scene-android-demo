@@ -1658,7 +1658,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 //有人在麦位上的布局
                 TextView name = view.findViewById(R.id.tv_member_name);
                 view.setBackground(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()?null:mView.getLiveActivity().getDrawable(R.drawable.shape_live_seat_online_bg));
-                name.setVisibility(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToSix.getValue() ? View.GONE : View.VISIBLE);
                 RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
                 ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
                 //根据麦位信息来判断是否开启还是关闭动画效果
@@ -1667,8 +1666,10 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
 
                 if (TextUtils.equals(seatInfo.getUserId(), getCreateUserId())) {
                     tv_gift_count.setVisibility(View.GONE);
+                    name.setVisibility(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToSix.getValue() ? View.GONE : View.VISIBLE);
                 } else {
                     tv_gift_count.setVisibility(View.VISIBLE);
+                    name.setVisibility(View.VISIBLE);
                     if (giftMap != null) {
                         String giftCount = giftMap.get(seatInfo.getUserId());
                         tv_gift_count.setText(TextUtils.isEmpty(giftCount) ? "0" : giftCount);
@@ -1768,10 +1769,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 mView.showCreatorSettingFragment(rcLiveSeatInfo);
             } else {
                 //观众端-点击的他人的麦位
-                //如果观众端为管理员的话
-                if (MemberCache.getInstance().isAdmin(AccountStore.INSTANCE.getUserId())) {
-                    mView.showMemberSettingFragment(rcLiveSeatInfo.getUserId());
-                }
+                mView.showMemberSettingFragment(rcLiveSeatInfo.getUserId());
             }
         }
     }

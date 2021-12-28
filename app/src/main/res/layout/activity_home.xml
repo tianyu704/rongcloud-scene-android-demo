@@ -182,18 +182,58 @@
                 android:textColor="@color/white"
                 android:textSize="18sp" />
         </FrameLayout>
-
         <FrameLayout
             android:id="@+id/iv_video_live"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/ic_video_live"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_video_call"
             app:layout_constraintDimensionRatio="w,225:160"
+            app:layout_constraintBottom_toBottomOf="@+id/iv_video_call"
             app:layout_constraintTop_toBottomOf="@+id/iv_audio_call"
             app:layout_constraintLeft_toLeftOf="@+id/iv_audio_call"
-            app:layout_constraintWidth_percent="0.475" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/fl_radio"
+            app:layout_constraintWidth_percent="0.475">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/ic_live_video"
+                android:orientation="vertical"
+                android:padding="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/live_video_call"
+                    android:textColor="@color/app_color_white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/live_video_des"
+                    android:textColor="@color/app_color_white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/bg4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                android:src="@drawable/ic_live_video" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="COMING\nSOON"
+                android:visibility="gone"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </FrameLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

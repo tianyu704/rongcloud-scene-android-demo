@@ -30,4 +30,7 @@
     <string name="str_check_version" tools:ignore="ExtraTranslation">检查版本</string>
     <string name="str_logout" tools:ignore="ExtraTranslation">退出登录</string>
 
+    <string name="live_video_call">视频直播</string>
+    <string name="live_video_des">视频直播间，支持高级美颜、观众连麦互动</string>
+
 </resources>
