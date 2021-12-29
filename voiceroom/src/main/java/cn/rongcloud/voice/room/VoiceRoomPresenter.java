@@ -94,7 +94,6 @@ import cn.rong.combusis.ui.room.fragment.seatsetting.SeatOperationViewPagerFragm
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
-import cn.rongcloud.rtc.core.NetworkMonitorAutoDetect;
 import cn.rongcloud.voice.R;
 import cn.rongcloud.voice.room.dialogFragment.CreatorSettingFragment;
 import cn.rongcloud.voice.room.dialogFragment.SelfSettingFragment;
@@ -150,8 +149,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
     //监听事件全部用集合管理,所有的监听事件需要在离开当前房间的时候全部取消注册
     private List<Disposable> disposableList = new ArrayList<>();
     private EmptySeatFragment emptySeatFragment;
-    private NetworkMonitorAutoDetect networkMonitorAutoDetect;
-    private boolean isNetWorkConnect;
     private boolean isInRoom;
     private String notice;
 
@@ -411,44 +408,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         setObSeatInfoChange();
         setObRoomInfoChange();
         setObShieldListener();
-        setNetWorkChangleListener();
         setObMessageListener();
-    }
-
-    /**
-     * 网络状态监听
-     */
-    private void setNetWorkChangleListener() {
-
-        networkMonitorAutoDetect = new NetworkMonitorAutoDetect(new NetworkMonitorAutoDetect.Observer() {
-            @Override
-            public void onConnectionTypeChanged(NetworkMonitorAutoDetect.ConnectionType newConnectionType) {
-                //连接网络类型发生了改变
-                Log.e(TAG, "onConnectionTypeChanged: ");
-            }
-
-            @Override
-            public void onNetworkConnect(NetworkMonitorAutoDetect.NetworkInformation networkInfo) {
-                //网络连接
-                if (isNetWorkConnect) {
-                    //说明是断网重连状态
-                    isNetWorkConnect = false;
-                    Log.e(TAG, "onNetworkConnect: " + "断网重连成功");
-                    UiSeatModel uiSeatModel = voiceRoomModel.getSeatInfoByUserId(AccountStore.INSTANCE.getUserId());
-                    if (uiSeatModel != null && uiSeatModel.getSeatStatus() == RCVoiceSeatInfo.RCSeatStatus.RCSeatStatusUsing) {
-                        //说明当前用户在本地的状态是在麦，与RTC那边做对比，如果远程显示不在麦位上了，那么本地需要重新上麦
-                        //如果远程显示也在麦位上，那么不需要做任何操作
-                    }
-                }
-            }
-
-            @Override
-            public void onNetworkDisconnect(long networkHandle) {
-                //网络断开
-                isNetWorkConnect = true;
-                Log.e(TAG, "onNetworkDisconnect: ");
-            }
-        }, ((VoiceRoomFragment) mView).requireContext());
     }
 
     /**
@@ -1089,7 +1049,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      * @param index
      */
     @Override
-    public void showSeatOperationViewPagerFragment(int index,int seatIndex) {
+    public void showSeatOperationViewPagerFragment(int index, int seatIndex) {
         SeatOperationViewPagerFragment seatOperationViewPagerFragment
                 = new SeatOperationViewPagerFragment(getRoomOwnerType());
         seatOperationViewPagerFragment.setRequestSeats(voiceRoomModel.getRequestSeats());
@@ -1276,10 +1236,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
         disposableList.clear();
         EventHelper.helper().removeRCVoiceRoomEventListener();
         EventBus.get().off(UPDATE_SHIELD, null);
-
-        if (networkMonitorAutoDetect != null) {
-            networkMonitorAutoDetect.destroy();
-        }
     }
 
     /**
