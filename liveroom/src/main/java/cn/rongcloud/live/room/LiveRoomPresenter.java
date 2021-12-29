@@ -750,11 +750,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 .subscribe(new Consumer<MessageContent>() {
                     @Override
                     public void accept(MessageContent messageContent) throws Throwable {
-                        //发送成功以后需要清除输入框和隐藏软键盘
-                        if (null != mView) {
-                            mView.clearInput();
-                            mView.hideSoftKeyboardAndIntput();
-                        }
                         //将消息显示到列表上
                         Class<? extends MessageContent> aClass = messageContent.getClass();
                         if (RCChatroomLocationMessage.class.equals(aClass) || RCChatroomVoice.class.equals(aClass)
@@ -824,8 +819,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             if (isContains) {
                 //如果是包含了敏感词'
                 mView.addMessageContent(messageContent, false);
-                mView.clearInput();
-                mView.hideSoftKeyboardAndIntput();
                 return true;
             }
         }
@@ -927,7 +920,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             welcome.setContent(String.format("欢迎来到 %s", mVoiceRoomBean.getRoomName()));
             sendMessage(welcome);
             RCChatroomLocationMessage tips = new RCChatroomLocationMessage();
-            tips.setContent("感谢使用融云 RTC 直播房，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
+            tips.setContent("感谢使用融云 RTC 视频直播，请遵守相关法规，不要传播低俗、暴力等不良信息。欢迎您把使用过程中的感受反馈给我们。");
             sendMessage(tips);
             // 广播消息
             RCChatroomEnter enter = new RCChatroomEnter();
@@ -1085,6 +1078,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
         seatOperationViewPagerFragment.setLiveLayoutSettingCallBack(this::onRCMixLayoutChange);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
+        MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
     }
 
     /**

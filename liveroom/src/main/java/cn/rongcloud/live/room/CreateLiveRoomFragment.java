@@ -2,7 +2,8 @@ package cn.rongcloud.live.room;
 
 
 import android.content.Intent;
-import android.graphics.Point;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -26,6 +27,7 @@ import com.basis.mvp.BasePresenter;
 import com.basis.net.LoadTag;
 import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
+import com.basis.net.oklib.api.body.BitmapBody;
 import com.basis.net.oklib.api.body.FileBody;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.basis.ui.BaseFragment;
@@ -36,20 +38,20 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.utils.ChineseLengthFilter;
 import cn.rong.combusis.common.utils.RealPathFromUriUtils;
 import cn.rong.combusis.common.utils.SoftKeyboardUtils;
-import cn.rong.combusis.message.RCChatroomLike;
 import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.beauty.BeautyDialogFragment;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
-import cn.rongcloud.live.helper.LiveEventHelper;
 import cn.rongcloud.live.R;
+import cn.rongcloud.live.helper.LiveEventHelper;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 import io.rong.imkit.utils.StatusBarUtil;
@@ -63,7 +65,6 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
 
     private RelativeLayout rlSettingId;
     private AppCompatImageView ivBack;
-    private RelativeLayout selectCoverView;
     private AppCompatEditText etRoomName;
     private RadioGroup rgIsPublic;
     private AppCompatRadioButton rbPrivate;
@@ -101,6 +102,15 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
                     });
     private GestureDetector mGestureDetector;
     private View rl_content;
+    private int[] themeArray = new int[]{
+            cn.rong.combusis.R.drawable.img_room_theme_1,
+            cn.rong.combusis.R.drawable.img_room_theme_2,
+            cn.rong.combusis.R.drawable.img_room_theme_3,
+            cn.rong.combusis.R.drawable.img_room_theme_4,
+            cn.rong.combusis.R.drawable.img_room_theme_5,
+            cn.rong.combusis.R.drawable.img_room_theme_6
+    };
+    private Bitmap themeBitmap;
 
     public static CreateLiveRoomFragment getInstance() {
         Bundle bundle = new Bundle();
@@ -163,7 +173,7 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
     @Override
     public void initListener() {
         //房间封面
-        selectCoverView.setOnClickListener(this::onClick);
+        ivRoomCover.setOnClickListener(this::onClick);
         //开始直播
         btnStartLive.setOnClickListener(this::onClick);
         //翻转
@@ -192,7 +202,6 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         });
         rlSettingId = (RelativeLayout) getView().findViewById(R.id.rl_setting_id);
         ivBack = (AppCompatImageView) getView().findViewById(R.id.iv_back);
-        selectCoverView = (RelativeLayout) getView().findViewById(R.id.select_cover_view);
         etRoomName = (AppCompatEditText) getView().findViewById(R.id.et_room_name);
         etRoomName.setFilters(new InputFilter[]{new ChineseLengthFilter(20)});
         rgIsPublic = (RadioGroup) getView().findViewById(R.id.rg_is_public);
@@ -206,6 +215,10 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
         tvEffects = (AppCompatTextView) getView().findViewById(R.id.tv_effects);
         ivRoomCover = (RadiusImageView) getView().findViewById(R.id.iv_room_cover);
         rlSettingId.setPadding(0, StatusBarUtil.getStatusBarHeight(requireContext()), 0, 0);
+
+        int themeId = themeArray[new Random().nextInt(themeArray.length)];
+        themeBitmap = BitmapFactory.decodeResource(getResources(), themeId);
+        ivRoomCover.setImageBitmap(themeBitmap);
     }
 
 
@@ -288,6 +301,28 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
                     mLoading.dismiss();
                 }
             });
+        } else if (themeBitmap != null) {
+            mLoading.show();
+            BitmapBody body = new BitmapBody(null, themeBitmap);
+            OkApi.bitmap(VRApi.FILE_UPLOAD, "file", body, new WrapperCallBack() {
+                @Override
+                public void onResult(Wrapper result) {
+                    String url = result.getBody().getAsString();
+                    if (result.ok() && !TextUtils.isEmpty(url)) {
+                        createRoom(roomName, VRApi.FILE_PATH + url);
+                    } else {
+                        EToast.showToast(result.getMessage());
+                        mLoading.dismiss();
+                    }
+                }
+
+                @Override
+                public void onError(int code, String msg) {
+                    super.onError(code, msg);
+                    EToast.showToast(msg);
+                    mLoading.dismiss();
+                }
+            });
         } else {
             mLoading.show();
             createRoom(roomName, "");
@@ -337,7 +372,7 @@ public class CreateLiveRoomFragment extends BaseFragment implements View.OnClick
     @Override
     public void onClick(View v) {
         int id = v.getId();
-        if (id == R.id.select_cover_view) {
+        if (id == R.id.iv_room_cover) {
             startPicSelectActivity();
         } else if (id == R.id.btn_start_live) {
             preCreateRoom();

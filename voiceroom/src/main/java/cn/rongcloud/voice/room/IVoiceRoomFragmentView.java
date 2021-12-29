@@ -48,10 +48,6 @@ public interface IVoiceRoomFragmentView extends IBaseView {
 
     void setNotice(String notice);
 
-    void clearInput();
-
-    void hideSoftKeyboardAndIntput();
-
     void showMessage(MessageContent messageContent, boolean isRefresh);
 
     void showMessageList(List<MessageContent> messageContentList, boolean isRefresh);

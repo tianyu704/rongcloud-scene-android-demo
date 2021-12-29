@@ -46,6 +46,7 @@ import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.StateUtil;
@@ -155,11 +156,6 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
             public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
                 present.sendMessage(rcChatroomLike);
             }
-
-            @Override
-            public void onSingleTap() {
-                mRoomBottomView.hideSoftKeyboardAndInput();
-            }
         });
 
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) clVoiceRoomView.getLayoutParams();
@@ -232,7 +228,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mMessageView.setLayoutManager(linearLayoutManager);
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
-        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
+        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this, RoomType.VOICE_ROOM);
         mMessageView.setAdapter(mRoomMessageAdapter);
 
         pkView = getView(R.id.pk_view);
@@ -241,11 +237,6 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         if (null == mNoticeDialog) {
             mNoticeDialog = new RoomNoticeDialog(activity);
         }
-    }
-
-    @Override
-    public void onSoftKeyboardChange(int height) {
-        mRoomBottomView.setPadding(0, 0, 0, height);
     }
 
     /**
@@ -701,17 +692,6 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         barrage.setUserName(AccountStore.INSTANCE.getUserName());
         present.sendMessage(barrage);
     }
-
-    @Override
-    public void clearInput() {
-        mRoomBottomView.clearInput();
-    }
-
-    @Override
-    public void hideSoftKeyboardAndIntput() {
-        mRoomBottomView.hideSoftKeyboardAndInput();
-    }
-
 
     /**
      * 发送私信

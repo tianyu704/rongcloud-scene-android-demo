@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 
-import com.basis.ui.BaseActivity;
 import com.basis.ui.IBasis;
 import com.kit.utils.Logger;
 
@@ -155,10 +154,9 @@ public class UIStack {
     }
 
     private void setResultForAll() {
-        for (IBasis a : ibasiss) {
-            if (a instanceof Activity) {
-                a.onNetChange();
-            }
+        Activity activity = getTopActivity();
+        if (activity instanceof IBasis) {
+            ((IBasis) activity).onNetChange();
         }
     }
 

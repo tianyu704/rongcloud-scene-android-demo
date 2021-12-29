@@ -139,6 +139,11 @@ public class WXDialog implements IDialog<WXDialog> {
     }
 
     @Override
+    public boolean isShowing() {
+        return null != dialog && dialog.isShowing();
+    }
+
+    @Override
     public WXDialog setOutsideCanceled(boolean outsideCancele) {
         if (null != dialog) dialog.setCanceledOnTouchOutside(outsideCancele);
         return this;

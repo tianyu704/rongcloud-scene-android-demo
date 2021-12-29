@@ -64,7 +64,7 @@ public class RequestSeatFragment extends BaseFragment {
     @NonNull
     @Override
     public String getTitle() {
-        return "申请连麦";
+        return "申请列表";
     }
 
     /**

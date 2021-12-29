@@ -52,7 +52,8 @@
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
             app:layout_constraintDimensionRatio="w,225:160"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/iv_video_live"
             app:layout_constraintTop_toBottomOf="@+id/iv_voice_room"
             app:layout_constraintWidth_percent="0.475">
 
@@ -87,10 +88,14 @@
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
             app:layout_constraintDimensionRatio="w,225:160"
+            app:layout_constraintBottom_toBottomOf="@+id/fl_radio"
+            app:layout_constraintTop_toBottomOf="@+id/iv_audio_call"
             app:layout_constraintLeft_toLeftOf="@+id/iv_audio_call"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/fl_radio"
-            app:layout_constraintWidth_percent="0.475">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintLeft_toRightOf="@+id/fl_radio"
+            app:layout_constraintWidth_percent="0.475"
+
+            >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -138,9 +143,9 @@
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
             app:layout_constraintDimensionRatio="w,225:160"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/fl_radio"
-            app:layout_constraintTop_toBottomOf="@+id/iv_voice_room"
+            app:layout_constraintLeft_toLeftOf="@+id/iv_video_live"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fl_radio"
             app:layout_constraintWidth_percent="0.475">
 
             <LinearLayout
@@ -188,11 +193,8 @@
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
             app:layout_constraintDimensionRatio="w,225:160"
-            app:layout_constraintBottom_toBottomOf="@+id/iv_video_call"
-            app:layout_constraintTop_toBottomOf="@+id/iv_audio_call"
-            app:layout_constraintLeft_toLeftOf="@+id/iv_audio_call"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintLeft_toRightOf="@+id/fl_radio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_voice_room"
             app:layout_constraintWidth_percent="0.475">
 
             <LinearLayout
