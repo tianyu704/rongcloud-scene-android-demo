@@ -120,7 +120,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     private RoomBottomView roomBottomView;
     private RelativeLayout rlRoomFinishedId;
     private Button btnGoBackList;
-    private FrameLayout flCreateLiveRoom;
     private boolean isCreate;
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
@@ -184,7 +183,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
             createLiveRoomFragment = CreateLiveRoomFragment.getInstance();
             createLiveRoomFragment.setCreateRoomCallBack(this);
             fragmentTransaction.replace(R.id.fl_create_live_room, createLiveRoomFragment);
-            fragmentTransaction.commit();
+            fragmentTransaction.commitAllowingStateLoss();
         }
     }
 
@@ -285,7 +284,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         roomBottomView = (RoomBottomView) getView().findViewById(R.id.room_bottom_view);
         rlRoomFinishedId = (RelativeLayout) getView().findViewById(R.id.rl_room_finished_id);
         btnGoBackList = (Button) getView().findViewById(R.id.btn_go_back_list);
-        flCreateLiveRoom = (FrameLayout) getView().findViewById(R.id.fl_create_live_room);
         clLiveRoomView.setPadding(0, StatusBarUtil.getStatusBarHeight(requireContext()), 0, 0);
 
         //弹幕消息列表
@@ -445,7 +443,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         if (createLiveRoomFragment != null && fragmentManager != null) {
             fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(createLiveRoomFragment);
-            fragmentTransaction.commit();
+            fragmentTransaction.commitAllowingStateLoss();
         }
         mRoomId = voiceRoomBean.getRoomId();
         clLiveRoomView.setVisibility(View.VISIBLE);
