@@ -30,6 +30,6 @@ public class LiveRoomListActivity extends AbsSwitchActivity {
 
     @Override
     public String[] onSetSwitchTitle() {
-        return new String[]{"直播房", "好友"};
+        return new String[]{"视频直播", "好友"};
     }
 }

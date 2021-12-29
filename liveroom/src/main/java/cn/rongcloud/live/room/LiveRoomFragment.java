@@ -47,6 +47,7 @@ import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rong.combusis.ui.OnItemClickListener;
@@ -291,7 +292,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         rvMessage = (RecyclerViewAtVP2) getView().findViewById(R.id.rv_message);
         rvMessage.setLayoutManager(new LinearLayoutManager(getContext()));
         rvMessage.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
-        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
+        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this, RoomType.LIVE_ROOM);
         rvMessage.setAdapter(mRoomMessageAdapter);
 
         roomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {

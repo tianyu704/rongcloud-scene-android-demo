@@ -46,6 +46,7 @@ import cn.rong.combusis.music.MusicDialog;
 import cn.rong.combusis.provider.user.User;
 import cn.rong.combusis.provider.user.UserProvider;
 import cn.rong.combusis.provider.voiceroom.RoomOwnerType;
+import cn.rong.combusis.provider.voiceroom.RoomType;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomBean;
 import cn.rong.combusis.provider.voiceroom.VoiceRoomProvider;
 import cn.rong.combusis.sdk.StateUtil;
@@ -227,7 +228,7 @@ public class VoiceRoomFragment extends AbsRoomFragment<VoiceRoomPresenter>
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         mMessageView.setLayoutManager(linearLayoutManager);
         mMessageView.addItemDecoration(new DefaultItemDecoration(Color.TRANSPARENT, 0, UiUtils.INSTANCE.dp2Px(getContext(), 5)));
-        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this);
+        mRoomMessageAdapter = new RoomMessageAdapter(getContext(), this, RoomType.VOICE_ROOM);
         mMessageView.setAdapter(mRoomMessageAdapter);
 
         pkView = getView(R.id.pk_view);
