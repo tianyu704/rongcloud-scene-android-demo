@@ -47,9 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import cn.rong.combusis.R;
-
 import cn.rong.combusis.EventBus;
+import cn.rong.combusis.R;
 import cn.rong.combusis.api.VRApi;
 import cn.rong.combusis.common.ui.dialog.InputPasswordDialog;
 import cn.rong.combusis.common.ui.widget.WaveView;
@@ -110,7 +109,6 @@ import cn.rongcloud.live.helper.LiveRoomListener;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
-
 import cn.rongcloud.liveroom.api.RCParamter;
 import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import cn.rongcloud.liveroom.api.error.RCLiveError;
@@ -750,11 +748,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                 .subscribe(new Consumer<MessageContent>() {
                     @Override
                     public void accept(MessageContent messageContent) throws Throwable {
-                        //发送成功以后需要清除输入框和隐藏软键盘
-                        if (null != mView) {
-                            mView.clearInput();
-                            mView.hideSoftKeyboardAndIntput();
-                        }
+
                         //将消息显示到列表上
                         Class<? extends MessageContent> aClass = messageContent.getClass();
                         if (RCChatroomLocationMessage.class.equals(aClass) || RCChatroomVoice.class.equals(aClass)
@@ -824,8 +818,6 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             if (isContains) {
                 //如果是包含了敏感词'
                 mView.addMessageContent(messageContent, false);
-                mView.clearInput();
-                mView.hideSoftKeyboardAndIntput();
                 return true;
             }
         }
@@ -1120,7 +1112,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
-    public void onUserEnter(String userId,int onlineCount) {
+    public void onUserEnter(String userId, int onlineCount) {
         mView.setOnlineCount(onlineCount);
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
@@ -1131,14 +1123,15 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param userId 用户在融云服务的唯一标识，注意：和自己的业务数据userId可能不是同一个字段
      */
     @Override
-    public void onUserExit(String userId,int onlineCount) {
+    public void onUserExit(String userId, int onlineCount) {
         mView.setOnlineCount(onlineCount);
         MemberCache.getInstance().refreshMemberData(getRoomId());
     }
 
     /**
      * 被踢出去
-     *  @param userId     被踢用户唯一标识
+     *
+     * @param userId     被踢用户唯一标识
      * @param operatorId 踢人操作的执行用户的唯一标识
      */
     @Override
@@ -1657,7 +1650,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
             } else if (!TextUtils.isEmpty(seatInfo.getUserId()) && view != null) {
                 //有人在麦位上的布局
                 TextView name = view.findViewById(R.id.tv_member_name);
-                view.setBackground(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()?null:mView.getLiveActivity().getDrawable(R.drawable.shape_live_seat_online_bg));
+                view.setBackground(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue() ? null : mView.getLiveActivity().getDrawable(R.drawable.shape_live_seat_online_bg));
                 name.setVisibility(paramter.getMixType() == RCLiveMixType.RCMixTypeOneToSix.getValue() ? View.GONE : View.VISIBLE);
                 RelativeLayout rl_mic_audio_value = view.findViewById(R.id.rl_mic_audio_value);
                 ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);

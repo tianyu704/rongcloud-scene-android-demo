@@ -46,23 +46,12 @@ public interface LiveRoomView extends IBaseView {
     void addMessageList(List<MessageContent> messageContentList, boolean isReset);
 
     /**
-     * 清空消息输入框
-     */
-    void clearInput();
-
-    /**
-     * 隐藏软键盘和底部输入框
-     */
-    void hideSoftKeyboardAndIntput();
-
-    /**
      * 设置喜欢的动画
      */
     void showLikeAnimation();
 
     /**
      * 当前用户的麦位状态
-     *
      */
     void changeStatus();
 
@@ -70,6 +59,7 @@ public interface LiveRoomView extends IBaseView {
      * 当前的连麦状态
      */
     void changeSeatOrder();
+
     /**
      * 获取fragment管理器
      *
@@ -148,18 +138,21 @@ public interface LiveRoomView extends IBaseView {
 
     /**
      * 获取连麦视图距离顶部的距离
+     *
      * @return
      */
     int getMarginTop();
 
     /**
      * 显示人员设置弹窗
+     *
      * @param userId
      */
     void showMemberSettingFragment(String userId);
 
     /**
      * 主播点击自己的麦位
+     *
      * @param rcLiveSeatInfo
      */
     void showCreatorSettingFragment(RCLiveSeatInfo rcLiveSeatInfo);
@@ -171,6 +164,7 @@ public interface LiveRoomView extends IBaseView {
 
     /**
      * 切换到其他房间
+     *
      * @param roomId
      */
     void switchOtherRoom(String roomId);
@@ -189,4 +183,5 @@ public interface LiveRoomView extends IBaseView {
      * 动态修改 messageList的高度
      */
     void changeMessageContainerHeight();
+
 }

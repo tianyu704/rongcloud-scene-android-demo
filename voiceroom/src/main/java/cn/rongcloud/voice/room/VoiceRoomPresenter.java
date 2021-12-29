@@ -864,8 +864,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
             if (isContains) {
                 //如果是包含了敏感词'
                 mView.showMessage(messageContent, false);
-                mView.clearInput();
-                mView.hideSoftKeyboardAndIntput();
                 return;
             }
         }
@@ -873,10 +871,6 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
                 , new Function1<Integer, Unit>() {
                     @Override
                     public Unit invoke(Integer integer) {
-                        if (null != mView) {// fix：悬浮框 同意pk崩溃
-                            mView.clearInput();
-                            mView.hideSoftKeyboardAndIntput();
-                        }
                         EventHelper.helper().addMessage(messageContent);
                         if (messageContent instanceof RCChatroomAdmin) {
                             //发送成功，回调给接收的地方，统一去处理，避免多个地方处理 通知刷新管理员信息
