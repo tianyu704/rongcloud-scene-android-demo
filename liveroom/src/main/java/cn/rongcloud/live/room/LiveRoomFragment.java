@@ -60,6 +60,7 @@ import cn.rong.combusis.ui.room.dialog.shield.ShieldDialog;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.fragment.MemberListFragment;
 import cn.rong.combusis.ui.room.fragment.MemberSettingFragment;
+import cn.rong.combusis.ui.room.fragment.RoomVideoSettingFragment;
 import cn.rong.combusis.ui.room.fragment.gift.GiftFragment;
 import cn.rong.combusis.ui.room.fragment.roomsetting.IFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomBeautyFun;
@@ -75,7 +76,6 @@ import cn.rong.combusis.ui.room.fragment.roomsetting.RoomShieldFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomSpecialEffectsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomTagsFun;
 import cn.rong.combusis.ui.room.fragment.roomsetting.RoomVideoSetFun;
-import cn.rong.combusis.ui.room.fragment.RoomVideoSettingFragment;
 import cn.rong.combusis.ui.room.model.Member;
 import cn.rong.combusis.ui.room.widget.AllBroadcastView;
 import cn.rong.combusis.ui.room.widget.GiftAnimationView;
@@ -83,14 +83,13 @@ import cn.rong.combusis.ui.room.widget.RecyclerViewAtVP2;
 import cn.rong.combusis.ui.room.widget.RoomBottomView;
 import cn.rong.combusis.ui.room.widget.RoomTitleBar;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
+import cn.rongcloud.live.R;
 import cn.rongcloud.live.fragment.LiveRoomCreatorSettingFragment;
 import cn.rongcloud.live.fragment.LiveRoomHangUpFragment;
 import cn.rongcloud.live.fragment.LiveRoomUnIninviteVideoFragment;
 import cn.rongcloud.live.helper.LiveEventHelper;
-import cn.rongcloud.live.R;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
-
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.liveroom.manager.SeatManager;
@@ -202,11 +201,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         }
     }
 
-    @Override
-    public void onSoftKeyboardChange(int height) {
-        roomBottomView.setPadding(0, 0, 0, height);
-    }
-
     /**
      * 加入房间，初次进入和切换房间的时候
      */
@@ -272,11 +266,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                     present.sendMessage(rcChatroomLike, false);
                 }
             }
-
-            @Override
-            public void onSingleTap() {
-                roomBottomView.hideSoftKeyboardAndInput();
-            }
         });
         clLiveRoomView = (ConstraintLayout) getView().findViewById(R.id.cl_live_room_view);
         roomTitleBar = (RoomTitleBar) getView().findViewById(R.id.room_title_bar);
@@ -284,7 +273,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         tvNotice.post(new Runnable() {
             @Override
             public void run() {
-                marginTop = (int) (tvNotice.getY() + tvNotice.getHeight() + UiUtils.INSTANCE.dp2Px(requireContext(),8));
+                marginTop = (int) (tvNotice.getY() + tvNotice.getHeight() + UiUtils.INSTANCE.dp2Px(requireContext(), 8));
             }
         });
         tvGiftCount = (TextView) getView().findViewById(R.id.tv_gift_count);
@@ -378,16 +367,16 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
                     RCLiveView preview = RCLiveEngine.getInstance().preview();
                     if (preview != null) {
                         int realHeight = preview.getRealHeight();
-                        if (realHeight>0){
+                        if (realHeight > 0) {
                             layoutParams.height = clLiveRoomView.getHeight() - marginTop - preview.getRealHeight()
-                                    -roomBottomView.getHeight()-UiUtils.INSTANCE.dp2Px(requireContext(),12);
+                                    - roomBottomView.getHeight() - UiUtils.INSTANCE.dp2Px(requireContext(), 12);
                         }
                     }
                 }
                 messageContainerView.setLayoutParams(layoutParams);
-                Log.e(TAG, "changeMessageContainerHeight: "+messageContainerView.getHeight() );
+                Log.e(TAG, "changeMessageContainerHeight: " + messageContainerView.getHeight());
             }
-        },500);
+        }, 500);
     }
 
     @Override
@@ -809,16 +798,6 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         if (count > 0) {
             rvMessage.smoothScrollToPosition(count - 1);
         }
-    }
-
-    @Override
-    public void clearInput() {
-        roomBottomView.clearInput();
-    }
-
-    @Override
-    public void hideSoftKeyboardAndIntput() {
-        roomBottomView.hideSoftKeyboardAndInput();
     }
 
     @Override

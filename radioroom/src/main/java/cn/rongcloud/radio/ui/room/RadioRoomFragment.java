@@ -158,11 +158,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
     }
 
     @Override
-    public void onSoftKeyboardChange(int height) {
-        mRoomBottomView.setPadding(0, 0, 0, height);
-    }
-
-    @Override
     public void initListener() {
         super.initListener();
         btnGoBackList.setOnClickListener(this::onClick);
@@ -170,11 +165,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
             @Override
             public void onSendLikeMessage(RCChatroomLike rcChatroomLike) {
                 present.sendMessage(rcChatroomLike);
-            }
-
-            @Override
-            public void onSingleTap() {
-                mRoomBottomView.hideSoftKeyboardAndInput();
             }
         });
         mRoomTitleBar.setOnMenuClickListener().subscribe(new Consumer() {
@@ -265,11 +255,6 @@ public class RadioRoomFragment extends AbsRoomFragment<RadioRoomPresenter> imple
         if (count > 0) {
             mMessageView.smoothScrollToPosition(count - 1);
         }
-    }
-
-    @Override
-    public void clearInput() {
-        mRoomBottomView.clearInput();
     }
 
     @Override
