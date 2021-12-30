@@ -7,6 +7,7 @@ import static cn.rong.combusis.sdk.Api.EVENT_KICK_OUT_OF_SEAT;
 import static cn.rong.combusis.sdk.Api.EVENT_REJECT_MANAGE_PICK;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_AGREE;
 import static cn.rong.combusis.sdk.Api.EVENT_REQUEST_SEAT_REFUSE;
+import static cn.rong.combusis.sdk.Api.EVENT_ROOM_CLOSE;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -192,6 +193,11 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     @Override
     public void onRoomKVReady() {
 
+    }
+
+    @Override
+    public void onRoomDestroy() {
+        roomEventSubject.onNext(new Pair(EVENT_ROOM_CLOSE, new ArrayList<>()));
     }
 
     @Override

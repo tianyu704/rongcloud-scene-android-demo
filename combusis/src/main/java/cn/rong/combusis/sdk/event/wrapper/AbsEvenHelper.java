@@ -340,6 +340,13 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         }
     }
 
+    @Override
+    public void onRoomDestroy() {
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onRoomDestroy();
+        }
+    }
+
     /**
      * 当前用户被抱上麦回调
      *
