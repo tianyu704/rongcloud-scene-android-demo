@@ -41,6 +41,7 @@ import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rong.combusis.ui.room.model.MemberCache;
 import cn.rong.combusis.widget.miniroom.MiniRoomManager;
 import cn.rong.combusis.widget.miniroom.OnCloseMiniRoomListener;
+import cn.rongcloud.live.room.LiveRoomKvKey;
 import cn.rongcloud.liveroom.api.RCHolder;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.api.RCLiveMixType;
@@ -54,7 +55,6 @@ import cn.rongcloud.liveroom.api.interfaces.RCLiveLinkListener;
 import cn.rongcloud.liveroom.api.interfaces.RCLiveSeatListener;
 import cn.rongcloud.liveroom.api.model.RCLiveSeatInfo;
 import cn.rongcloud.liveroom.api.model.RCLivevideoFinishReason;
-import cn.rongcloud.live.room.LiveRoomKvKey;
 import cn.rongcloud.liveroom.manager.RCDataManager;
 import cn.rongcloud.rtc.base.RCRTCVideoFrame;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -86,7 +86,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     private String TAG = "LiveEventHelper";
 
-    private List<MessageContent> messageList;
+    private List<MessageContent> messageList = new ArrayList<>();
     private String roomId;//直播房的房间ID
     private String createUserId;//房间创建人ID
     private CurrentStatusType currentStatus = STATUS_NOT_ON_SEAT;
@@ -126,7 +126,6 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     @Override
     public void register(String roomId) {
         this.roomId = roomId;
-        this.messageList = new ArrayList<>();
         RCLiveEngine.getInstance().setLiveEventListener(this);
         RCLiveEngine.getInstance().getLinkManager().setLiveLinkListener(this);
         RCLiveEngine.getInstance().getSeatManager().setLiveSeatListener(this);
@@ -237,7 +236,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             public void onError(int code, RCLiveError error) {
                 if (callback != null)
                     callback.onResult(false, error.getMessage());
-                Log.e(TAG, "onError: joinRoom Fail:"+error.getMessage());
+                Log.e(TAG, "onError: joinRoom Fail:" + error.getMessage());
             }
         });
     }
@@ -255,7 +254,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public void onSuccess() {
                 //如果为默认模式
-                if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()){
+                if (RCDataManager.get().getMixType() == RCLiveMixType.RCMixTypeOneToOne.getValue()) {
                     setInviteStatusType(STATUS_UNDER_INVITATION);
                 }
                 if (callback != null) callback.onResult(true, "已邀请视频连线，等待对方接受");
@@ -435,12 +434,12 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
         RCLiveEngine.getInstance().getSeatManager().enableAudio(index, !isMute, new RCLiveCallback() {
             @Override
             public void onSuccess() {
-                if (callback!=null) callback.onResult(true,"关闭麦克风成功");
+                if (callback != null) callback.onResult(true, "关闭麦克风成功");
             }
 
             @Override
             public void onError(int code, RCLiveError error) {
-                if (callback!=null) callback.onResult(true,"关闭麦克风失败");
+                if (callback != null) callback.onResult(true, "关闭麦克风失败");
             }
         });
     }
@@ -819,11 +818,10 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     }
 
 
-
     @Override
     public void onUserEnter(String userId, int onlineCount) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onUserEnter(userId,onlineCount);
+            liveRoomListener.onUserEnter(userId, onlineCount);
         }
         Log.e(TAG, "onUserEnter: " + userId);
     }
@@ -831,7 +829,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
     @Override
     public void onUserExit(String userId, int onlineCount) {
         for (LiveRoomListener liveRoomListener : liveRoomListeners) {
-            liveRoomListener.onUserExit(userId,onlineCount);
+            liveRoomListener.onUserExit(userId, onlineCount);
         }
         Log.e(TAG, "onUserExit: " + userId);
     }
@@ -839,6 +837,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     /**
      * 用户被踢出房间
+     *
      * @param userId     被踢用户唯一标识
      * @param operatorId 踢人操作的执行用户的唯一标识
      */
@@ -969,7 +968,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
                     @Override
                     public void onError(int code, RCLiveError error) {
-                        if (error.getCode()==80502){
+                        if (error.getCode() == 80502) {
                             EToast.showToast("没有空余麦位");
                         }
                     }
@@ -1097,7 +1096,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             RCChatRoomMessageManager.INSTANCE.onReceiveMessage(roomId, message.getContent());
             messageList.add(message.getContent());
         }
-        Log.e(TAG, "onReceiveMessage: "+message);
+        Log.e(TAG, "onReceiveMessage: " + message);
     }
 
     @Override

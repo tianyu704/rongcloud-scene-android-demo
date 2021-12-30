@@ -205,7 +205,7 @@ public class RoomVideoSettingFragment extends BaseBottomSheetDialogFragment {
         if (videoFps == RCRTCParamsType.RCRTCVideoFps.Fps_10 || videoFps == RCRTCParamsType.RCRTCVideoFps.Fps_15) {
             tvCodeRate.setText(codeRate + "kbps");
         } else {
-            tvCodeRate.setText(codeRate * 1.5 + "kbps");
+            tvCodeRate.setText((int) (codeRate * 1.5) + "kbps");
         }
     }
 

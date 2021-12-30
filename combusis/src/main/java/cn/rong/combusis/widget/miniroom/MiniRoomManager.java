@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -20,10 +19,8 @@ import com.yhao.floatwindow.MoveType;
 import com.yhao.floatwindow.Screen;
 import com.yhao.floatwindow.ViewStateListener;
 
-
 import cn.rong.combusis.R;
 import cn.rong.combusis.common.ui.widget.WaveView;
-import cn.rong.combusis.sdk.event.wrapper.EToast;
 import cn.rongcloud.liveroom.api.RCLiveEngine;
 import cn.rongcloud.liveroom.weight.RCLiveView;
 
@@ -97,11 +94,11 @@ public class MiniRoomManager implements OnMiniRoomListener {
         this.onCloseMiniRoomListener = onCloseMiniRoomListener;
         miniWindows = LayoutInflater.from(context.getApplicationContext()).inflate(R.layout.view_live_room_mini, null);
         RelativeLayout relativeLayout = miniWindows.findViewById(R.id.fl_content_id);
-        View view_close=miniWindows.findViewById(R.id.iv_close_id);
+        View view_close = miniWindows.findViewById(R.id.iv_close_id);
         view_close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish("",null);
+                finish("", null);
             }
         });
         // 这里改成DP值
@@ -110,10 +107,8 @@ public class MiniRoomManager implements OnMiniRoomListener {
         if (parent instanceof ViewGroup) {
             ((ViewGroup) parent).removeAllViews();
         }
-        FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        rcLiveView.setLayoutParams(layoutParams);
-        rcLiveView.setDevTop(UiUtils.INSTANCE.dp2Px(context, 20));
+
+        rcLiveView.setDevTop(0);
         relativeLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
