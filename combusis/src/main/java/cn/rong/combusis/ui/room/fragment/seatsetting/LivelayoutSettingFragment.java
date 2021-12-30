@@ -62,7 +62,7 @@ public class LivelayoutSettingFragment extends BaseFragment {
                 //回传给界面，让界面去设置
                 getSeatOperationViewPagerFragment().dismiss();
                 if (getSeatOperationViewPagerFragment().getLiveLayoutSettingCallBack()!=null) {
-                    getSeatOperationViewPagerFragment().getLiveLayoutSettingCallBack().onRCMixLayoutChange(rcLiveMixTypes.get(position));
+                    getSeatOperationViewPagerFragment().getLiveLayoutSettingCallBack().setupMixType(rcLiveMixTypes.get(position));
                 }
             }
         });
