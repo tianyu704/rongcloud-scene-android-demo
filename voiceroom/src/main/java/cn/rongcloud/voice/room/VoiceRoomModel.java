@@ -195,6 +195,11 @@ public class VoiceRoomModel extends BaseModel<VoiceRoomPresenter> implements RCV
     }
 
     @Override
+    public void onRoomDestroy() {
+
+    }
+
+    @Override
     public void onRoomInfoUpdate(RCVoiceRoomInfo rcVoiceRoomInfo) {
         Log.e(TAG, "onRoomInfoUpdate: ");
         currentUIRoomInfo.setRcRoomInfo(rcVoiceRoomInfo);

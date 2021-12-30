@@ -252,7 +252,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                                 VoiceRoomApi.getApi().quitPK(new IResultBack<Boolean>() {
                                     @Override
                                     public void onResult(Boolean aBoolean) {
-                                        if (!aBoolean) KToast.show("PK结束失败");
+//                                        if (!aBoolean) KToast.show("PK结束失败");
                                     }
                                 });
                             }
@@ -467,7 +467,7 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
                     @Override
                     public void onResult(Boolean aBoolean) {
                         // 兼容ios 调整两端都结束 避免一端异常
-                        if (!aBoolean) KToast.show("PK结束失败");
+//                        if (!aBoolean) KToast.show("PK结束失败");
                     }
                 });
             } else {

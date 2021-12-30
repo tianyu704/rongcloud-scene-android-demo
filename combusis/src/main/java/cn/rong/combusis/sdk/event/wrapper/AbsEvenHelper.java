@@ -340,6 +340,24 @@ public abstract class AbsEvenHelper implements IEventHelp, RCVoiceRoomEventListe
         }
     }
 
+    @Override
+    public void onRoomDestroy() {
+        if (rcVoiceRoomEventListener != null) {
+            rcVoiceRoomEventListener.onRoomDestroy();
+        }
+        ConfirmDialog confirmDialog = new ConfirmDialog(UIStack.getInstance().getTopActivity(), "当前直播已结束", true
+                , "确定", "", null, new Function0<Unit>() {
+            @Override
+            public Unit invoke() {
+                VoiceRoomApi.getApi().leaveRoom(null);
+                unregeister();
+                return null;
+            }
+        });
+        confirmDialog.setCancelable(false);
+        confirmDialog.show();
+    }
+
     /**
      * 当前用户被抱上麦回调
      *
