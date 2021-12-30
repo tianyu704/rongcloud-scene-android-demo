@@ -1076,7 +1076,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         seatOperationViewPagerFragment.setInviteSeats(inviteSeats);
         seatOperationViewPagerFragment.setInviteSeatIndex(seatIndex);
         seatOperationViewPagerFragment.setSeatActionClickListener(LiveRoomPresenter.this);
-        seatOperationViewPagerFragment.setLiveLayoutSettingCallBack(this::onRCMixLayoutChange);
+        seatOperationViewPagerFragment.setLiveLayoutSettingCallBack(this::setupMixType);
         seatOperationViewPagerFragment.show(mView.getLiveFragmentManager());
         MemberCache.getInstance().fetchData(mVoiceRoomBean.getRoomId());
     }
@@ -1443,7 +1443,7 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
      * @param rcLiveMixType
      */
     @Override
-    public void onRCMixLayoutChange(RCLiveMixType rcLiveMixType) {
+    public void setupMixType(RCLiveMixType rcLiveMixType) {
         Log.e(TAG, "onRCMixLayoutChange: " + rcLiveMixType);
         RCLiveView videoView = RCLiveEngine.getInstance().preview();
         if (rcLiveMixType == RCLiveMixType.RCMixTypeOneToOne) {

@@ -447,7 +447,7 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
 
     @Override
     public void kickUserFromRoom(User user, ClickCallback<Boolean> callback) {
-        RCLiveEngine.getInstance().kictOutRoom(user.getUserId(), new RCLiveCallback() {
+        RCLiveEngine.getInstance().kickOutRoom(user.getUserId(), new RCLiveCallback() {
             @Override
             public void onSuccess() {
                 if (callback != null) callback.onResult(true, "踢出成功");
@@ -456,6 +456,21 @@ public class LiveEventHelper implements ILiveEventHelper, RCLiveEventListener, R
             @Override
             public void onError(int code, RCLiveError error) {
                 if (callback != null) callback.onResult(false, error.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void pickUpSeat(int targetIndex, String userId, RCLiveCallback callback) {
+        RCLiveEngine.getInstance().pickUpSeat(targetIndex, userId, new RCLiveCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(int code, RCLiveError error) {
+
             }
         });
     }

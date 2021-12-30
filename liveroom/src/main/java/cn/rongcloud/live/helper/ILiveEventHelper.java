@@ -8,6 +8,7 @@ import cn.rong.combusis.provider.voiceroom.CurrentStatusType;
 import cn.rong.combusis.sdk.event.listener.LeaveRoomCallBack;
 import cn.rong.combusis.ui.room.fragment.ClickCallback;
 import cn.rongcloud.liveroom.api.RCHolder;
+import cn.rongcloud.liveroom.api.callback.RCLiveCallback;
 import io.rong.imlib.model.MessageContent;
 
 /**
@@ -131,6 +132,11 @@ public interface ILiveEventHelper {
      * @param callback
      */
     void kickUserFromSeat(User user, ClickCallback<Boolean> callback);
+
+    /**
+     * 抱上麦位
+     */
+    void pickUpSeat(int targetIndex,String userId, RCLiveCallback callback);
 
     /**
      * 更改所属于房间
