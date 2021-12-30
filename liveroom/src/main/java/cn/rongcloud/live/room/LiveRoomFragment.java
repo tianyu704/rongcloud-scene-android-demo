@@ -752,7 +752,7 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
     @Override
     public void setRoomData(VoiceRoomBean voiceRoomBean) {
         clLiveRoomView.setVisibility(View.VISIBLE);
-        flLiveView.setVisibility(View.VISIBLE);
+        flLiveView.setVisibility(View.INVISIBLE);
         rlRoomFinishedId.setVisibility(View.GONE);
         // 设置title数据
         User createUser = voiceRoomBean.getCreateUser();
@@ -870,7 +870,11 @@ public class LiveRoomFragment extends AbsRoomFragment<LiveRoomPresenter>
         } else {
             videoView.setDevTop(marginTop);
         }
+        flLiveView.setVisibility(View.INVISIBLE);
         videoView.attachParent(flLiveView, null);
+        flLiveView.postDelayed(() -> {
+            flLiveView.setVisibility(View.VISIBLE);
+        }, 400);
         changeMessageContainerHeight();
     }
 
