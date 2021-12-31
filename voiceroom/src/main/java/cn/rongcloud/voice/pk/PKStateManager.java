@@ -388,6 +388,8 @@ public class PKStateManager implements IPKState, EventBus.EventCallback, DialogI
     void handlePKStart() {
         Logger.e(TAG, "PK Start");
         if (null != stateListener) stateListener.onPkStart();
+        // pk 开始后隐藏邀请界面
+        if (dialog != null) dialog.dismiss();
         // 首次刷新pk信息
         PKApi.getPKInfo(roomId, new IResultBack<PKResult>() {
             @Override
