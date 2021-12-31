@@ -31,6 +31,7 @@ import com.jakewharton.rxbinding4.view.RxView;
 import com.kit.UIKit;
 import com.kit.utils.KToast;
 import com.kit.utils.Logger;
+import com.kit.utils.ScreenUtil;
 import com.kit.wapper.IResultBack;
 import com.rongcloud.common.utils.AccountStore;
 import com.rongcloud.common.utils.ImageLoaderUtil;
@@ -1346,9 +1347,9 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
                             new MutableLiveData<>(new RoomTagsFun(0)),
                             new MutableLiveData<>(new RoomBeautyFun(0)),
                             new MutableLiveData<>(new RoomBeautyMakeUpFun(0)),
+                            new MutableLiveData<>(new RoomSpecialEffectsFun(0)),
                             new MutableLiveData<>(new RoomSeatModeFun
                                     (TextUtils.equals(mode, LiveRoomKvKey.EnterSeatMode.LIVE_ROOM_FreeEnterSeat) ? 1 : 0)),
-                            new MutableLiveData<>(new RoomSpecialEffectsFun(0)),
                             new MutableLiveData<>(new RoomMusicFun(0)),
                             new MutableLiveData<>(new RoomVideoSetFun(0))
                     );
@@ -1499,7 +1500,8 @@ public class LiveRoomPresenter extends BasePresenter<LiveRoomView> implements
         view.setLayoutParams(layoutParams);
         ImageView imageView = view.findViewById(R.id.iv_room_creator_portrait);
         WaveView waveView = view.findViewById(R.id.wv_creator_background);
-        setViewLayoutParams(imageView, seatWidth / 3, seatHeight / 3);
+        int width=seatWidth*2/5>ScreenUtil.getScreemWidth()/6?ScreenUtil.getScreemWidth()/6:seatWidth*2/5;
+        setViewLayoutParams(imageView, width, width);
         setViewLayoutParams(waveView, seatWidth, seatHeight);
         return view;
     }

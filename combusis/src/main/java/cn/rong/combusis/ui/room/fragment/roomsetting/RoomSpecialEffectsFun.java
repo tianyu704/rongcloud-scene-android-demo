@@ -16,7 +16,7 @@ public class RoomSpecialEffectsFun extends IFun.BaseFun {
 
     @Override
     public int getIcon() {
-        return R.drawable.ic_room_setting_beauty;
+        return R.drawable.ic_room_setting_effects;
     }
 
     @Override

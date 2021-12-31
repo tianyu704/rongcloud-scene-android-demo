@@ -9,14 +9,13 @@
         android:id="@+id/iv_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="1dp"
         android:scaleType="centerCrop"
         android:background="@color/white"
         />
     <RelativeLayout
         android:id="@+id/rl_mic_audio_value"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,9 +25,10 @@
 
         <cn.rong.combusis.common.ui.widget.WaveView
             android:id="@+id/wv_creator_background"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:init_radius="40dp"
+            android:layout_centerInParent="true"
             app:wave_color="@color/color_speaking_bg" />
 
         <de.hdodenhof.circleimageview.CircleImageView
