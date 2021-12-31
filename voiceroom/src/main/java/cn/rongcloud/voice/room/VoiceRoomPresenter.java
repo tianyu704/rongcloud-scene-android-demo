@@ -1140,7 +1140,7 @@ public class VoiceRoomPresenter extends BasePresenter<IVoiceRoomFragmentView> im
      */
     public void closeRoom() {
         mView.showLoading("正在关闭房间");
-        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null);
+//        RCVoiceRoomEngine.getInstance().notifyVoiceRoom(EVENT_ROOM_CLOSE, "", null);
         EventHelper.helper().leaveRoom(new LeaveRoomCallBack() {
             @Override
             public void onSuccess() {
