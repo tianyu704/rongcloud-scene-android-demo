@@ -36,6 +36,8 @@ public class RequestSeatFragment extends BaseFragment {
     private RecyclerView rvList;
     private ArrayList<User> requestSeats;
     private RequestSeatAdapter requestSeatAdapter;
+    private ImageView ivEmpty;
+    private TextView tvEmpty;
 
     public RequestSeatFragment(ArrayList<User> requestSeats) {
         super(R.layout.layout_list);
@@ -44,12 +46,15 @@ public class RequestSeatFragment extends BaseFragment {
 
     @Override
     public void initView() {
+        ivEmpty = (ImageView) getView().findViewById(R.id.iv_empty);
+        tvEmpty = (TextView) getView().findViewById(R.id.tv_empty);
         rvList = getView().findViewById(R.id.rv_list);
         rvList.setLayoutManager(new LinearLayoutManager(getContext()));
         requestSeatAdapter = new RequestSeatAdapter(R.layout.item_seat_layout);
         requestSeatAdapter.setDiffCallback(new DIffUserCallBack());
         rvList.setAdapter(requestSeatAdapter);
         requestSeatAdapter.setNewInstance(requestSeats);
+        checkEmpty(requestSeats);
     }
 
     /**
@@ -74,6 +79,20 @@ public class RequestSeatFragment extends BaseFragment {
      */
     public void refreshData(List<User> uiMemberModels) {
         if (requestSeatAdapter != null) requestSeatAdapter.setList(uiMemberModels);
+        checkEmpty(uiMemberModels);
+    }
+
+    private void checkEmpty(List<User> users) {
+        if (ivEmpty == null || tvEmpty == null) {
+            return;
+        }
+        if (users != null && users.size() > 0) {
+            ivEmpty.setVisibility(View.GONE);
+            tvEmpty.setVisibility(View.GONE);
+        } else {
+            ivEmpty.setVisibility(View.VISIBLE);
+            tvEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     class RequestSeatAdapter extends BaseQuickAdapter<User, BaseViewHolder> {

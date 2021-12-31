@@ -32,9 +32,11 @@ import kotlin.Unit;
 public class InviteSeatFragment extends BaseFragment {
 
     private RecyclerView rvList;
+    private ImageView ivEmpty;
+    private TextView tvEmpty;
     private ArrayList<User> inviteSeats;
     private InviteSeatAdapter inviteSeatAdapter;
-    private int seatIndex=-1;
+    private int seatIndex = -1;
 
     public InviteSeatFragment(ArrayList<User> inviteSeats) {
         super(R.layout.layout_list);
@@ -43,11 +45,14 @@ public class InviteSeatFragment extends BaseFragment {
 
     @Override
     public void initView() {
+        ivEmpty = (ImageView) getView().findViewById(R.id.iv_empty);
+        tvEmpty = (TextView) getView().findViewById(R.id.tv_empty);
         rvList = getView().findViewById(R.id.rv_list);
         rvList.setLayoutManager(new LinearLayoutManager(getContext()));
         inviteSeatAdapter = new InviteSeatAdapter(R.layout.item_seat_layout);
         rvList.setAdapter(inviteSeatAdapter);
         inviteSeatAdapter.setNewInstance(inviteSeats);
+        checkEmpty(inviteSeats);
     }
 
     @NonNull
@@ -72,10 +77,24 @@ public class InviteSeatFragment extends BaseFragment {
      */
     public void refreshData(List<User> uiMemberModels) {
         if (inviteSeatAdapter != null) inviteSeatAdapter.setList(uiMemberModels);
+        checkEmpty(uiMemberModels);
+    }
+
+    private void checkEmpty(List<User> users) {
+        if (ivEmpty == null || tvEmpty == null) {
+            return;
+        }
+        if (users != null && users.size() > 0) {
+            ivEmpty.setVisibility(View.GONE);
+            tvEmpty.setVisibility(View.GONE);
+        } else {
+            ivEmpty.setVisibility(View.VISIBLE);
+            tvEmpty.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setInviteSeatIndex(int seatIndex) {
-        this.seatIndex=seatIndex;
+        this.seatIndex = seatIndex;
     }
 
 
