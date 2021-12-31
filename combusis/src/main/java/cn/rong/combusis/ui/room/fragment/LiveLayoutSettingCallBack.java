@@ -10,5 +10,5 @@ import cn.rongcloud.liveroom.api.RCLiveMixType;
  */
 public interface LiveLayoutSettingCallBack {
 
-    void onRCMixLayoutChange(RCLiveMixType rcLiveMixType);
+    void setupMixType(RCLiveMixType rcLiveMixType);
 }

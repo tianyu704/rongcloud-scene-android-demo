@@ -10,9 +10,7 @@ import com.basis.net.oklib.OkApi;
 import com.basis.net.oklib.WrapperCallBack;
 import com.basis.net.oklib.wrapper.Wrapper;
 import com.kit.utils.KToast;
-import com.kit.utils.Logger;
 import com.kit.utils.ResUtil;
-import com.kit.utils.SystemUtil;
 import com.rongcloud.common.net.ApiConstant;
 
 import java.lang.ref.WeakReference;
@@ -21,6 +19,7 @@ import java.util.Map;
 
 import cn.rong.combusis.VRCenterDialog;
 import cn.rong.combusis.common.utils.UIKit;
+import cn.rongcloud.voiceroomdemo.BuildConfig;
 import cn.rongcloud.voiceroomdemo.R;
 
 public class VersionHelper {
@@ -55,22 +54,27 @@ public class VersionHelper {
 
     static boolean isUpdate(String lastVersionName) {
         try {
-            lastVersionName = lastVersionName.replaceAll("\\.", "");
-            int lastVersion = Integer.parseInt(lastVersionName);
-            String verStr = SystemUtil.getVerName();
-            int current = Integer.parseInt(verStr.replaceAll("\\.", ""));
-            // 对齐位数: 2.0.1 和 2.1 对比的问题
-            int ll = String.valueOf(lastVersion).length();
-            int cl = String.valueOf(current).length();
-            int dv = ll - cl;
-            if (dv < 0) {
-                lastVersion = lastVersion * (int) Math.pow(10, Math.abs(dv));
-            } else {
-                current = current * (int) Math.pow(10, Math.abs(dv));
+            String[] lastArray = lastVersionName.split("\\.");
+            String[] currentArray = BuildConfig.VERSION_NAME.split("\\.");
+            int size = Math.max(lastArray.length, currentArray.length);
+            int l, c = 0;
+            for (int i = 0; i < size; i++) {
+                try {
+                    l = Integer.parseInt(lastArray[i]);
+                } catch (IndexOutOfBoundsException | NumberFormatException e) {
+                    l = 0;
+                }
+                try {
+                    c = Integer.parseInt(currentArray[i]);
+                } catch (IndexOutOfBoundsException | NumberFormatException e) {
+                    c = 0;
+                }
+                if (l > c) {
+                    return true;
+                } else if (l < c) {
+                    return false;
+                }
             }
-            Logger.e(TAG, "lastVersionName = " + lastVersionName + " versionName = " + verStr);
-            Logger.e(TAG, "lastVersion = " + lastVersion + " version = " + current);
-            return current < lastVersion;
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
